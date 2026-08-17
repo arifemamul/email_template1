@@ -4,7 +4,7 @@ Bengali text handling and crossword placement, mirroring the game's own logic.
 
 These two algorithms exist three times: here, in `logic/BanglaText.kt` +
 `logic/CrosswordGenerator.kt` for Android, and in the `<script>` of `docs/index.html` for the
-web. That is deliberate — the authoring tools have to reason about levels exactly the way the
+web. That is deliberate - the authoring tools have to reason about levels exactly the way the
 game will lay them out, or a level can validate here and break on a phone.
 
 The three copies are kept honest by regenerating both builds from `catalogue.py` and then
@@ -27,8 +27,8 @@ COMBINING = frozenset([
 
 def split_aksharas(word):
     """
-    Split a word into aksharas — the letter units a Bengali reader sees, and what the game
-    puts on a tile. মাছ is two units (মা · ছ); বন্ধু is two (ব · ন্ধু).
+    Split a word into aksharas - the letter units a Bengali reader sees, and what the game
+    puts on a tile. মাছ is two units (মা + ছ); বন্ধু is two (ব + ন্ধু).
     """
     units, cur, join_next = [], '', False
     for c in word:
@@ -77,7 +77,7 @@ def conjunct_tiles(tiles):
     return [t for t in tiles if HASANTA in t]
 
 
-# ── crossword placement ─────────────────────────────────────────────────────────────────
+# -- crossword placement -----------------------------------------------------------------
 # Same rules as CrosswordGenerator.kt: every word after the first must cross an existing
 # akshara, may not butt end-to-end against another word, and a new letter may not sit
 # side-on against an unrelated word (which would spell something the player cannot solve).
@@ -162,7 +162,7 @@ def layout(words):
     Greedy placement is not enough: an early choice can strand a later word. Some word sets
     have no arrangement at all: only two words can pass through one cell, so three words whose
     only shared letter is the same akshara cannot all be placed. চার / কার / চাবি / চাকা fails
-    that way — চার, চাবি and চাকা meet only at চা.
+    that way - চার, চাবি and চাকা meet only at চা.
     """
     tokens = sorted(((w, split_aksharas(w)) for w in words),
                     key=lambda t: (-len(t[1]), t[0]))
@@ -214,7 +214,7 @@ def render(occupied):
     min_r, max_r = min(p[0] for p in occupied), max(p[0] for p in occupied)
     min_c, max_c = min(p[1] for p in occupied), max(p[1] for p in occupied)
     return '\n'.join(
-        ' '.join(occupied.get((r, c), '·').ljust(2) for c in range(min_c, max_c + 1))
+        ' '.join(occupied.get((r, c), '.').ljust(2) for c in range(min_c, max_c + 1))
         for r in range(min_r, max_r + 1))
 
 

@@ -86,7 +86,7 @@ class CrosswordGeneratorTest {
 
         /**
          * Every horizontal and vertical run of two or more filled cells must be one of the
-         * level's words — anything else is an accidental word the player cannot solve.
+         * level's words - anything else is an accidental word the player cannot solve.
          * A lone filled cell is fine: it is the middle of a word running the other way.
          */
         fun assertNoUnintendedRuns(puzzle: Puzzle) {

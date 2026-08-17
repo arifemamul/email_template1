@@ -28,7 +28,7 @@ import com.bangla.shobdojot.ui.theme.TileInk
 
 /**
  * The word being traced, shown above the wheel. A rejected word shakes rather than
- * printing an error — faster to read mid-drag, and it needs no translation.
+ * printing an error - faster to read mid-drag, and it needs no translation.
  */
 @Composable
 fun WordPreview(

@@ -196,7 +196,7 @@ fun GameScreen(
             text = {
                 Column {
                     Text(
-                        "বোর্ডে নেই এমন শব্দও বানাও — বাক্স ভরলে " +
+                        "বোর্ডে নেই এমন শব্দও বানাও - বাক্স ভরলে " +
                             "${BanglaText.digits(Chest.REWARD)} কয়েন পাবে।",
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 14.sp
@@ -212,7 +212,7 @@ fun GameScreen(
                         )
                     } else {
                         Text(
-                            state.extraWords.joinToString("  ·  "),
+                            state.extraWords.joinToString(", "),
                             color = LeafGreen,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp

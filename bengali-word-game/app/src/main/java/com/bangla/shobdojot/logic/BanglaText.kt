@@ -2,7 +2,7 @@ package com.bangla.shobdojot.logic
 
 /**
  * Bengali text is not one-character-per-letter: "মাছ" is written with four code points
- * (ম, া, ছ ... plus possible signs) but a reader sees two letter units — "মা" and "ছ".
+ * (ম, া, ছ ... plus possible signs) but a reader sees two letter units - "মা" and "ছ".
  * Those units are called aksharas, and they are what the player actually drags around
  * in this game, so every tile and every grid cell holds one akshara.
  */
@@ -37,7 +37,7 @@ object BanglaText {
 
     /**
      * Splits a word into aksharas. A new unit starts at a base character, unless the
-     * previous unit ended with a hasanta — then the two consonants form one conjunct.
+     * previous unit ended with a hasanta - then the two consonants form one conjunct.
      */
     fun splitAksharas(word: String): List<String> {
         val units = mutableListOf<String>()
@@ -84,7 +84,7 @@ object BanglaText {
     }
 
     /**
-     * True when [word] can be spelled from [tiles] using each tile at most once —
+     * True when [word] can be spelled from [tiles] using each tile at most once -
      * the rule the letter wheel enforces while the player drags.
      */
     fun isSpellableFrom(word: String, tiles: List<String>): Boolean {

@@ -4,7 +4,7 @@ The level catalogue: the single source both builds are generated from.
 
 Add or edit levels here, then run `python3 tools/build.py check` and, once it is clean,
 `python3 tools/build.py build`. Never hand-edit `Levels.kt` or the `LEVELS` table inside
-`docs/index.html` — they are generated, and editing one of them silently desynchronises the
+`docs/index.html` - they are generated, and editing one of them silently desynchronises the
 Android and web games.
 
 A level is written as a word list. The wheel is derived from it (the union of the words'
@@ -27,7 +27,7 @@ EASY_OPENERS = [
 
 # Ordered by difficulty at build time, so the order here is only for human readability.
 CATALOGUE = EASY_OPENERS + [
-    # ── short words, plain consonants and simple vowel signs ────────────────────────────
+    # -- short words, plain consonants and simple vowel signs ----------------------------
     ["জল", "জন", "মন", "নল"],
     ["নাম", "দাম", "দানা"],
     ["গান", "গাছ", "মান", "মাছ"],
@@ -42,7 +42,7 @@ CATALOGUE = EASY_OPENERS + [
     ["রস", "সর", "রসগোল্লা"],
     ["পাস", "পায়ে", "পায়েস"],
 
-    # ── four tiles, four to six words ───────────────────────────────────────────────────
+    # -- four tiles, four to six words ---------------------------------------------------
     ["কল", "কলা", "কলম", "কমল", "লাল", "কমলা"],
     ["চার", "কার", "রবি", "চাবি", "চাকা", "বিচার"],
     ["ফুল", "চাল", "চাকু"],
@@ -65,7 +65,7 @@ CATALOGUE = EASY_OPENERS + [
     ["রাস্তা", "ঘাট", "রাস্তাঘাট"],
     ["ফুল", "গান", "বাগান", "ফুলবাগান"],
 
-    # ── conjunct tiles and four-akshara spines ──────────────────────────────────────────
+    # -- conjunct tiles and four-akshara spines ------------------------------------------
     ["বাতি", "তিল", "বালতি", "বাতিল"],
     ["বল", "ফুল", "ফুট", "ফুটবল"],
     ["জন", "দিন", "জন্ম", "জন্মদিন"],
@@ -85,7 +85,7 @@ CATALOGUE = EASY_OPENERS + [
     ["কল", "কাক", "তাল", "লতা", "কাল", "কলকাতা"],
     ["প্রতি", "জাতি", "প্রজা", "প্রজাতি", "প্রজাপতি"],
 
-    # ── long spines, stacked conjuncts, five and six tiles ──────────────────────────────
+    # -- long spines, stacked conjuncts, five and six tiles ------------------------------
     ["তান", "স্বাধীন", "স্বাধীনতা"],
     ["প্রতি", "তিন", "প্রতিষ্ঠা", "প্রতিষ্ঠান"],
     ["পরা", "রাষ্ট্র", "রাষ্ট্রপতি"],
@@ -98,7 +98,7 @@ CATALOGUE = EASY_OPENERS + [
     ["গ্রহ", "গ্রহণ", "সূর্য", "সূর্যগ্রহণ"],
     ["বন", "মান", "মানব", "বিমান", "বন্দর", "বিমানবন্দর"],
 
-    # ── five tiles with room to spare: these are where the extra-words chest fills ───────
+    # -- five tiles with room to spare: these are where the extra-words chest fills -------
     ["সব", "কম", "রকম", "সবরকম"],
     ["কলা", "কমলা", "কলার", "কমলাপুর"],
     ["মাস", "মান", "মানা", "সমান", "মানানসই"],
@@ -109,9 +109,9 @@ CATALOGUE = EASY_OPENERS + [
     ["কলম", "রকম", "নগর"],
 ]
 
-# ── extra words ─────────────────────────────────────────────────────────────────────────
+# -- extra words -------------------------------------------------------------------------
 # Words the tiles can spell that are NOT on the board. Finding one fills the chest, which
-# pays coins — the mechanic that makes a letter wheel feel generous instead of restrictive.
+# pays coins - the mechanic that makes a letter wheel feel generous instead of restrictive.
 #
 # Every level's own words are automatically available as extras to other levels, since they
 # are already hand-verified. This list adds the rest, hand-picked from corpus candidates.
@@ -125,7 +125,7 @@ EXTRA_VOCABULARY = """
 """.split()
 
 # Three extra words fill the chest; a full chest pays out and starts again. The chest is
-# shared across levels rather than reset each time — with three- and four-tile boards there
+# shared across levels rather than reset each time - with three- and four-tile boards there
 # are not always extras to find, so a per-level chest would sit empty and teach the player to
 # ignore it.
 CHEST_TARGET = 3

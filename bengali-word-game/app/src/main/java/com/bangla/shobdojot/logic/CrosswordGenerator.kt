@@ -11,7 +11,7 @@ import kotlin.math.min
  * other word has to hang off a shared akshara, with the usual crossword rule that a new
  * letter may not sit side-on against an unrelated word.
  *
- * Greedy placement is not enough — an early choice can strand a later word — so this
+ * Greedy placement is not enough - an early choice can strand a later word - so this
  * backtracks over both the word order and the placement choices. The search is fully
  * deterministic: the same word list always yields the same board, which is what lets the
  * game store hint positions across restarts.
@@ -98,7 +98,7 @@ object CrosswordGenerator {
         /**
          * Every legal placement for [aksharas]: most crossings first, then the shallowest
          * board. Rows are ranked ahead of total area because the board sits above a letter
-         * wheel on a portrait screen — vertical space is what runs out, so a wide, shallow
+         * wheel on a portrait screen - vertical space is what runs out, so a wide, shallow
          * board keeps cells big enough to read.
          */
         fun candidates(aksharas: List<String>): List<Placement> {

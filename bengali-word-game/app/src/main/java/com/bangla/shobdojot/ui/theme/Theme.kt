@@ -20,7 +20,7 @@ val Parchment = Color(0xFFFDF6E7)
 val TileInk = Color(0xFF2B1B0E)
 
 /**
- * The board is a night sky with marigold tiles in either system theme — a puzzle that
+ * The board is a night sky with marigold tiles in either system theme - a puzzle that
  * repainted itself light would wash out the "letter revealed" contrast the game leans on.
  */
 private val BoardColors = darkColorScheme(

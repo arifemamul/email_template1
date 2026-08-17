@@ -8,9 +8,9 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Content checks for every shipped level. A level that fails here is unplayable — the
+ * Content checks for every shipped level. A level that fails here is unplayable - the
  * player would see tiles that spell nothing, or a board with a word floating off on its
- * own — so this runs over the whole catalogue rather than a sample.
+ * own - so this runs over the whole catalogue rather than a sample.
  */
 class LevelsTest {
 
@@ -119,8 +119,8 @@ class LevelsTest {
 
     @Test
     fun `difficulty climbs across the game`() {
-        // Word count is the main dial — finding six words from one wheel is what makes a
-        // board take a while — so the ramp is asserted on the trend rather than level to
+        // Word count is the main dial - finding six words from one wheel is what makes a
+        // board take a while - so the ramp is asserted on the trend rather than level to
         // level, which wobbles by design as several factors trade off.
         val thirds = Levels.all.chunked((Levels.count + 2) / 3)
         val tiles = thirds.map { third -> third.map { it.letters.size }.average() }

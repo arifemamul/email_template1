@@ -11,7 +11,7 @@ Open Font License asks that the licence travel with the font.
 
 Noto Sans Bengali, Copyright 2025 The Noto Project Authors
 (<https://github.com/notofonts/bengali>), licensed under the SIL Open Font License 1.1
-— see `OFL.txt`.
+- see `OFL.txt`.
 
 Only the Bengali range is included (roughly 92 KB for both weights); Latin text on the
 page uses the reader's own system UI font.

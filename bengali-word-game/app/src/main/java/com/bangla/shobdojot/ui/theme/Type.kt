@@ -9,7 +9,7 @@ import com.bangla.shobdojot.R
 /**
  * Noto Sans Bengali is bundled rather than borrowed from the device. Android has shipped a
  * Bengali font for years, but OEM builds vary and a stripped ROM with no Bengali coverage
- * would turn every tile into an empty box — the one failure this game cannot survive.
+ * would turn every tile into an empty box - the one failure this game cannot survive.
  * Bundling also means the letterforms match the web build exactly.
  *
  * Licence: SIL Open Font License 1.1, see `assets/fonts/OFL.txt`.

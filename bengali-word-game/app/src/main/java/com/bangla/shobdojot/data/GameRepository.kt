@@ -6,7 +6,7 @@ import com.bangla.shobdojot.model.GridPos
 
 /**
  * Player progress, kept in SharedPreferences. Small enough that a key/value store is the
- * right tool — coins, how far the player has unlocked, and per-level progress so leaving
+ * right tool - coins, how far the player has unlocked, and per-level progress so leaving
  * a half-solved board and coming back does not throw the work away.
  */
 class GameRepository(context: Context) {
@@ -52,7 +52,7 @@ class GameRepository(context: Context) {
 
     /**
      * Hinted cells survive a restart because [com.bangla.shobdojot.logic.CrosswordGenerator]
-     * is deterministic — the same level always lays out on the same coordinates.
+     * is deterministic - the same level always lays out on the same coordinates.
      */
     fun hintedCells(levelId: Int): Set<GridPos> =
         prefs.getStringSet(hintKey(levelId), emptySet())!!

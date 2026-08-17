@@ -42,7 +42,7 @@ import kotlin.math.sin
  * word. Dragging back onto the previous tile un-picks it, which is what players expect
  * after overshooting.
  *
- * The gesture lives entirely here — the parent only hears the word in progress
+ * The gesture lives entirely here - the parent only hears the word in progress
  * ([onWordChange]) and the word released ([onWordSubmit]).
  */
 @Composable

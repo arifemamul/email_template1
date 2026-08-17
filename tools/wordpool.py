@@ -35,7 +35,7 @@ def zipf(word):
 
 def build_pool(min_zipf=2.4, max_aksharas=5, scan=200_000):
     """
-    Attested Bengali words a letter wheel can actually spell: 2–`max_aksharas` units, no
+    Attested Bengali words a letter wheel can actually spell: 2-`max_aksharas` units, no
     repeated akshara (a tile is only available once), Bengali characters only.
     """
     pool = {}
@@ -83,9 +83,9 @@ def discover(spine, floor=3.2):
     aksharas = split_aksharas(spine)
     z = zipf(spine)
     if z < 2.0:
-        return f'{spine}: unattested (zipf {z:.2f}) — do not use'
+        return f'{spine}: unattested (zipf {z:.2f}) - do not use'
     if len(set(aksharas)) != len(aksharas):
-        return f'{spine}: repeats an akshara {aksharas} — cannot be spelled from distinct tiles'
+        return f'{spine}: repeats an akshara {aksharas} - cannot be spelled from distinct tiles'
 
     options = [w for w in words_from_tiles(cached_pool(), aksharas, floor) if w != spine]
     head = f'{spine} ({z:.1f})  {len(aksharas)} tiles: {" ".join(aksharas)}'

@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
 }
 
 /**
- * Two screens and one back stack entry — a navigation library would be more machinery
+ * Two screens and one back stack entry - a navigation library would be more machinery
  * than this needs.
  */
 @Composable
