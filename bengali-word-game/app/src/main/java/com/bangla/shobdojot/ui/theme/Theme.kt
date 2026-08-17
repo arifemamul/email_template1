@@ -14,6 +14,7 @@ val MidIndigo = Color(0xFF2C1A55)
 val SlateViolet = Color(0xFF3D2670)
 val Marigold = Color(0xFFFFB020)
 val LeafGreen = Color(0xFF35C08A)
+val SkyBlue = Color(0xFF3FA9F5)      // an extra word: neither right-on-the-board nor wrong
 val Coral = Color(0xFFFF6B6B)
 val Parchment = Color(0xFFFDF6E7)
 val TileInk = Color(0xFF2B1B0E)

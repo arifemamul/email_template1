@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
@@ -24,6 +25,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -39,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import com.bangla.shobdojot.data.GameRepository
 import com.bangla.shobdojot.data.Levels
 import com.bangla.shobdojot.logic.BanglaText
+import com.bangla.shobdojot.logic.Chest
 import com.bangla.shobdojot.ui.GameUiState
 import com.bangla.shobdojot.ui.WordResult
 import com.bangla.shobdojot.ui.components.CrosswordGrid
@@ -48,6 +52,7 @@ import com.bangla.shobdojot.ui.theme.DeepIndigo
 import com.bangla.shobdojot.ui.theme.LeafGreen
 import com.bangla.shobdojot.ui.theme.Marigold
 import com.bangla.shobdojot.ui.theme.MidIndigo
+import com.bangla.shobdojot.ui.theme.SlateViolet
 import kotlinx.coroutines.delay
 
 /**
@@ -72,6 +77,7 @@ fun GameScreen(
     var feedbackTick by remember(level.id) { mutableStateOf(0) }
     var showComplete by remember(level.id) { mutableStateOf(false) }
     var noCoins by remember { mutableStateOf(false) }
+    var showChest by remember { mutableStateOf(false) }
 
     LaunchedEffect(verdict) {
         if (verdict != null) {
@@ -124,13 +130,21 @@ fun GameScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ActionButton(
+                icon = Icons.Filled.Inventory2,
+                label = "${BanglaText.digits(state.chestFilled)}/${BanglaText.digits(state.chestTarget)}",
+                enabled = true
+            ) {
+                showChest = true
+            }
+            Spacer(Modifier.width(10.dp))
+            ActionButton(
                 icon = Icons.Filled.Lightbulb,
                 label = "সংকেত ${BanglaText.digits(GameRepository.HINT_COST)}",
                 enabled = !state.completed
             ) {
                 if (state.coins < GameRepository.HINT_COST) noCoins = true else onHint()
             }
-            Spacer(Modifier.width(12.dp))
+            Spacer(Modifier.width(10.dp))
             ActionButton(icon = Icons.Filled.Refresh, label = "এলোমেলো", enabled = true) {
                 onShuffle()
             }
@@ -172,6 +186,48 @@ fun GameScreen(
         )
     }
 
+    if (showChest) {
+        AlertDialog(
+            onDismissRequest = { showChest = false },
+            containerColor = MidIndigo,
+            title = {
+                Text("বাড়তি শব্দ", color = Marigold, fontWeight = FontWeight.Bold)
+            },
+            text = {
+                Column {
+                    Text(
+                        "বোর্ডে নেই এমন শব্দও বানাও — বাক্স ভরলে " +
+                            "${BanglaText.digits(Chest.REWARD)} কয়েন পাবে।",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 14.sp
+                    )
+                    Spacer(Modifier.height(14.dp))
+                    ChestTrack(filled = state.chestFilled, target = state.chestTarget)
+                    Spacer(Modifier.height(14.dp))
+                    if (state.extraWords.isEmpty()) {
+                        Text(
+                            "এই লেভেলে এখনো কিছু পাওনি",
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            fontSize = 13.sp
+                        )
+                    } else {
+                        Text(
+                            state.extraWords.joinToString("  ·  "),
+                            color = LeafGreen,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 16.sp
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showChest = false }) {
+                    Text("ঠিক আছে", color = Marigold, fontWeight = FontWeight.Bold)
+                }
+            }
+        )
+    }
+
     if (noCoins) {
         AlertDialog(
             onDismissRequest = { noCoins = false },
@@ -187,6 +243,31 @@ fun GameScreen(
             confirmButton = {
                 TextButton(onClick = { noCoins = false }) { Text("ঠিক আছে", color = Marigold) }
             }
+        )
+    }
+}
+
+/** How full the current chest is. */
+@Composable
+private fun ChestTrack(filled: Int, target: Int) {
+    val progress by animateFloatAsState(
+        targetValue = if (target == 0) 0f else filled.toFloat() / target,
+        animationSpec = tween(durationMillis = 450),
+        label = "chest"
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(12.dp)
+            .clip(RoundedCornerShape(50))
+            .background(SlateViolet)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(progress.coerceIn(0f, 1f))
+                .height(12.dp)
+                .clip(RoundedCornerShape(50))
+                .background(LeafGreen)
         )
     }
 }

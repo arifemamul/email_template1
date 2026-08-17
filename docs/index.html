@@ -269,6 +269,7 @@
     white-space: nowrap;
   }
   .chip.good { background: var(--leaf); }
+  .chip.extra { background: #3FA9F5; }
   .chip.bad  { background: var(--coral); }
   .chip.dup  { background: var(--marigold-d); }
   .chip.shake { animation: shake .34s ease; }
@@ -279,6 +280,16 @@
     38% { transform: translateX(-11px); }
     60% { transform: translateX(8px); }
     82% { transform: translateX(-4px); }
+  }
+
+  .chip .badge {
+    font-style: normal;
+    font-size: 12px;
+    font-weight: 700;
+    background: color-mix(in srgb, var(--ink) 18%, transparent);
+    color: var(--ink);
+    border-radius: 99px;
+    padding: 2px 8px;
   }
 
   .chip .go {
@@ -478,6 +489,186 @@
     * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
   }
 
+
+  /* ── Extra words: the chest ─────────────────────────────────────────────── */
+  .chest-btn { position: relative; }
+
+  .chest-btn .fill {
+    position: absolute;
+    left: 0; bottom: 0;
+    height: 3px;
+    background: var(--leaf);
+    border-radius: 0 99px 99px 0;
+    transition: width .45s cubic-bezier(.2,.8,.3,1);
+  }
+  .chest-btn.bump { animation: chest-bump .5s cubic-bezier(.2,1.6,.4,1); }
+  .chest-btn.full { background: var(--leaf); }
+  .chest-btn.full .glyph, .chest-btn.full span { color: var(--ink); }
+
+  @keyframes chest-bump {
+    0%   { transform: scale(1); }
+    35%  { transform: scale(1.16) rotate(-4deg); }
+    70%  { transform: scale(.97) rotate(2deg); }
+    100% { transform: scale(1); }
+  }
+
+  .sheet {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--indigo-900) 82%, transparent);
+    backdrop-filter: blur(3px);
+    display: grid;
+    place-items: center;
+    padding: 22px;
+    z-index: 7;
+  }
+  .sheet[hidden] { display: none; }
+
+  .sheet-card {
+    background: var(--indigo-700);
+    border-radius: 22px;
+    padding: 22px 20px;
+    width: 100%;
+    max-width: 290px;
+    box-shadow: 0 24px 60px -20px #000;
+    animation: card-in .28s cubic-bezier(.2,1.5,.4,1);
+  }
+
+  @keyframes card-in {
+    from { transform: scale(.9) translateY(8px); opacity: 0; }
+    to   { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  .sheet-card h2 {
+    font-family: var(--bn);
+    margin: 0 0 6px;
+    font-size: 21px;
+    color: var(--marigold);
+    text-align: center;
+  }
+  .sheet-card .lead {
+    font-family: var(--bn);
+    margin: 0 0 16px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    text-align: center;
+    color: color-mix(in srgb, var(--parchment) 72%, var(--indigo-700));
+  }
+
+  .track {
+    height: 12px;
+    border-radius: 99px;
+    background: var(--violet-600);
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .track > i {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, var(--leaf), #7ce0b8);
+    border-radius: 99px;
+    transition: width .5s cubic-bezier(.2,.8,.3,1);
+  }
+
+  .track-note {
+    font-family: var(--bn);
+    font-size: 12.5px;
+    display: flex;
+    justify-content: space-between;
+    color: color-mix(in srgb, var(--parchment) 62%, var(--indigo-700));
+    margin-bottom: 16px;
+  }
+
+  .found-words {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    justify-content: center;
+    margin-bottom: 18px;
+    min-height: 30px;
+  }
+  .found-words .w {
+    font-family: var(--bn);
+    font-size: 15px;
+    font-weight: 700;
+    background: var(--leaf);
+    color: var(--ink);
+    border-radius: 99px;
+    padding: 3px 12px;
+  }
+  .found-words .none {
+    font-family: var(--bn);
+    font-size: 13px;
+    color: color-mix(in srgb, var(--parchment) 50%, var(--indigo-700));
+  }
+
+  /* ── Animation layer: flying tiles, coins, confetti ─────────────────────── */
+  #fx {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 8;
+  }
+
+  .fly {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    font-family: var(--bn);
+    font-weight: 700;
+    border-radius: 22%;
+    background: var(--marigold);
+    color: var(--ink);
+    will-change: transform, opacity;
+  }
+
+  .fly.coin {
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 30%, #ffd66e, var(--marigold-d));
+  }
+
+  .fly.word {
+    border-radius: 99px;
+    background: var(--leaf);
+    padding: 4px 14px;
+    white-space: nowrap;
+  }
+
+  /* revealed cells arrive with a flip rather than a fade */
+  .cell.on.arrive { animation: cell-arrive .42s cubic-bezier(.2,1.4,.4,1) backwards; }
+  @keyframes cell-arrive {
+    0%   { transform: scale(.5) rotateY(-70deg); }
+    60%  { transform: scale(1.08) rotateY(0deg); }
+    100% { transform: scale(1) rotateY(0); }
+  }
+
+  .cell.knock { animation: knock .4s ease; }
+  @keyframes knock {
+    0%,100% { transform: translateY(0); }
+    30%     { transform: translateY(-7px); }
+    60%     { transform: translateY(2px); }
+  }
+
+  .coins.pulse { animation: coin-pulse .42s cubic-bezier(.2,1.6,.4,1); }
+  @keyframes coin-pulse {
+    0%,100% { transform: scale(1); }
+    45%     { transform: scale(1.14); }
+  }
+
+  .tile.reject { animation: tile-reject .36s ease; }
+  @keyframes tile-reject {
+    0%,100% { transform: translateX(0); }
+    25%     { transform: translateX(-4px) rotate(-3deg); }
+    75%     { transform: translateX(4px) rotate(3deg); }
+  }
+
+  .action.flash { animation: chest-bump .45s cubic-bezier(.2,1.6,.4,1); }
+
+  @media (prefers-reduced-motion: reduce) {
+    #fx { display: none; }
+  }
+
   /* ── Standalone-page essentials (the hosted build has no wrapper stylesheet) ── */
   html { -webkit-text-size-adjust: 100%; }
   html, body { overscroll-behavior: none; }
@@ -519,7 +710,7 @@
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">বাংলা শব্দ খেলা · 66 levels · plays in your browser</p>
+    <p class="eyebrow">বাংলা শব্দ খেলা · 70 levels · plays in your browser</p>
     <h1>শব্দজট</h1>
   </header>
 
@@ -541,11 +732,31 @@
         <div class="preview" id="preview"></div>
 
         <div class="actions">
+          <button class="action chest-btn" id="chest" title="বাড়তি শব্দের বাক্স">
+            <span class="glyph">▧</span><span class="bn" id="chestCount">০/৩</span>
+            <i class="fill" id="chestFill"></i>
+          </button>
           <button class="action" id="hint"><span class="glyph">◈</span><span class="bn">সংকেত ২৫</span></button>
           <button class="action" id="shuffle"><span class="glyph">⟳</span><span class="bn">এলোমেলো</span></button>
         </div>
 
         <div class="wheel-area"><div class="wheel" id="wheel"><svg id="trail"></svg></div></div>
+
+        <div class="sheet" id="chestSheet" hidden>
+          <div class="sheet-card">
+            <h2 class="bn">বাড়তি শব্দ</h2>
+            <p class="lead">বোর্ডে নেই এমন শব্দও বানাও — বাক্স ভরলে কয়েন পাবে।</p>
+            <div class="track"><i id="chestTrack"></i></div>
+            <div class="track-note">
+              <span class="bn" id="chestProgress">০ / ৩</span>
+              <span class="bn" id="chestReward">+১৫ কয়েন</span>
+            </div>
+            <div class="found-words" id="chestWords"></div>
+            <button class="primary bn" id="chestClose">ঠিক আছে</button>
+          </div>
+        </div>
+
+        <div id="fx"></div>
 
         <div class="clear" id="clear" hidden>
           <div class="clear-card">
@@ -563,7 +774,7 @@
     <div class="panel">
       <p class="deck">
         A Bengali word-cross puzzle. Drag across the letters to spell a word; each word you find
-        writes itself into the crossword above. <b>Sixty-six levels, easiest first</b>: plain
+        writes itself into the crossword above. <b>Seventy levels, easiest first</b>: plain
         consonants to open, then vowel signs, then compound words, and finally six-tile boards built
         on conjuncts — ন্দ্র and গ্র are each one tile in চন্দ্রগ্রহণ. Nothing to install, no sign-up,
         no ads — your progress is saved in this browser.
@@ -580,6 +791,7 @@
           <li><span class="k">drag</span><span>Press a letter and drag across the others. Sliding back onto the previous letter un-picks it.</span></li>
           <li><span class="k">click</span><span>Prefer clicking? Tap letters one at a time, then hit <b>✓</b> on the word — or press <b>Enter</b>. <b>Esc</b> clears.</span></li>
           <li><span class="k">◈ 25</span><span>A hint reveals one letter from a word you haven't solved. Words pay 5 coins per letter, plus 30 for clearing the level.</span></li>
+          <li><span class="k">▧ chest</span><span>Some words the letters can spell aren't on the board — spell one anyway and it goes in the chest. <b>Three fills it</b> and pays 15 coins.</span></li>
         </ul>
       </section>
 
@@ -603,7 +815,7 @@
   <footer>
     Every board is generated from a word list when you open the level, not hand-drawn: words are
     placed by backtracking search so each one crosses another and no accidental word ever appears
-    on the grid. All 215 words are attested in real Bengali text — checked against corpus frequency
+    on the grid. All 227 board words and every extra word are attested in real Bengali text — checked against corpus frequency
     data, then hand-picked, because frequency lists happily offer verb inflections and fragments. Tiles hold <b>aksharas</b> — the letter units a Bengali reader sees — so মাছ is two
     tiles, মা and ছ, and the conjunct ন্ধু in বন্ধু is one. Bengali text is rendered with your
     system font. There is also an Android build of this game, sharing the same levels and the same
@@ -803,78 +1015,86 @@ function normalise(occ, placed) {
 const LEVELS = [
   // Easiest first: three tiles, short everyday words.
   { id: 1, letters: ["ক", "ম", "ল"], words: ["কম", "কল", "কমল", "কলম"] },
-  { id: 2, letters: ["ব", "ন", "ধ"], words: ["বন", "ধন", "বধ"] },
+  { id: 2, letters: ["ব", "ন", "ধ"], words: ["বন", "ধন", "বধ"], extras: ["নব"] },
   { id: 3, letters: ["প", "থ", "র"], words: ["পথ", "পর", "রথ"] },
   { id: 4, letters: ["না", "ম", "দা"], words: ["নাম", "দাম", "দানা"] },
-  { id: 5, letters: ["রা", "ত", "না", "ম"], words: ["রাত", "নাম", "রাম"] },
+  { id: 5, letters: ["রা", "ত", "না", "ম"], words: ["রাত", "নাম", "রাম"], extras: ["মত"] },
   { id: 6, letters: ["ক", "বি", "তা"], words: ["কবি", "তাক", "কবিতা"] },
   { id: 7, letters: ["না", "ট", "ক"], words: ["নাক", "টক", "নাটক"] },
-  { id: 8, letters: ["ম", "ন", "তা", "রা"], words: ["মন", "তান", "তারা"] },
-  { id: 9, letters: ["ব", "ই", "খা", "তা"], words: ["বই", "খাই", "খাতা"] },
-  { id: 10, letters: ["ফু", "ল", "চা", "কু"], words: ["ফুল", "চাল", "চাকু"] },
+  { id: 8, letters: ["ম", "ন", "তা", "রা"], words: ["মন", "তান", "তারা"], extras: ["রাম"] },
+  { id: 9, letters: ["ব", "ই", "খা", "তা"], words: ["বই", "খাই", "খাতা"], extras: ["তাই", "খাব"] },
+  { id: 10, letters: ["ফু", "ল", "চা", "কু"], words: ["ফুল", "চাল", "চাকু"], extras: ["কুল"] },
   { id: 11, letters: ["পা", "হা", "ড়"], words: ["পাড়", "হাড়", "পাহাড়"] },
   { id: 12, letters: ["পা", "য়ে", "স"], words: ["পাস", "পায়ে", "পায়েস"] },
   { id: 13, letters: ["মে", "ঘ", "লা"], words: ["মেঘ", "মেলা", "মেঘলা"] },
   { id: 14, letters: ["গা", "ন", "ছ", "মা"], words: ["গান", "গাছ", "মান", "মাছ"] },
   { id: 15, letters: ["জ", "ল", "ন", "ম"], words: ["জল", "জন", "মন", "নল"] },
   { id: 16, letters: ["বা", "ল", "তি"], words: ["বাতি", "তিল", "বালতি", "বাতিল"] },
-  { id: 17, letters: ["ন", "গ", "র", "সা"], words: ["সার", "নগর", "সাগর"] },
+  { id: 17, letters: ["ন", "গ", "র", "সা"], words: ["সার", "নগর", "সাগর"], extras: ["নর"] },
 
   // The first level with a conjunct tile: ন্ত is one letter unit, one tile.
-  { id: 18, letters: ["ব", "স", "ন্ত"], words: ["সব", "বস", "বসন্ত"] },
-  { id: 19, letters: ["ব", "ন", "ধ", "ন্ধু"], words: ["বন", "ধন", "বন্ধু"] },
-  { id: 20, letters: ["ন", "দী", "র", "পা"], words: ["নদী", "পার", "পান", "নদীর"] },
+  { id: 18, letters: ["ব", "স", "ন্ত"], words: ["সব", "বস", "বসন্ত"], extras: ["সন্ত"] },
+  { id: 19, letters: ["ব", "ন", "ধ", "ন্ধু"], words: ["বন", "ধন", "বন্ধু"], extras: ["নব", "বধ"] },
+  { id: 20, letters: ["ন", "দী", "র", "পা"], words: ["নদী", "পার", "পান", "নদীর"], extras: ["দীন", "নর"] },
   { id: 21, letters: ["বাং", "লা", "দে", "শ"], words: ["বাংলা", "দেশ", "বাংলাদেশ"] },
-  { id: 22, letters: ["আ", "ম", "রা", "ত"], words: ["আম", "রাত", "আমরা", "আরাম"] },
+  { id: 22, letters: ["আ", "ম", "রা", "ত"], words: ["আম", "রাত", "আমরা", "আরাম"], extras: ["মত", "রাম"] },
   { id: 23, letters: ["চা", "ম", "চ", "কা"], words: ["কাচ", "চাকা", "চামচ"] },
   { id: 24, letters: ["বি", "দে", "শ", "কা"], words: ["দেশ", "বিশ", "বিদেশ", "বিকাশ"] },
-  { id: 25, letters: ["মা", "টি", "র", "পা"], words: ["মাটি", "পার", "পাটি", "মাটির"] },
+  { id: 25, letters: ["মা", "টি", "র", "পা"], words: ["মাটি", "পার", "পাটি", "মাটির"], extras: ["মার", "মাপা"] },
   { id: 26, letters: ["প", "রি", "বে", "শ"], words: ["বেশ", "পরি", "পরিবেশ"] },
   { id: 27, letters: ["দি", "ন", "রা", "ত"], words: ["দিন", "রাত", "দিনরাত"] },
   { id: 28, letters: ["বাং", "লা", "ভা", "ষা"], words: ["বাংলা", "ভাষা", "বাংলাভাষা"] },
-  { id: 29, letters: ["শি", "ক্ষ", "ক", "র"], words: ["কর", "কক্ষ", "শিক্ষক"] },
+  { id: 29, letters: ["শি", "ক্ষ", "ক", "র"], words: ["কর", "কক্ষ", "শিক্ষক"], extras: ["রক্ষক", "রশি"] },
   { id: 30, letters: ["ফু", "ট", "ব", "ল"], words: ["বল", "ফুল", "ফুট", "ফুটবল"] },
   { id: 31, letters: ["হা", "ত", "ঘ", "ড়ি"], words: ["হাত", "ঘড়ি", "হাতঘড়ি"] },
-  { id: 32, letters: ["জা", "না", "লা", "ম"], words: ["জাম", "নাম", "মজা", "নালা", "জানালা"] },
-  { id: 33, letters: ["প", "ড়া", "লে", "খা"], words: ["পড়া", "লেখা", "খাড়া", "পড়ালেখা"] },
+  { id: 32, letters: ["জা", "না", "লা", "ম"], words: ["জাম", "নাম", "মজা", "নালা", "জানালা"], extras: ["জানা"] },
+  { id: 33, letters: ["প", "ড়া", "লে", "খা"], words: ["পড়া", "লেখা", "খাড়া", "পড়ালেখা"], extras: ["লেখাপড়া"] },
   { id: 34, letters: ["দু", "ধ", "ভা", "ত"], words: ["দুধ", "ভাত", "দুধভাত"] },
-  { id: 35, letters: ["বা", "তা", "স", "র"], words: ["বাস", "তার", "বার", "রস", "তাস", "বাতাস"] },
-  { id: 36, letters: ["বি", "চা", "র", "কা"], words: ["চার", "কার", "রবি", "চাবি", "চাকা", "বিচার"] },
+  { id: 35, letters: ["বা", "তা", "স", "র"], words: ["বাস", "তার", "বার", "রস", "তাস", "বাতাস"], extras: ["সবার", "সর"] },
+  { id: 36, letters: ["বি", "চা", "র", "কা"], words: ["চার", "কার", "রবি", "চাবি", "চাকা", "বিচার"], extras: ["চাকার"] },
   { id: 37, letters: ["মা", "ছ", "রা", "ঙা"], words: ["মাছ", "মারা", "রাঙা", "মাছরাঙা"] },
-  { id: 38, letters: ["ক", "ল", "ম", "লা"], words: ["কল", "কলা", "কলম", "কমল", "লাল", "কমলা"] },
+  { id: 38, letters: ["ক", "ল", "ম", "লা"], words: ["কল", "কলা", "কলম", "কমল", "লাল", "কমলা"], extras: ["কম", "কলাম"] },
   { id: 39, letters: ["প", "রি", "বা", "র"], words: ["পর", "বার", "বাপ", "পরি", "পরিবার"] },
-  { id: 40, letters: ["ক", "লা", "গা", "ছ"], words: ["কলা", "লাগা", "গাছ", "কলাগাছ"] },
+  { id: 40, letters: ["ক", "লা", "গা", "ছ"], words: ["কলা", "লাগা", "গাছ", "কলাগাছ"], extras: ["ছক"] },
   { id: 41, letters: ["পা", "ঠ", "শা", "লা"], words: ["পাঠ", "পালা", "পাশা", "পাঠশালা"] },
   { id: 42, letters: ["রা", "ষ্ট্র", "প", "তি"], words: ["পরা", "রাষ্ট্র", "রাষ্ট্রপতি"] },
-  { id: 43, letters: ["ঘ", "র", "বা", "ড়ি"], words: ["ঘর", "বাঘ", "ঘড়ি", "বাড়ি", "ঘরবাড়ি"] },
+  { id: 43, letters: ["ঘ", "র", "বা", "ড়ি"], words: ["ঘর", "বাঘ", "ঘড়ি", "বাড়ি", "ঘরবাড়ি"], extras: ["বার", "বাড়ির", "ঘড়ির"] },
   { id: 44, letters: ["ভা", "লো", "বা", "সা"], words: ["ভালো", "বাসা", "ভাসা", "ভাবা", "ভালোবাসা"] },
   { id: 45, letters: ["স্বা", "ধী", "ন", "তা"], words: ["তান", "স্বাধীন", "স্বাধীনতা"] },
   { id: 46, letters: ["রা", "স্তা", "ঘা", "ট"], words: ["রাস্তা", "ঘাট", "রাস্তাঘাট"] },
   { id: 47, letters: ["জ", "ন্ম", "দি", "ন"], words: ["জন", "দিন", "জন্ম", "জন্মদিন"] },
-  { id: 48, letters: ["শী", "ত", "কা", "ল"], words: ["তল", "শীত", "কাল", "শীতল", "শীতকাল"] },
+  { id: 48, letters: ["শী", "ত", "কা", "ল"], words: ["তল", "শীত", "কাল", "শীতল", "শীতকাল"], extras: ["কাত"] },
   { id: 49, letters: ["হা", "ত", "পা", "খা"], words: ["হাত", "খাত", "পাত", "পাখা", "হাতপাখা"] },
   { id: 50, letters: ["র", "স", "গো", "ল্লা"], words: ["রস", "সর", "রসগোল্লা"] },
-  { id: 51, letters: ["ক", "ল", "কা", "তা"], words: ["কল", "কাক", "তাল", "লতা", "কাল", "কলকাতা"] },
+  { id: 51, letters: ["ক", "ল", "কা", "তা"], words: ["কল", "কাক", "তাল", "লতা", "কাল", "কলকাতা"], extras: ["তাক"] },
   { id: 52, letters: ["শি", "ল্প", "ক", "লা"], words: ["কলা", "শিলা", "শিল্প", "শিল্পকলা"] },
   { id: 53, letters: ["চি", "ঠি", "প", "ত্র"], words: ["চিঠি", "পত্র", "চিত্র", "চিঠিপত্র"] },
   { id: 54, letters: ["বি", "দ্যা", "ল", "য়"], words: ["বিল", "লয়", "বিদ্যা", "বিদ্যালয়"] },
-  { id: 55, letters: ["প্র", "জা", "প", "তি"], words: ["প্রতি", "জাতি", "প্রজা", "প্রজাতি", "প্রজাপতি"] },
-  { id: 56, letters: ["প্র", "তি", "ষ্ঠা", "ন"], words: ["প্রতি", "তিন", "প্রতিষ্ঠা", "প্রতিষ্ঠান"] },
-  { id: 57, letters: ["ব", "র্ষা", "কা", "ল"], words: ["বল", "বকা", "কাল", "বর্ষা", "বর্ষাকাল"] },
 
   // The first five-tile board. Six-tile boards close out the game.
-  { id: 58, letters: ["ফু", "ল", "বা", "গা", "ন"], words: ["ফুল", "গান", "বাগান", "ফুলবাগান"] },
-  { id: 59, letters: ["মু", "ক্তি", "যু", "দ্ধ"], words: ["মুক্তি", "যুদ্ধ", "যুক্তি", "মুক্তিযুদ্ধ"] },
-  { id: 60, letters: ["প্র", "জা", "ত", "ন্ত্র"], words: ["জাত", "প্রজা", "তন্ত্র", "প্রজাতন্ত্র"] },
-  { id: 61, letters: ["হা", "স", "পা", "তা", "ল"], words: ["পাতা", "তাল", "হাল", "পাস", "পাতাল", "হাসপাতাল"] },
-  { id: 62, letters: ["সং", "বা", "দ", "প", "ত্র"], words: ["বাদ", "পদ", "পত্র", "সংবাদ", "সংবাদপত্র"] },
-  { id: 63, letters: ["র", "বী", "ন্দ্র", "না", "থ"], words: ["বীর", "রথ", "নাথ", "রবীন্দ্র", "রবীন্দ্রনাথ"] },
-  { id: 64, letters: ["চ", "ন্দ্র", "গ্র", "হ", "ণ"], words: ["গ্রহ", "গ্রহণ", "চন্দ্র", "চন্দ্রগ্রহণ"] },
-  { id: 65, letters: ["সূ", "র্য", "গ্র", "হ", "ণ"], words: ["গ্রহ", "গ্রহণ", "সূর্য", "সূর্যগ্রহণ"] },
-  { id: 66, letters: ["বি", "মা", "ন", "ব", "ন্দ", "র"], words: ["বন", "মান", "মানব", "বিমান", "বন্দর", "বিমানবন্দর"] }
+  { id: 55, letters: ["স", "ব", "র", "ক", "ম"], words: ["সব", "কম", "রকম", "সবরকম"], extras: ["কর", "করব", "রস", "বস", "কবর", "বর", "রব", "সরব", "কসম", "সম"] },
+  { id: 56, letters: ["প্র", "জা", "প", "তি"], words: ["প্রতি", "জাতি", "প্রজা", "প্রজাতি", "প্রজাপতি"] },
+  { id: 57, letters: ["প্র", "তি", "ষ্ঠা", "ন"], words: ["প্রতি", "তিন", "প্রতিষ্ঠা", "প্রতিষ্ঠান"] },
+  { id: 58, letters: ["ব", "র্ষা", "কা", "ল"], words: ["বল", "বকা", "কাল", "বর্ষা", "বর্ষাকাল"] },
+  { id: 59, letters: ["ফু", "ল", "বা", "গা", "ন"], words: ["ফুল", "গান", "বাগান", "ফুলবাগান"], extras: ["বান", "গাল", "নল"] },
+  { id: 60, letters: ["ক", "ম", "লা", "পু", "র"], words: ["কলা", "কমলা", "কলার", "কমলাপুর"], extras: ["কম", "কর", "রকম", "কলাম", "পুর"] },
+  { id: 61, letters: ["মু", "ক্তি", "যু", "দ্ধ"], words: ["মুক্তি", "যুদ্ধ", "যুক্তি", "মুক্তিযুদ্ধ"] },
+  { id: 62, letters: ["মা", "না", "ন", "স", "ই"], words: ["মাস", "মান", "মানা", "সমান", "মানানসই"], extras: ["সই", "নামা", "মানস"] },
+  { id: 63, letters: ["ম", "হা", "ন", "গ", "র"], words: ["মন", "গম", "নগর", "গরম", "মহান", "মহানগর"], extras: ["হার", "নরম", "মহা", "গমন", "নর", "মগ"] },
+  { id: 64, letters: ["প্র", "জা", "ত", "ন্ত্র"], words: ["জাত", "প্রজা", "তন্ত্র", "প্রজাতন্ত্র"] },
+  { id: 65, letters: ["হা", "স", "পা", "তা", "ল"], words: ["পাতা", "তাল", "হাল", "পাস", "পাতাল", "হাসপাতাল"], extras: ["পাল", "লতা", "তাস", "হাতা"] },
+  { id: 66, letters: ["সং", "বা", "দ", "প", "ত্র"], words: ["বাদ", "পদ", "পত্র", "সংবাদ", "সংবাদপত্র"], extras: ["বাপ"] },
+  { id: 67, letters: ["র", "বী", "ন্দ্র", "না", "থ"], words: ["বীর", "রথ", "নাথ", "রবীন্দ্র", "রবীন্দ্রনাথ"] },
+  { id: 68, letters: ["চ", "ন্দ্র", "গ্র", "হ", "ণ"], words: ["গ্রহ", "গ্রহণ", "চন্দ্র", "চন্দ্রগ্রহণ"] },
+  { id: 69, letters: ["সূ", "র্য", "গ্র", "হ", "ণ"], words: ["গ্রহ", "গ্রহণ", "সূর্য", "সূর্যগ্রহণ"] },
+  { id: 70, letters: ["বি", "মা", "ন", "ব", "ন্দ", "র"], words: ["বন", "মান", "মানব", "বিমান", "বন্দর", "বিমানবন্দর"], extras: ["মার", "রবি", "নব", "বর", "রব", "নর"] }
 ];
 
 const HINT_COST = 25, PER_AKSHARA = 5, LEVEL_BONUS = 30;
+// Three extra words fill the chest and pay out. The chest is shared across levels: with
+// three- and four-tile boards there are not always extras to find, and a chest that sits
+// empty teaches the player to ignore it.
+const CHEST_TARGET = 3, CHEST_REWARD = 15;
 
 /* ════════════════════════════════════════════════════════════════════════════
    4. Game state
@@ -893,6 +1113,8 @@ const game = {
   coins: typeof saved.coins === "number" ? saved.coins : 120,
   found: saved.found || {},          // levelId -> [words]
   hints: saved.hints || {},          // levelId -> ["r,c"]
+  extras: saved.extras || {},        // levelId -> [extra words found]
+  chest: saved.chest || 0,           // extra words toward the next payout, across all levels
   puzzle: null,
   wheel: [],
   picked: [],
@@ -902,11 +1124,16 @@ const game = {
   verdict: null
 };
 
-const persist = () => store.write({ coins: game.coins, found: game.found, hints: game.hints });
+const persist = () => store.write({
+  coins: game.coins, found: game.found, hints: game.hints,
+  extras: game.extras, chest: game.chest
+});
 
 const level = () => LEVELS[game.index];
 const foundSet = () => new Set(game.found[level().id] || []);
 const hintSet = () => new Set(game.hints[level().id] || []);
+const extraSet = () => new Set(game.extras[level().id] || []);
+const levelExtras = () => new Set(level().extras || []);
 
 function revealedCells() {
   const done = foundSet();
@@ -939,7 +1166,16 @@ const el = {
   clear: document.getElementById("clear"),
   clearBody: document.getElementById("clearBody"),
   nextLevel: document.getElementById("nextLevel"),
-  replay: document.getElementById("replay")
+  replay: document.getElementById("replay"),
+  chest: document.getElementById("chest"),
+  chestCount: document.getElementById("chestCount"),
+  chestFill: document.getElementById("chestFill"),
+  chestSheet: document.getElementById("chestSheet"),
+  chestTrack: document.getElementById("chestTrack"),
+  chestProgress: document.getElementById("chestProgress"),
+  chestReward: document.getElementById("chestReward"),
+  chestWords: document.getElementById("chestWords"),
+  chestClose: document.getElementById("chestClose")
 };
 
 let tileCentres = [];
@@ -953,6 +1189,7 @@ function loadLevel(i) {
   game.verdict = null;
   game.tapMode = false;
   el.clear.hidden = true;
+  el.chestSheet.hidden = true;
   drawScreen();
   drawHud();
   drawPreview();
@@ -963,8 +1200,9 @@ function drawHud() {
   const lv = level();
   el.levelName.textContent = "লেভেল " + bn(lv.id);
   el.levelSub.textContent = bn(foundSet().size) + " / " + bn(lv.words.length) + " শব্দ";
-  el.coins.textContent = bn(game.coins);
+  if (el.coins.textContent !== bn(game.coins)) el.coins.textContent = bn(game.coins);
   el.hint.disabled = isClear();
+  drawChest();
 }
 
 /**
@@ -1127,14 +1365,36 @@ function drawPreview() {
     el.preview.innerHTML = `<span class="hint-text">অক্ষর জুড়ে শব্দ বানাও</span>`;
     return;
   }
-  const tone = game.verdict
-    ? (game.verdict.result === "correct" ? " good" : game.verdict.result === "dup" ? " dup shake" : " bad shake")
-    : "";
+  const tone = game.verdict ? ({
+    correct: " good",
+    extra: " extra",
+    dup: " dup shake",
+    wrong: " bad shake"
+  }[game.verdict.result] || "") : "";
   const submit = (!game.verdict && game.tapMode)
     ? `<button class="go" id="submitWord" title="মিলিয়ে দেখো" aria-label="Check word">✓</button>` : "";
-  el.preview.innerHTML = `<div class="chip${tone}">${word}${submit}</div>`;
+  const badge = game.verdict?.result === "extra"
+    ? `<em class="badge bn">বাড়তি</em>` : "";
+  el.preview.innerHTML = `<div class="chip${tone}">${word}${badge}${submit}</div>`;
   const go = document.getElementById("submitWord");
   if (go) go.addEventListener("click", () => submitWord());
+}
+
+/** The chest button and its sheet: progress toward the next payout. */
+function drawChest() {
+  const filled = game.chest % CHEST_TARGET;
+  el.chestCount.textContent = `${bn(filled)}/${bn(CHEST_TARGET)}`;
+  el.chestFill.style.width = `${(filled / CHEST_TARGET) * 100}%`;
+  el.chest.classList.toggle('full', filled === 0 && game.chest > 0);
+
+  el.chestTrack.style.width = `${(filled / CHEST_TARGET) * 100}%`;
+  el.chestProgress.textContent = `${bn(filled)} / ${bn(CHEST_TARGET)}`;
+  el.chestReward.textContent = `+${bn(CHEST_REWARD)} কয়েন`;
+
+  const mine = [...extraSet()];
+  el.chestWords.innerHTML = mine.length
+    ? mine.map(w => `<span class="w">${w}</span>`).join('')
+    : `<span class="none">এই লেভেলে এখনো কিছু পাওনি</span>`;
 }
 
 function drawLevelGrid() {
@@ -1152,8 +1412,193 @@ function drawLevelGrid() {
   });
 }
 
+
 /* ════════════════════════════════════════════════════════════════════════════
-   6. Play
+   6. Animation — every action gets a physical response
+   ════════════════════════════════════════════════════════════════════════════ */
+const still = window.matchMedia('(prefers-reduced-motion: reduce)');
+const reduced = () => still.matches;
+
+/** Screen-relative box, since the effects layer is positioned inside .screen. */
+function boxOf(node) {
+  const screenRect = document.querySelector('.screen').getBoundingClientRect();
+  const r = node.getBoundingClientRect();
+  return { x: r.left - screenRect.left, y: r.top - screenRect.top, w: r.width, h: r.height };
+}
+
+/**
+ * Sends a thing from one place to another and cleans up after itself. Everything that moves
+ * in this game moves through here: letters to the board, coins to the counter, words to the
+ * chest.
+ */
+function fly(from, to, { text = '', cls = '', size = null, delay = 0, duration = 460,
+                         arc = 0, spin = 0, fade = false } = {}) {
+  if (reduced()) return Promise.resolve();
+  const layer = document.getElementById('fx');
+  if (!layer) return Promise.resolve();
+
+  const el = document.createElement('div');
+  el.className = 'fly ' + cls;
+  el.textContent = text;
+  const w = size || from.w, hgt = size || from.h;
+  el.style.width = w + 'px';
+  el.style.height = cls.includes('word') ? 'auto' : hgt + 'px';
+  el.style.left = from.x + 'px';
+  el.style.top = from.y + 'px';
+  if (text) el.style.fontSize = Math.round(Math.min(w, hgt) * 0.44) + 'px';
+  layer.appendChild(el);
+
+  const dx = (to.x + to.w / 2) - (from.x + from.w / 2);
+  const dy = (to.y + to.h / 2) - (from.y + from.h / 2);
+  const scale = to.w && from.w ? to.w / from.w : 1;
+
+  const frames = [
+    { transform: 'translate(0,0) scale(1) rotate(0deg)', opacity: 1, offset: 0 },
+    { transform: `translate(${dx * 0.5}px, ${dy * 0.5 - arc}px) scale(${(1 + scale) / 2}) `
+               + `rotate(${spin / 2}deg)`, opacity: 1, offset: 0.55 },
+    { transform: `translate(${dx}px, ${dy}px) scale(${scale}) rotate(${spin}deg)`,
+      opacity: fade ? 0 : 1, offset: 1 }
+  ];
+
+  const run = el.animate(frames, { duration, delay, easing: 'cubic-bezier(.3,.7,.3,1)', fill: 'forwards' });
+  return run.finished.then(() => el.remove()).catch(() => el.remove());
+}
+
+/** Counts the coin readout from one value to another, in Bengali digits. */
+function countCoins(from, to, duration = 520) {
+  const node = el.coins;
+  node.classList.remove('pulse');
+  void node.offsetWidth;
+  node.classList.add('pulse');
+  if (reduced() || from === to) { node.textContent = bn(to); return; }
+  const start = performance.now();
+  const step = now => {
+    const t = Math.min(1, (now - start) / duration);
+    const eased = 1 - Math.pow(1 - t, 3);
+    node.textContent = bn(Math.round(from + (to - from) * eased));
+    if (t < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+/** A handful of coins tumbling to the counter. */
+function coinBurst(fromNode, count = 6) {
+  if (reduced()) return;
+  const from = boxOf(fromNode);
+  const to = boxOf(el.coins);
+  for (let i = 0; i < count; i++) {
+    fly({ x: from.x + from.w / 2 - 9, y: from.y + from.h / 2 - 9, w: 18, h: 18 }, to, {
+      cls: 'coin', size: 18, delay: i * 55, duration: 520 + i * 25,
+      arc: 26 + i * 8, spin: 180, fade: true
+    });
+  }
+}
+
+/** Letters leaving the wheel and landing in their cells. */
+function flyLettersToBoard(word, cells) {
+  const aksharas = splitAksharas(word);
+  const tiles = [...el.wheel.querySelectorAll('.tile')];
+  const arrivals = [];
+
+  aksharas.forEach((akshara, i) => {
+    const tile = tiles.find(t => t.textContent === akshara);
+    const cell = cells[i] && el.board.querySelector(`[data-pos="${key(cells[i][0], cells[i][1])}"]`);
+    if (!tile || !cell) return;
+    const delay = i * 70;
+    arrivals.push({ cell, delay });
+    fly(boxOf(tile), boxOf(cell), {
+      text: akshara, cls: '', delay, duration: 380, arc: 18
+    });
+  });
+
+  // reveal each cell as its letter lands
+  arrivals.forEach(({ cell, delay }) => {
+    setTimeout(() => {
+      cell.classList.add('on', 'arrive');
+      setTimeout(() => cell.classList.remove('arrive'), 460);
+    }, reduced() ? 0 : delay + 330);
+  });
+  const last = arrivals.length ? arrivals[arrivals.length - 1].delay + 380 : 0;
+  return reduced() ? 0 : last;
+}
+
+/** Nudges the cells of a word the player has already solved. */
+function knockWord(word) {
+  const placed = game.puzzle.words.find(w => w.word === word);
+  if (!placed || reduced()) return;
+  placed.cells.forEach(([r, c], i) => {
+    const cell = el.board.querySelector(`[data-pos="${key(r, c)}"]`);
+    if (!cell) return;
+    setTimeout(() => {
+      cell.classList.add('knock');
+      setTimeout(() => cell.classList.remove('knock'), 420);
+    }, i * 60);
+  });
+}
+
+/** The wheel refusing a word. */
+function rejectWheel() {
+  if (reduced()) return;
+  el.wheel.querySelectorAll('.tile').forEach((t, i) => {
+    setTimeout(() => {
+      t.classList.add('reject');
+      setTimeout(() => t.classList.remove('reject'), 380);
+    }, i * 25);
+  });
+}
+
+/** An extra word travelling into the chest. */
+function flyWordToChest(word) {
+  const chip = el.preview.querySelector('.chip');
+  const target = boxOf(el.chest);
+  if (chip && !reduced()) {
+    fly(boxOf(chip), target, { text: word, cls: 'word', duration: 520, arc: 34, fade: true });
+  }
+  setTimeout(() => {
+    el.chest.classList.remove('bump');
+    void el.chest.offsetWidth;
+    el.chest.classList.add('bump');
+  }, reduced() ? 0 : 420);
+}
+
+/** Cells popping in sequence, then coins raining, when a level is cleared. */
+function celebrateLevel() {
+  if (reduced()) return;
+  const cells = [...el.board.querySelectorAll('.cell.on')];
+  cells.forEach((cell, i) => setTimeout(() => {
+    cell.classList.add('knock');
+    setTimeout(() => cell.classList.remove('knock'), 420);
+  }, i * 45));
+
+  const layer = document.getElementById('fx');
+  const width = layer.clientWidth;
+  for (let i = 0; i < 14; i++) {
+    const x = 10 + Math.random() * Math.max(10, width - 30);
+    fly({ x, y: -24, w: 16, h: 16 }, { x, y: layer.clientHeight + 30, w: 16, h: 16 }, {
+      cls: 'coin', size: 16, delay: 180 + i * 70, duration: 900 + Math.random() * 500,
+      spin: 360, fade: true
+    });
+  }
+}
+
+/** Tiles sliding to their new places instead of teleporting. */
+function animateShuffle(before) {
+  if (reduced()) return;
+  el.wheel.querySelectorAll('.tile').forEach(tile => {
+    const from = before.get(tile.textContent);
+    if (!from) return;
+    const now = tile.getBoundingClientRect();
+    const dx = from.left - now.left;
+    const dy = from.top - now.top;
+    if (!dx && !dy) return;
+    tile.animate(
+      [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'translate(0,0)' }],
+      { duration: 420, easing: 'cubic-bezier(.3,1.2,.4,1)' });
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   7. Play
    ════════════════════════════════════════════════════════════════════════════ */
 let verdictTimer = null;
 
@@ -1174,31 +1619,77 @@ function submitWord() {
 
   const lv = level();
   const done = foundSet();
+  const extrasAvailable = levelExtras();
+  const extrasFound = extraSet();
 
-  if (!lv.words.includes(word)) { showVerdict(word, "wrong"); return; }
-  if (done.has(word)) { showVerdict(word, "dup"); return; }
+  // ── a word on the board ───────────────────────────────────────────────────
+  if (lv.words.includes(word)) {
+    if (done.has(word)) {
+      showVerdict(word, "dup");
+      knockWord(word);
+      return;
+    }
 
-  done.add(word);
-  game.found[lv.id] = [...done];
-  game.coins += splitAksharas(word).length * PER_AKSHARA;
+    done.add(word);
+    game.found[lv.id] = [...done];
 
-  const cleared = done.size === lv.words.length;
-  if (cleared) game.coins += LEVEL_BONUS;
+    const reward = splitAksharas(word).length * PER_AKSHARA;
+    const cleared = done.size === lv.words.length;
+    const before = game.coins;
+    game.coins += reward + (cleared ? LEVEL_BONUS : 0);
+    persist();
 
-  persist();
-  showVerdict(word, "correct");
-  refreshBoard();
-  drawHud();
-  drawLevelGrid();
-
-  if (cleared) {
+    showVerdict(word, "correct");
+    const placed = game.puzzle.words.find(w => w.word === word);
+    const settle = placed ? flyLettersToBoard(word, placed.cells) : 0;
     setTimeout(() => {
-      el.clearBody.textContent =
-        `সব শব্দ খুঁজে পেয়েছ। এখন তোমার কয়েন ${bn(game.coins)}।`;
-      el.nextLevel.textContent = game.index < LEVELS.length - 1 ? "পরের লেভেল" : "প্রথম থেকে";
-      el.clear.hidden = false;
-    }, 700);
+      refreshBoard();
+      countCoins(before, game.coins);
+      coinBurst(el.board, Math.min(6, splitAksharas(word).length + 2));
+      drawHud();
+      drawLevelGrid();
+    }, settle);
+
+    if (cleared) {
+      setTimeout(celebrateLevel, settle + 120);
+      setTimeout(() => {
+        el.clearBody.textContent =
+          `সব শব্দ খুঁজে পেয়েছ। এখন তোমার কয়েন ${bn(game.coins)}।`;
+        el.nextLevel.textContent = game.index < LEVELS.length - 1 ? "পরের লেভেল" : "প্রথম থেকে";
+        el.clear.hidden = false;
+      }, settle + 900);
+    }
+    return;
   }
+
+  // ── an extra word: not on the board, but real ─────────────────────────────
+  if (extrasAvailable.has(word)) {
+    if (extrasFound.has(word)) { showVerdict(word, "dup"); return; }
+
+    extrasFound.add(word);
+    game.extras[lv.id] = [...extrasFound];
+    game.chest += 1;
+    const full = game.chest % CHEST_TARGET === 0;
+    const before = game.coins;
+    if (full) game.coins += CHEST_REWARD;
+    persist();
+
+    showVerdict(word, "extra");
+    flyWordToChest(word);
+    setTimeout(() => {
+      drawChest();
+      if (full) {
+        coinBurst(el.chest, 8);
+        countCoins(before, game.coins);
+        drawHud();
+      }
+    }, reduced() ? 0 : 460);
+    return;
+  }
+
+  // ── not a word here ──────────────────────────────────────────────────────
+  showVerdict(word, "wrong");
+  rejectWheel();
 }
 
 /* pointer drag across the wheel */
@@ -1279,6 +1770,7 @@ el.wheel.addEventListener("pointercancel", () => {
 document.addEventListener("keydown", e => {
   if (e.key === "Enter" && game.picked.length) { e.preventDefault(); submitWord(); }
   if (e.key === "Escape") {
+    if (!el.chestSheet.hidden) { el.chestSheet.hidden = true; return; }
     game.picked = []; game.tapMode = false;
     markTiles(); drawTrail(); drawPreview();
   }
@@ -1302,14 +1794,30 @@ el.hint.addEventListener("click", () => {
     if (target) break;
   }
   if (!target) return;
+  const before = game.coins;
   game.coins -= HINT_COST;
   game.hints[lv.id] = [...hintSet(), target];
   persist();
   refreshBoard();
+  countCoins(before, game.coins);
   drawHud();
+
+  const cell = el.board.querySelector(`[data-pos="${target}"]`);
+  if (cell && !reduced()) {
+    cell.classList.add('arrive');
+    setTimeout(() => cell.classList.remove('arrive'), 460);
+    fly(boxOf(el.coins), boxOf(cell), { cls: 'coin', size: 18, duration: 420, arc: 20, fade: true });
+  }
+  el.hint.classList.remove('flash');
+  void el.hint.offsetWidth;
+  el.hint.classList.add('flash');
 });
 
 el.shuffle.addEventListener("click", () => {
+  // remember where each letter was, so the tiles can slide rather than jump
+  const before = new Map();
+  el.wheel.querySelectorAll('.tile').forEach(t => before.set(t.textContent, t.getBoundingClientRect()));
+
   for (let i = game.wheel.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [game.wheel[i], game.wheel[j]] = [game.wheel[j], game.wheel[i]];
@@ -1318,6 +1826,16 @@ el.shuffle.addEventListener("click", () => {
   game.tapMode = false;
   drawScreen();
   drawPreview();
+  animateShuffle(before);
+});
+
+el.chest.addEventListener("click", () => {
+  drawChest();
+  el.chestSheet.hidden = false;
+});
+el.chestClose.addEventListener("click", () => { el.chestSheet.hidden = true; });
+el.chestSheet.addEventListener("click", e => {
+  if (e.target === el.chestSheet) el.chestSheet.hidden = true;
 });
 
 el.prev.addEventListener("click", () => loadLevel(game.index - 1));

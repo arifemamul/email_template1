@@ -89,7 +89,37 @@ CATALOGUE = [
     ["গ্রহ", "গ্রহণ", "চন্দ্র", "চন্দ্রগ্রহণ"],
     ["গ্রহ", "গ্রহণ", "সূর্য", "সূর্যগ্রহণ"],
     ["বন", "মান", "মানব", "বিমান", "বন্দর", "বিমানবন্দর"],
+
+    # ── five tiles with room to spare: these are where the extra-words chest fills ───────
+    ["সব", "কম", "রকম", "সবরকম"],
+    ["কলা", "কমলা", "কলার", "কমলাপুর"],
+    ["মাস", "মান", "মানা", "সমান", "মানানসই"],
+    ["মন", "গম", "নগর", "গরম", "মহান", "মহানগর"],
 ]
+
+# ── extra words ─────────────────────────────────────────────────────────────────────────
+# Words the tiles can spell that are NOT on the board. Finding one fills the chest, which
+# pays coins — the mechanic that makes a letter wheel feel generous instead of restrictive.
+#
+# Every level's own words are automatically available as extras to other levels, since they
+# are already hand-verified. This list adds the rest, hand-picked from corpus candidates.
+# Deliberately rejected while curating: proper names (রবিন, তালহা, রামা), transliterations
+# (শপ, চিপ, লস, বট), grammatical fragments (টির, লাম, নত, রন, গন, ইন, নই), a corpus
+# misspelling (বিবরন for বিবরণ), and crude words (বাল, লাশ, শালা, মল, মদ).
+EXTRA_VOCABULARY = """
+তাই মত সবার জানা বার মার পাল বাপ নব বর তাক রক্ষক লতা বাড়ির ঘড়ির চাকার দীন কুল খাব তাস
+গাল নল সর হাতা মাপা লেখাপড়া সন্ত নর রশি ছক রব বান কাত মাল আল পাকা টাকা কাঠ নাতি রাজা কাজ
+জমা তামা নামা মামা চাচা কাকা দাদা নানা মাসি বোন ভাই বাবা হার মহা গমন মগ কর করব রস বস বর
+সরব কসম সম রকম কলাম পুর নামা সই মানস কবর কলার গরম গম নগর নরম মন
+""".split()
+
+# Three extra words fill the chest; a full chest pays out and starts again. The chest is
+# shared across levels rather than reset each time — with three- and four-tile boards there
+# are not always extras to find, so a per-level chest would sit empty and teach the player to
+# ignore it.
+CHEST_TARGET = 3
+CHEST_REWARD = 15
+MAX_EXTRAS_PER_LEVEL = 10
 
 # The opening levels are pinned rather than scored: plain consonants carry their own vowel,
 # so they teach what an akshara is before vowel signs and conjuncts arrive.
@@ -158,8 +188,19 @@ def validate(words):
         'occupied': occupied,
         'size': (rows, cols),
         'score': difficulty(tiles, words),
+        'extras': [],          # filled in by ordered_levels, which sees the whole catalogue
     }
     return level, problems
+
+
+def extras_for(tiles, words, vocabulary):
+    """
+    Attested words those tiles can spell that are not on this board, most common first so
+    the ones a player is likeliest to try are the ones that count.
+    """
+    found = [w for w in vocabulary if w not in words and spellable(w, tiles)]
+    found.sort(key=lambda w: (-zipf(w), w))
+    return found[:MAX_EXTRAS_PER_LEVEL]
 
 
 def ordered_levels():
@@ -174,6 +215,11 @@ def ordered_levels():
             failures.append((words, problems))
             continue
         levels.append(level)
+
+    # Every level's words are verified vocabulary, so they double as extras elsewhere.
+    vocabulary = sorted({w for level in levels for w in level['words']} | set(EXTRA_VOCABULARY))
+    for level in levels:
+        level['extras'] = extras_for(level['tiles'], level['words'], vocabulary)
 
     levels.sort(key=lambda l: l['score'])
     pinned = [l for opener in OPENERS for l in levels if l['words'] == opener]

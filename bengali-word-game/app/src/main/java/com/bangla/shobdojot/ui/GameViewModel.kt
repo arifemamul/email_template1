@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import com.bangla.shobdojot.data.GameRepository
 import com.bangla.shobdojot.data.Levels
 import com.bangla.shobdojot.logic.BanglaText
+import com.bangla.shobdojot.logic.Chest
 import com.bangla.shobdojot.logic.CrosswordGenerator
 import com.bangla.shobdojot.model.GridPos
 import com.bangla.shobdojot.model.Level
@@ -15,7 +16,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 /** What happened to the word the player just released the wheel on. */
-enum class WordResult { CORRECT, ALREADY_FOUND, WRONG }
+enum class WordResult {
+    /** A word on the board: it fills the grid. */
+    CORRECT,
+
+    /** A real word the tiles can spell that is not on the board: it fills the chest. */
+    EXTRA,
+
+    /** Already credited, on the board or in the chest. */
+    ALREADY_FOUND,
+
+    WRONG
+}
 
 data class GameUiState(
     val level: Level? = null,
@@ -23,6 +35,9 @@ data class GameUiState(
     val wheelLetters: List<String> = emptyList(),
     val foundWords: Set<String> = emptySet(),
     val hintedCells: Set<GridPos> = emptySet(),
+    val extraWords: Set<String> = emptySet(),
+    /** Extra words found across every level; the chest fills from this. */
+    val extrasCollected: Int = 0,
     val coins: Int = 0,
     val unlockedLevel: Int = 1,
     val completed: Boolean = false
@@ -38,6 +53,14 @@ data class GameUiState(
         }
 
     val totalWords: Int get() = level?.words?.size ?: 0
+
+    /** Slots filled in the current chest, and how many a chest holds. */
+    val chestFilled: Int get() = Chest.filled(extrasCollected)
+    val chestTarget: Int get() = Chest.TARGET
+
+    /** Extra words this level still has to offer, for a "keep looking" hint. */
+    val extrasRemaining: Int
+        get() = ((level?.extras ?: emptyList()) - extraWords).size
 }
 
 class GameViewModel(application: Application) : AndroidViewModel(application) {
@@ -62,6 +85,8 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             wheelLetters = level.letters,
             foundWords = found,
             hintedCells = repo.hintedCells(levelId).filter { it in puzzle.cellLetters }.toSet(),
+            extraWords = repo.extraWords(levelId).filter { it in level.extras }.toSet(),
+            extrasCollected = repo.extrasCollected,
             coins = repo.coins,
             unlockedLevel = repo.unlockedLevel,
             completed = found.size == level.words.size
@@ -71,12 +96,16 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     /** Handles the word the player traced on the wheel and reports how it went. */
     fun submitWord(word: String): WordResult {
         val level = _state.value.level ?: return WordResult.WRONG
+
         val result = when {
-            word !in level.words -> WordResult.WRONG
             word in _state.value.foundWords -> WordResult.ALREADY_FOUND
-            else -> WordResult.CORRECT
+            word in level.words -> WordResult.CORRECT
+            word in _state.value.extraWords -> WordResult.ALREADY_FOUND
+            word in level.extras -> WordResult.EXTRA
+            else -> WordResult.WRONG
         }
 
+        if (result == WordResult.EXTRA) return collectExtra(level, word)
         if (result != WordResult.CORRECT) return result
 
         val found = _state.value.foundWords + word
@@ -97,6 +126,26 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             )
         }
         return WordResult.CORRECT
+    }
+
+    /**
+     * Credits an extra word: it fills the chest rather than the board, and a full chest pays
+     * out. The chest total carries across levels.
+     */
+    private fun collectExtra(level: Level, word: String): WordResult {
+        val found = _state.value.extraWords + word
+        val before = repo.extrasCollected
+        val reward = Chest.rewardFor(before)
+        val coins = repo.coins + reward
+
+        repo.extrasCollected = before + 1
+        repo.saveExtraWords(level.id, found)
+        repo.coins = coins
+
+        _state.update {
+            it.copy(extraWords = found, extrasCollected = before + 1, coins = coins)
+        }
+        return WordResult.EXTRA
     }
 
     /** Buys one letter: reveals a cell from a word the player has not solved yet. */
