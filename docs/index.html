@@ -126,7 +126,7 @@
   /* ── Two-up: device on the left, controls and notes on the right ─────────── */
   .stage {
     display: grid;
-    grid-template-columns: minmax(0, auto) minmax(280px, 420px);
+    grid-template-columns: minmax(0, 400px) minmax(280px, 420px);
     gap: clamp(20px, 3vw, 44px);
     align-items: start;
     justify-content: center;
@@ -139,7 +139,8 @@
   /* ── Phone ──────────────────────────────────────────────────────────────── */
   .device {
     position: relative;
-    width: min(400px, 100%);
+    width: 400px;
+    max-width: 100%;
     height: min(760px, calc(100vh - 172px));
     height: min(760px, calc(100dvh - 172px));
     min-height: 540px;
@@ -223,8 +224,8 @@
     background: radial-gradient(circle at 32% 30%, #ffd66e, var(--marigold-d));
   }
 
-  /* board */
-  .board-area { flex: 1 1 auto; min-height: 0; display: grid; place-items: center; }
+  /* board — height is assigned in JS, since how much a board needs depends on its rows */
+  .board-area { flex: 0 0 auto; min-height: 0; display: grid; place-items: center; }
 
   .board { display: grid; gap: var(--gap); }
 
@@ -314,7 +315,7 @@
   .action .glyph { color: var(--marigold); font-size: 15px; }
 
   /* wheel */
-  .wheel-area { flex: 1.15 1 auto; min-height: 0; display: grid; place-items: center; }
+  .wheel-area { flex: 1 1 auto; min-height: 0; display: grid; place-items: center; }
 
   .wheel { position: relative; touch-action: none; }
   .wheel svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
@@ -518,7 +519,7 @@
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">বাংলা শব্দ খেলা · 31 levels · plays in your browser</p>
+    <p class="eyebrow">বাংলা শব্দ খেলা · 66 levels · plays in your browser</p>
     <h1>শব্দজট</h1>
   </header>
 
@@ -562,13 +563,14 @@
     <div class="panel">
       <p class="deck">
         A Bengali word-cross puzzle. Drag across the letters to spell a word; each word you find
-        writes itself into the crossword above. <b>Thirty-one levels</b>, from three-letter consonant
-        sets up to compound words like ফুলবাগান. Nothing to install, no sign-up, no ads — your
-        progress is saved in this browser.
+        writes itself into the crossword above. <b>Sixty-six levels, easiest first</b>: plain
+        consonants to open, then vowel signs, then compound words, and finally six-tile boards built
+        on conjuncts — ন্দ্র and গ্র are each one tile in চন্দ্রগ্রহণ. Nothing to install, no sign-up,
+        no ads — your progress is saved in this browser.
       </p>
 
       <section class="card">
-        <h3>Levels</h3>
+        <h3>Levels — easiest first</h3>
         <div class="levels" id="levelGrid"></div>
       </section>
 
@@ -601,7 +603,8 @@
   <footer>
     Every board is generated from a word list when you open the level, not hand-drawn: words are
     placed by backtracking search so each one crosses another and no accidental word ever appears
-    on the grid. Tiles hold <b>aksharas</b> — the letter units a Bengali reader sees — so মাছ is two
+    on the grid. All 215 words are attested in real Bengali text — checked against corpus frequency
+    data, then hand-picked, because frequency lists happily offer verb inflections and fragments. Tiles hold <b>aksharas</b> — the letter units a Bengali reader sees — so মাছ is two
     tiles, মা and ছ, and the conjunct ন্ধু in বন্ধু is one. Bengali text is rendered with your
     system font. There is also an Android build of this game, sharing the same levels and the same
     layout code.
@@ -680,7 +683,7 @@ function scorePlacement(occ, aks, start, horizontal) {
   return crossings;
 }
 
-function boundsArea(occ, extra) {
+function boundsExtent(occ, extra) {
   let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
   const visit = (r, c) => {
     if (r < minR) minR = r; if (r > maxR) maxR = r;
@@ -688,7 +691,8 @@ function boundsArea(occ, extra) {
   };
   for (const k of occ.keys()) { const [r, c] = k.split(",").map(Number); visit(r, c); }
   for (const [r, c] of extra) visit(r, c);
-  return (maxR - minR + 1) * (maxC - minC + 1);
+  const rows = maxR - minR + 1;
+  return [rows, rows * (maxC - minC + 1)];
 }
 
 function candidates(occ, aks) {
@@ -706,15 +710,15 @@ function candidates(occ, aks) {
         if (seen.has(id)) continue;
         const crossings = scorePlacement(occ, aks, start, horizontal);
         if (crossings === null) continue;
-        seen.set(id, {
-          start, horizontal, crossings,
-          area: boundsArea(occ, cellsFor(start, horizontal, aks.length))
-        });
+        const [rows, area] = boundsExtent(occ, cellsFor(start, horizontal, aks.length));
+        seen.set(id, { start, horizontal, crossings, rows, area });
       }
     }
   }
+  // rows before area: vertical space is what runs out on a portrait screen
   return [...seen.values()].sort((a, b) =>
     b.crossings - a.crossings ||
+    a.rows - b.rows ||
     a.area - b.area ||
     a.start[0] - b.start[0] ||
     a.start[1] - b.start[1] ||
@@ -797,37 +801,77 @@ function normalise(occ, placed) {
    3. Levels — data/Levels.kt, all 31
    ════════════════════════════════════════════════════════════════════════════ */
 const LEVELS = [
-  { id: 1,  letters: ["ক","ম","ল"],            words: ["কম","কল","মল","কমল"] },
-  { id: 2,  letters: ["ব","ন","ধ"],            words: ["বন","ধন","বধ"] },
-  { id: 3,  letters: ["প","থ","র"],            words: ["পথ","পর","রথ"] },
-  { id: 4,  letters: ["না","ম","দা"],          words: ["নাম","দাম","দানা"] },
-  { id: 5,  letters: ["জ","ল","ম","ন"],        words: ["জল","জন","মন","নল"] },
-  { id: 6,  letters: ["গা","ছ","ন","মা"],      words: ["গান","গাছ","মান","মাছ"] },
-  { id: 7,  letters: ["রা","ত","না","ম"],      words: ["রাত","নাম","রাম"] },
-  { id: 8,  letters: ["ক","ল","ম","লা"],       words: ["কল","কলা","কলম"] },
-  { id: 9,  letters: ["তা","রা","ম","ন"],      words: ["মন","তান","তারা"] },
-  { id: 10, letters: ["চা","বি","কা","র"],     words: ["চার","কার","চাবি"] },
-  { id: 11, letters: ["ফু","ল","কু","চা"],     words: ["ফুল","চাল","চাকু"] },
-  { id: 12, letters: ["সা","গ","র","ন"],       words: ["সার","নগর","সাগর"] },
-  { id: 13, letters: ["বা","তা","স","র"],      words: ["বাস","তার","বাতাস"] },
-  { id: 14, letters: ["আ","ম","রা","ত"],       words: ["আম","রাত","আমরা"] },
-  { id: 15, letters: ["ন","দী","র","পা"],      words: ["নদী","পার","নদীর"] },
-  { id: 16, letters: ["মা","টি","র","পা"],     words: ["মাটি","পার","মাটির"] },
-  { id: 17, letters: ["চা","ম","চ","কা"],      words: ["কাচ","চাকা","চামচ"] },
-  { id: 18, letters: ["জা","না","লা","ম"],     words: ["জাম","নাম","জানালা"] },
-  { id: 19, letters: ["দে","শ","বি","কা"],     words: ["দেশ","বিদেশ","বিকাশ"] },
-  { id: 20, letters: ["দি","ন","রা","ত"],      words: ["দিন","রাত","দিনরাত"] },
-  { id: 21, letters: ["দু","ধ","ভা","ত"],      words: ["দুধ","ভাত","দুধভাত"] },
-  { id: 22, letters: ["ব","ই","খা","তা"],      words: ["বই","খাতা","বইখাতা"] },
-  { id: 23, letters: ["হা","ত","পা","খা"],     words: ["হাত","পাখা","হাতপাখা"] },
-  { id: 24, letters: ["হা","ত","ঘ","ড়ি"],      words: ["হাত","ঘড়ি","হাতঘড়ি"] },
-  { id: 25, letters: ["ক","লা","গা","ছ"],      words: ["কলা","গাছ","কলাগাছ"] },
-  { id: 26, letters: ["প","ড়া","লে","খা"],     words: ["পড়া","লেখা","পড়ালেখা"] },
-  { id: 27, letters: ["ঘ","র","বা","ড়ি"],      words: ["ঘর","বাঘ","বাড়ি","ঘরবাড়ি"] },
-  { id: 28, letters: ["ব","ন","ধ","ন্ধু"],      words: ["বন","ধন","বন্ধু"] },
-  { id: 29, letters: ["শি","শু","পা","ঠ"],     words: ["শিশু","পাঠ","শিশুপাঠ"] },
-  { id: 30, letters: ["রা","স্তা","ঘা","ট"],    words: ["রাস্তা","ঘাট","রাস্তাঘাট"] },
-  { id: 31, letters: ["ফু","ল","বা","গা","ন"], words: ["ফুল","গান","বাগান","ফুলবাগান"] }
+  // Easiest first: three tiles, short everyday words.
+  { id: 1, letters: ["ক", "ম", "ল"], words: ["কম", "কল", "কমল", "কলম"] },
+  { id: 2, letters: ["ব", "ন", "ধ"], words: ["বন", "ধন", "বধ"] },
+  { id: 3, letters: ["প", "থ", "র"], words: ["পথ", "পর", "রথ"] },
+  { id: 4, letters: ["না", "ম", "দা"], words: ["নাম", "দাম", "দানা"] },
+  { id: 5, letters: ["রা", "ত", "না", "ম"], words: ["রাত", "নাম", "রাম"] },
+  { id: 6, letters: ["ক", "বি", "তা"], words: ["কবি", "তাক", "কবিতা"] },
+  { id: 7, letters: ["না", "ট", "ক"], words: ["নাক", "টক", "নাটক"] },
+  { id: 8, letters: ["ম", "ন", "তা", "রা"], words: ["মন", "তান", "তারা"] },
+  { id: 9, letters: ["ব", "ই", "খা", "তা"], words: ["বই", "খাই", "খাতা"] },
+  { id: 10, letters: ["ফু", "ল", "চা", "কু"], words: ["ফুল", "চাল", "চাকু"] },
+  { id: 11, letters: ["পা", "হা", "ড়"], words: ["পাড়", "হাড়", "পাহাড়"] },
+  { id: 12, letters: ["পা", "য়ে", "স"], words: ["পাস", "পায়ে", "পায়েস"] },
+  { id: 13, letters: ["মে", "ঘ", "লা"], words: ["মেঘ", "মেলা", "মেঘলা"] },
+  { id: 14, letters: ["গা", "ন", "ছ", "মা"], words: ["গান", "গাছ", "মান", "মাছ"] },
+  { id: 15, letters: ["জ", "ল", "ন", "ম"], words: ["জল", "জন", "মন", "নল"] },
+  { id: 16, letters: ["বা", "ল", "তি"], words: ["বাতি", "তিল", "বালতি", "বাতিল"] },
+  { id: 17, letters: ["ন", "গ", "র", "সা"], words: ["সার", "নগর", "সাগর"] },
+
+  // The first level with a conjunct tile: ন্ত is one letter unit, one tile.
+  { id: 18, letters: ["ব", "স", "ন্ত"], words: ["সব", "বস", "বসন্ত"] },
+  { id: 19, letters: ["ব", "ন", "ধ", "ন্ধু"], words: ["বন", "ধন", "বন্ধু"] },
+  { id: 20, letters: ["ন", "দী", "র", "পা"], words: ["নদী", "পার", "পান", "নদীর"] },
+  { id: 21, letters: ["বাং", "লা", "দে", "শ"], words: ["বাংলা", "দেশ", "বাংলাদেশ"] },
+  { id: 22, letters: ["আ", "ম", "রা", "ত"], words: ["আম", "রাত", "আমরা", "আরাম"] },
+  { id: 23, letters: ["চা", "ম", "চ", "কা"], words: ["কাচ", "চাকা", "চামচ"] },
+  { id: 24, letters: ["বি", "দে", "শ", "কা"], words: ["দেশ", "বিশ", "বিদেশ", "বিকাশ"] },
+  { id: 25, letters: ["মা", "টি", "র", "পা"], words: ["মাটি", "পার", "পাটি", "মাটির"] },
+  { id: 26, letters: ["প", "রি", "বে", "শ"], words: ["বেশ", "পরি", "পরিবেশ"] },
+  { id: 27, letters: ["দি", "ন", "রা", "ত"], words: ["দিন", "রাত", "দিনরাত"] },
+  { id: 28, letters: ["বাং", "লা", "ভা", "ষা"], words: ["বাংলা", "ভাষা", "বাংলাভাষা"] },
+  { id: 29, letters: ["শি", "ক্ষ", "ক", "র"], words: ["কর", "কক্ষ", "শিক্ষক"] },
+  { id: 30, letters: ["ফু", "ট", "ব", "ল"], words: ["বল", "ফুল", "ফুট", "ফুটবল"] },
+  { id: 31, letters: ["হা", "ত", "ঘ", "ড়ি"], words: ["হাত", "ঘড়ি", "হাতঘড়ি"] },
+  { id: 32, letters: ["জা", "না", "লা", "ম"], words: ["জাম", "নাম", "মজা", "নালা", "জানালা"] },
+  { id: 33, letters: ["প", "ড়া", "লে", "খা"], words: ["পড়া", "লেখা", "খাড়া", "পড়ালেখা"] },
+  { id: 34, letters: ["দু", "ধ", "ভা", "ত"], words: ["দুধ", "ভাত", "দুধভাত"] },
+  { id: 35, letters: ["বা", "তা", "স", "র"], words: ["বাস", "তার", "বার", "রস", "তাস", "বাতাস"] },
+  { id: 36, letters: ["বি", "চা", "র", "কা"], words: ["চার", "কার", "রবি", "চাবি", "চাকা", "বিচার"] },
+  { id: 37, letters: ["মা", "ছ", "রা", "ঙা"], words: ["মাছ", "মারা", "রাঙা", "মাছরাঙা"] },
+  { id: 38, letters: ["ক", "ল", "ম", "লা"], words: ["কল", "কলা", "কলম", "কমল", "লাল", "কমলা"] },
+  { id: 39, letters: ["প", "রি", "বা", "র"], words: ["পর", "বার", "বাপ", "পরি", "পরিবার"] },
+  { id: 40, letters: ["ক", "লা", "গা", "ছ"], words: ["কলা", "লাগা", "গাছ", "কলাগাছ"] },
+  { id: 41, letters: ["পা", "ঠ", "শা", "লা"], words: ["পাঠ", "পালা", "পাশা", "পাঠশালা"] },
+  { id: 42, letters: ["রা", "ষ্ট্র", "প", "তি"], words: ["পরা", "রাষ্ট্র", "রাষ্ট্রপতি"] },
+  { id: 43, letters: ["ঘ", "র", "বা", "ড়ি"], words: ["ঘর", "বাঘ", "ঘড়ি", "বাড়ি", "ঘরবাড়ি"] },
+  { id: 44, letters: ["ভা", "লো", "বা", "সা"], words: ["ভালো", "বাসা", "ভাসা", "ভাবা", "ভালোবাসা"] },
+  { id: 45, letters: ["স্বা", "ধী", "ন", "তা"], words: ["তান", "স্বাধীন", "স্বাধীনতা"] },
+  { id: 46, letters: ["রা", "স্তা", "ঘা", "ট"], words: ["রাস্তা", "ঘাট", "রাস্তাঘাট"] },
+  { id: 47, letters: ["জ", "ন্ম", "দি", "ন"], words: ["জন", "দিন", "জন্ম", "জন্মদিন"] },
+  { id: 48, letters: ["শী", "ত", "কা", "ল"], words: ["তল", "শীত", "কাল", "শীতল", "শীতকাল"] },
+  { id: 49, letters: ["হা", "ত", "পা", "খা"], words: ["হাত", "খাত", "পাত", "পাখা", "হাতপাখা"] },
+  { id: 50, letters: ["র", "স", "গো", "ল্লা"], words: ["রস", "সর", "রসগোল্লা"] },
+  { id: 51, letters: ["ক", "ল", "কা", "তা"], words: ["কল", "কাক", "তাল", "লতা", "কাল", "কলকাতা"] },
+  { id: 52, letters: ["শি", "ল্প", "ক", "লা"], words: ["কলা", "শিলা", "শিল্প", "শিল্পকলা"] },
+  { id: 53, letters: ["চি", "ঠি", "প", "ত্র"], words: ["চিঠি", "পত্র", "চিত্র", "চিঠিপত্র"] },
+  { id: 54, letters: ["বি", "দ্যা", "ল", "য়"], words: ["বিল", "লয়", "বিদ্যা", "বিদ্যালয়"] },
+  { id: 55, letters: ["প্র", "জা", "প", "তি"], words: ["প্রতি", "জাতি", "প্রজা", "প্রজাতি", "প্রজাপতি"] },
+  { id: 56, letters: ["প্র", "তি", "ষ্ঠা", "ন"], words: ["প্রতি", "তিন", "প্রতিষ্ঠা", "প্রতিষ্ঠান"] },
+  { id: 57, letters: ["ব", "র্ষা", "কা", "ল"], words: ["বল", "বকা", "কাল", "বর্ষা", "বর্ষাকাল"] },
+
+  // The first five-tile board. Six-tile boards close out the game.
+  { id: 58, letters: ["ফু", "ল", "বা", "গা", "ন"], words: ["ফুল", "গান", "বাগান", "ফুলবাগান"] },
+  { id: 59, letters: ["মু", "ক্তি", "যু", "দ্ধ"], words: ["মুক্তি", "যুদ্ধ", "যুক্তি", "মুক্তিযুদ্ধ"] },
+  { id: 60, letters: ["প্র", "জা", "ত", "ন্ত্র"], words: ["জাত", "প্রজা", "তন্ত্র", "প্রজাতন্ত্র"] },
+  { id: 61, letters: ["হা", "স", "পা", "তা", "ল"], words: ["পাতা", "তাল", "হাল", "পাস", "পাতাল", "হাসপাতাল"] },
+  { id: 62, letters: ["সং", "বা", "দ", "প", "ত্র"], words: ["বাদ", "পদ", "পত্র", "সংবাদ", "সংবাদপত্র"] },
+  { id: 63, letters: ["র", "বী", "ন্দ্র", "না", "থ"], words: ["বীর", "রথ", "নাথ", "রবীন্দ্র", "রবীন্দ্রনাথ"] },
+  { id: 64, letters: ["চ", "ন্দ্র", "গ্র", "হ", "ণ"], words: ["গ্রহ", "গ্রহণ", "চন্দ্র", "চন্দ্রগ্রহণ"] },
+  { id: 65, letters: ["সূ", "র্য", "গ্র", "হ", "ণ"], words: ["গ্রহ", "গ্রহণ", "সূর্য", "সূর্যগ্রহণ"] },
+  { id: 66, letters: ["বি", "মা", "ন", "ব", "ন্দ", "র"], words: ["বন", "মান", "মানব", "বিমান", "বন্দর", "বিমানবন্দর"] }
 ];
 
 const HINT_COST = 25, PER_AKSHARA = 5, LEVEL_BONUS = 30;
@@ -909,8 +953,7 @@ function loadLevel(i) {
   game.verdict = null;
   game.tapMode = false;
   el.clear.hidden = true;
-  drawBoard();
-  drawWheel();
+  drawScreen();
   drawHud();
   drawPreview();
   drawLevelGrid();
@@ -924,18 +967,60 @@ function drawHud() {
   el.hint.disabled = isClear();
 }
 
-function drawBoard() {
+/**
+ * Splits the screen between board and wheel. A six-row board needs far more height than a
+ * two-row one, so a fixed share leaves the big levels with unreadably small cells. The board
+ * asks for what its rows need, the wheel asks for what its tiles need, and when the screen
+ * cannot supply both the wheel gives ground first — it has slack, a crossword does not.
+ */
+function allocateSpace() {
   const p = game.puzzle;
-  const area = el.boardArea.getBoundingClientRect();
+  const screenEl = document.querySelector('.screen');
+  const style = getComputedStyle(screenEl);
+  const gaps = parseFloat(style.rowGap || 8) * 4;
+  const chrome = document.querySelector('.topbar').offsetHeight
+    + el.preview.offsetHeight
+    + document.querySelector('.actions').offsetHeight
+    + gaps;
+  const usable = screenEl.clientHeight
+    - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom)
+    - chrome;
+  const width = screenEl.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+
   const gap = 5;
-  const cell = Math.max(
-    22,
-    Math.floor(Math.min(
-      (area.width - gap * (p.cols - 1)) / p.cols,
-      (area.height - gap * (p.rows - 1)) / p.rows,
-      64
-    ))
-  );
+  const IDEAL_CELL = 46, MIN_CELL = 30, MAX_CELL = 64;
+  const byWidth = Math.floor((width - gap * (p.cols - 1)) / p.cols);
+  const wheelWant = game.wheel.length <= 4 ? 210 : game.wheel.length <= 5 ? 230 : 250;
+  const MIN_WHEEL = 148;   // still leaves ~44px tap targets
+
+  let cell = Math.min(MAX_CELL, byWidth, IDEAL_CELL);
+  let boardH = p.rows * cell + gap * (p.rows - 1);
+  let wheel = Math.min(wheelWant, width);
+
+  if (boardH + wheel > usable) {
+    // take it out of the wheel first, then out of the cells
+    wheel = Math.max(MIN_WHEEL, Math.min(wheel, usable - boardH));
+    const forBoard = usable - wheel;
+    cell = Math.max(MIN_CELL, Math.min(cell, Math.floor((forBoard - gap * (p.rows - 1)) / p.rows)));
+    cell = Math.min(cell, byWidth);
+    boardH = p.rows * cell + gap * (p.rows - 1);
+    wheel = Math.max(MIN_WHEEL, Math.min(width, usable - boardH));
+  } else {
+    // spare height: give it to the board, up to a comfortable cell size
+    const spare = usable - boardH - wheel;
+    const grown = Math.min(MAX_CELL, byWidth, cell + Math.floor(spare / p.rows));
+    cell = Math.max(cell, grown);
+    boardH = p.rows * cell + gap * (p.rows - 1);
+  }
+
+  el.boardArea.style.height = Math.round(boardH) + 'px';
+  return { cell, wheel: Math.round(Math.min(wheel, width)) };
+}
+
+function drawBoard(alloc) {
+  const p = game.puzzle;
+  const gap = 5;
+  const cell = alloc.cell;
 
   el.board.style.gridTemplateColumns = `repeat(${p.cols}, ${cell}px)`;
   el.board.style.gridAutoRows = cell + "px";
@@ -954,7 +1039,8 @@ function drawBoard() {
       if (letter !== undefined) {
         const span = document.createElement("span");
         span.textContent = letter;
-        span.style.fontSize = Math.round(cell * 0.42) + "px";
+        // Conjuncts need vertical room, so small cells get a proportionally larger glyph.
+        span.style.fontSize = Math.round(cell * (cell < 40 ? 0.5 : 0.42)) + "px";
         div.appendChild(span);
         if (shown.has(k)) div.classList.add("on");
         if (hinted.has(k) && !div.classList.contains("blank")) div.classList.add("hinted");
@@ -962,6 +1048,13 @@ function drawBoard() {
       el.board.appendChild(div);
     }
   }
+}
+
+/** Re-measures the split, then redraws board and wheel from the same allocation. */
+function drawScreen() {
+  const alloc = allocateSpace();
+  drawBoard(alloc);
+  drawWheel(alloc);
 }
 
 function refreshBoard() {
@@ -974,9 +1067,8 @@ function refreshBoard() {
   }
 }
 
-function drawWheel() {
-  const area = el.wheelArea.getBoundingClientRect();
-  const size = Math.max(180, Math.floor(Math.min(area.width, area.height)));
+function drawWheel(alloc) {
+  const size = Math.max(148, alloc.wheel);
   const n = game.wheel.length;
   const tile = Math.round(size * (n <= 4 ? 0.30 : n <= 6 ? 0.26 : 0.21));
   const radius = size / 2 - tile / 2;
@@ -1224,7 +1316,7 @@ el.shuffle.addEventListener("click", () => {
   }
   game.picked = [];
   game.tapMode = false;
-  drawWheel();
+  drawScreen();
   drawPreview();
 });
 
@@ -1242,7 +1334,7 @@ el.replay.addEventListener("click", () => {
 let resizeTimer = null;
 new ResizeObserver(() => {
   clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => { drawBoard(); drawWheel(); markTiles(); }, 60);
+  resizeTimer = setTimeout(() => { drawScreen(); markTiles(); }, 60);
 }).observe(document.querySelector(".screen"));
 
 /* first unsolved level makes the best landing spot */

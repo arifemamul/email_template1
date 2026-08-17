@@ -96,8 +96,45 @@ class LevelsTest {
     fun `boards stay small enough for a phone screen`() {
         for (level in Levels.all) {
             val puzzle = CrosswordGenerator.generate(level.words)
-            assertTrue("level ${level.id} is ${puzzle.rows} rows tall", puzzle.rows <= 6)
-            assertTrue("level ${level.id} is ${puzzle.cols} cols wide", puzzle.cols <= 7)
+            assertTrue("level ${level.id} is ${puzzle.rows} rows tall", puzzle.rows <= 8)
+            assertTrue("level ${level.id} is ${puzzle.cols} cols wide", puzzle.cols <= 9)
         }
+    }
+
+    @Test
+    fun `the first levels stay gentle`() {
+        // A hard level at the front would meet the player before they know what a tile is.
+        for (level in Levels.all.take(8)) {
+            assertTrue("level ${level.id} opens with ${level.letters.size} tiles",
+                level.letters.size <= 4)
+            val longest = level.words.maxOf { BanglaText.length(it) }
+            assertTrue("level ${level.id} opens with a $longest-akshara word", longest <= 3)
+            assertTrue(
+                "level ${level.id} opens with a conjunct tile",
+                level.letters.none { it.contains('\u09CD') }
+            )
+        }
+    }
+
+    @Test
+    fun `difficulty ramps rather than jumping about`() {
+        // Tile count is the coarsest difficulty dial; it should never fall far as ids rise.
+        val tiles = Levels.all.map { it.letters.size }
+        for (i in 1 until tiles.size) {
+            assertTrue(
+                "level ${i + 1} drops to ${tiles[i]} tiles from ${tiles[i - 1]}",
+                tiles[i] >= tiles[i - 1] - 1
+            )
+        }
+        assertTrue("the last level should be one of the biggest", tiles.last() >= tiles.max() - 1)
+    }
+
+    @Test
+    fun `the catalogue is big enough to be worth playing`() {
+        assertTrue("only ${Levels.count} levels", Levels.count >= 60)
+        val words = Levels.all.flatMap { it.words }.toSet()
+        assertTrue("only ${words.size} distinct words", words.size >= 150)
+        val conjunctLevels = Levels.all.count { lv -> lv.letters.any { it.contains('\u09CD') } }
+        assertTrue("only $conjunctLevels levels use conjunct tiles", conjunctLevels >= 10)
     }
 }

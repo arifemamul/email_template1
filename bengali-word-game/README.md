@@ -25,8 +25,10 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 
 ## Gameplay
 
-- **31 levels**, from three-tile consonant puzzles up to five-tile compound words
-  (ফুল + বাগান → ফুলবাগান), including conjunct levels (বন্ধু, রাস্তা).
+- **66 levels, ordered by difficulty**: three-tile consonant puzzles to open, then vowel
+  signs, compound words (ফুল + বাগান → ফুলবাগান), conjunct tiles (বন্ধু, রাস্তা, মুক্তিযুদ্ধ),
+  and finally six-tile boards with five- and six-akshara spines (বিমানবন্দর, চন্দ্রগ্রহণ).
+  215 distinct words across the catalogue, up to six words per board.
 - **Drag to spell.** Sliding back onto the previous tile un-picks it.
 - **Coins** for each word found (5 per akshara) and a 30-coin bonus for finishing a level.
 - **Hints** cost 25 coins and reveal one letter from a word you have not solved.
@@ -39,7 +41,7 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 build of the same game for the browser — one file, no build step, no dependencies, no
 network calls. Bengali splitting, the crossword generator and all 31 levels are ported from
 this app's Kotlin, and the port is checked by diffing generated boards against the compiled
-Kotlin: all 31 come out identical, cell for cell.
+Kotlin: all 66 come out identical, cell for cell.
 
 Launch it any of these ways:
 
@@ -103,10 +105,16 @@ Add an entry to `data/Levels.kt`:
 Level(32, listOf("ক", "লা", "গা", "ছ"), listOf("কলা", "গাছ", "কলাগাছ"))
 ```
 
-Then run `./gradlew test`. `LevelsTest` checks the whole catalogue: every word spellable
-from its tiles using each tile at most once, no tile left unusable, at least three words per
-level, a connected layout, no accidental words on the board, and a grid that fits a phone
-screen.
+Then run `./gradlew test`. `LevelsTest` checks the whole catalogue: every word spellable from
+its tiles using each tile at most once, no tile left unusable, at least three words per level,
+a connected layout, no accidental words on the board, a grid that fits a phone screen, a gentle
+first eight levels, and a tile count that ramps rather than jumping about.
+
+Words should also be real. Every word shipped here was checked against Bengali corpus
+frequency data before being hand-picked; that check caught two compounds in an earlier draft
+(বইখাতা, শিশুপাঠ) that read plausibly but do not occur in Bengali text. A frequency list on its
+own is not enough either — its most common four-letter entries are verb inflections like
+করেছেন, which make dull puzzles.
 
 ## Layout
 

@@ -86,7 +86,8 @@ private fun GridCell(letter: String, revealed: Boolean, size: Dp) {
         Text(
             text = letter,
             color = TileInk,
-            fontSize = (size.value * 0.42f).sp,
+            // Conjuncts need vertical room, so small cells get a proportionally larger glyph.
+            fontSize = (size.value * if (size.value < 40f) 0.5f else 0.42f).sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
             maxLines = 1,

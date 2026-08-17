@@ -95,9 +95,14 @@ object CrosswordGenerator {
             undo.addedCells.forEach { occupied.remove(it) }
         }
 
-        /** Every legal placement for [aksharas], best crossings and tightest board first. */
+        /**
+         * Every legal placement for [aksharas]: most crossings first, then the shallowest
+         * board. Rows are ranked ahead of total area because the board sits above a letter
+         * wheel on a portrait screen — vertical space is what runs out, so a wide, shallow
+         * board keeps cells big enough to read.
+         */
         fun candidates(aksharas: List<String>): List<Placement> {
-            val scored = LinkedHashMap<Placement, Pair<Int, Int>>()
+            val scored = LinkedHashMap<Placement, Triple<Int, Int, Int>>()
             val anchors = occupied.entries.sortedWith(compareBy({ it.key.row }, { it.key.col }))
 
             for ((anchorPos, anchorLetter) in anchors) {
@@ -112,15 +117,17 @@ object CrosswordGenerator {
                         val placement = Placement(start, horizontal)
                         if (scored.containsKey(placement)) continue
                         val crossings = score(aksharas, placement) ?: continue
-                        scored[placement] = crossings to areaWith(cellsFor(placement, aksharas.size))
+                        val extent = extentWith(cellsFor(placement, aksharas.size))
+                        scored[placement] = Triple(crossings, extent.first, extent.second)
                     }
                 }
             }
 
             return scored.entries
                 .sortedWith(
-                    compareByDescending<Map.Entry<Placement, Pair<Int, Int>>> { it.value.first }
+                    compareByDescending<Map.Entry<Placement, Triple<Int, Int, Int>>> { it.value.first }
                         .thenBy { it.value.second }
+                        .thenBy { it.value.third }
                         .thenBy { it.key.start.row }
                         .thenBy { it.key.start.col }
                         .thenBy { !it.key.horizontal }
@@ -163,7 +170,8 @@ object CrosswordGenerator {
             return crossings
         }
 
-        private fun areaWith(extra: List<GridPos>): Int {
+        /** Row count and cell area of the board once [extra] is added. */
+        private fun extentWith(extra: List<GridPos>): Pair<Int, Int> {
             var minRow = Int.MAX_VALUE
             var maxRow = Int.MIN_VALUE
             var minCol = Int.MAX_VALUE
@@ -174,7 +182,8 @@ object CrosswordGenerator {
                 minCol = min(minCol, pos.col)
                 maxCol = max(maxCol, pos.col)
             }
-            return (maxRow - minRow + 1) * (maxCol - minCol + 1)
+            val rows = maxRow - minRow + 1
+            return rows to rows * (maxCol - minCol + 1)
         }
 
         fun detachedPlacement(): Placement =
