@@ -14,12 +14,20 @@ from bangla import (conjunct_tiles, grid_size, layout, split_aksharas, spellable
                     stray_runs, tiles_for)
 from wordpool import zipf
 
-# Ordered by difficulty at build time, so the order here is only for human readability.
-CATALOGUE = [
-    # ── short words, plain consonants and simple vowel signs ────────────────────────────
-    ["কম", "কল", "কমল", "কলম"],
-    ["বন", "ধন", "বধ"],
+# The opening five, in this order. Nothing else is this small: three plain consonants, three
+# two-akshara words, all of them everyday vocabulary, and no extras to distract. They exist to
+# teach the drag and the idea that a tile is a letter unit, nothing more.
+EASY_OPENERS = [
+    ["জল", "জন", "নল"],
     ["পথ", "পর", "রথ"],
+    ["কর", "বর", "রব"],
+    ["সব", "বস", "রস"],
+    ["কম", "কল", "কমল"],
+]
+
+# Ordered by difficulty at build time, so the order here is only for human readability.
+CATALOGUE = EASY_OPENERS + [
+    # ── short words, plain consonants and simple vowel signs ────────────────────────────
     ["জল", "জন", "মন", "নল"],
     ["নাম", "দাম", "দানা"],
     ["গান", "গাছ", "মান", "মাছ"],
@@ -85,7 +93,7 @@ CATALOGUE = [
     ["মুক্তি", "যুদ্ধ", "যুক্তি", "মুক্তিযুদ্ধ"],
     ["বাদ", "পদ", "পত্র", "সংবাদ", "সংবাদপত্র"],
     ["বীর", "রথ", "নাথ", "রবীন্দ্র", "রবীন্দ্রনাথ"],
-    ["পাতা", "তাল", "হাল", "পাস", "পাতাল", "হাসপাতাল"],
+    ["হাসপাতাল", "পাটি", "পাতাল", "হাতা", "তাল", "পাস"],
     ["গ্রহ", "গ্রহণ", "চন্দ্র", "চন্দ্রগ্রহণ"],
     ["গ্রহ", "গ্রহণ", "সূর্য", "সূর্যগ্রহণ"],
     ["বন", "মান", "মানব", "বিমান", "বন্দর", "বিমানবন্দর"],
@@ -95,6 +103,10 @@ CATALOGUE = [
     ["কলা", "কমলা", "কলার", "কমলাপুর"],
     ["মাস", "মান", "মানা", "সমান", "মানানসই"],
     ["মন", "গম", "নগর", "গরম", "মহান", "মহানগর"],
+
+    # Six tiles picked for coverage rather than for one long word: these letters spell
+    # fifteen words between the board and the chest.
+    ["কলম", "রকম", "নগর"],
 ]
 
 # ── extra words ─────────────────────────────────────────────────────────────────────────
@@ -107,10 +119,9 @@ CATALOGUE = [
 # (শপ, চিপ, লস, বট), grammatical fragments (টির, লাম, নত, রন, গন, ইন, নই), a corpus
 # misspelling (বিবরন for বিবরণ), and crude words (বাল, লাশ, শালা, মল, মদ).
 EXTRA_VOCABULARY = """
-তাই মত সবার জানা বার মার পাল বাপ নব বর তাক রক্ষক লতা বাড়ির ঘড়ির চাকার দীন কুল খাব তাস
-গাল নল সর হাতা মাপা লেখাপড়া সন্ত নর রশি ছক রব বান কাত মাল আল পাকা টাকা কাঠ নাতি রাজা কাজ
-জমা তামা নামা মামা চাচা কাকা দাদা নানা মাসি বোন ভাই বাবা হার মহা গমন মগ কর করব রস বস বর
-সরব কসম সম রকম কলাম পুর নামা সই মানস কবর কলার গরম গম নগর নরম মন
+তাই মত সবার নাই জানা করব হার বাড়ির মার নরম সই পাল মহা নব বর লেখাপড়া রব রক্ষক কলাম নামা
+ঘড়ির খাপ বান কসম সম বাড়িঘর চাকার দীন কুল খাব গাল রশি ছক সন্ত নর মগ মাপা বক মকর বাসর সমর
+হাতা কাত বন্দ লেপ তাস তিল লতা লাগা খাড়া তাক পাশা গম নল সর তল পাত খাত জাম রাঙা কাক গরম
 """.split()
 
 # Three extra words fill the chest; a full chest pays out and starts again. The chest is
@@ -119,15 +130,6 @@ EXTRA_VOCABULARY = """
 # ignore it.
 CHEST_TARGET = 3
 CHEST_REWARD = 15
-MAX_EXTRAS_PER_LEVEL = 10
-
-# The opening levels are pinned rather than scored: plain consonants carry their own vowel,
-# so they teach what an akshara is before vowel signs and conjuncts arrive.
-OPENERS = [
-    ["কম", "কল", "কমল", "কলম"],
-    ["বন", "ধন", "বধ"],
-    ["পথ", "পর", "রথ"],
-]
 
 MIN_ZIPF = 2.0          # below this, treat a "word" as invented rather than Bengali
 MAX_ROWS, MAX_COLS = 8, 9
@@ -135,12 +137,13 @@ MAX_ROWS, MAX_COLS = 8, 9
 
 def difficulty(tiles, words):
     """
-    What makes a level hard, weighted: how many tiles to scan, how many words to find, how
-    long the longest one is, whether any tile is a conjunct, and how rare the words are.
+    What makes a level hard, weighted. Word count carries the most weight per unit: having to
+    find six words from one wheel is what actually makes a board take a while, more than any
+    single word being long. Then tiles to scan, the longest word, conjunct tiles, and rarity.
     """
     longest = max(len(split_aksharas(w)) for w in words)
     rarity = sum(max(0.0, 5.5 - zipf(w)) for w in words) / len(words)
-    return (2.4 * len(tiles) + 1.4 * len(words) + 2.2 * longest
+    return (2.2 * len(tiles) + 3.4 * len(words) + 2.0 * longest
             + 3.0 * len(conjunct_tiles(tiles)) + 1.6 * rarity)
 
 
@@ -193,6 +196,66 @@ def validate(words):
     return level, problems
 
 
+def board_target(rank, total):
+    """
+    How many words a level should ask for, by how far into the game it sits. More words from
+    one wheel is the main difficulty dial, so it climbs; the opening five never grow.
+    """
+    if rank < len(EASY_OPENERS):
+        return 3
+    share = rank / max(1, total - 1)
+    if share < 0.25:
+        return 4
+    if share < 0.5:
+        return 5
+    if share < 0.8:
+        return 6
+    return 7
+
+
+def extras_reserve(available):
+    """
+    How many of a tile set's words to hold back for the chest rather than put on the board.
+    The board is the difficulty dial and the chest is the reward, so both need feeding: a
+    board that swallowed every word would leave the chest permanently empty.
+    """
+    if available >= 6:
+        return 3
+    if available >= 4:
+        return 2
+    if available >= 2:
+        return 1
+    return 0
+
+
+def grow_board(words, candidates, target):
+    """
+    Adds words to a board until it holds `target` of them, keeping only additions the
+    crossword can still take. Common words first, so a bigger board stays fair; the rarest
+    are reserved for the chest, where knowing an uncommon word is worth coins.
+    """
+    reserve = extras_reserve(len(candidates))
+    candidates = candidates[:max(0, len(candidates) - reserve)]
+
+    grown = list(words)
+    for candidate in candidates:
+        if len(grown) >= target:
+            break
+        if candidate in grown:
+            continue
+        trial = grown + [candidate]
+        placed = layout(trial)
+        if not placed:
+            continue
+        rows, cols = grid_size(placed[0])
+        if rows > MAX_ROWS or cols > MAX_COLS:
+            continue
+        if stray_runs(placed[0], trial):
+            continue
+        grown = trial
+    return grown
+
+
 def extras_for(tiles, words, vocabulary):
     """
     Attested words those tiles can spell that are not on this board, most common first so
@@ -200,7 +263,7 @@ def extras_for(tiles, words, vocabulary):
     """
     found = [w for w in vocabulary if w not in words and spellable(w, tiles)]
     found.sort(key=lambda w: (-zipf(w), w))
-    return found[:MAX_EXTRAS_PER_LEVEL]
+    return found
 
 
 def ordered_levels():
@@ -218,10 +281,33 @@ def ordered_levels():
 
     # Every level's words are verified vocabulary, so they double as extras elsewhere.
     vocabulary = sorted({w for level in levels for w in level['words']} | set(EXTRA_VOCABULARY))
+
+    # Sort by the difficulty of the level as written, then hand each one a word-count target
+    # by how far into the game it sits and grow it to fit.
+    levels.sort(key=lambda l: l['score'])
+    openers = [l for opener in EASY_OPENERS for l in levels if l['words'] == opener]
+    rest = [l for l in levels if l not in openers]
+    levels = openers + rest
+
+    for rank, level in enumerate(levels):
+        target = board_target(rank, len(levels))
+        candidates = [w for w in vocabulary
+                      if w not in level['words'] and spellable(w, level['tiles'])]
+        candidates.sort(key=lambda w: -zipf(w))
+        grown = grow_board(level['words'], candidates, target)
+        if grown != level['words']:
+            placed = layout(grown)
+            level['words'] = grown
+            level['occupied'] = placed[0]
+            level['size'] = grid_size(placed[0])
+        level['score'] = difficulty(level['tiles'], level['words'])
+
+    # Re-sort now that the boards have their final size, then pin the openers back to front.
+    levels.sort(key=lambda l: l['score'])
+    openers = [l for opener in EASY_OPENERS for l in levels if l['words'] == opener]
+    rest = [l for l in levels if l not in openers]
+    levels = openers + rest
+
     for level in levels:
         level['extras'] = extras_for(level['tiles'], level['words'], vocabulary)
-
-    levels.sort(key=lambda l: l['score'])
-    pinned = [l for opener in OPENERS for l in levels if l['words'] == opener]
-    rest = [l for l in levels if l not in pinned]
-    return pinned + rest, failures
+    return levels, failures

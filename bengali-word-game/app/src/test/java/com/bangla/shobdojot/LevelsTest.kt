@@ -102,13 +102,14 @@ class LevelsTest {
     }
 
     @Test
-    fun `the first levels stay gentle`() {
-        // A hard level at the front would meet the player before they know what a tile is.
-        for (level in Levels.all.take(8)) {
-            assertTrue("level ${level.id} opens with ${level.letters.size} tiles",
-                level.letters.size <= 4)
+    fun `the first five levels are the smallest in the game`() {
+        // They exist to teach the drag and the idea that a tile is a letter unit. Three plain
+        // consonants, three short words, nothing else to look at.
+        for (level in Levels.all.take(5)) {
+            assertEquals("level ${level.id} tile count", 3, level.letters.size)
+            assertEquals("level ${level.id} word count", 3, level.words.size)
             val longest = level.words.maxOf { BanglaText.length(it) }
-            assertTrue("level ${level.id} opens with a $longest-akshara word", longest <= 3)
+            assertTrue("level ${level.id} has a $longest-akshara word", longest <= 3)
             assertTrue(
                 "level ${level.id} opens with a conjunct tile",
                 level.letters.none { it.contains('\u09CD') }
@@ -117,21 +118,39 @@ class LevelsTest {
     }
 
     @Test
-    fun `difficulty ramps rather than jumping about`() {
-        // Tile count is the coarsest difficulty dial; it should never fall far as ids rise.
-        val tiles = Levels.all.map { it.letters.size }
-        for (i in 1 until tiles.size) {
+    fun `difficulty climbs across the game`() {
+        // Word count is the main dial — finding six words from one wheel is what makes a
+        // board take a while — so the ramp is asserted on the trend rather than level to
+        // level, which wobbles by design as several factors trade off.
+        val thirds = Levels.all.chunked((Levels.count + 2) / 3)
+        val tiles = thirds.map { third -> third.map { it.letters.size }.average() }
+        val words = thirds.map { third -> third.map { it.words.size }.average() }
+
+        assertTrue("mean tiles per third: $tiles", tiles[0] < tiles[1] && tiles[1] < tiles[2])
+        assertTrue("mean words per third: $words", words[0] < words[1] && words[1] < words[2])
+    }
+
+    @Test
+    fun `no level lurches away from its neighbours`() {
+        for (i in 1 until Levels.count) {
+            val drop = Levels.all[i].words.size - Levels.all[i - 1].words.size
             assertTrue(
-                "level ${i + 1} drops to ${tiles[i]} tiles from ${tiles[i - 1]}",
-                tiles[i] >= tiles[i - 1] - 1
+                "level ${i + 1} asks for $drop fewer words than level $i",
+                drop >= -2
             )
         }
-        assertTrue("the last level should be one of the biggest", tiles.last() >= tiles.max() - 1)
+    }
+
+    @Test
+    fun `the last level is one of the biggest`() {
+        val last = Levels.all.last()
+        assertTrue("last level has ${last.letters.size} tiles", last.letters.size >= 5)
+        assertTrue("last level has ${last.words.size} words", last.words.size >= 6)
     }
 
     @Test
     fun `the catalogue is big enough to be worth playing`() {
-        assertTrue("only ${Levels.count} levels", Levels.count >= 60)
+        assertTrue("only ${Levels.count} levels", Levels.count >= 70)
         val words = Levels.all.flatMap { it.words }.toSet()
         assertTrue("only ${words.size} distinct words", words.size >= 150)
         val conjunctLevels = Levels.all.count { lv -> lv.letters.any { it.contains('\u09CD') } }

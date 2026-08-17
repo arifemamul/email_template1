@@ -25,10 +25,12 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 
 ## Gameplay
 
-- **70 levels, ordered by difficulty**: three-tile consonant puzzles to open, then vowel
+- **73 levels, ordered by difficulty**: three-tile consonant puzzles to open, then vowel
   signs, compound words (ফুল + বাগান → ফুলবাগান), conjunct tiles (বন্ধু, রাস্তা, মুক্তিযুদ্ধ),
   and finally six-tile boards with five- and six-akshara spines (বিমানবন্দর, চন্দ্রগ্রহণ).
-  227 distinct words across the catalogue, up to six words per board.
+  The first five are deliberately tiny — three plain consonants, three short words — and
+  boards grow from three words to seven, because how many words one wheel has to yield is
+  what actually makes a level take a while. 246 distinct words, up to seven per board.
 - **Extra words.** Some words the tiles can spell are not on the board. Spell one anyway and
   it goes into the chest; three fills it and pays 15 coins. The chest is shared across levels
   rather than reset with each one — three- and four-tile boards do not always have extras, and
@@ -45,7 +47,7 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 build of the same game for the browser — one file, no build step, no dependencies, no
 network calls. Bengali splitting, the crossword generator and all 31 levels are ported from
 this app's Kotlin, and the port is checked by diffing generated boards against the compiled
-Kotlin: all 70 come out identical, cell for cell.
+Kotlin: all 73 come out identical, cell for cell.
 
 Launch it any of these ways:
 
