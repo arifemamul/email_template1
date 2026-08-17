@@ -50,5 +50,9 @@ fun ShobdoJotTheme(content: @Composable () -> Unit) {
             }
         }
     }
-    MaterialTheme(colorScheme = BoardColors, content = content)
+    MaterialTheme(
+        colorScheme = BoardColors,
+        typography = BanglaTypography,
+        content = content
+    )
 }

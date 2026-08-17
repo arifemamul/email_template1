@@ -52,6 +52,11 @@ Launch it any of these ways:
 Progress is kept in the browser's own storage, so a player keeps their coins and solved
 levels between visits without any account or server.
 
+The Bengali face is embedded in the file as a `data:` URI (Noto Sans Bengali, Bengali range
+only, ~92 KB for both weights), so the page reads correctly on machines with no Bengali font
+installed and keeps working with no network at all. Originals and the licence are in
+`docs/fonts/`.
+
 ## Building
 
 Requires the Android SDK (API 35 platform + build tools) and JDK 17.
@@ -63,9 +68,16 @@ cd bengali-word-game
 ./gradlew test                   # unit tests: text splitting, layout, level content
 ```
 
-Bengali text is rendered with the system font (Noto Sans Bengali ships with Android). No
-font is bundled; if you target devices with an incomplete font set, drop a Bengali TTF into
-`app/src/main/res/font/` and set it as the default `FontFamily` in `ui/theme/Theme.kt`.
+### Fonts
+
+Noto Sans Bengali is bundled with the app (`res/font/`, regular + bold, ~276 KB) and applied
+to every style in the type scale by `ui/theme/Type.kt`. Android has shipped a Bengali font
+for years, but OEM builds vary, and a ROM without Bengali coverage would turn every tile
+into an empty box — the one failure this game cannot survive. Bundling also makes the app
+and the web build render identical letterforms.
+
+Licence: SIL Open Font License 1.1 — `app/src/main/assets/fonts/OFL.txt`, which ships inside
+the APK so the licence travels with the font.
 
 ## How the board gets built
 
