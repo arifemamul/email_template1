@@ -33,6 +33,25 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 - **Shuffle** rearranges the wheel and is free.
 - Levels unlock in order; a half-solved board is saved, so you can leave and come back.
 
+## Play it on the web
+
+`docs/index.html` (repo root, one level up from this folder) is a complete, self-contained
+build of the same game for the browser — one file, no build step, no dependencies, no
+network calls. Bengali splitting, the crossword generator and all 31 levels are ported from
+this app's Kotlin, and the port is checked by diffing generated boards against the compiled
+Kotlin: all 31 come out identical, cell for cell.
+
+Launch it any of these ways:
+
+- **GitHub Pages** — Settings → Pages → Source: *Deploy from a branch*, branch `main`,
+  folder `/docs`. The game is then live at `https://<user>.github.io/<repo>/`.
+- **Any static host** — drag `docs/index.html` onto Netlify, Cloudflare Pages, Vercel, or an
+  S3 bucket. Rename it `index.html` at the root of whatever you upload.
+- **No host at all** — open the file directly, or email it. It runs from `file://`.
+
+Progress is kept in the browser's own storage, so a player keeps their coins and solved
+levels between visits without any account or server.
+
 ## Building
 
 Requires the Android SDK (API 35 platform + build tools) and JDK 17.
