@@ -92,10 +92,15 @@ backtracks over both word order and placement, and is fully deterministic. That 
 is load-bearing: hint positions are saved as grid coordinates, and they have to still point
 at the same cells after the app is killed and reopened.
 
-Some word sets simply cannot be laid out. `বন / ধন / বধ` is a triangle — every word crosses
-every other — and no grid arrangement exists. The generator degrades gracefully by parking
-leftovers on their own row, but `LevelsTest` fails the build instead, because a floating word
-is a content bug, not something to ship.
+Some word sets simply cannot be laid out. Only two words can pass through one cell — one
+across, one down — so three words that share nothing but the same akshara cannot all be
+placed. `চার / কার / চাবি / চাকা` fails that way, because চার, চাবি and চাকা meet only at চা.
+The generator degrades gracefully by parking leftovers on their own row, but `LevelsTest`
+fails the build instead, because a floating word is a content bug, not something to ship.
+
+Adding a word can *fix* such a level rather than break it: this one becomes placeable — and
+better — once বিচার and রবি join it, because they give the stranded words somewhere else to
+cross. It ships as a six-word level.
 
 ## Adding levels
 
