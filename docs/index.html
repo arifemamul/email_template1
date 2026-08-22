@@ -1419,6 +1419,20 @@ const store = {
   write(v) { try { localStorage.setItem("shobdojot", JSON.stringify(v)); } catch {} }
 };
 
+/**
+ * Which levels count as finished, from a save of any age. A level is finished if it says so,
+ * or - for saves predating that flag - if its found-word list covers the whole board.
+ */
+function migrateCompleted(saved) {
+  const completed = { ...(saved.completed || {}) };
+  const found = saved.found || {};
+  for (const lv of LEVELS) {
+    const words = found[lv.id];
+    if (Array.isArray(words) && lv.words.every(w => words.includes(w))) completed[lv.id] = true;
+  }
+  return completed;
+}
+
 const saved = store.read();
 const game = {
   index: 0,
@@ -1431,7 +1445,11 @@ const game = {
   // is revisited so it can be played again - a board sitting there fully lit with nothing left
   // to drag is not a level, it is a screenshot of one. `completed` is what remembers progress
   // for the level grid and for where a fresh visit lands.
-  completed: saved.completed || {},
+  //
+  // Saves written before this existed recorded a finished level only as a full `found` list,
+  // so read that too. Without it a returning player loses every checkmark, lands back on
+  // level 1, and watches those `found` lists get wiped one by one as they look around.
+  completed: migrateCompleted(saved),
   puzzle: null,
   wheel: [],
   picked: [],
