@@ -40,6 +40,14 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
   a syllabus that keeps early boards to three tiles cannot also have those tiles spell spare
   words. The fix is to change what the chest asks for, not to pad the boards: a word from an
   earlier level makes it spaced review and stops it depending on the current wheel.
+- **Every word spoken.** Web build only so far: a word is said the moment it is found, and
+  speaker marks replay any word, any Bengali sentence, and the letter each level introduces.
+  This matters more than it sounds - Bengali spelling hides the sound, since ব and ভ, শ and ষ
+  and স, ন and ণ are each one sound in speech and different letters on the page, which is
+  exactly where a child who speaks Bengali at home but reads none of it goes wrong. Recorded
+  clips take precedence when they exist (`python3 tools/build.py voice` lists what to record);
+  failing that the device's own Bengali voice is used; failing that nothing is spoken at all,
+  because an English voice reading Bengali would teach the wrong sounds.
 - **Drag to spell.** Sliding back onto the previous tile un-picks it.
 - **Coins** for each word found (5 per akshara) and a 30-coin bonus for finishing a level.
 - **Hints** cost 25 coins and reveal one letter from a word you have not solved.

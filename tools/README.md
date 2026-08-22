@@ -10,6 +10,7 @@ python3 tools/build.py check              # validate the catalogue, print the ra
 python3 tools/build.py build              # regenerate both builds' level tables
 python3 tools/build.py curriculum         # the syllabus: what each level teaches
 python3 tools/build.py slots              # audio and illustration work, in recording order
+python3 tools/build.py voice              # the pronunciation manifest, as pasteable JS
 python3 tools/build.py show 64            # print one level's board
 python3 tools/build.py discover প্রজাপতি   # what else can this word's tiles spell?
 python3 tools/propose.py 2 --kar া        # candidate tile sets for one stage of the syllabus
@@ -27,6 +28,17 @@ python3 tools/bangla.py                   # self-test the akshara and layout log
 | `wordpool.py` | Corpus frequency, used as the floor that rejects invented words |
 | `bangla.py` | Akshara splitting and crossword placement, mirroring the game's own logic |
 | `build.py` | The CLI, and the only thing that writes the generated files |
+
+## Pronunciation
+
+`build.py voice` prints the manifest the web build reads: 54 letters and 178 words, in the
+order a learner meets them, as a `VOICE_CLIPS` object to paste into `docs/index.html`. Until
+those recordings exist the page speaks through the device's own Bengali voice, and stays
+silent where there is none - `speechSynthesis` will otherwise read Bengali with an English
+voice, and a child copying that learns the wrong sounds from the app meant to teach them.
+
+A vowel sign cannot be pronounced on its own, so the manifest records the tile that carries
+it instead: া is listed as কা, matching what the game shows on its "new letter" chip.
 
 ## Teaching order, not difficulty order
 
