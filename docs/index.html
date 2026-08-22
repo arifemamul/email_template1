@@ -1423,10 +1423,15 @@ const saved = store.read();
 const game = {
   index: 0,
   coins: typeof saved.coins === "number" ? saved.coins : 120,
-  found: saved.found || {},          // levelId -> [words]
+  found: saved.found || {},          // levelId -> [words] found on THIS attempt
   hints: saved.hints || {},          // levelId -> ["r,c"]
   extras: saved.extras || {},        // levelId -> [extra words found]
   chest: saved.chest || 0,           // extra words toward the next payout, across all levels
+  // Levels ever fully solved. Separate from `found`, which is wiped each time a cleared level
+  // is revisited so it can be played again - a board sitting there fully lit with nothing left
+  // to drag is not a level, it is a screenshot of one. `completed` is what remembers progress
+  // for the level grid and for where a fresh visit lands.
+  completed: saved.completed || {},
   puzzle: null,
   wheel: [],
   picked: [],
@@ -1438,7 +1443,7 @@ const game = {
 
 const persist = () => store.write({
   coins: game.coins, found: game.found, hints: game.hints,
-  extras: game.extras, chest: game.chest
+  extras: game.extras, chest: game.chest, completed: game.completed
 });
 
 const level = () => LEVELS[game.index];
@@ -1502,6 +1507,11 @@ let tileCentres = [];
 function loadLevel(i) {
   game.index = (i + LEVELS.length) % LEVELS.length;
   const lv = level();
+  if (lv.words.length && (game.found[lv.id] || []).length === lv.words.length) {
+    delete game.found[lv.id];
+    delete game.hints[lv.id];
+    persist();
+  }
   game.puzzle = generate(lv.words);
   game.wheel = lv.letters.slice();
   game.picked = [];
@@ -1723,7 +1733,7 @@ function drawLevelGrid() {
     b.className = "lv";
     b.type = "button";
     b.textContent = bn(lv.id);
-    const done = (game.found[lv.id] || []).length === lv.words.length;
+    const done = !!game.completed[lv.id];
     if (done) b.classList.add("done");
     if (i === game.index) b.classList.add("now");
     b.addEventListener("click", () => loadLevel(i));
@@ -1806,10 +1816,10 @@ const Speech = {
   },
 
   /**
-   * Say something Bengali. `rate` is deliberately below 1: a learner needs to hear the
+   * Say something Bengali. `rate` is deliberately well below 1: a learner needs to hear the
    * shape of a word, not a native-speed run at it. Sentences go slower still.
    */
-  say(text, { rate = 0.85 } = {}) {
+  say(text, { rate = 0.7 } = {}) {
     if (!this.on || !text) return false;
 
     const clip = VOICE_CLIPS[text];
@@ -1818,7 +1828,7 @@ const Speech = {
       let audio = this.clips.get(text);
       if (!audio) { audio = new Audio(clip); this.clips.set(text, audio); }
       audio.currentTime = 0;
-      audio.playbackRate = rate < 1 ? 0.9 : 1;   // recordings are already paced for a child
+      audio.playbackRate = rate < 1 ? 0.8 : 1;   // recordings are already paced for a child
       this.playing = audio;
       audio.play().catch(() => {});              // a blocked autoplay is not worth an error
       return true;
@@ -1836,10 +1846,10 @@ const Speech = {
   },
 
   /** A whole sentence, slower again, and only when asked for. */
-  sentence(text) { return this.say(text, { rate: 0.78 }); },
+  sentence(text) { return this.say(text, { rate: 0.58 }); },
 
   /** One akshara on its own - the "new letter" chip. */
-  letter(akshara) { return this.say(akshara, { rate: 0.7 }); }
+  letter(akshara) { return this.say(akshara, { rate: 0.55 }); }
 };
 
 /** Reflects whether sound is on, and whether it is possible at all. */
@@ -2109,6 +2119,7 @@ function submitWord() {
     const cleared = done.size === lv.words.length;
     const before = game.coins;
     game.coins += reward + (cleared ? LEVEL_BONUS : 0);
+    if (cleared) game.completed[lv.id] = true;
     persist();
 
     showVerdict(word, "correct");
@@ -2367,13 +2378,9 @@ drawSound();
 el.prev.addEventListener("click", () => loadLevel(game.index - 1));
 el.next.addEventListener("click", () => loadLevel(game.index + 1));
 el.nextLevel.addEventListener("click", () => loadLevel(game.index + 1));
-el.replay.addEventListener("click", () => {
-  const lv = level();
-  delete game.found[lv.id];
-  delete game.hints[lv.id];
-  persist();
-  loadLevel(game.index);
-});
+// loadLevel already wipes a fully-found level back to blank, which is exactly what
+// "play again" means here - the button just re-enters the level it is already on.
+el.replay.addEventListener("click", () => loadLevel(game.index));
 
 /* keep the board and wheel sized to the screen */
 let resizeTimer = null;
@@ -2383,7 +2390,7 @@ new ResizeObserver(() => {
 }).observe(document.querySelector(".screen"));
 
 /* first unsolved level makes the best landing spot */
-const firstOpen = LEVELS.findIndex(lv => (game.found[lv.id] || []).length !== lv.words.length);
+const firstOpen = LEVELS.findIndex(lv => !game.completed[lv.id]);
 loadLevel(firstOpen === -1 ? 0 : firstOpen);
 </script>
 </body>
