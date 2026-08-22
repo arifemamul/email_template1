@@ -52,7 +52,15 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 - **Coins** for each word found (5 per akshara) and a 30-coin bonus for finishing a level.
 - **Hints** cost 25 coins and reveal one letter from a word you have not solved.
 - **Shuffle** rearranges the wheel and is free.
-- Levels unlock in order; a half-solved board is saved, so you can leave and come back.
+- **Finishing a level moves on by itself** (web build), after a five-second pause on a card
+  that lists the level's words to tap and hear. Touching the card stops the countdown, so a
+  child listening to words is never yanked onward.
+- **Every level opens blank.** Leaving a level discards the attempt rather than saving it -
+  going back to a level means wanting to play it again, and a board arriving part-filled with
+  letters you cannot remember placing is worse than a clean one. Which levels you have
+  finished is remembered separately, and shows in the level picker.
+- The level picker is colour-coded by syllabus block, so it reads as five stages rather than
+  83 identical chips.
 
 ## Play it on the web
 
