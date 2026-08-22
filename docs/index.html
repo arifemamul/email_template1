@@ -123,20 +123,33 @@
 
   .deck b { color: var(--parchment); font-weight: 600; }
 
-  /* The same copy sits inside a card, under its heading, so it needs room below it. */
-  .card .deck { margin-bottom: 16px; }
+  /* Inside a card the deck is body copy under a heading; it only needs room below it when
+     something else follows. */
+  .card .deck:not(:last-child) { margin-bottom: 16px; }
 
-  /* -- Two-up: device on the left, controls and notes on the right ----------- */
+  /* -- Two-up: the game and its level picker on the left, notes on the right ---
+       The level grid belongs to the game rather than to the notes, so it sits in the
+       same column, directly under the phone - close enough to read as one thing. */
   .stage {
     display: grid;
     grid-template-columns: minmax(0, 400px) minmax(280px, 420px);
+    grid-template-areas: "game notes" "levels notes";
+    grid-template-rows: auto 1fr;
     gap: clamp(20px, 3vw, 44px);
     align-items: start;
     justify-content: center;
   }
 
+  .stage > .device { grid-area: game; }
+  .stage > .levels-card { grid-area: levels; }
+  .stage > .panel { grid-area: notes; }
+
   @media (max-width: 860px) {
-    .stage { grid-template-columns: minmax(0, 1fr); }
+    .stage {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "game" "levels" "notes";
+      grid-template-rows: auto auto auto;
+    }
   }
 
   /* -- Phone ---------------------------------------------------------------- */
@@ -770,9 +783,14 @@
       </div>
     </div>
 
+    <section class="card levels-card">
+      <h3>Levels - in teaching order</h3>
+      <div class="levels" id="levelGrid"></div>
+    </section>
+
     <div class="panel">
       <section class="card">
-        <h3>Levels - in teaching order</h3>
+        <h3>What this is</h3>
         <p class="deck">
           A Bengali word-cross puzzle. Drag across the letters to spell a word; each word you find
           writes itself into the crossword above. <b>Eighty-three levels in a teaching order</b>,
@@ -781,7 +799,6 @@
           a time - ন্ধ, স্ত, ক্ষ - and finally free play on the fullest boards. Nothing to
           install, no sign-up, no ads - your progress is saved in this browser.
         </p>
-        <div class="levels" id="levelGrid"></div>
       </section>
 
       <section class="card">
@@ -789,7 +806,7 @@
         <ul class="how">
           <li><span class="k">drag</span><span>Press a letter and drag across the others. Sliding back onto the previous letter un-picks it.</span></li>
           <li><span class="k">click</span><span>Prefer clicking? Tap letters one at a time, then hit <b>✓</b> on the word - or press <b>Enter</b>. <b>Esc</b> clears.</span></li>
-          <li><span class="k">&lsaquo; &rsaquo;</span><span>The arrows step to the previous or next level, and wrap around at either end. The grid above jumps straight to any level.</span></li>
+          <li><span class="k">&lsaquo; &rsaquo;</span><span>The arrows step to the previous or next level, and wrap around at either end. The level grid jumps straight to any level.</span></li>
           <li><span class="k">◈ 25</span><span>A hint reveals one letter from a word you haven't solved. Words pay 5 coins per letter, plus 30 for clearing the level.</span></li>
           <li><span class="k">▧ chest</span><span>Some words the letters can spell aren't on the board - spell one anyway and it goes in the chest. <b>Three fills it</b> and pays 15 coins.</span></li>
         </ul>
