@@ -1033,6 +1033,14 @@
     .device { min-height: 400px; }
   }
 
+  /* A window this short cannot hold a portrait phone frame, so stop reserving height it
+     does not have. The layout budget shrinks the board and wheel to fit what is left, and
+     if even that is not enough it grows the frame back and the page scrolls - which beats
+     the alternative, since the screen clips its overflow and would simply hide the wheel. */
+  @media (max-height: 480px) {
+    .device { min-height: 0; }
+  }
+
   @media (max-width: 380px) {
     .levels { grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); }
   }
@@ -1601,7 +1609,8 @@ const el = {
   newLetter: document.getElementById("newLetter"),
   newLetterFace: document.getElementById("newLetterFace"),
   clearWords: document.getElementById("clearWords"),
-  clearProgress: document.getElementById("clearProgress")
+  clearProgress: document.getElementById("clearProgress"),
+  device: document.querySelector(".device")
 };
 
 let tileCentres = [];
@@ -1625,6 +1634,10 @@ function loadLevel(i) {
   game.tapMode = false;
   el.clear.hidden = true;
   el.chestSheet.hidden = true;
+  // Before the layout is measured, not after: the chip is a flex child of the screen, so a
+  // level that newly shows one would otherwise be allocated space as though it were not
+  // there, and the wheel would be pushed off the bottom by exactly the chip plus its gap.
+  drawNewLetter(lv);
   drawScreen();
   drawHud();
   drawPreview();
@@ -1650,44 +1663,79 @@ function allocateSpace() {
   const p = game.puzzle;
   const screenEl = document.querySelector('.screen');
   const style = getComputedStyle(screenEl);
-  const gaps = parseFloat(style.rowGap || 8) * 4;
-  const chrome = document.querySelector('.topbar').offsetHeight
-    + el.preview.offsetHeight
-    + document.querySelector('.actions').offsetHeight
-    + gaps;
+  // Everything in the screen that is not the board or the wheel, measured rather than
+  // guessed. Counting the flex gaps by hand was wrong the moment a sixth child appeared -
+  // the "new letter" chip - and it under-reserved by exactly one gap, which the wheel then
+  // spent and had clipped off the bottom.
+  const inFlow = [...screenEl.children].filter(c => {
+    if (c.hidden) return false;
+    const cs = getComputedStyle(c);
+    return cs.display !== 'none' && cs.position !== 'absolute' && cs.position !== 'fixed';
+  });
+  const rowGap = parseFloat(style.rowGap) || 0;
+  const chrome = inFlow
+    .filter(c => c !== el.boardArea && c !== el.wheelArea)
+    .reduce((sum, c) => sum + c.getBoundingClientRect().height, 0)
+    + rowGap * Math.max(0, inFlow.length - 1);
   const usable = screenEl.clientHeight
     - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom)
     - chrome;
   const width = screenEl.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
 
   const gap = 5;
-  const IDEAL_CELL = 46, MIN_CELL = 30, MAX_CELL = 64;
+  const IDEAL_CELL = 46, MIN_CELL = 26, MAX_CELL = 64;
   const byWidth = Math.floor((width - gap * (p.cols - 1)) / p.cols);
-  const wheelWant = game.wheel.length <= 4 ? 210 : game.wheel.length <= 5 ? 230 : 250;
-  const MIN_WHEEL = 148;   // still leaves ~44px tap targets
+  const rowGaps = gap * (p.rows - 1);
+  const boardFor = c => p.rows * c + rowGaps;
 
-  let cell = Math.min(MAX_CELL, byWidth, IDEAL_CELL);
-  let boardH = p.rows * cell + gap * (p.rows - 1);
-  let wheel = Math.min(wheelWant, width);
+  // What each part would like, before anyone gives anything up.
+  const wheelWant = Math.min(width, game.wheel.length <= 4 ? 210 : game.wheel.length <= 5 ? 230 : 250);
+  const cellWant = Math.min(MAX_CELL, byWidth, IDEAL_CELL);
 
-  if (boardH + wheel > usable) {
-    // take it out of the wheel first, then out of the cells
-    wheel = Math.max(MIN_WHEEL, Math.min(wheel, usable - boardH));
-    const forBoard = usable - wheel;
-    cell = Math.max(MIN_CELL, Math.min(cell, Math.floor((forBoard - gap * (p.rows - 1)) / p.rows)));
-    cell = Math.min(cell, byWidth);
-    boardH = p.rows * cell + gap * (p.rows - 1);
-    wheel = Math.max(MIN_WHEEL, Math.min(width, usable - boardH));
+  // ...and the layout we refuse to go below: cells small but still readable, and a wheel with
+  // tiles a finger can still hit. Width can force the cells smaller than MIN_CELL - a
+  // six-column board on a narrow phone leaves no choice - but height never may.
+  const WHEEL_FLOOR = Math.min(wheelWant, 132);
+  const floorCell = Math.min(byWidth, MIN_CELL);
+  const floorHeight = boardFor(floorCell) + WHEEL_FLOOR;
+
+  // If even that will not fit, say by how much rather than letting the difference be clipped.
+  // `.screen` hides its overflow, so whatever does not fit is not merely cramped - it is
+  // invisible, which is how the bottom of the wheel used to disappear on a small phone with
+  // the letters still in it.
+  const deficit = Math.max(0, floorHeight - usable);
+  const budget = usable + deficit;
+
+  // Split in this order, which is the order the two parts matter in:
+  //
+  //   1. the board gets cells up to a comfortable size - it is the puzzle, and it is what
+  //      the player is reading;
+  //   2. the wheel takes whatever is left, down to its floor;
+  //   3. only if the wheel has hit that floor does the board start giving cells back.
+  //
+  // Doing it the other way round - handing the wheel its full 210px first - squeezed a
+  // four-row board down to 26px cells on a desktop screen with room to spare, because the
+  // board was pushed to its own floor before the wheel gave up a single pixel.
+  let cell = Math.min(cellWant, byWidth);
+  let wheel;
+  const roomAfterBoard = budget - boardFor(cell);
+
+  if (roomAfterBoard >= wheelWant) {
+    // Everything fits with room over: spend it on bigger cells, up to the maximum.
+    wheel = wheelWant;
+    cell = Math.min(MAX_CELL, byWidth, cell + Math.floor((roomAfterBoard - wheel) / p.rows));
+  } else if (roomAfterBoard >= WHEEL_FLOOR) {
+    wheel = roomAfterBoard;
   } else {
-    // spare height: give it to the board, up to a comfortable cell size
-    const spare = usable - boardH - wheel;
-    const grown = Math.min(MAX_CELL, byWidth, cell + Math.floor(spare / p.rows));
-    cell = Math.max(cell, grown);
-    boardH = p.rows * cell + gap * (p.rows - 1);
+    wheel = WHEEL_FLOOR;
+    cell = Math.max(floorCell, Math.floor((budget - wheel - rowGaps) / p.rows));
   }
 
-  el.boardArea.style.height = Math.round(boardH) + 'px';
-  return { cell, wheel: Math.round(Math.min(wheel, width)) };
+  cell = Math.max(1, Math.min(cell, byWidth));
+  wheel = Math.max(WHEEL_FLOOR, Math.min(wheel, width, budget - boardFor(cell)));
+
+  el.boardArea.style.height = Math.round(boardFor(cell)) + 'px';
+  return { cell, wheel: Math.round(wheel), deficit: Math.ceil(deficit) };
 }
 
 function drawBoard(alloc) {
@@ -1725,7 +1773,16 @@ function drawBoard(alloc) {
 
 /** Re-measures the split, then redraws board and wheel from the same allocation. */
 function drawScreen() {
-  const alloc = allocateSpace();
+  // Measure against the frame's natural height first, then give it back any height the
+  // content could not be squeezed into. On a short screen - a small phone, or any phone in
+  // landscape - that makes the page scroll a little instead of hiding the bottom of the
+  // wheel. Two passes, because growing the frame changes what there is to allocate.
+  el.device.style.removeProperty('height');
+  let alloc = allocateSpace();
+  if (alloc.deficit > 0) {
+    el.device.style.height = (el.device.getBoundingClientRect().height + alloc.deficit) + 'px';
+    alloc = allocateSpace();
+  }
   drawBoard(alloc);
   drawWheel(alloc);
 }
@@ -1741,7 +1798,10 @@ function refreshBoard() {
 }
 
 function drawWheel(alloc) {
-  const size = Math.max(148, alloc.wheel);
+  // Trust the allocation. This used to impose its own 148px floor, which quietly overrode
+  // every budget upstream - the wheel drew itself bigger than the space it had been given and
+  // `.screen`, which hides its overflow, ate the difference along with the letters in it.
+  const size = alloc.wheel;
   const n = game.wheel.length;
   const tile = Math.round(size * (n <= 4 ? 0.30 : n <= 6 ? 0.26 : 0.21));
   const radius = size / 2 - tile / 2;
