@@ -123,6 +123,9 @@
 
   .deck b { color: var(--parchment); font-weight: 600; }
 
+  /* The same copy sits inside a card, under its heading, so it needs room below it. */
+  .card .deck { margin-bottom: 16px; }
+
   /* -- Two-up: device on the left, controls and notes on the right ----------- */
   .stage {
     display: grid;
@@ -768,17 +771,16 @@
     </div>
 
     <div class="panel">
-      <p class="deck">
-        A Bengali word-cross puzzle. Drag across the letters to spell a word; each word you find
-        writes itself into the crossword above. <b>Eighty-three levels in a teaching order</b>, for
-        anyone learning to read Bengali rather than only to speak it: plain letters first, then one
-        vowel sign at a time, then several signs together, then conjuncts one family at a time -
-        ন্ধ, স্ত, ক্ষ - and finally free play on the fullest boards. Nothing to install, no
-        sign-up, no ads - your progress is saved in this browser.
-      </p>
-
       <section class="card">
         <h3>Levels - in teaching order</h3>
+        <p class="deck">
+          A Bengali word-cross puzzle. Drag across the letters to spell a word; each word you find
+          writes itself into the crossword above. <b>Eighty-three levels in a teaching order</b>,
+          for anyone learning to read Bengali rather than only to speak it: plain letters first,
+          then one vowel sign at a time, then several signs together, then conjuncts one family at
+          a time - ন্ধ, স্ত, ক্ষ - and finally free play on the fullest boards. Nothing to
+          install, no sign-up, no ads - your progress is saved in this browser.
+        </p>
         <div class="levels" id="levelGrid"></div>
       </section>
 
