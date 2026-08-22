@@ -129,27 +129,161 @@
 
   /* -- Two-up: the game and its level picker on the left, notes on the right ---
        The level grid belongs to the game rather than to the notes, so it sits in the
-       same column, directly under the phone - close enough to read as one thing. */
+       same column, directly under the phone - close enough to read as one thing.
+
+       `.guide` groups the reading material so a phone or tablet can put all of it behind
+       one button. On a wide screen it is display: contents, which dissolves the wrapper and
+       lets its children take their own places in this grid as if it were not there. */
   .stage {
     display: grid;
     grid-template-columns: minmax(0, 400px) minmax(280px, 420px);
-    grid-template-areas: "game notes" "levels notes";
-    grid-template-rows: auto 1fr;
+    grid-template-areas: "game notes" "levels notes" "prose prose";
+    grid-template-rows: auto auto auto;
     gap: clamp(20px, 3vw, 44px);
     align-items: start;
     justify-content: center;
   }
 
-  .stage > .device { grid-area: game; }
-  .stage > .levels-card { grid-area: levels; }
-  .stage > .panel { grid-area: notes; }
+  .device { grid-area: game; }
+  .levels-card { grid-area: levels; }
+  .panel { grid-area: notes; }
+  footer { grid-area: prose; }
+
+  .guide { display: contents; }
+  .guide-head, .touch-bar { display: none; }
 
   @media (max-width: 860px) {
     .stage {
       grid-template-columns: minmax(0, 1fr);
-      grid-template-areas: "game" "levels" "notes";
-      grid-template-rows: auto auto auto;
+      grid-template-areas: "game" "levels" "notes" "prose";
+      grid-template-rows: auto auto auto auto;
     }
+  }
+
+  /* -- Phones and tablets: the game owns the first screen ----------------------
+       On a touch-sized screen the masthead and three cards of prose pushed the board
+       halfway down the page, so a player had to scroll before they could play. The game
+       now fills the viewport and everything written about it moves behind one button.
+       Width-gated rather than pointer-gated: a narrow desktop window gets the same
+       treatment, which is no loss, and it stays testable. */
+  @media (max-width: 1024px) {
+    header { display: none; }
+
+    .touch-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .touch-title {
+      font-family: var(--bn);
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--marigold);
+      line-height: 1;
+    }
+
+    .touch-menu {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      border: 1px solid color-mix(in srgb, var(--parchment) 14%, transparent);
+      background: var(--indigo-700);
+      color: var(--marigold);
+      border-radius: 99px;
+      padding: 9px 15px 9px 12px;
+      font: inherit;
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color .16s ease, transform .16s ease;
+    }
+    .touch-menu:hover { background: var(--violet-600); }
+    .touch-menu:active { transform: scale(.96); }
+
+    /* Three lines drawn rather than typed, so it never depends on a glyph being present. */
+    .touch-menu .bars {
+      width: 15px; height: 11px;
+      border-top: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      position: relative;
+    }
+    .touch-menu .bars::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; top: 50%;
+      border-top: 2px solid currentColor;
+      transform: translateY(-1px);
+    }
+
+    /* The stage is only the game now; the rest is a sheet over the top of it. */
+    .stage {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "game";
+      grid-template-rows: auto;
+      gap: 0;
+    }
+
+    .guide {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      background: var(--indigo-900);
+      padding: 14px 14px calc(34px + env(safe-area-inset-bottom));
+      transform: translateY(100%);
+      visibility: hidden;
+      transition: transform .26s cubic-bezier(.22, 1, .36, 1), visibility .26s;
+    }
+    .guide.open { transform: translateY(0); visibility: visible; }
+    body.guide-open { overflow: hidden; }
+
+    .guide-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: -14px;
+      margin: -14px -14px 14px;
+      padding: 16px 14px 12px;
+      background: linear-gradient(var(--indigo-900) 78%, transparent);
+      z-index: 1;
+    }
+
+    .guide-title {
+      font-size: 11px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: color-mix(in srgb, var(--marigold) 78%, var(--parchment));
+    }
+
+    .guide-close {
+      border: 1px solid color-mix(in srgb, var(--parchment) 14%, transparent);
+      background: var(--indigo-700);
+      color: var(--marigold);
+      border-radius: 99px;
+      padding: 8px 16px;
+      font: inherit;
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .guide-close:active { transform: scale(.96); }
+
+    /* Inside the sheet the level grid and the notes are simply a stack. */
+    .guide .levels-card, .guide .panel, .guide footer { grid-area: auto; }
+    .guide .panel { margin-top: 16px; }
+    .guide footer { margin-top: 22px; }
   }
 
   /* -- Phone ---------------------------------------------------------------- */
@@ -693,12 +827,16 @@
 
   /* -- Phones: drop the bezel, give the game the viewport ------------------- */
   @media (max-width: 700px) {
-    body { padding: 14px 12px 32px; }
+    body { padding: 14px 12px 24px; }
     .device {
       width: 100%;
-      height: min(700px, calc(100vh - 138px));
-      height: min(700px, calc(100dvh - 138px));
-      min-height: 460px;
+      /* The masthead is gone at this width and the touch bar is much shorter, so the frame
+         starts higher up the page. The 700px cap stays: past it the extra height lands as
+         empty space inside the frame rather than as a bigger board, since the cells are
+         already at their comfortable maximum. */
+      height: min(700px, calc(100vh - 104px));
+      height: min(700px, calc(100dvh - 104px));
+      min-height: 440px;
       padding: 7px;
       border-radius: 30px;
     }
@@ -725,6 +863,16 @@
     <p class="eyebrow">বাংলা শব্দ খেলা / 83 levels / plays in your browser</p>
     <h1>শব্দজট</h1>
   </header>
+
+  <!-- Stands in for the masthead on phones and tablets, where the game itself should own the
+       first screen. The notes move behind the button rather than below the fold. -->
+  <div class="touch-bar">
+    <span class="touch-title bn">শব্দজট</span>
+    <button class="touch-menu" id="guideOpen" aria-expanded="false" aria-controls="guide">
+      <span class="bars" aria-hidden="true"></span>
+      <span class="label">Guide</span>
+    </button>
+  </div>
 
   <div class="stage">
     <div class="device">
@@ -783,10 +931,16 @@
       </div>
     </div>
 
-    <section class="card levels-card">
-      <h3>Levels - in teaching order</h3>
-      <div class="levels" id="levelGrid"></div>
-    </section>
+    <div class="guide" id="guide" aria-label="Levels and how this game works">
+      <div class="guide-head">
+        <span class="guide-title">Levels &amp; guide</span>
+        <button class="guide-close" id="guideClose" aria-label="Close">Close</button>
+      </div>
+
+      <section class="card levels-card">
+        <h3>Levels - in teaching order</h3>
+        <div class="levels" id="levelGrid"></div>
+      </section>
 
     <div class="panel">
       <section class="card">
@@ -827,20 +981,21 @@
         </p>
       </section>
     </div>
-  </div>
 
-  <footer>
-    Every board is generated from a word list when you open the level, not hand-drawn: words are
-    placed by backtracking search so each one crosses another and no accidental word ever appears
-    on the grid. All 176 board words are attested in real Bengali text - checked against corpus
-    frequency data, then hand-picked from a vocabulary curated for a learner, because frequency
-    alone offers verb inflections and newspaper register. Levels run in the order the writing
-    system is taught rather than by puzzle difficulty alone, and each one records what it is the
-    first to introduce. Tiles hold <b>aksharas</b> - the letter units a Bengali reader sees - so
-    মাছ is two tiles, মা and ছ, and the conjunct ন্ধু in বন্ধু is one. Bengali text is rendered
-    with the embedded font. There is also an Android build of this game, sharing the same levels and the same
-    layout code.
-  </footer>
+    <footer>
+      Every board is generated from a word list when you open the level, not hand-drawn: words are
+      placed by backtracking search so each one crosses another and no accidental word ever appears
+      on the grid. All 176 board words are attested in real Bengali text - checked against corpus
+      frequency data, then hand-picked from a vocabulary curated for a learner, because frequency
+      alone offers verb inflections and newspaper register. Levels run in the order the writing
+      system is taught rather than by puzzle difficulty alone, and each one records what it is the
+      first to introduce. Tiles hold <b>aksharas</b> - the letter units a Bengali reader sees - so
+      মাছ is two tiles, মা and ছ, and the conjunct ন্ধু in বন্ধু is one. Bengali text is rendered
+      with the embedded font. There is also an Android build of this game, sharing the same levels
+      and the same layout code.
+    </footer>
+    </div>
+  </div>
 </div>
 <script>
 "use strict";
@@ -1212,7 +1367,10 @@ const el = {
   chestProgress: document.getElementById("chestProgress"),
   chestReward: document.getElementById("chestReward"),
   chestWords: document.getElementById("chestWords"),
-  chestClose: document.getElementById("chestClose")
+  chestClose: document.getElementById("chestClose"),
+  guide: document.getElementById("guide"),
+  guideOpen: document.getElementById("guideOpen"),
+  guideClose: document.getElementById("guideClose")
 };
 
 let tileCentres = [];
@@ -1806,6 +1964,7 @@ el.wheel.addEventListener("pointercancel", () => {
 document.addEventListener("keydown", e => {
   if (e.key === "Enter" && game.picked.length) { e.preventDefault(); submitWord(); }
   if (e.key === "Escape") {
+    if (guideIsOpen()) { closeGuide(); return; }
     if (!el.chestSheet.hidden) { el.chestSheet.hidden = true; return; }
     game.picked = []; game.tapMode = false;
     markTiles(); drawTrail(); drawPreview();
@@ -1869,6 +2028,33 @@ el.chest.addEventListener("click", () => {
   drawChest();
   el.chestSheet.hidden = false;
 });
+/* The guide sheet. On a wide screen the notes are simply on the page and this never runs;
+   the class it toggles has no styling above the touch breakpoint. */
+const guideIsOpen = () => el.guide.classList.contains("open");
+
+function openGuide() {
+  el.guide.classList.add("open");
+  document.body.classList.add("guide-open");
+  el.guideOpen.setAttribute("aria-expanded", "true");
+  el.guide.scrollTop = 0;
+  el.guideClose.focus();
+}
+
+function closeGuide() {
+  el.guide.classList.remove("open");
+  document.body.classList.remove("guide-open");
+  el.guideOpen.setAttribute("aria-expanded", "false");
+  el.guideOpen.focus();
+}
+
+el.guideOpen.addEventListener("click", openGuide);
+el.guideClose.addEventListener("click", closeGuide);
+
+// Picking a level from inside the sheet means the player wants to play it, so get out of the way.
+el.levelGrid.addEventListener("click", e => {
+  if (e.target.closest(".lv") && guideIsOpen()) closeGuide();
+});
+
 el.chestClose.addEventListener("click", () => { el.chestSheet.hidden = true; });
 el.chestSheet.addEventListener("click", e => {
   if (e.target === el.chestSheet) el.chestSheet.hidden = true;
