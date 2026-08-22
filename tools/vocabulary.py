@@ -13,6 +13,11 @@ Every word below is concrete enough to draw, or is a number, colour or everyday 
 test being whether a picture could replace the translation, since a picture works the same
 in an English, Arabic or Japanese-speaking household.
 
+A few entries are here because the syllabus needs them rather than because a child would
+reach for them: ঔষধ and ঐক্য are the only attested, conjunct-free words that carry ঔ and ঐ,
+and the alphabet is not finished without those letters. Where there was a choice the concrete
+word won - উট for উ over উপর, ঈদ for ঈ over ঈশ্বর, অজগর for অ over অনেক.
+
 Themes are not decoration. They group the recording and illustration work, they let a parent
 pick a set ("do the animals one"), and words from one theme make the best extras for another
 level in the same theme.
@@ -28,35 +33,37 @@ THEMES = {
     """,
     'animals': """
         গরু ছাগল বিড়াল পাখি হাতি সাপ মুরগি ব্যাঙ হরিণ বানর ঘোড়া ময়ূর ইঁদুর মাছি
-        মাছ বাঘ কাক মাছরাঙা প্রজাপতি
+        মাছ বাঘ কাক মাছরাঙা প্রজাপতি অজগর ঈগল উট মৌমাছি ষাঁড়
     """,
     'food': """
         ভাত রুটি ডিম দুধ আম কলা রুটি চিনি লবণ তেল পানি জল মাখন সবজি ফল আপেল কমলা
         পেয়ারা নারকেল মিষ্টি রস গম টক রসগোল্লা দুধভাত বিস্কুট স্বাদ
+        যব ডাল ডালিম মূলা তৈল
     """,
     'body': """
-        হাত চোখ কান মাথা মুখ দাঁত চুল পেট আঙুল গলা হাঁটু কাঁধ নখ
+        হাত চোখ কান মাথা মুখ দাঁত চুল পেট আঙুল গলা হাঁটু কাঁধ নখ হৃদয়
     """,
     'home': """
         ঘর বই কলম খাতা জুতো জামা ছাতা বালিশ চাদর থালা বাটি চামচ দরজা জানালা বিছানা
         আয়না সাবান তোয়ালে চেয়ার টেবিল ঘড়ি হাতঘড়ি চাবি বালতি ঘরবাড়ি বাড়ি
-        বাক্স কম্বল চশমা পাখা
+        বাক্স কম্বল চশমা পাখা ঢোল ঝুড়ি ঔষধ ওষুধ গৃহ
     """,
     'nature': """
         গাছ ফুল পাতা নদী চাঁদ আকাশ মেঘ বৃষ্টি রোদ মাঠ পুকুর সমুদ্র বাতাস আগুন বালি
         পাথর পাহাড় বন ঝড় বরফ তারা মেঘলা কলাগাছ ফুলবাগান বাগান চন্দ্র
+        সূর্য ঝরনা ঢেউ পৃথিবী ঢাল
     """,
     # মা and পা are one akshara each, so a wheel cannot make a puzzle of them - they belong
     # in the reading material, not the board.
     'people': """
-        ভাই বোন খালা ছেলে মেয়ে শিশু বন্ধু পরিবার জন মানুষ
+        ভাই বোন খালা ছেলে মেয়ে শিশু বন্ধু পরিবার জন মানুষ কৃষক সৈনিক
     """,
     'colours': """
-        লাল নীল সবুজ কালো সাদা হলুদ বেগুনি গোলাপি রঙ
+        লাল নীল সবুজ কালো সাদা হলুদ বেগুনি গোলাপি রঙ গাঢ় বাংলা
     """,
     'school': """
         স্কুল পেন্সিল ছাত্র শেখা ছুটি খেলা গল্প ছবি কবিতা পড়া লেখা পড়ালেখা নাটক
-        বিদ্যালয় পাঠশালা শিক্ষক নৃত্য চিঠি চিঠিপত্র
+        বিদ্যালয় পাঠশালা শিক্ষক নৃত্য চিঠি চিঠিপত্র ভাষা বাক্য ঋণ
     """,
     'getting about': """
         গাড়ি সাইকেল নৌকা বিমান ট্রেন পথ রাস্তা সড়ক শহর নগর বাজার দৌড় লাফ
@@ -67,12 +74,14 @@ THEMES = {
     """,
     'describing': """
         বড় কম গরম নরম শীতল লাল ভালোবাসা সব শক্ত আনন্দ স্বপ্ন অন্ধকার লবণ
+        দূর মূল অতল মৃদু তৈরি ওজন ঐক্য যত
     """,
     'directions': """
         উত্তর দক্ষিণ পশ্চিম পূর্ব
     """,
     'time': """
         দিন রাত সকাল শীত বর্ষা কাল দিনরাত শীতকাল বর্ষাকাল বসন্ত জন্মদিন সন্ধ্যা
+        ঈদ ঋতু মৌসুম বৈশাখ পৌষ ঊষা বৈঠক
     """,
 }
 

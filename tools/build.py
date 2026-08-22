@@ -23,7 +23,8 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
 from bangla import conjunct_tiles, render, split_aksharas            # noqa: E402
 from catalogue import CATALOGUE, MAX_NEW_UNITS, ordered_levels        # noqa: E402
-from curriculum import BLOCKS, unit_label                             # noqa: E402
+from curriculum import (BLOCKS, NOT_TAUGHT, alphabet,                  # noqa: E402
+                        unit_label)
 from vocabulary import theme_of                                       # noqa: E402
 
 REPO = pathlib.Path(__file__).resolve().parent.parent
@@ -160,6 +161,17 @@ def report(levels, failures):
           f'largest level {max(len(l["words"]) for l in levels)} words '
           f'/ {max(len(l["tiles"]) for l in levels)} tiles')
 
+    # Coverage. The whole point of a teaching order is that a learner who finishes reaches the
+    # end of the alphabet, so a gap here is a broken promise rather than a missing nicety.
+    taught = {u for level in levels for u in level['teaches']}
+    missing = [u for u in alphabet() if u not in taught]
+    print(f'\nalphabet: {len(alphabet()) - len(missing)} of {len(alphabet())} units taught'
+          f' ({len(NOT_TAUGHT)} excluded by design: {" ".join(NOT_TAUGHT)})')
+    if missing:
+        print(f'  NOT TAUGHT ANYWHERE ({len(missing)}):')
+        for unit in missing:
+            print(f'    {unit_label(unit)}')
+
     # The chest depends on tile sets spelling more words than the board uses, and a syllabus
     # that keeps early boards to three tiles cannot do that - three tiles spell three words.
     # Worth printing rather than discovering later: the mechanic needs to stop asking for an
@@ -205,6 +217,13 @@ def curriculum(levels):
           ', '.join(f'{n} {kind}s' for kind, n in sorted(kinds.items())))
     silent = [i for i, level in enumerate(levels, 1) if not level['teaches']]
     print(f'{len(silent)} levels introduce nothing new (pure review)')
+
+    taught = {u for level in levels for u in level['teaches']}
+    missing = [u for u in alphabet() if u not in taught]
+    print(f'alphabet: {len(alphabet()) - len(missing)} of {len(alphabet())} units'
+          + (', missing ' + ' '.join(s for _, s in missing) if missing else ' - complete'))
+    print('excluded by design: ' + ', '.join(f'{s} ({why.split(chr(45))[0].strip()})'
+                                             for s, why in NOT_TAUGHT.items()))
 
 
 def slots(levels):
@@ -291,6 +310,11 @@ def main(argv):
         report(levels, failures)
         if failures:
             print('\ncheck FAILED')
+            return 1
+        gaps = [u for u in alphabet()
+                if u not in {t for level in levels for t in level['teaches']}]
+        if gaps:
+            print(f'\ncheck FAILED: {len(gaps)} pieces of the alphabet are never taught')
             return 1
         if len(levels) != len(CATALOGUE):
             print('\ncheck FAILED: lost levels between catalogue and output')

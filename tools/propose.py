@@ -11,6 +11,7 @@ between. It never writes a level.
     python3 tools/propose.py 2 --kar া      one vowel sign, that sign
     python3 tools/propose.py 4 --new ন্ত    conjuncts, introducing that cluster
     python3 tools/propose.py 3 --theme food
+    python3 tools/propose.py 2 --kar ৌ --tiles 5
 
 Only tile sets whose words *all* belong to the requested block are offered, which is the
 whole point: a block-2 level containing a stray second vowel sign is not a block-2 level.
@@ -132,6 +133,7 @@ def main(argv):
 
     block = int(argv[0])
     kar = cluster = theme = None
+    widest = 0
     for i, arg in enumerate(argv):
         if arg == '--kar' and i + 1 < len(argv):
             kar = argv[i + 1]
@@ -139,11 +141,15 @@ def main(argv):
             cluster = argv[i + 1]
         if arg == '--theme' and i + 1 < len(argv):
             theme = argv[i + 1]
+        if arg == '--tiles' and i + 1 < len(argv) and argv[i + 1].isdigit():
+            widest = int(argv[i + 1])
 
     vocabulary = pool_words(theme) if theme else pool_words()
     # The later blocks need wider boards: a conjunct word plus enough companions to cross it
     # rarely fits in three tiles.
     sizes = (3, 4, 5) if block >= BLOCK_CONJUNCT else (3, 4)
+    if widest:
+        sizes = tuple(range(3, widest + 1))
     found = propose(vocabulary, block, sizes=sizes, kar=kar, cluster=cluster)
 
     info = BLOCKS[block]

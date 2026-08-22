@@ -194,7 +194,32 @@ class LevelsTest {
                 taught[symbol] = level.id
             }
         }
-        assertTrue("only ${taught.size} pieces of the writing system taught", taught.size >= 40)
+        assertTrue("only ${taught.size} pieces of the writing system taught", taught.size >= 70)
+    }
+
+    @Test
+    fun `the syllabus covers the whole alphabet`() {
+        // The promise of a teaching order is that finishing it leaves you able to read. A gap
+        // here is a broken promise rather than a missing nicety, so the inventory is written
+        // out in full: every independent vowel, every vowel sign, the nasal marks, and every
+        // consonant. Three are left out on purpose and named below.
+        val vowels = "অআইঈউঊঋএঐওঔ".map { it.toString() }
+        val signs = listOf("া", "ি", "ী", "ু", "ূ", "ৃ", "ে", "ৈ", "ো", "ৌ")
+        val nasals = listOf("ঁ", "ং")
+        val consonants = ("কখগঘঙচছজঝটঠডঢণতথদধনপফবভমযরলশষসহ".map { it.toString() }
+            + listOf("ড়", "ঢ়", "য়"))
+
+        // Deliberately absent: ৗ is not a sign of its own in modern Bengali (ৌ is the
+        // composed form), ঃ reaches only দুঃখ and অতঃপর, and ঞ never stands outside a
+        // cluster - so there is no word to teach any of them with.
+        val expected = vowels + signs + nasals + consonants
+        val taught = Levels.all.flatMap { it.teaches }.toSet()
+
+        val missing = expected.filterNot { it in taught }
+        assertTrue(
+            "the syllabus never teaches: ${missing.joinToString(" ")}",
+            missing.isEmpty()
+        )
     }
 
     @Test
@@ -273,7 +298,7 @@ class LevelsTest {
 
     @Test
     fun `the catalogue is big enough to be worth playing`() {
-        assertTrue("only ${Levels.count} levels", Levels.count >= 80)
+        assertTrue("only ${Levels.count} levels", Levels.count >= 100)
         val words = Levels.all.flatMap { it.words }.toSet()
         assertTrue("only ${words.size} distinct words", words.size >= 150)
         val conjunctLevels = Levels.all.count { lv -> lv.letters.any { it.contains('\u09CD') } }

@@ -1,6 +1,6 @@
 # Level pipeline
 
-The 83 levels in the game are generated from `catalogue.py`, not typed into the app. This
+The 105 levels in the game are generated from `catalogue.py`, not typed into the app. This
 directory is that generator, plus the checks that keep bad content out.
 
 ```bash
@@ -39,6 +39,17 @@ voice, and a child copying that learns the wrong sounds from the app meant to te
 
 A vowel sign cannot be pronounced on its own, so the manifest records the tile that carries
 it instead: া is listed as কা, matching what the game shows on its "new letter" chip.
+
+## Coverage
+
+`check` fails if the syllabus stops short of the alphabet. `curriculum.alphabet()` is the
+inventory it checks against - 11 vowels, 10 vowel signs, 2 nasal marks, 34 consonants - and
+`curriculum.NOT_TAUGHT` holds the three deliberate omissions with the reason for each, so a
+considered exclusion is never mistaken for an oversight. `build.py curriculum` prints what
+each level introduces.
+
+Conjuncts are not in that inventory: there are hundreds, no learner needs all of them, and
+the block-4 levels teach the common families in order instead.
 
 ## Teaching order, not difficulty order
 
@@ -100,5 +111,5 @@ has a third copy in the `<script>` of `docs/index.html`. The tools have to reaso
 exactly the way the game will lay it out, or a level validates here and breaks on a phone.
 
 The copies are kept honest by regenerating and diffing: the Kotlin generator and the web
-generator are run over all 83 levels and their boards compared cell by cell. If you change a
+generator are run over all 105 levels and their boards compared cell by cell. If you change a
 placement rule, change it in all three and re-run that comparison.

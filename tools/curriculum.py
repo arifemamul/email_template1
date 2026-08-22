@@ -36,7 +36,7 @@ VOWELS = set('অআইঈউঊঋএঐওঔ')
 CONSONANT_ORDER = [
     'ল', 'ব', 'র', 'ন', 'ক', 'ম', 'ত', 'প', 'দ', 'স', 'গ', 'চ', 'শ', 'ছ', 'খ', 'ট', 'জ',
     'ঘ', 'হ', 'ফ', 'ভ', 'থ', 'ঠ', 'ণ', 'ধ', 'ঙ', 'ড', 'ঝ', 'ষ', 'ড়', 'য়', 'ঢ', 'ঢ়',
-    'য', 'ঞ', 'ঁ',
+    'য', 'ঞ',
 ]
 
 # Independent vowels in the order a Bengali primer teaches them, which is also the order they
@@ -66,6 +66,20 @@ CONJUNCT_ORDER = [
     # three consonants
     'ন্দ্র', 'ষ্ট্র', 'ন্ত্র', 'ন্ধ্য', 'ক্ত্র',
 ]
+
+
+# Three pieces of the script the syllabus deliberately does not teach, with the reason. Kept
+# here so a coverage check can tell a considered omission from an oversight, which is the only
+# difference between the two that anyone can see from the outside.
+NOT_TAUGHT = {
+    'ৗ': 'not a sign of its own in modern Bengali - ৌ is the composed form, and ৗ survives '
+         'only in legacy decompositions',
+    'ঃ': 'visarga, which appears in a handful of Sanskritic words. The reachable ones are '
+         'দুঃখ (sorrow) and অতঃপর (thereafter) - one too bleak for a child, the other too '
+         'formal, and neither placeable in a three-word crossword',
+    'ঞ': 'never stands alone in a modern Bengali word - it appears only inside clusters like '
+         'ঞ্চ and ঞ্জ, so there is no word to teach it with',
+}
 
 
 def strip_signs(akshara):
@@ -206,6 +220,20 @@ BLOCKS = {
         'goal': 'everything taught, mixed, longest words and fullest boards',
     },
 }
+
+
+def alphabet():
+    """
+    Everything a syllabus has to teach before a learner can read ordinary Bengali, as
+    (kind, symbol) pairs - independent vowels, vowel signs, nasal marks and letters, less the
+    documented exclusions. Conjuncts are not in here: there are hundreds and no learner needs
+    all of them, so they are covered by teaching the common families in order instead.
+    """
+    units = ([('vowel', v) for v in VOWEL_ORDER]
+             + [('kar', k) for k in KAR_ORDER]
+             + [('nasal', n) for n in NASALS]
+             + [('consonant', c) for c in CONSONANT_ORDER])
+    return [(kind, sym) for kind, sym in units if sym not in NOT_TAUGHT]
 
 
 def block_for(words):

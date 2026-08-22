@@ -54,6 +54,22 @@ SYLLABUS = {
         ["কলম", "কম", "কল", "ফল"],
         ["বদল", "দল", "বল", "দশ"],
         ["মন", "গম", "নগর", "গরম"],
+
+        # The rest of the bare alphabet. These letters are rarer than the ones above, which is
+        # why they come last - but a syllabus that stops before them leaves a learner unable
+        # to read ওষুধ on a packet or ঋতু in a schoolbook, so they are not optional.
+        ["কলম", "অতল", "কম", "কল"],      # অ
+        ["অজগর", "নগর", "জন"],           # a python, for a letter that badly needs a picture
+        ["বদল", "দল", "বল", "ঈদ"],       # ঈ
+        ["ঈগল", "দল", "ঈদ"],
+        ["কম", "টক", "উট"],              # উ
+        ["ওজন", "জন", "জল", "নল"],       # ও
+        ["ধন", "বন", "বল"],              # ধ, so that ঔষধ below has only two new things in it
+        ["ঔষধ", "ধন", "নল"],             # ঔ and ষ together - ঔষধ is the only attested
+                                         # conjunct-free word that carries ঔ at all
+        ["ঋণ", "লবণ", "বল"],             # ঋ and ণ
+        ["বড়", "ঝড়", "বন"],            # ঝ
+        ["সব", "বস", "যব"],              # য, the bare one rather than the ya-phala
     ],
 
     # Block 2: one vowel sign per level, in the order of `curriculum.KAR_ORDER`. A level here
@@ -96,6 +112,21 @@ SYLLABUS = {
         ["পাঠ", "পালা", "পাশা", "পাঠশালা"],
         ["পাড়", "হাড়", "পাহাড়"],
         ["বল", "ফুল", "ফুট", "ফুটবল"],
+
+        # ূ, ৈ, ৃ - the last three signs that a word can carry on its own.
+        ["কলম", "কম", "মূল", "কল"],        # ূ
+        ["কলম", "কম", "কল", "তৈল"],        # ৈ
+        ["কৃষক", "কলম", "কম", "কল"],       # ৃ
+        ["ঊষা", "ভাষা", "ভাত"],            # ঊ, which needs a sign to sit beside
+        # The nasal marks. They are not vowel signs, but they behave like one - hung on a
+        # letter rather than standing beside it - and চাঁদ and বাংলা are too common to leave
+        # a learner guessing at.
+        ["চাঁদ", "বদল", "দল", "বল"],       # ঁ
+        ["কমলা", "বাংলা", "কম", "কলা"],    # ং
+        # and the last three letters, which only appear with a sign attached
+        ["ডিম", "কম", "কলম"],              # ড
+        ["ঢাল", "বল", "বদল", "দল"],        # ঢ
+        ["গাঢ়", "গান", "কান"],            # ঢ়
     ],
 
     # Block 3: several signs in one word, all of them already taught. This is where ordinary
@@ -115,6 +146,9 @@ SYLLABUS = {
         ["তল", "শীত", "কাল", "শীতল", "শীতকাল"],
         ["পর", "বার", "বাপ", "পরি", "পরিবার"],
         ["পাস", "পায়ে", "পায়েস"],
+        # ৌ waits until here because every word that carries it carries a second sign too -
+        # নৌকা is ৌ and া - so there is no honest way to teach it in the one-sign block.
+        ["নৌকা", "কম", "কাক"],
     ],
 
     # Block 4: joined consonants, one cluster family at a time, in `CONJUNCT_ORDER`. Two
@@ -140,6 +174,10 @@ SYLLABUS = {
         ["কমলা", "কম", "গ্রাম", "কলা"],      # গ্র
         ["বিল", "লয়", "বিদ্যা", "বিদ্যালয়"],  # দ্য
         ["জন", "দিন", "জন্ম", "জন্মদিন"],    # ন্ম
+        # ঐ lands in the conjunct block for the same reason ৌ landed in the last one: every
+        # attested word carrying it also carries a cluster. ঐক্য is abstract for a child, and
+        # it is still the best of a very short list.
+        ["ঐক্য", "বাক্য", "বাটি"],           # ঐ, with ক্য
     ],
 
     # Block 5: everything taught, mixed, on the fullest boards the phone can hold.
