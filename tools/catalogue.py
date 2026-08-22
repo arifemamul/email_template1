@@ -9,120 +9,155 @@ Android and web games.
 
 A level is written as a word list. The wheel is derived from it (the union of the words'
 aksharas), which is what guarantees every tile is usable.
+
+Levels are grouped into the five blocks of `curriculum.py`, and that grouping is the primary
+ordering: a learner meets plain letters, then one vowel sign at a time, then several signs
+together, then conjuncts, then everything mixed. Puzzle difficulty only decides the order
+*within* a block. Getting this the other way round - ranking purely by how hard a board is to
+solve - is what produced the earlier ordering, which handed out its first vowel sign in level
+6 without ever having introduced one, and whose first conjunct was a three-consonant cluster.
+
+Words come from `vocabulary.py`, which is curated for a child. Corpus frequency is still the
+floor that rejects invented compounds, but it is no longer the selector: rank by frequency
+alone and the game fills with প্রতিষ্ঠান and রাষ্ট্রপতি, which are common in newspapers and
+useless to a seven-year-old.
 """
 from bangla import (conjunct_tiles, grid_size, layout, split_aksharas, spellable,
                     stray_runs, tiles_for)
+from curriculum import (BLOCK_CONJUNCT, BLOCK_FREE, BLOCK_KARS, BLOCK_ONE_KAR, BLOCK_PLAIN,
+                        block_for, new_units, teaching_rank, units_in)
+from vocabulary import REJECTED, words as pool_words
 from wordpool import zipf
 
-# The opening five, in this order. Nothing else is this small: three plain consonants, three
-# two-akshara words, all of them everyday vocabulary, and no extras to distract. They exist to
-# teach the drag and the idea that a tile is a letter unit, nothing more.
-EASY_OPENERS = [
-    ["জল", "জন", "নল"],
-    ["পথ", "পর", "রথ"],
-    ["কর", "বর", "রব"],
-    ["সব", "বস", "রস"],
-    ["কম", "কল", "কমল"],
-]
+# -- the syllabus ------------------------------------------------------------------------
+# Each block holds the previous block's material constant and adds one new kind of thing.
+# Order inside a block is decided at build time by how much is new, so the order written here
+# is only for human readability.
 
-# Ordered by difficulty at build time, so the order here is only for human readability.
-CATALOGUE = EASY_OPENERS + [
-    # -- short words, plain consonants and simple vowel signs ----------------------------
-    ["জল", "জন", "মন", "নল"],
-    ["নাম", "দাম", "দানা"],
-    ["গান", "গাছ", "মান", "মাছ"],
-    ["রাত", "নাম", "রাম"],
-    ["মন", "তান", "তারা"],
-    ["সার", "নগর", "সাগর"],
-    ["নাক", "টক", "নাটক"],
-    ["কবি", "তাক", "কবিতা"],
-    ["মেঘ", "মেলা", "মেঘলা"],
-    ["পাড়", "হাড়", "পাহাড়"],
-    ["সব", "বস", "বসন্ত"],
-    ["রস", "সর", "রসগোল্লা"],
-    ["পাস", "পায়ে", "পায়েস"],
+SYLLABUS = {
 
-    # -- four tiles, four to six words ---------------------------------------------------
-    ["কল", "কলা", "কলম", "কমল", "লাল", "কমলা"],
-    ["চার", "কার", "রবি", "চাবি", "চাকা", "বিচার"],
-    ["ফুল", "চাল", "চাকু"],
-    ["বাস", "তার", "বার", "রস", "তাস", "বাতাস"],
-    ["আম", "রাত", "আমরা", "আরাম"],
-    ["নদী", "পার", "পান", "নদীর"],
-    ["মাটি", "পার", "পাটি", "মাটির"],
-    ["কাচ", "চাকা", "চামচ"],
-    ["জাম", "নাম", "মজা", "নালা", "জানালা"],
-    ["দেশ", "বিশ", "বিদেশ", "বিকাশ"],
-    ["বই", "খাই", "খাতা"],
-    ["দিন", "রাত", "দিনরাত"],
-    ["দুধ", "ভাত", "দুধভাত"],
-    ["হাত", "খাত", "পাত", "পাখা", "হাতপাখা"],
-    ["হাত", "ঘড়ি", "হাতঘড়ি"],
-    ["কলা", "লাগা", "গাছ", "কলাগাছ"],
-    ["পড়া", "লেখা", "খাড়া", "পড়ালেখা"],
-    ["ঘর", "বাঘ", "ঘড়ি", "বাড়ি", "ঘরবাড়ি"],
-    ["বন", "ধন", "বন্ধু"],
-    ["রাস্তা", "ঘাট", "রাস্তাঘাট"],
-    ["ফুল", "গান", "বাগান", "ফুলবাগান"],
+    # Block 1: letters on their own. No vowel signs, no conjuncts, nothing hanging off
+    # anything. Roughly one or two new letters per level, with the earlier ones coming back
+    # so they get used rather than met once. These boards stay at three or four words: the
+    # thing being learned here is that a tile is a letter and a drag is a word.
+    BLOCK_PLAIN: [
+        ["জল", "জন", "নল"],
+        ["বল", "সব", "বস"],
+        ["সব", "রস", "বস"],
+        ["কলম", "কম", "কল"],
+        ["বদল", "দল", "বল"],
+        ["গরম", "কম", "কর", "গম"],
+        ["সব", "বই", "বস"],
+        ["কলম", "কম", "কল", "আম"],
+        ["কলম", "এক", "কম", "কল"],
+        ["সব", "বড়", "বস"],
+        ["কলম", "কম", "কল", "ফল"],
+        ["বদল", "দল", "বল", "দশ"],
+        ["মন", "গম", "নগর", "গরম"],
+    ],
 
-    # -- conjunct tiles and four-akshara spines ------------------------------------------
-    ["বাতি", "তিল", "বালতি", "বাতিল"],
-    ["বল", "ফুল", "ফুট", "ফুটবল"],
-    ["জন", "দিন", "জন্ম", "জন্মদিন"],
-    ["কলা", "শিলা", "শিল্প", "শিল্পকলা"],
-    ["পাঠ", "পালা", "পাশা", "পাঠশালা"],
-    ["চিঠি", "পত্র", "চিত্র", "চিঠিপত্র"],
-    ["বেশ", "পরি", "পরিবেশ"],
-    ["পর", "বার", "বাপ", "পরি", "পরিবার"],
-    ["তল", "শীত", "কাল", "শীতল", "শীতকাল"],
-    ["বল", "বকা", "কাল", "বর্ষা", "বর্ষাকাল"],
-    ["মাছ", "মারা", "রাঙা", "মাছরাঙা"],
-    ["কর", "কক্ষ", "শিক্ষক"],
-    ["বিল", "লয়", "বিদ্যা", "বিদ্যালয়"],
-    ["ভালো", "বাসা", "ভাসা", "ভাবা", "ভালোবাসা"],
-    ["বাংলা", "দেশ", "বাংলাদেশ"],
-    ["বাংলা", "ভাষা", "বাংলাভাষা"],
-    ["কল", "কাক", "তাল", "লতা", "কাল", "কলকাতা"],
-    ["প্রতি", "জাতি", "প্রজা", "প্রজাতি", "প্রজাপতি"],
+    # Block 2: one vowel sign per level, in the order of `curriculum.KAR_ORDER`. A level here
+    # may reuse plain letters freely but never mixes two signs - the sign is the lesson, and
+    # two at once means neither gets learned.
+    BLOCK_ONE_KAR: [
+        # া, the sign that sits plainly after its letter
+        ["কল", "কাল", "কাক"],
+        ["লাল", "কল", "কলা"],
+        ["কাল", "কান", "নল"],
+        ["কমলা", "কম", "কলা"],
+        ["লাল", "ফল", "লাফ"],
+        ["সকাল", "সব", "বল", "কাল", "বস"],
+        ["গান", "কাল", "কান", "নল"],
+        ["ভাই", "বই", "ভাত"],
+        ["খাতা", "কলা", "খালা"],
+        ["নাটক", "আট", "টক"],
+        ["থালা", "কমলা", "কম", "কলা"],
+        # ি, the first sign written to the left of the letter it belongs to
+        ["সবজি", "সব", "বস"],
+        ["দিন", "জন", "জল", "নল"],
+        ["তিন", "জন", "জল", "নল"],
+        ["ঘড়ি", "কর", "ঘর"],
+        # ে, also written in front
+        ["তেল", "কলম", "কম", "কল"],
+        ["আপেল", "আট", "পেট"],
+        ["মেঘ", "ঘর", "রস"],
+        # ু, written underneath
+        ["ঘুম", "কলম", "কম", "কল"],
+        ["ফুল", "কলম", "কম", "কল"],
+        ["দুই", "বই", "দুধ"],
+        ["গরু", "আম", "গম"],
+        ["চুল", "বদল", "দল", "বল"],
+        # longer words, still one sign: by now া is familiar enough to carry a compound
+        ["কলা", "লাগা", "গাছ", "কলাগাছ"],
+        ["হাত", "খাত", "পাত", "পাখা", "হাতপাখা"],
+        ["জাম", "নাম", "মজা", "নালা", "জানালা"],
+        ["বই", "খাই", "খাতা"],
+        ["মাছ", "মারা", "রাঙা", "মাছরাঙা"],
+        ["পাঠ", "পালা", "পাশা", "পাঠশালা"],
+        ["পাড়", "হাড়", "পাহাড়"],
+        ["বল", "ফুল", "ফুট", "ফুটবল"],
+    ],
 
-    # -- long spines, stacked conjuncts, five and six tiles ------------------------------
-    ["তান", "স্বাধীন", "স্বাধীনতা"],
-    ["প্রতি", "তিন", "প্রতিষ্ঠা", "প্রতিষ্ঠান"],
-    ["পরা", "রাষ্ট্র", "রাষ্ট্রপতি"],
-    ["জাত", "প্রজা", "তন্ত্র", "প্রজাতন্ত্র"],
-    ["মুক্তি", "যুদ্ধ", "যুক্তি", "মুক্তিযুদ্ধ"],
-    ["বাদ", "পদ", "পত্র", "সংবাদ", "সংবাদপত্র"],
-    ["বীর", "রথ", "নাথ", "রবীন্দ্র", "রবীন্দ্রনাথ"],
-    ["হাসপাতাল", "পাটি", "পাতাল", "হাতা", "তাল", "পাস"],
-    ["গ্রহ", "গ্রহণ", "চন্দ্র", "চন্দ্রগ্রহণ"],
-    ["গ্রহ", "গ্রহণ", "সূর্য", "সূর্যগ্রহণ"],
-    ["বন", "মান", "মানব", "বিমান", "বন্দর", "বিমানবন্দর"],
+    # Block 3: several signs in one word, all of them already taught. This is where ordinary
+    # Bengali vocabulary opens up, and where compounds start (ফুল + বাগান -> ফুলবাগান).
+    BLOCK_KARS: [
+        ["কবি", "তাক", "কবিতা"],
+        ["মেঘ", "মেলা", "মেঘলা"],
+        ["ফুল", "চাল", "চাকু"],
+        ["নদী", "পার", "পান", "নদীর"],
+        ["মাটি", "পার", "পাটি", "মাটির"],
+        ["দিন", "রাত", "দিনরাত"],
+        ["দুধ", "ভাত", "দুধভাত"],
+        ["হাত", "ঘড়ি", "হাতঘড়ি"],
+        ["পড়া", "লেখা", "খাড়া", "পড়ালেখা"],
+        ["ঘর", "বাঘ", "ঘড়ি", "বাড়ি", "ঘরবাড়ি"],
+        ["ফুল", "গান", "বাগান", "ফুলবাগান"],
+        ["তল", "শীত", "কাল", "শীতল", "শীতকাল"],
+        ["পর", "বার", "বাপ", "পরি", "পরিবার"],
+        ["পাস", "পায়ে", "পায়েস"],
+    ],
 
-    # -- five tiles with room to spare: these are where the extra-words chest fills -------
-    ["সব", "কম", "রকম", "সবরকম"],
-    ["কলা", "কমলা", "কলার", "কমলাপুর"],
-    ["মাস", "মান", "মানা", "সমান", "মানানসই"],
-    ["মন", "গম", "নগর", "গরম", "মহান", "মহানগর"],
+    # Block 4: joined consonants, one cluster family at a time, in `CONJUNCT_ORDER`. Two
+    # consonants before three, and clusters whose parts stay legible (ন্ত, স্ত) before the
+    # ligatures that fuse into a shape of their own (ক্ষ, ষ্ট).
+    BLOCK_CONJUNCT: [
+        ["সব", "বস", "বসন্ত"],              # ন্ত
+        ["আগুন", "আনন্দ", "আম"],             # ন্দ
+        ["রাস্তা", "ঘাট", "রাস্তাঘাট"],      # স্ত
+        ["কলম", "কম", "স্কুল", "কল"],        # স্ক
+        ["গরম", "গল্প", "গম"],               # ল্প
+        ["কলা", "শিলা", "শিল্প", "শিল্পকলা"],
+        ["দিনরাত", "দিন", "রাত", "রান্না"],  # ন্ন
+        ["রস", "সর", "রসগোল্লা"],            # ল্ল
+        ["বন", "ধন", "বন্ধু"],               # ন্ধ
+        ["বালিশ", "শক্ত", "বালি"],           # ক্ত
+        ["আপেল", "পেন্সিল", "আট", "পেট"],    # ন্স
+        ["বদল", "দল", "বল", "স্বাদ"],        # স্ব
+        ["বর্ষাকাল", "বল", "কাল", "বর্ষা"],  # র্ষ
+        ["চিঠিপত্র", "ছাত্র", "চিঠি"],       # ত্র
+        ["কর", "কক্ষ", "শিক্ষক"],            # ক্ষ
+        ["সমুদ্র", "সব", "বস"],              # দ্র
+        ["কমলা", "কম", "গ্রাম", "কলা"],      # গ্র
+        ["বিল", "লয়", "বিদ্যা", "বিদ্যালয়"],  # দ্য
+        ["জন", "দিন", "জন্ম", "জন্মদিন"],    # ন্ম
+    ],
 
-    # Six tiles picked for coverage rather than for one long word: these letters spell
-    # fifteen words between the board and the chest.
-    ["কলম", "রকম", "নগর"],
-]
+    # Block 5: everything taught, mixed, on the fullest boards the phone can hold.
+    BLOCK_FREE: [
+        ["কলম", "কমলা", "গ্রাম", "লাল"],
+        ["সকাল", "সব", "বল", "কাল"],
+        ["বাতি", "তিল", "বালতি"],
+        ["চার", "কার", "রবি", "চাবি", "চাকা", "বিচার"],
+        ["ভালো", "বাসা", "ভাসা", "ভাবা", "ভালোবাসা"],
+        ["হাসপাতাল", "পাটি", "পাতাল", "হাতা", "তাল", "পাস"],
+    ],
+}
 
-# -- extra words -------------------------------------------------------------------------
-# Words the tiles can spell that are NOT on the board. Finding one fills the chest, which
-# pays coins - the mechanic that makes a letter wheel feel generous instead of restrictive.
-#
-# Every level's own words are automatically available as extras to other levels, since they
-# are already hand-verified. This list adds the rest, hand-picked from corpus candidates.
-# Deliberately rejected while curating: proper names (রবিন, তালহা, রামা), transliterations
-# (শপ, চিপ, লস, বট), grammatical fragments (টির, লাম, নত, রন, গন, ইন, নই), a corpus
-# misspelling (বিবরন for বিবরণ), and crude words (বাল, লাশ, শালা, মল, মদ).
-EXTRA_VOCABULARY = """
-তাই মত সবার নাই জানা করব হার বাড়ির মার নরম সই পাল মহা নব বর লেখাপড়া রব রক্ষক কলাম নামা
-ঘড়ির খাপ বান কসম সম বাড়িঘর চাকার দীন কুল খাব গাল রশি ছক সন্ত নর মগ মাপা বক মকর বাসর সমর
-হাতা কাত বন্দ লেপ তাস তিল লতা লাগা খাড়া তাক পাশা গম নল সর তল পাত খাত জাম রাঙা কাক গরম
-""".split()
+# Every level as (declared block, words). The declared block is checked against what the
+# words actually contain, so a level cannot drift out of its block unnoticed.
+DECLARED = [(block, words) for block in sorted(SYLLABUS) for words in SYLLABUS[block]]
+
+CATALOGUE = [words for _, words in DECLARED]
 
 # Three extra words fill the chest; a full chest pays out and starts again. The chest is
 # shared across levels rather than reset each time - with three- and four-tile boards there
@@ -134,12 +169,27 @@ CHEST_REWARD = 15
 MIN_ZIPF = 2.0          # below this, treat a "word" as invented rather than Bengali
 MAX_ROWS, MAX_COLS = 8, 9
 
+# How many pieces of the writing system one level may introduce. Two is a lesson; five is a
+# lecture. Levels that exceed it are reported by `check` rather than rejected, because the
+# ordering is greedy and can be forced into a jump when a block runs short of gentle options.
+MAX_NEW_UNITS = {
+    BLOCK_PLAIN: 2, BLOCK_ONE_KAR: 2, BLOCK_KARS: 3, BLOCK_CONJUNCT: 3, BLOCK_FREE: 3,
+}
+
+# How many words a board should hold, by block. Word count is the main difficulty dial, so it
+# climbs with the syllabus rather than with raw level number - a learner meeting their first
+# vowel sign does not also need a seven-word board.
+BOARD_TARGET = {
+    BLOCK_PLAIN: 3, BLOCK_ONE_KAR: 4, BLOCK_KARS: 5, BLOCK_CONJUNCT: 6, BLOCK_FREE: 7,
+}
+
 
 def difficulty(tiles, words):
     """
-    What makes a level hard, weighted. Word count carries the most weight per unit: having to
-    find six words from one wheel is what actually makes a board take a while, more than any
-    single word being long. Then tiles to scan, the longest word, conjunct tiles, and rarity.
+    What makes a level hard to solve, weighted. Word count carries the most weight per unit:
+    having to find six words from one wheel is what actually makes a board take a while, more
+    than any single word being long. Then tiles to scan, the longest word, conjunct tiles, and
+    rarity. This orders levels *within* a block; the block itself comes first.
     """
     longest = max(len(split_aksharas(w)) for w in words)
     rarity = sum(max(0.0, 5.5 - zipf(w)) for w in words) / len(words)
@@ -147,7 +197,7 @@ def difficulty(tiles, words):
             + 3.0 * len(conjunct_tiles(tiles)) + 1.6 * rarity)
 
 
-def validate(words):
+def validate(words, block=None):
     """Everything that has to be true before a level can ship. Returns (level, problems)."""
     problems = []
     tiles = tiles_for(words)
@@ -168,6 +218,20 @@ def validate(words):
             problems.append(f'{w} repeats an akshara {aksharas}, so tiles cannot spell it')
         if not spellable(w, tiles):
             problems.append(f'{w} is not spellable from {" ".join(tiles)}')
+        if w in REJECTED:
+            problems.append(f'{w} is on the rejection list: {REJECTED[w]}')
+
+    # A level written into one block must not contain something from a later one, or the
+    # syllabus is a fiction: this is what stops a stray conjunct landing in the vowel-sign
+    # block, where nothing has taught it yet.
+    actual = block_for(words)
+    if block == BLOCK_FREE:
+        # Free play is a placement, not a property of the words: anything already taught may
+        # appear, so the only thing to check is that nothing *untaught* has crept in.
+        if actual > BLOCK_CONJUNCT:
+            problems.append(f'free play cannot introduce block {actual} material')
+    elif block is not None and actual != block:
+        problems.append(f'declared block {block} but its words need block {actual}')
 
     placed = layout(words)
     if not placed:
@@ -191,26 +255,11 @@ def validate(words):
         'occupied': occupied,
         'size': (rows, cols),
         'score': difficulty(tiles, words),
-        'extras': [],          # filled in by ordered_levels, which sees the whole catalogue
+        'block': block if block is not None else actual,
+        'teaches': [],         # filled in by ordered_levels, which knows what came before
+        'extras': [],          # likewise: extras depend on what has been taught
     }
     return level, problems
-
-
-def board_target(rank, total):
-    """
-    How many words a level should ask for, by how far into the game it sits. More words from
-    one wheel is the main difficulty dial, so it climbs; the opening five never grow.
-    """
-    if rank < len(EASY_OPENERS):
-        return 3
-    share = rank / max(1, total - 1)
-    if share < 0.25:
-        return 4
-    if share < 0.5:
-        return 5
-    if share < 0.8:
-        return 6
-    return 7
 
 
 def extras_reserve(available):
@@ -256,58 +305,86 @@ def grow_board(words, candidates, target):
     return grown
 
 
-def extras_for(tiles, words, vocabulary):
+def teachable(vocabulary, tiles, words, known):
     """
-    Attested words those tiles can spell that are not on this board, most common first so
-    the ones a player is likeliest to try are the ones that count.
+    Words those tiles can spell that a learner is equipped to read - every piece of the
+    writing system in them has already been taught. A bonus word built on an untaught
+    conjunct is worse than no bonus word: it is a puzzle the player cannot see the answer to
+    even when staring at it.
     """
-    found = [w for w in vocabulary if w not in words and spellable(w, tiles)]
+    found = [w for w in vocabulary
+             if w not in words and spellable(w, tiles) and set(units_in([w])) <= known]
     found.sort(key=lambda w: (-zipf(w), w))
     return found
 
 
+def order_block(group, known):
+    """
+    Order one block gently: at each step take the level that introduces the least new
+    material, breaking ties by where its newest piece sits in the syllabus and then by how
+    hard the board is. Greedy rather than sorted, because "how much is new" depends on what
+    has already been placed - a level that looks like a big jump from the start of a block can
+    be an easy step once its neighbours have been taken. `known` carries in what earlier
+    blocks already taught.
+    """
+    remaining, ordered = list(group), []
+    while remaining:
+        def cost(level):
+            fresh = new_units(level['words'], known)
+            hardest = max((teaching_rank(u) for u in fresh), default=(0, 0))
+            return (len(fresh), hardest, level['score'])
+
+        pick = min(remaining, key=cost)
+        pick['teaches'] = new_units(pick['words'], known)
+        known |= set(units_in(pick['words']))
+        ordered.append(pick)
+        remaining.remove(pick)
+    return ordered, known
+
+
 def ordered_levels():
     """
-    Every valid level, easiest first. Returns (levels, failures) so callers can report
+    Every valid level in teaching order. Returns (levels, failures) so callers can report
     problems rather than silently shipping fewer levels than the catalogue lists.
     """
     levels, failures = [], []
-    for words in CATALOGUE:
-        level, problems = validate(words)
+    for block, words in DECLARED:
+        level, problems = validate(words, block)
         if problems:
             failures.append((words, problems))
             continue
         levels.append(level)
 
-    # Every level's words are verified vocabulary, so they double as extras elsewhere.
-    vocabulary = sorted({w for level in levels for w in level['words']} | set(EXTRA_VOCABULARY))
+    # Board words are verified vocabulary too, so they can serve as bonus words elsewhere.
+    vocabulary = list(dict.fromkeys(pool_words() + [w for l in levels for w in l['words']]))
 
-    # Sort by the difficulty of the level as written, then hand each one a word-count target
-    # by how far into the game it sits and grow it to fit.
-    levels.sort(key=lambda l: l['score'])
-    openers = [l for opener in EASY_OPENERS for l in levels if l['words'] == opener]
-    rest = [l for l in levels if l not in openers]
-    levels = openers + rest
+    # Blocks in order; inside each, the gentlest step first.
+    known, out = set(), []
+    for block in sorted({l['block'] for l in levels}):
+        group = [l for l in levels if l['block'] == block]
+        group.sort(key=lambda l: l['score'])
+        ordered, known = order_block(group, known)
+        out += ordered
+    levels = out
 
-    for rank, level in enumerate(levels):
-        target = board_target(rank, len(levels))
+    # Grow each board towards its block's word count, using only words the learner has been
+    # taught to read by the time they arrive - so a bigger board never smuggles in a letter
+    # the syllabus has not reached.
+    taught = set()
+    for level in levels:
+        taught |= set(units_in(level['words']))
         candidates = [w for w in vocabulary
-                      if w not in level['words'] and spellable(w, level['tiles'])]
+                      if w not in level['words'] and spellable(w, level['tiles'])
+                      and set(units_in([w])) <= taught
+                      and block_for(level['words'] + [w]) == level['block']]
         candidates.sort(key=lambda w: -zipf(w))
-        grown = grow_board(level['words'], candidates, target)
+        grown = grow_board(level['words'], candidates, BOARD_TARGET[level['block']])
         if grown != level['words']:
             placed = layout(grown)
             level['words'] = grown
             level['occupied'] = placed[0]
             level['size'] = grid_size(placed[0])
         level['score'] = difficulty(level['tiles'], level['words'])
+        level['extras'] = teachable(vocabulary, level['tiles'], level['words'], taught)
 
-    # Re-sort now that the boards have their final size, then pin the openers back to front.
-    levels.sort(key=lambda l: l['score'])
-    openers = [l for opener in EASY_OPENERS for l in levels if l['words'] == opener]
-    rest = [l for l in levels if l not in openers]
-    levels = openers + rest
-
-    for level in levels:
-        level['extras'] = extras_for(level['tiles'], level['words'], vocabulary)
     return levels, failures

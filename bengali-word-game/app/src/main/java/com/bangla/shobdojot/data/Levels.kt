@@ -3,13 +3,17 @@ package com.bangla.shobdojot.data
 import com.bangla.shobdojot.model.Level
 
 /**
- * Level content, ordered by difficulty: tile count, word count, how long the longest word
- * is, whether conjunct tiles appear, and how common the words are.
+ * Level content, in teaching order: plain letters first, then one vowel sign at a time, then
+ * several signs together, then conjuncts one family at a time, then everything mixed. Puzzle
+ * difficulty (tiles, word count, longest word, rarity) only orders levels within a block.
  *
  * Every word is attested in real Bengali text (checked against corpus frequency data) and
- * hand-picked - frequency lists happily offer verb inflections and word fragments, which
- * make poor puzzles. Each `letters` entry is one akshara: the unit that sits on a wheel tile
- * and fills one grid cell.
+ * hand-picked from a vocabulary curated for a child - frequency alone offers verb inflections,
+ * word fragments and newspaper register, none of which teach a beginner anything. Each
+ * `letters` entry is one akshara: the unit that sits on a wheel tile and fills one grid cell.
+ *
+ * `teaches` is what this level introduces that no earlier level used - a letter, a vowel sign,
+ * or a conjunct - so the app can show it before the board.
  *
  * Two rules constrain what can go here, and `LevelsTest` enforces both:
  *  - a word must be spellable from the tiles using each tile at most once, and every tile
@@ -26,84 +30,98 @@ import com.bangla.shobdojot.model.Level
 object Levels {
 
     val all: List<Level> = listOf(
-        // Easiest first: three tiles, short everyday words.
-        Level(1, listOf("জ", "ল", "ন"), listOf("জল", "জন", "নল")),
-        Level(2, listOf("প", "থ", "র"), listOf("পথ", "পর", "রথ")),
-        Level(3, listOf("ক", "র", "ব"), listOf("কর", "বর", "রব"), extras = listOf("করব", "বক")),
-        Level(4, listOf("স", "ব", "র"), listOf("সব", "বস", "রস"), extras = listOf("বর", "রব", "সর")),
-        Level(5, listOf("ক", "ম", "ল"), listOf("কম", "কল", "কমল"), extras = listOf("কলম")),
-        Level(6, listOf("না", "ম", "দা"), listOf("নাম", "দাম", "দানা")),
-        Level(7, listOf("রা", "ত", "না", "ম"), listOf("রাত", "নাম", "রাম"), extras = listOf("মত")),
-        Level(8, listOf("ক", "বি", "তা"), listOf("কবি", "তাক", "কবিতা")),
-        Level(9, listOf("না", "ট", "ক"), listOf("নাক", "টক", "নাটক")),
-        Level(10, listOf("ম", "ন", "তা", "রা"), listOf("মন", "তান", "তারা"), extras = listOf("রাম")),
-        Level(11, listOf("ব", "ই", "খা", "তা"), listOf("বই", "খাই", "খাতা"), extras = listOf("তাই", "খাব")),
-        Level(12, listOf("ফু", "ল", "চা", "কু"), listOf("ফুল", "চাল", "চাকু"), extras = listOf("কুল")),
-        Level(13, listOf("পা", "হা", "ড়"), listOf("পাড়", "হাড়", "পাহাড়")),
-        Level(14, listOf("পা", "য়ে", "স"), listOf("পাস", "পায়ে", "পায়েস")),
-        Level(15, listOf("মে", "ঘ", "লা"), listOf("মেঘ", "মেলা", "মেঘলা")),
-        Level(16, listOf("গা", "ন", "ছ", "মা"), listOf("গান", "গাছ", "মান", "মাছ")),
-        Level(17, listOf("বাং", "লা", "দে", "শ"), listOf("বাংলা", "দেশ", "বাংলাদেশ")),
+        // Block 1, plain letters: consonants and independent vowels on their own, no signs at all.
+        Level(1, listOf("ক", "ল", "ম"), listOf("কলম", "কম", "কল"), block = 1, teaches = listOf("ল", "ক", "ম")),
+        Level(2, listOf("ক", "ল", "ম", "আ"), listOf("কলম", "কম", "কল", "আম"), block = 1, teaches = listOf("আ")),
+        Level(3, listOf("ক", "ল", "ম", "এ"), listOf("কলম", "এক", "কম", "কল"), block = 1, teaches = listOf("এ")),
+        Level(4, listOf("ক", "ল", "ম", "ফ"), listOf("কলম", "কম", "কল", "ফল"), block = 1, teaches = listOf("ফ")),
+        Level(5, listOf("ব", "দ", "ল"), listOf("বদল", "দল", "বল"), block = 1, teaches = listOf("ব", "দ")),
+        Level(6, listOf("ব", "ল", "স"), listOf("বল", "সব", "বস"), block = 1, teaches = listOf("স")),
+        Level(7, listOf("স", "ব", "ই"), listOf("সব", "বই", "বস"), block = 1, teaches = listOf("ই")),
+        Level(8, listOf("স", "ব", "র"), listOf("সব", "রস", "বস"), block = 1, teaches = listOf("র"), extras = listOf("সর")),
+        Level(9, listOf("গ", "র", "ম", "ক"), listOf("গরম", "কম", "কর", "গম"), block = 1, teaches = listOf("গ")),
+        Level(10, listOf("ন", "গ", "র", "ম"), listOf("মন", "গম", "নগর", "গরম"), block = 1, teaches = listOf("ন"), extras = listOf("নরম")),
+        Level(11, listOf("ব", "দ", "ল", "শ"), listOf("বদল", "দল", "বল", "দশ"), block = 1, teaches = listOf("শ")),
+        Level(12, listOf("জ", "ল", "ন"), listOf("জল", "জন", "নল"), block = 1, teaches = listOf("জ")),
+        Level(13, listOf("স", "ব", "ড়"), listOf("সব", "বড়", "বস"), block = 1, teaches = listOf("ড়")),
 
-        // The first level with a conjunct tile: ন্ত is one letter unit, one tile.
-        Level(18, listOf("ব", "ন", "ধ", "ন্ধু"), listOf("বন", "ধন", "বন্ধু"), extras = listOf("নব")),
-        Level(19, listOf("জ", "ল", "ন", "ম"), listOf("জল", "জন", "মন", "নল")),
-        Level(20, listOf("চা", "ম", "চ", "কা"), listOf("কাচ", "চাকা", "চামচ")),
-        Level(21, listOf("প", "রি", "বে", "শ"), listOf("বেশ", "পরি", "পরিবেশ")),
-        Level(22, listOf("দি", "ন", "রা", "ত"), listOf("দিন", "রাত", "দিনরাত")),
-        Level(23, listOf("বা", "ল", "তি"), listOf("বাতি", "তিল", "বালতি", "বাতিল")),
-        Level(24, listOf("বাং", "লা", "ভা", "ষা"), listOf("বাংলা", "ভাষা", "বাংলাভাষা")),
-        Level(25, listOf("হা", "ত", "ঘ", "ড়ি"), listOf("হাত", "ঘড়ি", "হাতঘড়ি")),
-        Level(26, listOf("বি", "দে", "শ", "কা"), listOf("দেশ", "বিশ", "বিদেশ", "বিকাশ")),
-        Level(27, listOf("দু", "ধ", "ভা", "ত"), listOf("দুধ", "ভাত", "দুধভাত")),
-        Level(28, listOf("ন", "গ", "র", "সা"), listOf("সার", "নগর", "সাগর", "নর")),
-        Level(29, listOf("ব", "স", "ন্ত"), listOf("সব", "বস", "বসন্ত", "সন্ত")),
-        Level(30, listOf("রা", "ষ্ট্র", "প", "তি"), listOf("পরা", "রাষ্ট্র", "রাষ্ট্রপতি")),
-        Level(31, listOf("ফু", "ট", "ব", "ল"), listOf("বল", "ফুল", "ফুট", "ফুটবল")),
-        Level(32, listOf("স্বা", "ধী", "ন", "তা"), listOf("তান", "স্বাধীন", "স্বাধীনতা")),
-        Level(33, listOf("রা", "স্তা", "ঘা", "ট"), listOf("রাস্তা", "ঘাট", "রাস্তাঘাট")),
-        Level(34, listOf("মা", "ছ", "রা", "ঙা"), listOf("মাছ", "মারা", "রাঙা", "মাছরাঙা")),
-        Level(35, listOf("শি", "ক্ষ", "ক", "র"), listOf("কর", "কক্ষ", "শিক্ষক", "রক্ষক"), extras = listOf("রশি")),
-        Level(36, listOf("র", "স", "গো", "ল্লা"), listOf("রস", "সর", "রসগোল্লা")),
-        Level(37, listOf("আ", "ম", "রা", "ত"), listOf("আম", "রাত", "আমরা", "আরাম", "মত"), extras = listOf("রাম")),
-        Level(38, listOf("পা", "ঠ", "শা", "লা"), listOf("পাঠ", "পালা", "পাশা", "পাঠশালা")),
-        Level(39, listOf("ন", "দী", "র", "পা"), listOf("নদী", "পার", "পান", "নদীর", "দীন"), extras = listOf("নর")),
-        Level(40, listOf("মা", "টি", "র", "পা"), listOf("মাটি", "পার", "পাটি", "মাটির", "মার"), extras = listOf("মাপা")),
-        Level(41, listOf("জা", "না", "লা", "ম"), listOf("জাম", "নাম", "মজা", "নালা", "জানালা"), extras = listOf("জানা")),
-        Level(42, listOf("জ", "ন্ম", "দি", "ন"), listOf("জন", "দিন", "জন্ম", "জন্মদিন")),
-        Level(43, listOf("প", "রি", "বা", "র"), listOf("পর", "বার", "বাপ", "পরি", "পরিবার")),
-        Level(44, listOf("শি", "ল্প", "ক", "লা"), listOf("কলা", "শিলা", "শিল্প", "শিল্পকলা")),
-        Level(45, listOf("চি", "ঠি", "প", "ত্র"), listOf("চিঠি", "পত্র", "চিত্র", "চিঠিপত্র")),
-        Level(46, listOf("ভা", "লো", "বা", "সা"), listOf("ভালো", "বাসা", "ভাসা", "ভাবা", "ভালোবাসা")),
-        Level(47, listOf("বি", "দ্যা", "ল", "য়"), listOf("বিল", "লয়", "বিদ্যা", "বিদ্যালয়")),
-        Level(48, listOf("বা", "তা", "স", "র"), listOf("বাস", "তার", "বার", "রস", "তাস", "বাতাস"), extras = listOf("সবার", "সর", "বাসর")),
-        Level(49, listOf("হা", "ত", "পা", "খা"), listOf("হাত", "খাত", "পাত", "পাখা", "হাতপাখা")),
-        Level(50, listOf("ক", "লা", "গা", "ছ"), listOf("কলা", "লাগা", "গাছ", "কলাগাছ", "ছক")),
-        Level(51, listOf("বি", "চা", "র", "কা"), listOf("চার", "কার", "রবি", "চাবি", "চাকা", "বিচার"), extras = listOf("চাকার")),
-        Level(52, listOf("প্র", "তি", "ষ্ঠা", "ন"), listOf("প্রতি", "তিন", "প্রতিষ্ঠা", "প্রতিষ্ঠান")),
+        // Block 2, one vowel sign: a single vowel sign per level, introduced one at a time in KAR_ORDER.
+        Level(14, listOf("লা", "ল", "ক"), listOf("লাল", "কল", "কলা"), block = 2, teaches = listOf("া")),
+        Level(15, listOf("লা", "ল", "ফ"), listOf("লাল", "ফল", "লাফ"), block = 2),
+        Level(16, listOf("ক", "ল", "কা"), listOf("কল", "কাল", "কাক"), block = 2),
+        Level(17, listOf("কা", "ল", "ন"), listOf("কাল", "কান", "নল"), block = 2),
+        Level(18, listOf("ক", "ম", "লা"), listOf("কমলা", "কম", "কলা"), block = 2),
+        Level(19, listOf("গা", "ন", "কা", "ল"), listOf("গান", "কাল", "কান", "নল"), block = 2),
+        Level(20, listOf("স", "কা", "ল", "ব"), listOf("সকাল", "সব", "বল", "কাল", "বস"), block = 2),
+        Level(21, listOf("জা", "না", "লা", "ম"), listOf("জাম", "নাম", "মজা", "নালা", "জানালা"), block = 2),
+        Level(22, listOf("ক", "লা", "গা", "ছ"), listOf("কলা", "লাগা", "গাছ", "কলাগাছ"), block = 2, teaches = listOf("ছ")),
+        Level(23, listOf("না", "ট", "ক", "আ"), listOf("নাটক", "আট", "টক"), block = 2, teaches = listOf("ট")),
+        Level(24, listOf("ক", "ম", "লা", "থা"), listOf("থালা", "কমলা", "কম", "কলা"), block = 2, teaches = listOf("থ")),
+        Level(25, listOf("মা", "ছ", "রা", "ঙা"), listOf("মাছ", "মারা", "রাঙা", "মাছরাঙা"), block = 2, teaches = listOf("ঙ")),
+        Level(26, listOf("স", "ব", "জি"), listOf("সবজি", "সব", "বস"), block = 2, teaches = listOf("ি")),
+        Level(27, listOf("দি", "ন", "জ", "ল"), listOf("দিন", "জন", "জল", "নল"), block = 2),
+        Level(28, listOf("তি", "ন", "জ", "ল"), listOf("তিন", "জন", "জল", "নল"), block = 2, teaches = listOf("ত"), extras = listOf("তিল")),
+        Level(29, listOf("ব", "ই", "খা", "তা"), listOf("বই", "খাই", "খাতা"), block = 2, teaches = listOf("খ")),
+        Level(30, listOf("খা", "তা", "ক", "লা"), listOf("খাতা", "কলা", "খালা"), block = 2, extras = listOf("তাক")),
+        Level(31, listOf("ঘ", "ড়ি", "ক", "র"), listOf("ঘড়ি", "কর", "ঘর"), block = 2, teaches = listOf("ঘ")),
+        Level(32, listOf("ভা", "ই", "ব", "ত"), listOf("ভাই", "বই", "ভাত"), block = 2, teaches = listOf("ভ")),
+        Level(33, listOf("মে", "ঘ", "র", "স"), listOf("মেঘ", "ঘর", "রস", "সর"), block = 2, teaches = listOf("ে")),
+        Level(34, listOf("ক", "ল", "ম", "তে"), listOf("তেল", "কলম", "কম", "কল"), block = 2),
+        Level(35, listOf("আ", "পে", "ল", "ট"), listOf("আপেল", "আট", "পেট"), block = 2, teaches = listOf("প")),
+        Level(36, listOf("পা", "হা", "ড়"), listOf("পাড়", "হাড়", "পাহাড়"), block = 2, teaches = listOf("হ")),
+        Level(37, listOf("হা", "ত", "পা", "খা"), listOf("হাত", "খাত", "পাত", "পাখা", "হাতপাখা"), block = 2),
+        Level(38, listOf("পা", "ঠ", "শা", "লা"), listOf("পাঠ", "পালা", "পাশা", "পাঠশালা"), block = 2, teaches = listOf("ঠ")),
+        Level(39, listOf("গ", "রু", "আ", "ম"), listOf("গরু", "আম", "গম"), block = 2, teaches = listOf("ু")),
+        Level(40, listOf("ক", "ল", "ম", "ফু"), listOf("ফুল", "কলম", "কম", "কল"), block = 2),
+        Level(41, listOf("ক", "ল", "ম", "ঘু"), listOf("ঘুম", "কলম", "কম", "কল"), block = 2),
+        Level(42, listOf("ফু", "ট", "ব", "ল"), listOf("বল", "ফুল", "ফুট", "ফুটবল"), block = 2),
+        Level(43, listOf("ব", "দ", "ল", "চু"), listOf("চুল", "বদল", "দল", "বল"), block = 2, teaches = listOf("চ")),
+        Level(44, listOf("দু", "ই", "ব", "ধ"), listOf("দুই", "বই", "দুধ"), block = 2, teaches = listOf("ধ")),
 
-        // The first five-tile board. Six-tile boards close out the game.
-        Level(53, listOf("ক", "ল", "ম", "র", "ন", "গ"), listOf("কলম", "রকম", "নগর", "কম", "কর"), extras = listOf("মন", "কল", "গরম", "নরম", "গম", "কমল", "নর", "মগ", "নল", "মকর")),
-        Level(54, listOf("মু", "ক্তি", "যু", "দ্ধ"), listOf("মুক্তি", "যুদ্ধ", "যুক্তি", "মুক্তিযুদ্ধ")),
-        Level(55, listOf("ঘ", "র", "বা", "ড়ি"), listOf("ঘর", "বাঘ", "ঘড়ি", "বাড়ি", "ঘরবাড়ি", "বার"), extras = listOf("বাড়ির", "ঘড়ির", "বাড়িঘর")),
-        Level(56, listOf("প্র", "জা", "প", "তি"), listOf("প্রতি", "জাতি", "প্রজা", "প্রজাতি", "প্রজাপতি")),
-        Level(57, listOf("ক", "ল", "কা", "তা"), listOf("কল", "কাক", "তাল", "লতা", "কাল", "কলকাতা"), extras = listOf("তাক")),
-        Level(58, listOf("প", "ড়া", "লে", "খা"), listOf("পড়া", "লেখা", "খাড়া", "পড়ালেখা", "লেখাপড়া", "খাপ"), extras = listOf("লেপ")),
-        Level(59, listOf("ব", "র্ষা", "কা", "ল"), listOf("বল", "বকা", "কাল", "বর্ষা", "বর্ষাকাল")),
-        Level(60, listOf("প্র", "জা", "ত", "ন্ত্র"), listOf("জাত", "প্রজা", "তন্ত্র", "প্রজাতন্ত্র")),
-        Level(61, listOf("শী", "ত", "কা", "ল"), listOf("তল", "শীত", "কাল", "শীতল", "শীতকাল", "কাত")),
-        Level(62, listOf("ক", "ল", "ম", "লা"), listOf("কল", "কলা", "কলম", "কমল", "লাল", "কমলা", "কম"), extras = listOf("কলাম")),
-        Level(63, listOf("স", "ব", "র", "ক", "ম"), listOf("সব", "কম", "রকম", "সবরকম", "কর", "করব"), extras = listOf("রস", "বস", "বর", "রব", "কসম", "সম", "সর", "বক", "মকর", "সমর")),
-        Level(64, listOf("চ", "ন্দ্র", "গ্র", "হ", "ণ"), listOf("গ্রহ", "গ্রহণ", "চন্দ্র", "চন্দ্রগ্রহণ")),
-        Level(65, listOf("সূ", "র্য", "গ্র", "হ", "ণ"), listOf("গ্রহ", "গ্রহণ", "সূর্য", "সূর্যগ্রহণ")),
-        Level(66, listOf("র", "বী", "ন্দ্র", "না", "থ"), listOf("বীর", "রথ", "নাথ", "রবীন্দ্র", "রবীন্দ্রনাথ")),
-        Level(67, listOf("ফু", "ল", "বা", "গা", "ন"), listOf("ফুল", "গান", "বাগান", "ফুলবাগান", "বান", "গাল"), extras = listOf("নল")),
-        Level(68, listOf("সং", "বা", "দ", "প", "ত্র"), listOf("বাদ", "পদ", "পত্র", "সংবাদ", "সংবাদপত্র", "বাপ")),
-        Level(69, listOf("ম", "হা", "ন", "গ", "র"), listOf("মন", "গম", "নগর", "গরম", "মহান", "মহানগর", "হার"), extras = listOf("নরম", "মহা", "নর", "মগ")),
-        Level(70, listOf("মা", "না", "ন", "স", "ই"), listOf("মাস", "মান", "মানা", "সমান", "মানানসই", "নাই", "সই"), extras = listOf("নামা")),
-        Level(71, listOf("ক", "ম", "লা", "পু", "র"), listOf("কলা", "কমলা", "কলার", "কমলাপুর", "কম", "কর", "রকম"), extras = listOf("কলাম", "মকর")),
-        Level(72, listOf("হা", "স", "পা", "তা", "ল", "টি"), listOf("হাসপাতাল", "পাটি", "পাতাল", "হাতা", "তাল", "পাস", "পাল"), extras = listOf("লতা", "তাস")),
-        Level(73, listOf("বি", "মা", "ন", "ব", "ন্দ", "র"), listOf("বন", "মান", "মানব", "বিমান", "বন্দর", "বিমানবন্দর", "মার"), extras = listOf("রবি", "নব", "বর", "রব", "নর", "বন্দ"))
+        // Block 3, vowel signs together: several signs in one word, all of them already taught.
+        Level(45, listOf("ক", "বি", "তা"), listOf("কবি", "তাক", "কবিতা"), block = 3),
+        Level(46, listOf("ফু", "ল", "চা", "কু"), listOf("ফুল", "চাল", "চাকু"), block = 3),
+        Level(47, listOf("মে", "ঘ", "লা"), listOf("মেঘ", "মেলা", "মেঘলা"), block = 3),
+        Level(48, listOf("দি", "ন", "রা", "ত"), listOf("দিন", "রাত", "দিনরাত"), block = 3),
+        Level(49, listOf("হা", "ত", "ঘ", "ড়ি"), listOf("হাত", "ঘড়ি", "হাতঘড়ি"), block = 3),
+        Level(50, listOf("দু", "ধ", "ভা", "ত"), listOf("দুধ", "ভাত", "দুধভাত"), block = 3),
+        Level(51, listOf("মা", "টি", "র", "পা"), listOf("মাটি", "পার", "পাটি", "মাটির"), block = 3),
+        Level(52, listOf("প", "ড়া", "লে", "খা"), listOf("পড়া", "লেখা", "খাড়া", "পড়ালেখা"), block = 3),
+        Level(53, listOf("প", "রি", "বা", "র"), listOf("পর", "বার", "বাপ", "পরি", "পরিবার"), block = 3),
+        Level(54, listOf("ঘ", "র", "বা", "ড়ি"), listOf("ঘর", "বাঘ", "ঘড়ি", "বাড়ি", "ঘরবাড়ি"), block = 3, extras = listOf("বার")),
+        Level(55, listOf("ফু", "ল", "বা", "গা", "ন"), listOf("ফুল", "গান", "বাগান", "ফুলবাগান", "নল"), block = 3),
+        Level(56, listOf("পা", "য়ে", "স"), listOf("পাস", "পায়ে", "পায়েস"), block = 3, teaches = listOf("য়")),
+        Level(57, listOf("ন", "দী", "র", "পা"), listOf("নদী", "পার", "পান", "নদীর"), block = 3, teaches = listOf("ী")),
+        Level(58, listOf("শী", "ত", "কা", "ল"), listOf("তল", "শীত", "কাল", "শীতল", "শীতকাল"), block = 3),
+
+        // Block 4, conjuncts: joined consonants, one cluster family at a time.
+        Level(59, listOf("ব", "স", "ন্ত"), listOf("সব", "বস", "বসন্ত"), block = 4, teaches = listOf("ন্ত")),
+        Level(60, listOf("আ", "গু", "ন", "ন্দ", "ম"), listOf("আগুন", "আনন্দ", "আম"), block = 4, teaches = listOf("ন্দ"), extras = listOf("মন")),
+        Level(61, listOf("রা", "স্তা", "ঘা", "ট"), listOf("রাস্তা", "ঘাট", "রাস্তাঘাট"), block = 4, teaches = listOf("স্ত")),
+        Level(62, listOf("ক", "ল", "ম", "স্কু"), listOf("কলম", "কম", "স্কুল", "কল"), block = 4, teaches = listOf("স্ক")),
+        Level(63, listOf("গ", "র", "ম", "ল্প"), listOf("গরম", "গল্প", "গম"), block = 4, teaches = listOf("ল্প")),
+        Level(64, listOf("শি", "ল্প", "ক", "লা"), listOf("কলা", "শিলা", "শিল্প", "শিল্পকলা"), block = 4),
+        Level(65, listOf("দি", "ন", "রা", "ত", "ন্না"), listOf("দিনরাত", "দিন", "রাত", "রান্না"), block = 4, teaches = listOf("ন্ন")),
+        Level(66, listOf("ব", "ন", "ধ", "ন্ধু"), listOf("বন", "ধন", "বন্ধু"), block = 4, teaches = listOf("ন্ধ")),
+        Level(67, listOf("বা", "লি", "শ", "ক্ত"), listOf("বালিশ", "শক্ত", "বালি"), block = 4, teaches = listOf("ক্ত")),
+        Level(68, listOf("আ", "পে", "ল", "ন্সি", "ট"), listOf("আপেল", "পেন্সিল", "আট", "পেট"), block = 4, teaches = listOf("ন্স")),
+        Level(69, listOf("ব", "দ", "ল", "স্বা"), listOf("বদল", "দল", "বল", "স্বাদ"), block = 4, teaches = listOf("স্ব")),
+        Level(70, listOf("ব", "র্ষা", "কা", "ল"), listOf("বর্ষাকাল", "বল", "কাল", "বর্ষা"), block = 4, teaches = listOf("র্ষ")),
+        Level(71, listOf("চি", "ঠি", "প", "ত্র", "ছা"), listOf("চিঠিপত্র", "ছাত্র", "চিঠি"), block = 4, teaches = listOf("ত্র")),
+        Level(72, listOf("শি", "ক্ষ", "ক", "র"), listOf("কর", "কক্ষ", "শিক্ষক"), block = 4, teaches = listOf("ক্ষ")),
+        Level(73, listOf("স", "মু", "দ্র", "ব"), listOf("সমুদ্র", "সব", "বস"), block = 4, teaches = listOf("দ্র")),
+        Level(74, listOf("ক", "ম", "লা", "গ্রা"), listOf("কমলা", "কম", "গ্রাম", "কলা"), block = 4, teaches = listOf("গ্র")),
+        Level(75, listOf("বি", "দ্যা", "ল", "য়"), listOf("বিল", "লয়", "বিদ্যা", "বিদ্যালয়"), block = 4, teaches = listOf("দ্য")),
+        Level(76, listOf("জ", "ন্ম", "দি", "ন"), listOf("জন", "দিন", "জন্ম", "জন্মদিন"), block = 4, teaches = listOf("ন্ম")),
+        Level(77, listOf("র", "স", "গো", "ল্লা"), listOf("রস", "সর", "রসগোল্লা"), block = 4, teaches = listOf("ো", "ল্ল")),
+
+        // Block 5, free play: everything taught, mixed, longest words and fullest boards.
+        Level(78, listOf("বা", "ল", "তি"), listOf("বাতি", "তিল", "বালতি"), block = 5),
+        Level(79, listOf("স", "কা", "ল", "ব"), listOf("সকাল", "সব", "বল", "কাল"), block = 5, extras = listOf("বস")),
+        Level(80, listOf("ক", "ল", "ম", "লা", "গ্রা"), listOf("কলম", "কমলা", "গ্রাম", "লাল"), block = 5, extras = listOf("কম", "কল", "কলা")),
+        Level(81, listOf("ভা", "লো", "বা", "সা"), listOf("ভালো", "বাসা", "ভাসা", "ভাবা", "ভালোবাসা"), block = 5),
+        Level(82, listOf("বি", "চা", "র", "কা"), listOf("চার", "কার", "রবি", "চাবি", "চাকা", "বিচার"), block = 5),
+        Level(83, listOf("হা", "স", "পা", "তা", "ল", "টি"), listOf("হাসপাতাল", "পাটি", "পাতাল", "হাতা", "তাল", "পাস"), block = 5, extras = listOf("পাতা"))
     )
 
     val count: Int get() = all.size

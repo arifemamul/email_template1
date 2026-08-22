@@ -6,6 +6,8 @@ Level pipeline CLI.
     python3 tools/build.py check              validate the catalogue, print the ramp
     python3 tools/build.py build              regenerate both builds' level tables
     python3 tools/build.py show 64            print one level's board
+    python3 tools/build.py curriculum         the syllabus: what each level teaches
+    python3 tools/build.py slots              recording and illustration work, in order
     python3 tools/build.py discover প্রজাপতি   what else can this word's tiles spell?
 
 `check` exits non-zero when anything is wrong, so it works in CI. After `build`, run the
@@ -18,8 +20,10 @@ import sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
-from bangla import HASANTA, conjunct_tiles, render, split_aksharas   # noqa: E402
-from catalogue import CATALOGUE, ordered_levels                      # noqa: E402
+from bangla import conjunct_tiles, render, split_aksharas            # noqa: E402
+from catalogue import CATALOGUE, MAX_NEW_UNITS, ordered_levels        # noqa: E402
+from curriculum import BLOCKS, unit_label                             # noqa: E402
+from vocabulary import theme_of                                       # noqa: E402
 
 REPO = pathlib.Path(__file__).resolve().parent.parent
 KOTLIN = REPO / 'bengali-word-game/app/src/main/java/com/bangla/shobdojot/data/Levels.kt'
@@ -30,13 +34,17 @@ KOTLIN_HEADER = '''package com.bangla.shobdojot.data
 import com.bangla.shobdojot.model.Level
 
 /**
- * Level content, ordered by difficulty: tile count, word count, how long the longest word
- * is, whether conjunct tiles appear, and how common the words are.
+ * Level content, in teaching order: plain letters first, then one vowel sign at a time, then
+ * several signs together, then conjuncts one family at a time, then everything mixed. Puzzle
+ * difficulty (tiles, word count, longest word, rarity) only orders levels within a block.
  *
  * Every word is attested in real Bengali text (checked against corpus frequency data) and
- * hand-picked - frequency lists happily offer verb inflections and word fragments, which
- * make poor puzzles. Each `letters` entry is one akshara: the unit that sits on a wheel tile
- * and fills one grid cell.
+ * hand-picked from a vocabulary curated for a child - frequency alone offers verb inflections,
+ * word fragments and newspaper register, none of which teach a beginner anything. Each
+ * `letters` entry is one akshara: the unit that sits on a wheel tile and fills one grid cell.
+ *
+ * `teaches` is what this level introduces that no earlier level used - a letter, a vowel sign,
+ * or a conjunct - so the app can show it before the board.
  *
  * Two rules constrain what can go here, and `LevelsTest` enforces both:
  *  - a word must be spellable from the tiles using each tile at most once, and every tile
@@ -61,22 +69,18 @@ KOTLIN_FOOTER = '''    )
     fun byId(id: Int): Level? = all.firstOrNull { it.id == id }
 }'''
 
-FIRST_LINE = 'Easiest first: three tiles, short everyday words.'
-FIRST_CONJUNCT = 'The first level with a conjunct tile: ন্ত is one letter unit, one tile.'
-FIRST_BIG = 'The first five-tile board. Six-tile boards close out the game.'
-
-
 def milestones(levels):
     """
-    Which level ids deserve a comment. Difficulty ordering interleaves the categories, so a
-    category header would lie about what follows it; a "first of its kind" note does not.
+    Which level ids deserve a comment. Levels now run in syllabus order, so the honest marker
+    is the start of each block - it says exactly what changes from here on.
     """
-    marks = {1: FIRST_LINE}
+    marks, seen = {}, set()
     for i, level in enumerate(levels, 1):
-        if any(HASANTA in t for t in level['tiles']) and FIRST_CONJUNCT not in marks.values():
-            marks[i] = FIRST_CONJUNCT
-        if len(level['tiles']) >= 5 and FIRST_BIG not in marks.values():
-            marks[i] = FIRST_BIG
+        block = level['block']
+        if block not in seen:
+            seen.add(block)
+            info = BLOCKS[block]
+            marks[i] = f'Block {block}, {info["name"]}: {info["goal"]}.'
     return marks
 
 
@@ -95,11 +99,17 @@ def emit(levels):
         tiles = ', '.join(f'"{t}"' for t in level['tiles'])
         words = ', '.join(f'"{w}"' for w in level['words'])
         extras = ', '.join(f'"{w}"' for w in level['extras'])
-        # Levels whose tiles spell nothing extra simply omit the argument.
+        teaches = ', '.join(f'"{symbol}"' for _, symbol in level['teaches'])
+        # Levels whose tiles spell nothing extra, or that introduce nothing new, simply omit
+        # the argument rather than passing an empty list.
         kt_extras = f', extras = listOf({extras})' if extras else ''
         js_extras = f', extras: [{extras}]' if extras else ''
-        kt.append(f'        Level({i}, listOf({tiles}), listOf({words}){kt_extras}),')
-        js.append(f'  {{ id: {i}, letters: [{tiles}], words: [{words}]{js_extras} }},')
+        kt_teaches = f', teaches = listOf({teaches})' if teaches else ''
+        js_teaches = f', teaches: [{teaches}]' if teaches else ''
+        kt.append(f'        Level({i}, listOf({tiles}), listOf({words}), '
+                  f'block = {level["block"]}{kt_teaches}{kt_extras}),')
+        js.append(f'  {{ id: {i}, letters: [{tiles}], words: [{words}], '
+                  f'block: {level["block"]}{js_teaches}{js_extras} }},')
 
     kt[-1] = kt[-1].rstrip(',')
     js[-1] = js[-1].rstrip(',')
@@ -133,19 +143,94 @@ def report(levels, failures):
     if failures:
         print()
 
-    print('  id  tiles  words  longest  board   content')
+    print('  id  blk  tiles  words  longest  board   teaches      content')
     for i, level in enumerate(levels, 1):
         longest = max(len(split_aksharas(w)) for w in level['words'])
         mark = ' +conjunct' if conjunct_tiles(level['tiles']) else ''
         rows, cols = level['size']
-        print(f'  {i:<3} {len(level["tiles"]):<6} {len(level["words"]):<6} {longest:<8} '
-              f'{rows}x{cols:<5} {" ".join(level["words"])}{mark}')
+        new = ' '.join(symbol for _, symbol in level['teaches'])
+        print(f'  {i:<3} {level["block"]:<4} {len(level["tiles"]):<6} '
+              f'{len(level["words"]):<6} {longest:<8} {rows}x{cols:<5} {new:<12} '
+              f'{" ".join(level["words"])}{mark}')
 
     words = {w for level in levels for w in level['words']}
     aksharas = {a for w in words for a in split_aksharas(w)}
     print(f'\n{len(words)} distinct words, {len(aksharas)} distinct aksharas, '
           f'largest level {max(len(l["words"]) for l in levels)} words '
           f'/ {max(len(l["tiles"]) for l in levels)} tiles')
+
+    # The chest depends on tile sets spelling more words than the board uses, and a syllabus
+    # that keeps early boards to three tiles cannot do that - three tiles spell three words.
+    # Worth printing rather than discovering later: the mechanic needs to stop asking for an
+    # unlisted word from *these* tiles and start asking for a word from an earlier level.
+    fed = [l for l in levels if l['extras']]
+    print(f'\nchest: {len(fed)} of {len(levels)} levels can feed it, '
+          f'{sum(len(l["extras"]) for l in levels)} extra words in total')
+
+    # A level that introduces a pile of new material at once is a lecture, not a lesson. The
+    # ordering is greedy, so it can be forced into a jump when a block runs short of gentle
+    # options - which is worth saying out loud rather than hiding.
+    # Level 1 is exempt: it has nothing to build on, so every letter in it is new by
+    # definition.
+    steep = [(i, level) for i, level in enumerate(levels, 1)
+             if i > 1 and len(level['teaches']) > MAX_NEW_UNITS[level['block']]]
+    if steep:
+        print(f'\n{len(steep)} levels past the first introduce more than their '
+              f'block\'s budget:')
+        for i, level in steep:
+            budget = MAX_NEW_UNITS[level['block']]
+            new = ' '.join(unit_label(u) for u in level['teaches'])
+            print(f'  level {i:<3} block {level["block"]}  {len(level["teaches"])} > '
+                  f'{budget}:  {new}')
+
+
+def curriculum(levels):
+    """The syllabus as a reader sees it: what each block covers and what each level adds."""
+    block = None
+    for i, level in enumerate(levels, 1):
+        if level['block'] != block:
+            block = level['block']
+            info = BLOCKS[block]
+            print(f'\n== Block {block}: {info["name"]} ({info["bn"]}) ==')
+            print(f'   {info["goal"]}\n')
+        new = ', '.join(unit_label(u) for u in level['teaches']) or '-'
+        print(f'  {i:<3} {" ".join(level["words"]):<44} new: {new}')
+
+    taught = [u for level in levels for u in level['teaches']]
+    kinds = {}
+    for kind, _ in taught:
+        kinds[kind] = kinds.get(kind, 0) + 1
+    print('\ntaught across the game: ' +
+          ', '.join(f'{n} {kind}s' for kind, n in sorted(kinds.items())))
+    silent = [i for i, level in enumerate(levels, 1) if not level['teaches']]
+    print(f'{len(silent)} levels introduce nothing new (pure review)')
+
+
+def slots(levels):
+    """
+    The content work this syllabus implies, in the order it would be recorded: every distinct
+    word, the level it first appears in, and the theme it was curated under. Audio and a
+    picture per word is the bulk of the remaining effort, and it is useless out of order - a
+    learner meets level 3 long before level 60.
+    """
+    first, kind = {}, {}
+    for i, level in enumerate(levels, 1):
+        for w in level['words']:
+            if w not in first:
+                first[w], kind[w] = i, 'board'
+        for w in level['extras']:
+            if w not in first:
+                first[w], kind[w] = i, 'extra'
+
+    print(f'{len(first)} words need audio and a picture, in this order:\n')
+    print('  level  kind   theme            word')
+    for w, i in sorted(first.items(), key=lambda kv: (kv[1], kv[0])):
+        print(f'  {i:<6} {kind[w]:<6} {str(theme_of(w) or "-"):<16} {w}')
+
+    missing = [w for w in first if theme_of(w) is None]
+    if missing:
+        print(f'\n{len(missing)} board words are not in the curated pool, so they have no '
+              f'theme yet:\n  {" ".join(sorted(missing))}')
 
 
 def main(argv):
@@ -182,6 +267,14 @@ def main(argv):
         print(f'  {KOTLIN.relative_to(REPO)}  {"updated" if kt_changed else "unchanged"}')
         print(f'  {WEB.relative_to(REPO)}  {"updated" if web_changed else "unchanged"}')
         print('\nnow run: cd bengali-word-game && ./gradlew test')
+        return 0
+
+    if command == 'curriculum':
+        curriculum(levels)
+        return 0
+
+    if command == 'slots':
+        slots(levels)
         return 0
 
     if command == 'show':

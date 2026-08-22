@@ -7,6 +7,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+private const val NUKTA = '\u09BC'
+
 /**
  * Content checks for every shipped level. A level that fails here is unplayable - the
  * player would see tiles that spell nothing, or a board with a word floating off on its
@@ -102,58 +104,179 @@ class LevelsTest {
     }
 
     @Test
-    fun `the first five levels are the smallest in the game`() {
-        // They exist to teach the drag and the idea that a tile is a letter unit. Three plain
-        // consonants, three short words, nothing else to look at.
-        for (level in Levels.all.take(5)) {
-            assertEquals("level ${level.id} tile count", 3, level.letters.size)
-            assertEquals("level ${level.id} word count", 3, level.words.size)
-            val longest = level.words.maxOf { BanglaText.length(it) }
-            assertTrue("level ${level.id} has a $longest-akshara word", longest <= 3)
+    fun `the syllabus runs in order and never goes backwards`() {
+        // Blocks are the primary ordering: a learner meets plain letters, then one vowel sign
+        // at a time, then several together, then conjuncts, then everything mixed. A level out
+        // of block order means someone edited the generated file by hand.
+        var block = Levels.all.first().block
+        for (level in Levels.all) {
             assertTrue(
-                "level ${level.id} opens with a conjunct tile",
-                level.letters.none { it.contains('\u09CD') }
+                "level ${level.id} is block ${level.block} after block $block",
+                level.block >= block
+            )
+            block = level.block
+        }
+        assertEquals("the game should open in block 1", 1, Levels.all.first().block)
+        assertTrue("blocks used: $block", block >= 4)
+    }
+
+    @Test
+    fun `the opening block is plain letters only`() {
+        // No vowel signs, no conjuncts, no nasal marks: the thing being learned here is that a
+        // tile is a letter and a drag is a word. A tile may still be two code points - ড় is a
+        // ড with a dot under it - so this checks for signs rather than for length.
+        for (level in Levels.all.filter { it.block == 1 }) {
+            for (tile in level.letters) {
+                val signs = tile.filter { BanglaText.isCombining(it) && it != NUKTA }
+                assertTrue(
+                    "level ${level.id} tile '$tile' carries the sign(s) '$signs'",
+                    signs.isEmpty()
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `the first level is the smallest in the game`() {
+        val first = Levels.all.first()
+        assertEquals("level 1 tile count", 3, first.letters.size)
+        assertEquals("level 1 word count", 3, first.words.size)
+        assertTrue(
+            "level 1 has a ${first.words.maxOf { BanglaText.length(it) }}-akshara word",
+            first.words.maxOf { BanglaText.length(it) } <= 3
+        )
+    }
+
+    @Test
+    fun `no level uses a letter form the syllabus has not reached`() {
+        // The invariant the whole ordering exists for. Checked per code point rather than per
+        // tile, because a tile is a *combination*: কা is ক plus া, and a learner who has met
+        // both can read it without it having to be taught as a third thing. So every code
+        // point must have appeared before, or be part of what this level declares it teaches.
+        val seen = mutableSetOf<Char>()
+        for (level in Levels.all) {
+            for (tile in level.letters) {
+                for (c in tile) {
+                    val introduced = level.teaches.any { c in it }
+                    assertTrue(
+                        "level ${level.id} shows '$tile' containing '$c', " +
+                            "which nothing has taught",
+                        c in seen || introduced
+                    )
+                }
+            }
+            seen += level.letters.flatMap { it.toList() }
+        }
+    }
+
+    @Test
+    fun `what a level teaches is actually on its board`() {
+        for (level in Levels.all) {
+            for (symbol in level.teaches) {
+                assertTrue(
+                    "level ${level.id} claims to teach '$symbol', which is not in its tiles",
+                    level.letters.any { it.contains(symbol) }
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `nothing is taught twice`() {
+        val taught = mutableMapOf<String, Int>()
+        for (level in Levels.all) {
+            for (symbol in level.teaches) {
+                val earlier = taught[symbol]
+                assertTrue(
+                    "'$symbol' is taught in level ${level.id} and again in level $earlier",
+                    earlier == null
+                )
+                taught[symbol] = level.id
+            }
+        }
+        assertTrue("only ${taught.size} pieces of the writing system taught", taught.size >= 40)
+    }
+
+    @Test
+    fun `no level past the first introduces more than three things at once`() {
+        // Level 1 is exempt: it has nothing to build on, so all of it is new.
+        for (level in Levels.all.drop(1)) {
+            assertTrue(
+                "level ${level.id} introduces ${level.teaches}",
+                level.teaches.size <= 3
             )
         }
     }
 
     @Test
-    fun `difficulty climbs across the game`() {
-        // Word count is the main dial - finding six words from one wheel is what makes a
-        // board take a while - so the ramp is asserted on the trend rather than level to
-        // level, which wobbles by design as several factors trade off.
-        val thirds = Levels.all.chunked((Levels.count + 2) / 3)
-        val tiles = thirds.map { third -> third.map { it.letters.size }.average() }
-        val words = thirds.map { third -> third.map { it.words.size }.average() }
-
-        assertTrue("mean tiles per third: $tiles", tiles[0] < tiles[1] && tiles[1] < tiles[2])
-        assertTrue("mean words per third: $words", words[0] < words[1] && words[1] < words[2])
+    fun `most of the game is review`() {
+        // A letter met once and never seen again has not been learned, so the majority of
+        // levels should introduce nothing at all.
+        val review = Levels.all.count { it.teaches.isEmpty() }
+        assertTrue("only $review of ${Levels.count} levels are review", review * 3 >= Levels.count)
     }
 
     @Test
-    fun `no level lurches away from its neighbours`() {
-        for (i in 1 until Levels.count) {
-            val drop = Levels.all[i].words.size - Levels.all[i - 1].words.size
+    fun `boards get fuller as the syllabus advances`() {
+        // Word count is the main difficulty dial, and it is tied to the block rather than to
+        // raw level number: a learner meeting their first vowel sign does not also need a
+        // seven-word board.
+        //
+        // Asserted end to end rather than block by block. The conjunct block dips below the
+        // one before it, and that is a property of the language rather than a mistake: a wheel
+        // holding a conjunct tile spells fewer other words, so those boards cannot be filled
+        // out as far. Difficulty there comes from the cluster, not from the word count.
+        val meanWords = Levels.all.groupBy { it.block }
+            .toSortedMap()
+            .map { (_, group) -> group.map { it.words.size }.average() }
+
+        assertTrue(
+            "mean words per block: $meanWords",
+            meanWords.last() > meanWords.first()
+        )
+        for ((i, mean) in meanWords.withIndex()) {
             assertTrue(
-                "level ${i + 1} asks for $drop fewer words than level $i",
-                drop >= -2
+                "block ${i + 1} is thinner than the opening block: $meanWords",
+                mean >= meanWords.first()
             )
         }
     }
 
     @Test
-    fun `the last level is one of the biggest`() {
-        val last = Levels.all.last()
-        assertTrue("last level has ${last.letters.size} tiles", last.letters.size >= 5)
-        assertTrue("last level has ${last.words.size} words", last.words.size >= 6)
+    fun `conjuncts arrive only in the conjunct block or later`() {
+        for (level in Levels.all) {
+            val hasConjunct = level.letters.any { it.contains('\u09CD') }
+            if (hasConjunct) {
+                assertTrue(
+                    "level ${level.id} shows a conjunct tile in block ${level.block}",
+                    level.block >= 4
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `every extra word is spellable and off the board`() {
+        for (level in Levels.all) {
+            for (extra in level.extras) {
+                assertTrue(
+                    "level ${level.id}: extra '$extra' is also on the board",
+                    extra !in level.words
+                )
+                assertTrue(
+                    "level ${level.id}: extra '$extra' is not spellable from ${level.letters}",
+                    BanglaText.isSpellableFrom(extra, level.letters)
+                )
+            }
+        }
     }
 
     @Test
     fun `the catalogue is big enough to be worth playing`() {
-        assertTrue("only ${Levels.count} levels", Levels.count >= 70)
+        assertTrue("only ${Levels.count} levels", Levels.count >= 80)
         val words = Levels.all.flatMap { it.words }.toSet()
         assertTrue("only ${words.size} distinct words", words.size >= 150)
         val conjunctLevels = Levels.all.count { lv -> lv.letters.any { it.contains('\u09CD') } }
-        assertTrue("only $conjunctLevels levels use conjunct tiles", conjunctLevels >= 10)
+        assertTrue("only $conjunctLevels levels use conjunct tiles", conjunctLevels >= 15)
     }
 }

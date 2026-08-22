@@ -25,16 +25,21 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 
 ## Gameplay
 
-- **73 levels, ordered by difficulty**: three-tile consonant puzzles to open, then vowel
-  signs, compound words (ফুল + বাগান -> ফুলবাগান), conjunct tiles (বন্ধু, রাস্তা, মুক্তিযুদ্ধ),
-  and finally six-tile boards with five- and six-akshara spines (বিমানবন্দর, চন্দ্রগ্রহণ).
-  The first five are deliberately tiny - three plain consonants, three short words - and
-  boards grow from three words to seven, because how many words one wheel has to yield is
-  what actually makes a level take a while. 244 distinct words, up to seven per board.
+- **83 levels in teaching order**, for someone learning to read Bengali rather than only to
+  speak it. Five blocks, each holding the previous one constant and adding one new thing:
+  plain letters, then one vowel sign at a time (া, then ি, then ে, then ু), then several signs
+  in one word, then conjuncts one family at a time (ন্ত, স্ত, ন্ধ, ক্ষ), then free play on the
+  fullest boards. Puzzle difficulty orders levels only *within* a block. 176 distinct words,
+  up to six per board.
+- **Each level records what it is first to introduce** - a letter, a vowel sign, a conjunct -
+  so the app can show it before the board. Thirty-three of the 83 introduce nothing at all: a
+  shape met once and never seen again has not been learned.
 - **Extra words.** Some words the tiles can spell are not on the board. Spell one anyway and
   it goes into the chest; three fills it and pays 15 coins. The chest is shared across levels
-  rather than reset with each one - three- and four-tile boards do not always have extras, and
-  a chest that sits empty teaches the player to ignore it.
+  rather than reset with each one. It is currently thin - only nine levels can feed it, because
+  a syllabus that keeps early boards to three tiles cannot also have those tiles spell spare
+  words. The fix is to change what the chest asks for, not to pad the boards: a word from an
+  earlier level makes it spaced review and stops it depending on the current wheel.
 - **Drag to spell.** Sliding back onto the previous tile un-picks it.
 - **Coins** for each word found (5 per akshara) and a 30-coin bonus for finishing a level.
 - **Hints** cost 25 coins and reveal one letter from a word you have not solved.
@@ -45,9 +50,9 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 
 `docs/index.html` (repo root, one level up from this folder) is a complete, self-contained
 build of the same game for the browser - one file, no build step, no dependencies, no
-network calls. Bengali splitting, the crossword generator and all 73 levels are ported from
+network calls. Bengali splitting, the crossword generator and all 83 levels are ported from
 this app's Kotlin, and the port is checked by diffing generated boards against the compiled
-Kotlin: all 73 come out identical, cell for cell.
+Kotlin: all 83 come out identical, cell for cell.
 
 Launch it any of these ways:
 
@@ -110,22 +115,29 @@ cross. It ships as a six-word level.
 
 ## Adding levels
 
-Add an entry to `data/Levels.kt`:
+`data/Levels.kt` is generated - editing it by hand desynchronises this app from the web build.
+Add the level to the right block of `SYLLABUS` in `tools/catalogue.py` instead, then:
 
-```kotlin
-Level(32, listOf("ক", "লা", "গা", "ছ"), listOf("কলা", "গাছ", "কলাগাছ"))
+```bash
+python3 tools/build.py check     # then fix whatever it complains about
+python3 tools/build.py build
+cd bengali-word-game && ./gradlew test
 ```
 
-Then run `./gradlew test`. `LevelsTest` checks the whole catalogue: every word spellable from
-its tiles using each tile at most once, no tile left unusable, at least three words per level,
-a connected layout, no accidental words on the board, a grid that fits a phone screen, a gentle
-first five levels, and a tile count that ramps rather than jumping about.
+`LevelsTest` checks the whole catalogue: every word spellable from its tiles using each tile at
+most once, no tile left unusable, at least three words per level, a connected layout, no
+accidental words on the board, a grid that fits a phone screen, blocks that never run backwards,
+nothing taught twice, and - the one the ordering exists for - no level showing a letter form that
+nothing earlier introduced.
 
-Words should also be real. Every word shipped here was checked against Bengali corpus
-frequency data before being hand-picked; that check caught two compounds in an earlier draft
-(বইখাতা, শিশুপাঠ) that read plausibly but do not occur in Bengali text. A frequency list on its
-own is not enough either - its most common four-letter entries are verb inflections like
-করেছেন, which make dull puzzles.
+Words should also be real, and worth a learner's time. Every word shipped here was checked
+against Bengali corpus frequency data before being hand-picked; that check caught two compounds
+in an earlier draft (বইখাতা, শিশুপাঠ) that read plausibly but do not occur in Bengali text.
+
+Frequency is the floor, not the selector. Ranking by it fills the game with প্রতিষ্ঠান
+(institution), সংবাদপত্র (newspaper) and রাষ্ট্রপতি (president) - all common in adult prose,
+none of them words a child needs - so words now come from a themed pool curated for a learner,
+with the rejections written down in `tools/vocabulary.py`.
 
 ## Layout
 
@@ -135,7 +147,7 @@ app/src/main/java/com/bangla/shobdojot/
   logic/CrosswordGenerator.kt   backtracking crossword layout
   logic/Chest.kt                extra-word chest: fill, reward, reset
   model/Models.kt               Level, Puzzle, PlacedWord, GridPos
-  data/Levels.kt                the 73 levels, generated by tools/build.py
+  data/Levels.kt                the 83 levels, generated by tools/build.py
   data/GameRepository.kt        coins, unlocks, per-level progress, chest
   ui/GameViewModel.kt           game state and rules
   ui/components/LetterWheel.kt  the drag-to-connect wheel
