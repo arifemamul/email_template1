@@ -196,17 +196,13 @@
   .icon-btn:hover { background: var(--violet-600); }
   .icon-btn:active { transform: scale(.94); }
 
-  .level-meta { flex: 1; min-width: 0; }
-  .level-meta .name {
-    font-family: var(--bn);
-    font-size: 18px;
-    font-weight: 700;
-    line-height: 1.25;
-  }
+  .level-meta { flex: 1; min-width: 0; text-align: center; }
   .level-meta .sub {
     font-family: var(--bn);
-    font-size: 12.5px;
-    color: color-mix(in srgb, var(--parchment) 58%, var(--indigo-700));
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: color-mix(in srgb, var(--parchment) 82%, var(--indigo-700));
   }
 
   .coins {
@@ -721,9 +717,9 @@
         <div class="topbar">
           <button class="icon-btn" id="prev" title="আগের লেভেল" aria-label="Previous level">‹</button>
           <div class="level-meta">
-            <div class="name bn" id="levelName">লেভেল ১</div>
             <div class="sub" id="levelSub">০ / ৪ শব্দ</div>
           </div>
+          <button class="icon-btn" id="next" title="পরের লেভেল" aria-label="Next level">›</button>
           <div class="coins"><span class="dot"></span><span id="coinCount">১২০</span></div>
         </div>
 
@@ -790,6 +786,7 @@
         <ul class="how">
           <li><span class="k">drag</span><span>Press a letter and drag across the others. Sliding back onto the previous letter un-picks it.</span></li>
           <li><span class="k">click</span><span>Prefer clicking? Tap letters one at a time, then hit <b>✓</b> on the word - or press <b>Enter</b>. <b>Esc</b> clears.</span></li>
+          <li><span class="k">&lsaquo; &rsaquo;</span><span>The arrows step to the previous or next level, and wrap around at either end. The grid above jumps straight to any level.</span></li>
           <li><span class="k">◈ 25</span><span>A hint reveals one letter from a word you haven't solved. Words pay 5 coins per letter, plus 30 for clearing the level.</span></li>
           <li><span class="k">▧ chest</span><span>Some words the letters can spell aren't on the board - spell one anyway and it goes in the chest. <b>Three fills it</b> and pays 15 coins.</span></li>
         </ul>
@@ -1160,12 +1157,12 @@ const el = {
   trail: document.getElementById("trail"),
   preview: document.getElementById("preview"),
   coins: document.getElementById("coinCount"),
-  levelName: document.getElementById("levelName"),
   levelSub: document.getElementById("levelSub"),
   levelGrid: document.getElementById("levelGrid"),
   hint: document.getElementById("hint"),
   shuffle: document.getElementById("shuffle"),
   prev: document.getElementById("prev"),
+  next: document.getElementById("next"),
   clear: document.getElementById("clear"),
   clearBody: document.getElementById("clearBody"),
   nextLevel: document.getElementById("nextLevel"),
@@ -1201,7 +1198,6 @@ function loadLevel(i) {
 
 function drawHud() {
   const lv = level();
-  el.levelName.textContent = "লেভেল " + bn(lv.id);
   el.levelSub.textContent = bn(foundSet().size) + " / " + bn(lv.words.length) + " শব্দ";
   if (el.coins.textContent !== bn(game.coins)) el.coins.textContent = bn(game.coins);
   el.hint.disabled = isClear();
@@ -1842,6 +1838,7 @@ el.chestSheet.addEventListener("click", e => {
 });
 
 el.prev.addEventListener("click", () => loadLevel(game.index - 1));
+el.next.addEventListener("click", () => loadLevel(game.index + 1));
 el.nextLevel.addEventListener("click", () => loadLevel(game.index + 1));
 el.replay.addEventListener("click", () => {
   const lv = level();
