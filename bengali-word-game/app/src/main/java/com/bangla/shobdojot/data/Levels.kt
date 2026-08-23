@@ -44,15 +44,13 @@ object Levels {
     val count: Int get() = all.size
 
     /**
-     * How many levels the catalogue holds, as opposed to how many ship. The two differ while
-     * the game is being reworked: `catalogue.SHIP_LEVELS` caps what is written out, and the
-     * levels beyond the cap are parked rather than deleted. A test that asserts something
-     * about the *whole* syllabus - that it reaches every letter, that it spans all five
-     * blocks - can only hold when these two agree, so it checks first.
+     * Whether the catalogue runs the whole way through the teaching order rather than stopping
+     * part-way. Several tests only mean something about a finished syllabus - that it reaches
+     * every letter, that boards get fuller as it advances, that most levels are review - and
+     * this is what tells them whether they are looking at one. Only block 1 is written at the
+     * moment; the tests come back by themselves as soon as the later blocks do.
      */
-    const val AUTHORED = 104
-
-    val isComplete: Boolean get() = count == AUTHORED
+    val spansSyllabus: Boolean get() = all.map { it.block }.distinct().size == 5
 
     fun byId(id: Int): Level? = all.firstOrNull { it.id == id }
 }

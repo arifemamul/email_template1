@@ -17,24 +17,25 @@ together, then conjuncts, then everything mixed. Puzzle difficulty only decides 
 solve - is what produced the earlier ordering, which handed out its first vowel sign in level
 6 without ever having introduced one, and whose first conjunct was a three-consonant cluster.
 
+Only the first block is written here at the moment. The other four were removed while the way
+a level works is reworked, so the machinery below - blocks, budgets, board targets, the
+coverage report - is sized for a syllabus that is coming back rather than for the ten levels
+that are here now.
+
 Words come from `vocabulary.py`, which is curated for a child. Corpus frequency is still the
 floor that rejects invented compounds, but it is no longer the selector: rank by frequency
 alone and the game fills with প্রতিষ্ঠান and রাষ্ট্রপতি, which are common in newspapers and
 useless to a seven-year-old.
 
-No word is set as a puzzle twice. The earlier catalogue leaned on a handful of easy words -
-কলম, বল, কল, সব, রুটি - and reused them across a dozen tile sets, so a learner spent a good
-part of the game re-spelling words they already knew. The rule that forbids it is what forced
-the pool up past five hundred words. Nine early levels have to borrow anyway - see `SHARED` -
-because a learner who knows four letters has exactly one board available to them.
-
-The rule costs board size. Boards used to grow to seven words by leaning on the same common
-words everywhere; now the whole catalogue has to come out of one pool without repeats, so they
-run three to five. Difficulty climbs through tile count, word length and conjuncts instead.
+No word is set as a puzzle twice. An earlier catalogue leaned on a handful of easy words -
+কলম, বল, কল, সব - and reused them across a dozen tile sets, so a learner spent a good part of
+the game re-spelling words they already knew. Four levels here have to borrow anyway - see
+`SHARED` - because a learner who knows three letters has exactly one board available to them.
 """
 from bangla import (conjunct_tiles, grid_size, layout, split_aksharas, spellable,
                     stray_runs, tiles_for)
 from curriculum import (BLOCK_CONJUNCT, BLOCK_FREE, BLOCK_KARS, BLOCK_ONE_KAR, BLOCK_PLAIN,
+                        BLOCKS,
                         block_for, new_units, teaching_rank, units_in)
 from vocabulary import REJECTED, words as pool_words
 from wordpool import zipf
@@ -47,156 +48,26 @@ from wordpool import zipf
 SYLLABUS = {
 
     # Block 1: letters on their own. No vowel signs, no conjuncts, nothing hanging off
-    # anything. Roughly one or two new letters per level, with the earlier ones coming back
-    # so they get used rather than met once. These boards stay at three or four words: the
-    # thing being learned here is that a tile is a letter and a drag is a word.
+    # anything. One or two new letters per level, with the earlier ones coming back so they
+    # get used rather than met once. Boards stay at three or four words: the thing being
+    # learned here is that a tile is a letter and a drag is a word.
+    #
+    # Ten levels, which is the whole game for now. There were 104, running through all five
+    # blocks to free play and covering every letter and sign in the language; they were deleted
+    # on purpose while the way a level works is reworked. They are in the history rather than
+    # commented out here: `git show d102737:tools/catalogue.py` has all of them, along with the
+    # `SHARED` entries and the checks that went with them.
     BLOCK_PLAIN: [
-        ["জল", "জন", "নল"],
-        ["সব", "বস", "বক"],
-        ["কর", "সকল", "সরল"],
-        ["কলম", "কম", "কল"],
-        ["বদল", "দল", "বল"],
-        ["বরফ", "তরল", "বগল"],
-        ["সব", "বই", "বস"],
-        ["কলম", "কম", "কল", "আম"],
-        ["কলম", "এক", "কম", "কল"],
-        ["সড়ক", "অলস", "কলস"],
-        ["ফল", "কমল", "ফলক"],
-        ["দশ", "নগদ", "নদ"],
-        ["মন", "নগর", "নরম"],
-
-        # The rest of the bare alphabet. These letters are rarer than the ones above, which is
-        # why they come last - but a syllabus that stops before them leaves a learner unable
-        # to read ওষুধ on a packet or ঋতু in a schoolbook, so they are not optional.
-        ["কলম", "অতল", "কম", "কল"],      # অ
-        ["ঈদ", "কদম", "দম"],       # ঈ
-        ["গরম", "রকম", "গম"],
-        ["উট", "মটর", "টগর"],              # উ
-        ["ওজন", "নজর", "আজ"],       # ও
-        ["ধন", "বন", "বল"],              # ধ, so that ঔষধ below has only two new things in it
-        ["ঔষধ", "ধন", "নল"],             # ঔ and ষ together - ঔষধ is the only attested
-                                         # conjunct-free word that carries ঔ at all
-        ["ঋণ", "লবণ", "বল"],             # ঋ and ণ
-        ["ঝলক", "নকল", "ঝড়"],            # ঝ
-        ["যত", "জগত", "যব"],              # য, the bare one rather than the ya-phala
-    ],
-
-    # Block 2: one vowel sign per level, in the order of `curriculum.KAR_ORDER`. A level here
-    # may reuse plain letters freely but never mixes two signs - the sign is the lesson, and
-    # two at once means neither gets learned.
-    BLOCK_ONE_KAR: [
-        # া, the sign that sits plainly after its letter
-        ["গতকাল", "ঈগল", "লতা"],
-        ["করা", "তারা", "কলা", "তালা"],
-        ["সাদা", "সাত", "কাদা"],
-        ["দরজা", "কামার", "জামা"],
-        ["সকাল", "কাটা", "ঝাল"],
-        ["অজগর", "সাগর", "গাজর"],
-        ["সমতল", "মাস", "মশা"],
-        ["ভাই", "ভাত", "দই"],
-        ["নাশতা", "ছাতা", "ছাদ"],
-        ["বাতাস", "বাগান", "বাসন"],
-        ["মাথা", "মাখন", "নখ"],
-        # ি, the first sign written to the left of the letter it belongs to
-        ["বিল", "সফল", "ফসল"],
-        ["বছর", "খবর", "ছবি"],
-        ["ভবন", "সবজি", "জিভ"],
-        ["ঘর", "বানর", "ঘন", "বাঘ"],
-        # ে, also written in front
-        ["খাবার", "বানান", "রতন"],
-        ["আপেল", "আট", "পেট"],
-        ["লেখক", "ছেলে", "টক"],
-        # ু, written underneath
-        ["পশম", "পথ", "ঘুম"],
-        ["দুপুর", "পুকুর", "দুই"],
-        ["আঙুল", "আসল", "আঙুর", "রস"],
-        ["সহজ", "সবুজ", "বুক"],
-        ["চুল", "পলক", "কচু", "চুপ"],
-        # longer words, still one sign: by now া is familiar enough to carry a compound
-        ["লাগা", "গাছ", "কলাগাছ"],
-        ["পাথর", "রঙ", "পাখা", "রথ"],
-        ["নাটক", "কমলা", "লাউ"],
-        ["রাখা", "রাখাল", "রাগ", "খাল"],
-        ["মাছ", "মারা", "মাছরাঙা", "রাঙা"],
-        ["পাঠ", "পালা", "পাঠশালা", "পাশা"],
-        ["পাড়", "হাড়", "পাহাড়"],
-        ["শরবত", "শহর", "হাত"],
-
-        # ূ, ৈ, ৃ - the last three signs that a word can carry on its own.
-        ["মূল", "মহল", "হজম"],        # ূ
-        ["বৈঠক", "চমক", "চক"],        # ৈ
-        ["কৃষক", "কলম", "কম", "কল"],       # ৃ
-        ["ঊষা", "ভাষা", "ভাত"],            # ঊ, which needs a sign to sit beside
-        # The nasal marks. They are not vowel signs, but they behave like one - hung on a
-        # letter rather than standing beside it - and চাঁদ and বাংলা are too common to leave
-        # a learner guessing at.
-        ["কাঁটা", "আটা", "কাঁদা", "আদা"],       # ঁ
-        ["বাংলা", "খালা", "খাতা"],    # ং
-        # and the last three letters, which only appear with a sign attached
-        ["ডাল", "লাল", "লাফ"],              # ড
-        ["ঢাল", "কাল", "কাক"],        # ঢ
-        ["গাঢ়", "গান", "কান"],            # ঢ়
-    ],
-
-    # Block 3: several signs in one word, all of them already taught. This is where ordinary
-    # Bengali vocabulary opens up, and where compounds start (ফুল + বাগান -> ফুলবাগান).
-    BLOCK_KARS: [
-        ["পড়ালেখা", "লেখা", "পড়া", "খালি", "লিচু"],
-        ["ইতিহাস", "হাতি", "হাঁস", "হাঁড়ি"],
-        ["ঘরবাড়ি", "বাড়ি", "গাড়ি", "ঘড়ি", "কুঁড়ি"],
-        ["নদী", "পান", "নদীর", "পার"],
-        ["আলমারি", "তৈরি", "তৈল", "ঝিল"],
-        ["কপাল", "পানি", "চিল", "চিনি"],
-        ["মেঘলা", "খেলা", "মেঘ", "মেঝে"],
-        ["বিছানা", "চাবি", "নাতি", "নাচা"],
-        ["পরিবার", "বাছুর", "ছুটি"],
-        ["ধরা", "রানি", "কাঁধ"],
-        ["ফুলবাগান", "বালতি", "ফুল", "তিতা"],
-        ["সময়", "ডিম", "সরু", "মরু"],
-        ["কাঠবিড়ালি", "বিকাল", "বিড়াল", "আঁকা"],
-        ["পাস", "পায়ে", "পায়েস"],
-        # ৌ waits until here because every word that carries it carries a second sign too -
-        # নৌকা is ৌ and া - so there is no honest way to teach it in the one-sign block.
-        ["মৌমাছি", "মাঠ", "মাছি", "মালি"],
-    ],
-
-    # Block 4: joined consonants, one cluster family at a time, in `CONJUNCT_ORDER`. Two
-    # consonants before three, and clusters whose parts stay legible (ন্ত, স্ত) before the
-    # ligatures that fuse into a shape of their own (ক্ষ, ষ্ট).
-    BLOCK_CONJUNCT: [
-        ["বসন্ত", "বড়", "ঘাস", "ঘাড়"],              # ন্ত
-        ["বারান্দা", "বাজার", "রাবার", "রাজা"],             # ন্দ
-        ["রাস্তা", "রাস্তাঘাট", "ঘাট"],      # স্ত
-        ["স্কুল", "শীতল", "শীত"],        # স্ক
-        ["গল্প", "গড়া", "ছাড়া"],               # ল্প
-        ["সুন্দর", "আনন্দ", "রসুন"],
-        ["দিনরাত", "দিন", "রাত", "রান্না"],  # ন্ন
-        ["রসগোল্লা", "আনারস", "আনা"],            # ল্ল
-        ["বন্ধ", "বলা", "গলা"],               # ন্ধ
-        ["বালিশ", "শক্ত", "বালি"],           # ক্ত
-        ["পেন্সিল", "গাল", "পেঁপে"],    # ন্স
-        ["স্বাদ", "চাদর", "চার"],        # স্ব
-        ["বর্ষাকাল", "বর্ষা", "বসা", "আসা"],  # র্ষ
-        ["চিঠিপত্র", "ছাত্র", "চিঠি"],       # ত্র
-        ["শিক্ষক", "শিকড়", "কফি"],            # ক্ষ
-        ["সমুদ্র", "বাস", "মুখ"],              # দ্র
-        ["গ্রাম", "মধু", "ধুলা"],      # গ্র
-        ["লয়", "বিদ্যালয়", "বিদ্যা"],  # দ্য
-        ["জন্মদিন", "তিন", "বীজ"],    # ন্ম
-        # ঐ lands in the conjunct block for the same reason ৌ landed in the last one: every
-        # attested word carrying it also carries a cluster. ঐক্য is abstract for a child, and
-        # it is still the best of a very short list.
-        ["ঐক্য", "বাক্য", "বাটি"],           # ঐ, with ক্য
-    ],
-
-    # Block 5: everything taught, mixed, on the fullest boards the phone can hold.
-    BLOCK_FREE: [
-        ["দেওয়া", "গাওয়া", "দেখা"],
-        ["মানুষ", "মাসি", "পৌষ"],
-        ["আকাশ", "কালো", "আলো", "নৌকা"],
-        ["কঠিন", "গায়ক", "নয়"],
-        ["যাওয়া", "ওঠা", "ছায়া"],
-        ["মিনিট", "নিচু", "ঘট"],
+        ["কলম", "কম", "কল"],             # ল, ক, ম - the first three letters of the game
+        ["কলম", "কম", "কল", "আম"],       # আ
+        ["কলম", "এক", "কম", "কল"],       # এ
+        ["ফল", "কমল", "ফলক"],            # ফ
+        ["কলম", "অতল", "কম", "কল"],      # অ, ত
+        ["বদল", "দল", "বল"],             # ব, দ
+        ["ঈদ", "কদম", "দম"],             # ঈ
+        ["সব", "বস", "বক"],              # স
+        ["সব", "বই", "বস"],              # ই
+        ["কর", "সকল", "সরল"],            # র
     ],
 }
 
@@ -212,43 +83,25 @@ CATALOGUE = [words for _, words in DECLARED]
 # have nothing left to teach its cluster with.
 AUTHORED = {w for _, words in DECLARED for w in words}
 
-# A word is set as a puzzle once. Nine levels break that rule, and every one of them is a
-# level introducing a letter that Bengali barely uses - so these are the words they have to
-# borrow, with what makes each one unavoidable. The check below fails on any repeat that is
-# not listed here, which is the only thing that keeps the list from quietly growing.
+# A word is set as a puzzle once. Four levels break that rule, and every one of them is a
+# level introducing a letter early enough that there is nothing else to build a board from -
+# so these are the words they have to borrow, with what makes each one unavoidable. The check
+# below fails on any repeat that is not listed here, and on any entry here that no level
+# actually needs, which is the only thing that keeps the list honest in both directions.
 SHARED = {
     'কলম': 'the opening level teaches ল, ক and ম, and কলম, কম and কল are every word those '
-            'three letters spell. The four levels that add one more letter to them - আ, এ, অ '
-            'and ৃ - have nothing else to cross the new letter with, because at that point in '
+            'three letters spell. The three levels that add one more letter to them - আ, এ '
+            'and অ - have nothing else to cross the new letter with, because at that point in '
             'the syllabus there is nothing else the learner can read',
-    'কম': 'same three letters, same four levels',
-    'কল': 'same three letters, same four levels',
+    'কম': 'same three letters, same three levels',
+    'কল': 'same three letters, same three levels',
     'সব': 'ব and স are taught two levels before ই, and সব and বস are the only words a learner '
            'who knows ল ক ম ব দ র স can read that will cross বই',
     'বস': 'same, and for the same level',
-    'বল': 'the level that teaches ধ has ধন to work with, and the one that teaches ঋ and ণ has '
-           'ঋণ and লবণ; neither cluster of letters spells a third word without বল',
-    'ধন': 'ঔষধ is the only attested conjunct-free Bengali word carrying ঔ, and ধন and নল are '
-           'the only two words already taught that cross it',
-    'নল': 'same, and for the same level',
-    'ভাত': 'ঊষা is the only word a beginner can read that carries ঊ, and ভাষা is the only '
-            'word that crosses it - which leaves ভাত as the third',
 }
 
 MIN_ZIPF = 2.0          # below this, treat a "word" as invented rather than Bengali
 MAX_ROWS, MAX_COLS = 8, 9
-
-# How many levels actually ship, counted from the start of the syllabus. The catalogue below
-# is authored in full and validated in full - `build.py check` still holds all 104 levels to
-# every rule, including the promise that the syllabus reaches the whole alphabet - but only
-# this many are written into the two builds.
-#
-# It exists because the game is being reworked and there is no point carrying a hundred levels
-# through changes to how a level works. The rest are parked, not deleted: set this to None and
-# the full catalogue ships again, unchanged, because nothing about the levels themselves
-# depends on it. The cap is applied after ordering and after the boards are settled, so the
-# levels that do ship are byte-identical to the opening of the full catalogue.
-SHIP_LEVELS = 10
 
 # The widest wheel worth drawing. A board grows by taking on words, and a word it has no tile
 # for brings its own - so this is what stops a level from ending up with a wheel too crowded to
@@ -417,21 +270,21 @@ def order_block(group, known):
     return ordered, known
 
 
-def shipped(levels):
+def spans_syllabus(levels):
     """
-    The levels that go into the builds: the first `SHIP_LEVELS` of the syllabus, or all of them
-    when the cap is off. Kept separate from `ordered_levels` so the checks still see the whole
-    catalogue - a parked level that has quietly broken is worth knowing about before it is
-    un-parked, not after.
+    Whether the catalogue runs the whole way through the teaching order rather than stopping
+    part-way. Several checks only mean something about a finished syllabus - that it reaches
+    every letter, that boards get fuller as it advances - and this is what tells them whether
+    they are looking at one. Derived from the levels rather than declared, so the checks come
+    back by themselves as soon as the later blocks do.
     """
-    return levels if SHIP_LEVELS is None else levels[:SHIP_LEVELS]
+    return {l['block'] for l in levels} == set(BLOCKS)
 
 
 def ordered_levels():
     """
-    Every valid level in teaching order - the whole catalogue, cap or no cap. Returns
-    (levels, failures) so callers can report problems rather than silently shipping fewer
-    levels than the catalogue lists.
+    Every valid level in teaching order. Returns (levels, failures) so callers can report
+    problems rather than silently shipping fewer levels than the catalogue lists.
     """
     levels, failures = [], []
     for block, words in DECLARED:

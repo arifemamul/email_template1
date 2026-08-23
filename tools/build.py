@@ -22,8 +22,8 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
 from bangla import conjunct_tiles, render, split_aksharas            # noqa: E402
-from catalogue import (CATALOGUE, MAX_NEW_UNITS, SHARED, SHIP_LEVELS,          # noqa: E402
-                       ordered_levels, shipped)
+from catalogue import (CATALOGUE, MAX_NEW_UNITS, SHARED, ordered_levels,       # noqa: E402
+                       spans_syllabus)
 from curriculum import (BLOCKS, NOT_TAUGHT, alphabet,                  # noqa: E402
                         unit_label)
 from vocabulary import theme_of                                       # noqa: E402
@@ -68,15 +68,13 @@ KOTLIN_FOOTER = '''    )
     val count: Int get() = all.size
 
     /**
-     * How many levels the catalogue holds, as opposed to how many ship. The two differ while
-     * the game is being reworked: `catalogue.SHIP_LEVELS` caps what is written out, and the
-     * levels beyond the cap are parked rather than deleted. A test that asserts something
-     * about the *whole* syllabus - that it reaches every letter, that it spans all five
-     * blocks - can only hold when these two agree, so it checks first.
+     * Whether the catalogue runs the whole way through the teaching order rather than stopping
+     * part-way. Several tests only mean something about a finished syllabus - that it reaches
+     * every letter, that boards get fuller as it advances, that most levels are review - and
+     * this is what tells them whether they are looking at one. Only block 1 is written at the
+     * moment; the tests come back by themselves as soon as the later blocks do.
      */
-    const val AUTHORED = %d
-
-    val isComplete: Boolean get() = count == AUTHORED
+    val spansSyllabus: Boolean get() = all.map { it.block }.distinct().size == 5
 
     fun byId(id: Int): Level? = all.firstOrNull { it.id == id }
 }'''
@@ -96,12 +94,7 @@ def milestones(levels):
     return marks
 
 
-def emit(levels, authored=None):
-    """
-    The two generated tables. `authored` is the size of the whole catalogue, which is not the
-    same as `len(levels)` when `SHIP_LEVELS` is capping what goes out.
-    """
-    authored = len(levels) if authored is None else authored
+def emit(levels):
     marks = milestones(levels)
     kt, js = [KOTLIN_HEADER], ['const LEVELS = [']
 
@@ -127,7 +120,7 @@ def emit(levels, authored=None):
 
     kt[-1] = kt[-1].rstrip(',')
     js[-1] = js[-1].rstrip(',')
-    kt.append(KOTLIN_FOOTER % authored)
+    kt.append(KOTLIN_FOOTER)
     js.append('];')
     # Nothing may follow the closing bracket. `write_builds` splices this in by replacing
     # everything from `const LEVELS = [` to the first `];` it finds after it, so anything
@@ -136,8 +129,8 @@ def emit(levels, authored=None):
     return '\n'.join(kt) + '\n', '\n'.join(js)
 
 
-def write_builds(levels, authored=None):
-    kotlin_src, js_src = emit(levels, authored)
+def write_builds(levels):
+    kotlin_src, js_src = emit(levels)
 
     before_kt = KOTLIN.read_text(encoding='utf-8') if KOTLIN.exists() else ''
     KOTLIN.write_text(kotlin_src, encoding='utf-8')
@@ -173,11 +166,6 @@ def report(levels, failures):
               f'{len(level["words"]):<6} {longest:<8} {rows}x{cols:<5} {new:<12} '
               f'{" ".join(level["words"])}{mark}')
 
-    if SHIP_LEVELS is not None and SHIP_LEVELS < len(levels):
-        print(f'\nshipping the first {SHIP_LEVELS} of {len(levels)} levels; the rest are parked '
-              f'(catalogue.SHIP_LEVELS).\nEverything below still checks the whole catalogue, '
-              f'so a parked level cannot rot unnoticed.')
-
     words = {w for level in levels for w in level['words']}
     aksharas = {a for w in words for a in split_aksharas(w)}
     print(f'\n{len(words)} distinct words, {len(aksharas)} distinct aksharas, '
@@ -185,15 +173,22 @@ def report(levels, failures):
           f'/ {max(len(l["tiles"]) for l in levels)} tiles')
 
     # Coverage. The whole point of a teaching order is that a learner who finishes reaches the
-    # end of the alphabet, so a gap here is a broken promise rather than a missing nicety.
+    # end of the alphabet, so a gap here is a broken promise rather than a missing nicety -
+    # once there is a whole teaching order to finish. While the syllabus stops inside block 1
+    # the gaps are simply the blocks that are not written yet, and are reported rather than
+    # treated as failures.
     taught = {u for level in levels for u in level['teaches']}
     missing = [u for u in alphabet() if u not in taught]
     print(f'\nalphabet: {len(alphabet()) - len(missing)} of {len(alphabet())} units taught'
           f' ({len(NOT_TAUGHT)} excluded by design: {" ".join(NOT_TAUGHT)})')
-    if missing:
+    if missing and spans_syllabus(levels):
         print(f'  NOT TAUGHT ANYWHERE ({len(missing)}):')
         for unit in missing:
             print(f'    {unit_label(unit)}')
+    elif missing:
+        print(f'  {len(missing)} still to come - the syllabus stops inside block '
+              f'{max(l["block"] for l in levels)} of {len(BLOCKS)}, so this is the blocks that '
+              f'are not written yet rather than a gap in one that is.')
 
     # No word set as a puzzle twice. `ordered_levels` rejects any level that breaks it outside
     # the documented list, so this is a count of what the documented list is actually covering
@@ -210,6 +205,9 @@ def report(levels, failures):
           f'{len(borrowed)} borrowed by {len({i for i, _, _ in borrowed})} levels')
     for i, word, first in borrowed:
         print(f'  level {i:<3} borrows {word} from level {first}: {SHARED[word]}')
+    unused = [w for w in SHARED if w not in {word for _, word, _ in borrowed}]
+    if unused:
+        print(f'  {len(unused)} SHARED entries no level needs: {" ".join(unused)}')
 
     # A level that introduces a pile of new material at once is a lecture, not a lesson. The
     # ordering is greedy, so it can be forced into a jump when a block runs short of gentle
@@ -333,11 +331,24 @@ def main(argv):
             return 1
         gaps = [u for u in alphabet()
                 if u not in {t for level in levels for t in level['teaches']}]
-        if gaps:
+        if gaps and spans_syllabus(levels):
             print(f'\ncheck FAILED: {len(gaps)} pieces of the alphabet are never taught')
             return 1
         if len(levels) != len(CATALOGUE):
             print('\ncheck FAILED: lost levels between catalogue and output')
+            return 1
+        borrowed = {w for level in levels for w in level['words']}
+        needed = set()
+        seen = set()
+        for level in levels:
+            for w in level['words']:
+                if w in seen:
+                    needed.add(w)
+                seen.add(w)
+        stale = sorted(set(SHARED) - needed)
+        if stale:
+            print(f'\ncheck FAILED: SHARED lists {len(stale)} words no level borrows: '
+                  f'{" ".join(stale)}')
             return 1
         print('check ok')
         return 0
@@ -347,11 +358,8 @@ def main(argv):
             report(levels, failures)
             print('\nrefusing to build with rejected levels')
             return 1
-        going = shipped(levels)
-        kt_changed, web_changed = write_builds(going, authored=len(levels))
-        print(f'{len(going)} levels written'
-              + (f' - {len(levels) - len(going)} parked, see catalogue.SHIP_LEVELS'
-                 if len(going) != len(levels) else ''))
+        kt_changed, web_changed = write_builds(levels)
+        print(f'{len(levels)} levels written')
         print(f'  {KOTLIN.relative_to(REPO)}  {"updated" if kt_changed else "unchanged"}')
         print(f'  {WEB.relative_to(REPO)}  {"updated" if web_changed else "unchanged"}')
         print('\nnow run: cd bengali-word-game && ./gradlew test')

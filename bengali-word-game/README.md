@@ -25,31 +25,33 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 
 ## Gameplay
 
-- **Ten levels are shipping** while the game is reworked - the opening of the syllabus, plain
-  letters only. The catalogue holds 104 and is still checked in full; `catalogue.SHIP_LEVELS`
-  is the one line that decides how many go out, and setting it to `None` restores every level
-  exactly as it was. The rest of this section describes the full syllabus, which is what comes
-  back.
-- **104 levels in teaching order**, for someone learning to read Bengali rather than only to
-  speak it. Five blocks, each holding the previous one constant and adding one new thing:
-  plain letters, then one vowel sign at a time (া, then ি, then ে, then ু), then several signs
-  in one word, then conjuncts one family at a time (ন্ত, স্ত, ন্ধ, ক্ষ), then free play on the
-  fullest boards. Puzzle difficulty orders levels only *within* a block. 348 distinct words,
-  three to five per board.
-- **The whole alphabet, by the end**: all 11 independent vowels, all 10 vowel signs, both
-  nasal marks and every consonant - 57 pieces of the writing system, each introduced by name
-  in the level that first uses it. Three are left out on purpose and `curriculum.NOT_TAUGHT`
-  says why: ৗ is not a sign of its own in modern Bengali, ঃ reaches only দুঃখ and অতঃপর, and
-  ঞ never stands outside a cluster. `build.py check` fails if anything else goes missing.
-- **Each level records what it is first to introduce** - a letter, a vowel sign, a conjunct -
-  Thirty-seven of the 104 introduce nothing at all: a shape met once and never seen again has
-  not been learned.
-- **No word is set as a puzzle twice.** The catalogue used to fill 377 board slots with 201
+- **Ten levels**, the opening of the teaching order: plain letters on their own, ক ল ম through
+  র, one or two new ones per level, no vowel signs and nothing joined together. There were 104,
+  running through all five blocks of the syllabus to free play and covering every letter and
+  sign in the language; they were deleted on purpose while the way a level works is reworked.
+  `git show d102737:tools/catalogue.py` has all of them, with the `SHARED` entries and the
+  checks that went with them.
+- **Five blocks are still the plan**, each holding the previous one constant and adding one new
+  thing: plain letters, then one vowel sign at a time (া, then ি, then ে, then ু), then several
+  signs in one word, then conjuncts one family at a time (ন্ত, স্ত, ন্ধ, ক্ষ), then free play on
+  the fullest boards. Only the first is written. The machinery for the rest - block budgets,
+  board targets, the coverage report - is still here and sized for the full syllabus.
+- **The whole alphabet was the promise**, and is what the syllabus comes back to: all 11
+  independent vowels, all 10 vowel signs, both nasal marks and every consonant - 57 pieces of
+  the writing system, each introduced by name in the level that first uses it. Three are left
+  out on purpose and `curriculum.NOT_TAUGHT` says why: ৗ is not a sign of its own in modern
+  Bengali, ঃ reaches only দুঃখ and অতঃপর, and ঞ never stands outside a cluster. `build.py
+  check` reports what is missing, and goes back to failing on a gap once the levels span all
+  five blocks again.
+- **Each level records what it is first to introduce** - a letter, a vowel sign, a conjunct.
+  All ten introduce something, because a syllabus that stops this early has not reached the
+  point where review levels make sense.
+- **No word is set as a puzzle twice.** An earlier catalogue filled 377 board slots with 201
   words, leaning on কলম, বল, কল and সব across a dozen tile sets each, so a good part of the
-  game was re-spelling words the player already knew. Now every board is words no earlier
-  board has used. Nine levels early in block 1 have to borrow and cannot do otherwise - a
-  learner who knows four letters has exactly one board available to them - and each is listed
-  in `catalogue.SHARED` with the reason. `build.py check` fails on any repeat that is not.
+  game was re-spelling words the player already knew. Four levels here have to borrow and
+  cannot do otherwise - a learner who knows three letters has exactly one board available to
+  them - and each is listed in `catalogue.SHARED` with the reason. `build.py check` fails on
+  any repeat that is not listed, and on any listing no level needs.
 - **Every word spoken.** Web build only so far: a word is said the moment it is found.
   This matters more than it sounds - Bengali spelling hides the sound, since ব and ভ, শ and ষ
   and স, ন and ণ are each one sound in speech and different letters on the page, which is
@@ -73,8 +75,8 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 - **The wheel is scrambled**, from a seed fixed by the level id - so a level looks the same
   every time you return to it, and no wheel lays a word of three or more letters out in
   sequence around the ring.
-- The level picker is colour-coded by syllabus block, so it reads as five stages rather than
-  a hundred identical chips.
+- The level picker is colour-coded by syllabus block, so that once there is more than one
+  block it reads as stages rather than as a wall of identical chips.
 
 ## Play it on the web
 

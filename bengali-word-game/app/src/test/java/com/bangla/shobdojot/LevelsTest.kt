@@ -117,8 +117,8 @@ class LevelsTest {
             block = level.block
         }
         assertEquals("the game should open in block 1", 1, Levels.all.first().block)
-        // How far the blocks reach is a property of the whole syllabus, not of a slice of it.
-        if (Levels.isComplete) assertTrue("blocks used: $block", block >= 4)
+        // How far the blocks reach is a property of a finished syllabus.
+        if (Levels.spansSyllabus) assertTrue("blocks used: $block", block >= 4)
     }
 
     @Test
@@ -195,17 +195,17 @@ class LevelsTest {
                 taught[symbol] = level.id
             }
         }
-        if (Levels.isComplete) {
+        if (Levels.spansSyllabus) {
             assertTrue("only ${taught.size} pieces of the writing system taught", taught.size >= 70)
         }
     }
 
     @Test
     fun `the syllabus covers the whole alphabet`() {
-        // Only checkable against the whole catalogue. While `catalogue.SHIP_LEVELS` caps what
-        // ships, the parked levels are still held to this by `python3 tools/build.py check`,
-        // which runs over all of them - so this stops asserting rather than starts lying.
-        if (!Levels.isComplete) return
+        // Only means something about a finished syllabus. Only block 1 is written at the
+        // moment, so this stops asserting rather than starts lying, and re-arms by itself when
+        // the later blocks are written again.
+        if (!Levels.spansSyllabus) return
 
         // The promise of a teaching order is that finishing it leaves you able to read. A gap
         // here is a broken promise rather than a missing nicety, so the inventory is written
@@ -245,9 +245,10 @@ class LevelsTest {
     fun `most of the game is review`() {
         // A letter met once and never seen again has not been learned, so the majority of
         // levels should introduce nothing at all.
-        // A slice taken from the front of the syllabus is all teaching levels by construction:
-        // review levels are the ones that introduce nothing, and nothing has been introduced yet.
-        if (!Levels.isComplete) return
+        // Only means something about a finished syllabus: review levels are the ones that
+        // introduce nothing, and at the start of the teaching order nothing has been
+        // introduced yet, so every early level teaches something.
+        if (!Levels.spansSyllabus) return
 
         val review = Levels.all.count { it.teaches.isEmpty() }
         assertTrue("only $review of ${Levels.count} levels are review", review * 3 >= Levels.count)
@@ -266,7 +267,7 @@ class LevelsTest {
         val meanWords = Levels.all.groupBy { it.block }
             .toSortedMap()
             .map { (_, group) -> group.map { it.words.size }.average() }
-        // Nothing to compare when the shipped slice sits inside one block.
+        // Nothing to compare while the catalogue sits inside one block.
         if (meanWords.size < 2) return
 
         assertTrue(
@@ -296,10 +297,10 @@ class LevelsTest {
 
     @Test
     fun `the catalogue is big enough to be worth playing`() {
-        // Only checkable against the whole catalogue. While `catalogue.SHIP_LEVELS` caps what
-        // ships, the parked levels are still held to this by `python3 tools/build.py check`,
-        // which runs over all of them - so this stops asserting rather than starts lying.
-        if (!Levels.isComplete) return
+        // Only means something about a finished syllabus. Only block 1 is written at the
+        // moment, so this stops asserting rather than starts lying, and re-arms by itself when
+        // the later blocks are written again.
+        if (!Levels.spansSyllabus) return
 
         assertTrue("only ${Levels.count} levels", Levels.count >= 100)
         val words = Levels.all.flatMap { it.words }.toSet()
@@ -326,10 +327,10 @@ class LevelsTest {
             "words set as a puzzle more than once: ${repeats.joinToString("; ")}",
             repeats.size <= 20
         )
-        // The levels that have to borrow are all in the first handful, so a slice taken from
-        // the front is as repetitive as the catalogue ever gets. The ratio only means something
-        // across the whole thing.
-        if (!Levels.isComplete) return
+        // The levels that have to borrow are all in the first handful, which is the whole
+        // catalogue at the moment - so it is as repetitive as it will ever be. The ratio only
+        // means something once the syllabus is long enough for the borrowing to be a minority.
+        if (!Levels.spansSyllabus) return
 
         val slots = Levels.all.sumOf { it.words.size }
         assertTrue(
