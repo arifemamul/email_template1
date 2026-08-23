@@ -93,7 +93,23 @@ SYLLABUS = [
     ("দ",  BLOCK_KARS,     ["দিনরাত", "দুধভাত", "দিন", "দুধ", "রাত", "ভাত"]),
     ("ধ",  BLOCK_KARS,     ["ধরা", "ধনী", "পায়রা", "ধোপা"]),
     ("ন",  BLOCK_CONJUNCT, ["নয়", "নম্বর", "নজর", "নকল", "নল", "কম্বল", "জল"]),
-    # প, ফ, ব, ভ, ম and the rest of the alphabet are where this picks up next
+
+    # -- প onwards ----------------------------------------------------------------------
+    ("প",  BLOCK_CONJUNCT, ["পেন্সিল", "পলক", "পটল", "পেট", "টক"]),
+    ("ফ",  BLOCK_KARS,     ["ফড়িং", "ফসল", "ফলক", "ফল", "ফুল", "সফল", "কফি"]),
+    ("ব",  BLOCK_CONJUNCT, ["বন", "বর্ষাকাল", "বিমান", "বিকাল", "বল", "বর্ষা", "কান"]),
+    ("ভ",  BLOCK_KARS,     ["ভাই", "ভাষা", "কড়াই", "ভালুক", "ভাঙা"]),
+    ("ম",  BLOCK_KARS,     ["মধু", "মৌসুম", "মৌমাছি", "মাছি", "মাসি"]),
+    ("য",  BLOCK_CONJUNCT, ["যন্ত্র", "যত", "গণিত", "বগল", "যব"]),
+    ("র",  BLOCK_CONJUNCT, ["রঙ", "রান্নাঘর", "রাবার", "রান্না", "রথ"]),
+    ("ল",  BLOCK_KARS,     ["লাঠি", "লাল", "বদল", "দল", "লবণ", "নদ"]),
+    ("শ",  BLOCK_KARS,     ["শিয়াল", "শীতকাল", "শীতল", "শিশু", "শীত"]),
+    # ষ and স share a level for the same reason the vowels do: ষাঁড় and ষোল are the only two
+    # words in the pool that begin with ষ, and they share no letter with each other or with
+    # ষষ্ঠ, so no board can be built from them alone. Word-initial ষ is rare in Bengali - it
+    # lives inside words, in clusters like ষ্ট and ষ্ঠ.
+    ("ষস", BLOCK_KARS,     ["ষাঁড়", "ষোল", "সকল", "সড়ক", "কলস", "সকাল"]),
+    # হ is what is left, and finishes the alphabet: ড়, ঢ় and য় begin no Bengali word either.
 ]
 
 # Every level as (letters, declared block, words). Both declarations are checked against what

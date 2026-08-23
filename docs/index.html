@@ -845,12 +845,13 @@
           <br><br>
           The alphabet opens with vowels, and those come first - অ আ, then ই উ, then এ ও, two to a
           level, because ঊ, এ and ঐ have barely a word each to their name. Then the consonants
-          one at a time, from ক through to ন. ঙ, ঞ and ণ are skipped, since no Bengali word
-          begins with any of them.
+          one at a time, ক through স. ঙ, ঞ and ণ are skipped, since no Bengali word begins with
+          any of them, and ষ shares with স for much the same reason - ষাঁড় and ষোল are almost
+          the whole of it.
           <br><br>
           A few words on each board are there to hold the crossword together rather than for
           their letter - এক and ওজন share no letter at all, so something has to sit between
-          them. More levels are on the way, picking up at প. No word is ever set as a puzzle
+          them. হ is still to come, and finishes the alphabet. No word is ever set as a puzzle
           twice. Nothing to install, no sign-up, no ads - your progress is saved in this
           browser.
         </p>
@@ -1117,7 +1118,17 @@ const LEVELS = [
   { id: 17, letters: ["পা", "ঠ", "শা", "লা", "থা", "কা", "মা"], words: ["থাকা", "থালা", "পাঠশালা", "মাঠ"], block: 2, teaches: ["প", "থ"] },
   { id: 18, letters: ["দি", "ন", "রা", "ত", "দু", "ধ", "ভা"], words: ["দিনরাত", "দুধভাত", "দিন", "দুধ", "রাত", "ভাত"], block: 3, teaches: ["ভ", "ধ"] },
   { id: 19, letters: ["পা", "য়", "রা", "ধ", "নী", "ধো"], words: ["ধরা", "ধনী", "পায়রা", "ধোপা"], block: 3, teaches: ["ী"] },
-  { id: 20, letters: ["ন", "ম্ব", "র", "জ", "ক", "ল", "য়"], words: ["নয়", "নম্বর", "নজর", "নকল", "নল", "কম্বল", "জল"], block: 4, teaches: ["ম্ব"] }
+  { id: 20, letters: ["ন", "ম্ব", "র", "জ", "ক", "ল", "য়"], words: ["নয়", "নম্বর", "নজর", "নকল", "নল", "কম্বল", "জল"], block: 4, teaches: ["ম্ব"] },
+  { id: 21, letters: ["পে", "ন্সি", "ল", "প", "ক", "ট"], words: ["পেন্সিল", "পলক", "পটল", "পেট", "টক"], block: 4, teaches: ["ন্স"] },
+  { id: 22, letters: ["ফ", "স", "ল", "ক", "ড়িং", "ফু", "ফি"], words: ["ফড়িং", "ফসল", "ফলক", "ফল", "ফুল", "সফল", "কফি"], block: 3, teaches: ["ফ"] },
+  { id: 23, letters: ["ব", "র্ষা", "কা", "ল", "বি", "মা", "ন"], words: ["বন", "বর্ষাকাল", "বিমান", "বিকাল", "বল", "বর্ষা", "কান"], block: 4, teaches: ["র্ষ"] },
+  { id: 24, letters: ["ক", "ড়া", "ই", "ভা", "লু", "ষা", "ঙা"], words: ["ভাই", "ভাষা", "কড়াই", "ভালুক", "ভাঙা"], block: 3, teaches: ["ঙ", "ষ"] },
+  { id: 25, letters: ["মৌ", "সু", "ম", "মা", "ছি", "ধু", "সি"], words: ["মধু", "মৌসুম", "মৌমাছি", "মাছি", "মাসি"], block: 3, teaches: ["ৌ"] },
+  { id: 26, letters: ["গ", "ণি", "ত", "ব", "ল", "য", "ন্ত্র"], words: ["যন্ত্র", "যত", "গণিত", "বগল", "যব"], block: 4, teaches: ["ণ", "য", "ন্ত্র"] },
+  { id: 27, letters: ["রা", "ন্না", "ঘ", "র", "বা", "ঙ", "থ"], words: ["রঙ", "রান্নাঘর", "রাবার", "রান্না", "রথ"], block: 4, teaches: ["ন্ন"] },
+  { id: 28, letters: ["ব", "দ", "ল", "ণ", "লা", "ঠি", "ন"], words: ["লাঠি", "লাল", "বদল", "দল", "লবণ", "নদ"], block: 3 },
+  { id: 29, letters: ["শী", "ত", "কা", "ল", "শি", "য়া", "শু"], words: ["শিয়াল", "শীতকাল", "শীতল", "শিশু", "শীত"], block: 3 },
+  { id: 30, letters: ["স", "ক", "ল", "ড়", "কা", "ষাঁ", "ষো"], words: ["ষাঁড়", "ষোল", "সকল", "সড়ক", "কলস", "সকাল"], block: 3 }
 ];
 
 

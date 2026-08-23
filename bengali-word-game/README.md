@@ -25,12 +25,16 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 
 ## Gameplay
 
-- **An alphabet game, twenty letters in.** Each level is a letter, and its board is the words
-  that begin with it: ক is কলম কবুতর কমলা কমল কম কর কল কলা, eight words and every one of them ক.
-  The alphabet starts with vowels so those come first, two to a level - অ আ, ই উ, এ ও - because
-  ঊ, এ and ঐ have a single pool word each and cannot carry a level alone. Then the consonants one
-  at a time, ক through ন. ঙ, ঞ and ণ are skipped; no Bengali word begins with any of them. The
-  next batch picks up at প.
+- **An alphabet game, thirty levels, ক through স.** Each level is a letter, and its board is the
+  words that begin with it: ক is কলম কবুতর কমলা কমল কম কর কল কলা, eight words and every one of
+  them ক. ম, র and শ are five words each and nothing else.
+- **Some letters have to share.** The alphabet opens with vowels, and ঊ, এ and ঐ have one pool
+  word apiece, so the vowels that start words are paired - অ আ, ই উ, এ ও. ষ shares with স for
+  the same reason: ষাঁড় and ষোল are the only two ষ words in the pool and they share no letter
+  with each other, so no board can be built from them alone. Word-initial ষ is rare in Bengali -
+  it lives inside words, in clusters like ষ্ট and ষ্ঠ. ঙ, ঞ and ণ are skipped outright; no
+  Bengali word begins with any of them, and neither do ড়, ঢ় or য়.
+- **হ is what is left**, and finishes the alphabet.
 - **Some words are bridges.** এক and ওজন share no letter, so a board holding both needs কঠিন and
   জন between them. Each level declares its letter in `catalogue.SYLLABUS`, and `build.py check`
   fails unless the board is about that letter: at least two words starting with it, and more
