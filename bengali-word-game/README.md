@@ -25,18 +25,27 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 
 ## Gameplay
 
-- **Ten levels**, authored to be played rather than to teach. Five to eight words a board, six
-  or seven tiles, every board anchored on a long word - ফুলবাগান, কাঠবিড়ালি, রান্নাঘর - which is
-  the one the wheel hides best. The last three carry a conjunct. `catalogue.FULL_SYLLABUS` is
-  `False` and says so: the checks that only mean something about a complete syllabus report
+- **An alphabet game, ten letters in.** Each level is a letter, and its board is the words that
+  begin with it: ক is কলম কবুতর কমলা কমল কম কর কল কলা, eight words and every one of them ক. The
+  alphabet starts with vowels so those come first, two to a level - অ আ, ই উ, এ ও - because ঊ, এ
+  and ঐ have a single pool word each and cannot carry a level alone. Then the consonants one at
+  a time: ক খ গ ঘ চ ছ জ. ঙ and ঞ are skipped; no Bengali word begins with either.
+- **Some words are bridges.** এক and ওজন share no letter, so a board holding both needs কঠিন and
+  জন between them. `build.py check` prints which letter each level is really about and how many
+  of its words start with it, and fails if a level has no two words sharing a first letter -
+  which would mean it is not about a letter at all.
+- **`catalogue.FULL_SYLLABUS` is `False`** and the ordering follows from it: a syllabus is
+  ordered by block, an alphabet game by the alphabet, and the two disagree - ক lands in block 3
+  and গ in block 2. Checks and tests that only mean something about a complete syllabus report
   instead of failing.
 - **There were 104**, running through all five blocks to free play and covering every letter and
   sign in the language. They were deleted on purpose while the way a level works is reworked;
   `git show d102737:tools/catalogue.py` has all of them.
-- **Five blocks are still the ordering**, and still the plan: plain letters, then one vowel sign
+- **Five blocks are still the plan** for a rebuilt syllabus: plain letters, then one vowel sign
   at a time, then several signs in one word, then conjuncts one family at a time, then free play
-  on the fullest boards. The ten reach into the fourth. The machinery for a full syllabus -
-  block budgets, board targets, the coverage report - is still here and sized for it.
+  on the fullest boards. Blocks are still derived and checked for every level - they just do not
+  decide the order while this is an alphabet game. The machinery for a full syllabus - block
+  budgets, board targets, board growth from the pool - is still here and sized for it.
 - **The whole alphabet was the promise**, and is what a rebuilt syllabus comes back to: all 11
   independent vowels, all 10 vowel signs, both nasal marks and every consonant - 57 pieces of
   the writing system, each introduced by name in the level that first uses it. Three are left
@@ -49,7 +58,7 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
   from plain letters to conjuncts cannot also spend two of them per level.
 - **No word is set as a puzzle twice.** An earlier catalogue filled 377 board slots with 201
   words, leaning on কলম, বল, কল and সব across a dozen tile sets each, so a good part of the
-  game was re-spelling words the player already knew. Nothing borrows now - sixty-five board
+  game was re-spelling words the player already knew. Nothing borrows now - fifty-nine board
   words out of a five-hundred-word pool leaves no level short of options - so
   `catalogue.SHARED` is empty. `build.py check` fails on any repeat that is not listed there,
   and on any listing no level needs.

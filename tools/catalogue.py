@@ -45,68 +45,55 @@ from wordpool import zipf
 # Order inside a block is decided at build time by how much is new, so the order written here
 # is only for human readability.
 
-SYLLABUS = {
+# The levels, in the order they are played. An alphabet game: each level is named after a
+# letter, and the words on its board are the words that start with that letter.
+#
+# Written as a list rather than grouped by block, because here the order is the alphabet and
+# nothing else. Each entry still declares the block its words belong to, which `validate`
+# checks against what they actually contain - but the block no longer decides where a level
+# sits. See `ordered_levels`.
+#
+# The alphabet opens with eleven vowels, and a vowel level cannot be built one letter at a
+# time: ঊ, এ and ঐ have a single word each in the whole pool. So the vowels that begin words
+# are paired up into the first three levels and the consonants follow one at a time. ঙ, ঞ and ণ
+# never begin a Bengali word and are skipped when their turn comes.
+#
+# Not every word on a board starts with the level's letter. Some are there to hold the
+# crossword together: এক and ওজন share no letter at all, so without কঠিন and জন between them
+# there is no board that holds both.
 
-    # Ten levels, which is the whole game for now. There were 104, running through all five
-    # blocks to free play and covering every letter and sign in the language; they were deleted
-    # on purpose while the way a level works is reworked. They are in the history rather than
-    # commented out here: `git show d102737:tools/catalogue.py` has all of them.
-    #
-    # These ten are not the opening of that syllabus. That opening was as gentle as the game
-    # gets - three two-letter words off a three-tile wheel - and with the rest of the levels
-    # gone there is nothing for it to be gentle in preparation for. So they are authored to be
-    # played rather than to teach: every board is anchored on a long word, five to eight words
-    # to a board, six or seven tiles, and the last three carry a conjunct. The wheel no longer
-    # tells you how many letters the answer has.
-    #
-    # No word appears on two boards, and here that costs nothing: sixty-five words out of a
-    # pool of five hundred, so `SHARED` is empty and the rule holds outright.
+SYLLABUS = [
+    # -- the vowels that start words, two or three to a level ---------------------------
+    (BLOCK_ONE_KAR,  ["আজ", "আনারস", "অজগর", "আনা", "রস"]),                    # অ আ
+    (BLOCK_CONJUNCT, ["উট", "ইঁদুর", "উত্তর", "দুই"]),                          # ই উ
+    (BLOCK_KARS,     ["এক", "ওজন", "কঠিন", "জন", "ওঠা"]),                      # এ ও
 
-    # Plain letters, no signs. A bigger wheel than the alphabet needs, because the difficulty
-    # here is scanning it rather than reading anything new.
-    BLOCK_PLAIN: [
-        ["শরবত", "রতন", "যত", "বন", "যব"],
-        ["অজগর", "গরম", "মটর", "টগর", "গম"],
-    ],
-
-    # One vowel sign per board - all া here, which is the sign that does the most work in
-    # Bengali - so the sign is never the puzzle; the board is.
-    BLOCK_ONE_KAR: [
-        ["কলাগাছ", "মাছ", "গাছ", "কলা", "থালা", "মাথা"],
-        ["পাঠশালা", "পাতা", "পাঠ", "তালা", "খাতা", "খালা"],
-        ["আনারস", "আসল", "সফল", "ফসল", "সরল", "ফল", "আনা", "রস"],
-    ],
-
-    # Several signs in one word, which is where ordinary Bengali vocabulary starts.
-    BLOCK_KARS: [
-        ["পড়ালেখা", "রাখাল", "রাখা", "লেখা", "পড়া", "খাল"],
-        ["কাঠবিড়ালি", "বিমান", "মাঠ", "কান", "মালি"],
-    ],
-
-    # Joined consonants, on the fullest boards the phone can hold. ন্ন, র্ষ, ম্ব, ট্র and ঞ্চ,
-    # each sitting in a word a child would recognise rather than in a word chosen to show the
-    # cluster off.
-    BLOCK_CONJUNCT: [
-        ["ঘরবাড়ি", "রান্নাঘর", "রাবার", "বাড়ি", "ঘর", "রান্না", "বাঘ", "ঘড়ি"],
-        ["বর্ষাকাল", "কম্বল", "বল", "কল", "কাল", "বর্ষা", "কাক", "বক"],
-        ["ফুলবাগান", "বাগান", "গান", "ফুল", "ট্রেন", "গাল", "নল", "লঞ্চ"],
-    ],
-}
+    # -- then the consonants, in alphabet order -----------------------------------------
+    (BLOCK_KARS,     ["কলম", "কবুতর", "কমলা", "কমল", "কম", "কর", "কল", "কলা"]),  # ক
+    (BLOCK_KARS,     ["খালা", "খাবার", "খেলা", "খবর", "বলা"]),                   # খ
+    (BLOCK_ONE_KAR,  ["গরম", "গাছ", "গাজর", "গম", "নগর", "গান"]),                # গ
+    (BLOCK_CONJUNCT, ["ঘরবাড়ি", "ঘর", "ঘণ্টা", "ঘড়ি", "ঘট", "বাঘ", "ঘাট", "বাড়ি"]),  # ঘ
+    # ঙ never begins a word
+    (BLOCK_KARS,     ["চুল", "চালক", "চামচ", "চক", "কচু", "চমক"]),               # চ
+    (BLOCK_ONE_KAR,  ["ছাতা", "ছাগল", "ঈগল", "ঈদ", "ছাদ", "লতা", "ছায়া"]),       # ছ
+    (BLOCK_KARS,     ["জাহাজ", "জামা", "জগত", "হাত", "হাতি"]),                   # জ
+    # ঝ, ঞ, ট, ঠ, ড and the rest of the alphabet are where this picks up next
+]
 
 # Every level as (declared block, words). The declared block is checked against what the
 # words actually contain, so a level cannot drift out of its block unnoticed.
-DECLARED = [(block, words) for block in sorted(SYLLABUS) for words in SYLLABUS[block]]
+DECLARED = list(SYLLABUS)
 
 CATALOGUE = [words for _, words in DECLARED]
 
-# Every word the syllabus was authored around. Boards grow into the pool, and this is what
-# growth may not touch: a common word swallowed by a level in block 2 is a word missing from
-# the block-4 level that was built on it, and since no word is set twice, that level would
-# have nothing left to teach its cluster with.
+# Every word the catalogue was authored around. Boards grow into the pool, and this is what
+# growth may not touch: a word swallowed by an early level is a word missing from the later
+# level that was built on it, and since no word is set twice, that level would have nothing
+# left to make a board from.
 AUTHORED = {w for _, words in DECLARED for w in words}
 
 # Words a board is allowed to reuse from an earlier board, with the reason. Empty, and worth
-# keeping empty: sixty-five board words out of a five-hundred-word pool leaves no level short
+# keeping empty: fifty-nine board words out of a five-hundred-word pool leaves no level short
 # of options. It was not empty when the catalogue was a hundred levels long - the opening
 # levels there had three letters to build from and no choice but to borrow - so this comes
 # back if the syllabus does. `check` fails on any repeat that is not listed here, and on any
@@ -239,38 +226,44 @@ def placeable(words):
 
 def grow_board(seed, candidates, target, max_tiles=None):
     """
-    Fills a board out to `target` words, taking each candidate only if the crossword still
-    lays out legally. The authored words go on first and are never dropped; the rest are
-    commonest first, so a bigger board stays fair.
+    Fills a board out to `target` words, taking each candidate only if the crossword still lays
+    out legally. A candidate the wheel has no tile for brings its own, up to `max_tiles`, so a
+    board can grow past what its authored words happened to spell.
 
-    A candidate the wheel has no tile for brings its own, up to `max_tiles`, so a board can
-    grow past what its authored words happened to spell. The authored words themselves are
-    never dropped and never counted against the cap.
+    The authored words are laid down first and as a whole - `validate` has already proved they
+    make a board - and are never dropped. They used to go into the same queue as the
+    candidates, which lost them: a level authored as উট ইঁদুর উত্তর দুই came out as
+    উট উত্তর আট টগর আসা, because ইঁদুর shares no letter with উট and so went to the back of the
+    queue, and by the time it came round again the board had spent its tiles on filler and had
+    no room for it. An alphabet level for ই that contains no ই is worse than a small one.
 
-    A word the board could not take goes back in the queue rather than being discarded,
+    A candidate the board could not take goes back in the queue rather than being discarded,
     because whether it fits depends on what is already down: কর shares no letter with ঘড়ি but
     crosses ঘর happily, so one pass in the wrong order would lose it.
     """
-    board, queue = [], list(dict.fromkeys(list(seed) + list(candidates)))
-    while queue:
+    board = list(seed)
+    if len(board) > 1 and placeable(board) is None:
+        return board                     # validate should have caught this; do no harm
+    queue = [w for w in dict.fromkeys(candidates) if w not in board]
+    while queue and len(board) < target:
         rest = []
         for word in queue:
-            if len(board) >= target and word not in seed:
-                break
             trial = board + [word]
-            if max_tiles and word not in seed and len(tiles_for(trial)) > max_tiles:
+            if max_tiles and len(tiles_for(trial)) > max_tiles:
                 continue
-            if len(trial) > 1 and placeable(trial) is None:
+            if placeable(trial) is None:
                 rest.append(word)
                 continue
             board = trial
+            if len(board) >= target:
+                break
         if len(rest) == len(queue):
             break                        # a whole pass over the queue added nothing
         queue = rest
     return board
 
 
-def order_block(group, known):
+def order_block(group, known, keep_order=False):
     """
     Order one block gently: at each step take the level that introduces the least new
     material, breaking ties by where its newest piece sits in the syllabus and then by how
@@ -278,7 +271,18 @@ def order_block(group, known):
     has already been placed - a level that looks like a big jump from the start of a block can
     be an easy step once its neighbours have been taken. `known` carries in what earlier
     blocks already taught.
+
+    With `keep_order` the levels stay in the order they were written and this only works out
+    what each one is the first to use, which is what an alphabet game wants: the order is
+    already decided, by the alphabet.
     """
+    if keep_order:
+        ordered = list(group)
+        for level in ordered:
+            level['teaches'] = new_units(level['words'], known)
+            known |= set(units_in(level['words']))
+        return ordered, known
+
     remaining, ordered = list(group), []
     while remaining:
         def cost(level):
@@ -311,13 +315,20 @@ def ordered_levels():
     # authored around - it just cannot take one another level has already set.
     vocabulary = list(dict.fromkeys(pool_words() + [w for l in levels for w in l['words']]))
 
-    # Blocks in order; inside each, the gentlest step first.
+    # Where the levels sit. A syllabus is ordered by block - plain letters, then one vowel
+    # sign, then several, then conjuncts - with puzzle difficulty deciding only the order
+    # inside a block. An alphabet game is ordered by the alphabet, which is the order it is
+    # written in, and sorting by block would scatter it: ক lands in block 3 and গ in block 2,
+    # so ক would be played second.
     known, out = set(), []
-    for block in sorted({l['block'] for l in levels}):
-        group = [l for l in levels if l['block'] == block]
-        group.sort(key=lambda l: l['score'])
-        ordered, known = order_block(group, known)
-        out += ordered
+    if FULL_SYLLABUS:
+        for block in sorted({l['block'] for l in levels}):
+            group = [l for l in levels if l['block'] == block]
+            group.sort(key=lambda l: l['score'])
+            ordered, known = order_block(group, known)
+            out += ordered
+    else:
+        out, known = order_block(levels, known, keep_order=True)
     levels = out
 
     # No word is a puzzle twice. That rule is what decides the rest: a board grows only into
@@ -332,11 +343,16 @@ def ordered_levels():
         seen |= set(units_in(level['words']))
         taught_by[id(level)] = set(seen)
 
-    # Fill the boards out, fullest blocks first. Free play is meant to be the fullest board in
-    # the game and it sits at the end of the syllabus, so if the levels took their turn in
+    # Fill the boards out, fullest blocks first - and only for a syllabus. An alphabet level is
+    # the list of words that start with its letter, and growing it from the pool would pad it
+    # with words that do not: গ's board is গরম গাছ গাজর গম গান because those are the গ words,
+    # not because six was the target.
+    #
+    # Fullest blocks first because free play is meant to be the fullest board in Free play is meant to be the fullest board in
+    # the game and sits at the end of the syllabus, so if the levels took their turn in
     # teaching order it would be picking over what twenty blocks of vowel signs left behind.
     claimed = set(AUTHORED)
-    for level in sorted(levels, key=lambda l: -l['block']):
+    for level in (sorted(levels, key=lambda l: -l['block']) if FULL_SYLLABUS else []):
         candidates = [w for w in vocabulary
                       if w not in claimed and set(units_in([w])) <= taught_by[id(level)]
                       and block_for(level['words'] + [w]) == level['block']]

@@ -28,23 +28,21 @@ import com.bangla.shobdojot.model.Level
 object Levels {
 
     val all: List<Level> = listOf(
-        // Block 1, plain letters: consonants and independent vowels on their own, no signs at all.
-        Level(1, listOf("অ", "জ", "গ", "র", "ম", "ট"), listOf("অজগর", "গরম", "মটর", "টগর", "গম"), block = 1, teaches = listOf("অ", "র", "ম", "গ", "ট", "জ")),
-        Level(2, listOf("শ", "র", "ব", "ত", "ন", "য"), listOf("শরবত", "রতন", "যত", "বন", "যব"), block = 1, teaches = listOf("ব", "ন", "ত", "শ", "য")),
-
         // Block 2, one vowel sign: a single vowel sign per level, introduced one at a time in KAR_ORDER.
-        Level(3, listOf("ক", "লা", "গা", "ছ", "মা", "থা"), listOf("কলাগাছ", "মাছ", "গাছ", "কলা", "থালা", "মাথা"), block = 2, teaches = listOf("ল", "ক", "ছ", "থ", "া")),
-        Level(4, listOf("আ", "না", "র", "স", "ল", "ফ"), listOf("আনারস", "আসল", "সফল", "ফসল", "সরল", "ফল", "আনা", "রস"), block = 2, teaches = listOf("আ", "স", "ফ")),
-        Level(5, listOf("পা", "ঠ", "শা", "লা", "তা", "খা"), listOf("পাঠশালা", "পাতা", "পাঠ", "তালা", "খাতা", "খালা"), block = 2, teaches = listOf("প", "খ", "ঠ")),
-
-        // Block 3, vowel signs together: several signs in one word, all of them already taught.
-        Level(6, listOf("কা", "ঠ", "বি", "ড়া", "লি", "মা", "ন"), listOf("কাঠবিড়ালি", "বিমান", "মাঠ", "কান", "মালি"), block = 3, teaches = listOf("ড়", "ি")),
-        Level(7, listOf("প", "ড়া", "লে", "খা", "রা", "ল"), listOf("পড়ালেখা", "রাখাল", "রাখা", "লেখা", "পড়া", "খাল"), block = 3, teaches = listOf("ে")),
+        Level(1, listOf("আ", "না", "র", "স", "অ", "জ", "গ"), listOf("আজ", "আনারস", "অজগর", "আনা", "রস"), block = 2, teaches = listOf("অ", "আ", "র", "ন", "স", "গ", "জ", "া")),
 
         // Block 4, conjuncts: joined consonants, one cluster family at a time.
-        Level(8, listOf("ঘ", "র", "বা", "ড়ি", "রা", "ন্না"), listOf("ঘরবাড়ি", "রান্নাঘর", "রাবার", "বাড়ি", "ঘর", "রান্না", "বাঘ", "ঘড়ি"), block = 4, teaches = listOf("ঘ", "ন্ন")),
-        Level(9, listOf("ব", "র্ষা", "কা", "ল", "ক", "ম্ব"), listOf("বর্ষাকাল", "কম্বল", "বল", "কল", "কাল", "বর্ষা", "কাক", "বক"), block = 4, teaches = listOf("ম্ব", "র্ষ")),
-        Level(10, listOf("ফু", "ল", "বা", "গা", "ন", "ট্রে", "ঞ্চ"), listOf("ফুলবাগান", "বাগান", "গান", "ফুল", "ট্রেন", "গাল", "নল", "লঞ্চ"), block = 4, teaches = listOf("ু", "ট্র", "ঞ্চ"))
+        Level(2, listOf("ইঁ", "দু", "র", "উ", "ত্ত", "ট", "ই"), listOf("উট", "ইঁদুর", "উত্তর", "দুই"), block = 4, teaches = listOf("ই", "উ", "দ", "ট", "ু", "ঁ", "ত্ত")),
+
+        // Block 3, vowel signs together: several signs in one word, all of them already taught.
+        Level(3, listOf("ও", "জ", "ন", "ক", "ঠি", "এ", "ঠা"), listOf("এক", "ওজন", "কঠিন", "জন", "ওঠা"), block = 3, teaches = listOf("ক", "এ", "ও", "ঠ", "ি")),
+        Level(4, listOf("ক", "বু", "ত", "র", "ল", "ম", "লা"), listOf("কলম", "কবুতর", "কমলা", "কমল", "কম", "কর", "কল", "কলা"), block = 3, teaches = listOf("ল", "ব", "ম", "ত")),
+        Level(5, listOf("খা", "বা", "র", "খ", "ব", "লা", "খে"), listOf("খালা", "খাবার", "খেলা", "খবর", "বলা"), block = 3, teaches = listOf("খ", "ে")),
+        Level(6, listOf("গ", "র", "ম", "গা", "জ", "ন", "ছ"), listOf("গরম", "গাছ", "গাজর", "গম", "নগর", "গান"), block = 2, teaches = listOf("ছ")),
+        Level(7, listOf("ঘ", "র", "বা", "ড়ি", "ণ্টা", "ট", "ঘা"), listOf("ঘরবাড়ি", "ঘর", "ঘণ্টা", "ঘড়ি", "ঘট", "বাঘ", "ঘাট", "বাড়ি"), block = 4, teaches = listOf("ঘ", "ড়", "ণ্ট")),
+        Level(8, listOf("চা", "ল", "ক", "ম", "চ", "চু"), listOf("চুল", "চালক", "চামচ", "চক", "কচু", "চমক"), block = 3, teaches = listOf("চ")),
+        Level(9, listOf("ছা", "গ", "ল", "ঈ", "তা", "দ", "য়া"), listOf("ছাতা", "ছাগল", "ঈগল", "ঈদ", "ছাদ", "লতা", "ছায়া"), block = 2, teaches = listOf("ঈ", "য়")),
+        Level(10, listOf("জা", "হা", "জ", "গ", "ত", "মা", "তি"), listOf("জাহাজ", "জামা", "জগত", "হাত", "হাতি"), block = 3, teaches = listOf("হ"))
     )
 
     val count: Int get() = all.size

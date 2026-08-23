@@ -108,6 +108,11 @@ class LevelsTest {
         // Blocks are the primary ordering: a learner meets plain letters, then one vowel sign
         // at a time, then several together, then conjuncts, then everything mixed. A level out
         // of block order means someone edited the generated file by hand.
+        // Blocks order a syllabus. An alphabet game is ordered by the alphabet, and the two
+        // disagree: ক lands in block 3 and গ in block 2, so sorting by block would put ক
+        // second. Nothing below holds unless blocks are what decides the order.
+        if (!Levels.FULL_SYLLABUS) return
+
         var block = Levels.all.first().block
         for (level in Levels.all) {
             assertTrue(
@@ -139,10 +144,11 @@ class LevelsTest {
 
     @Test
     fun `the first level is the smallest in the game`() {
-        // Relative rather than absolute. It used to assert three tiles and three words, which
-        // was true of the syllabus this catalogue was cut from and is not a property worth
-        // pinning: what matters is that whatever the game opens with, nothing before it is
-        // easier to look at.
+        // Only true where difficulty decides the order. An alphabet game is ordered by the
+        // alphabet: level 2 is ই উ and has four words because four is what those letters
+        // spell, not because it is a step up from level 1.
+        if (!Levels.FULL_SYLLABUS) return
+
         val first = Levels.all.first()
         for (level in Levels.all) {
             assertTrue(
@@ -279,6 +285,11 @@ class LevelsTest {
         // one before it, and that is a property of the language rather than a mistake: a wheel
         // holding a conjunct tile spells fewer other words, so those boards cannot be filled
         // out as far. Difficulty there comes from the cluster, not from the word count.
+        // Word count climbing with the block is a syllabus property. In an alphabet game the
+        // block a level lands in is a consequence of which letters its words happen to carry,
+        // so there is nothing for the means to be ordered by.
+        if (!Levels.FULL_SYLLABUS) return
+
         val meanWords = Levels.all.groupBy { it.block }
             .toSortedMap()
             .map { (_, group) -> group.map { it.words.size }.average() }

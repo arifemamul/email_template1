@@ -838,16 +838,21 @@
       <section class="card">
         <h3>What this is</h3>
         <p class="deck">
-          A Bengali word-cross puzzle. Drag across the letters to spell a word; each word you find
-          writes itself into the crossword above. <b><span id="deckCount">Levels</span></b>, for
-          anyone learning to read Bengali rather than only to speak it - five to eight words to a
-          board, six or seven letters on the wheel, and every board built around one long word
-          that is the last thing you will spot.
+          A Bengali word-cross puzzle, one letter of the alphabet at a time. Drag across the
+          letters to spell a word; each word you find writes itself into the crossword above.
+          <b><span id="deckCount">Levels</span></b>, and each one is a letter: the board for ক is
+          কলম, কবুতর, কমলা, কমল, কম, কর, কল, কলা - eight words, all of them ক.
           <br><br>
-          The order still follows the writing system: plain letters first, then a vowel sign,
-          then several in a word, then joined consonants - ন্ন in রান্নাঘর, র্ষ in বর্ষাকাল,
-          ট্র in ট্রেন. More levels are on the way. No word is ever set as a puzzle twice.
-          Nothing to install, no sign-up, no ads - your progress is saved in this browser.
+          The alphabet opens with vowels, and those come first - অ আ, then ই উ, then এ ও, two to a
+          level, because ঊ, এ and ঐ have barely a word each to their name. Then the consonants
+          one at a time: ক, খ, গ, ঘ, চ, ছ, জ. ঙ and ঞ are skipped, since no Bengali word begins
+          with either.
+          <br><br>
+          A few words on each board are there to hold the crossword together rather than for
+          their letter - এক and ওজন share no letter at all, so something has to sit between
+          them. More levels are on the way, picking up at ঝ. No word is ever set as a puzzle
+          twice. Nothing to install, no sign-up, no ads - your progress is saved in this
+          browser.
         </p>
       </section>
 
@@ -1088,23 +1093,21 @@ function normalise(occ, placed) {
    3. Levels - generated from data/Levels.kt
    ============================================================================ */
 const LEVELS = [
-  // Block 1, plain letters: consonants and independent vowels on their own, no signs at all.
-  { id: 1, letters: ["অ", "জ", "গ", "র", "ম", "ট"], words: ["অজগর", "গরম", "মটর", "টগর", "গম"], block: 1, teaches: ["অ", "র", "ম", "গ", "ট", "জ"] },
-  { id: 2, letters: ["শ", "র", "ব", "ত", "ন", "য"], words: ["শরবত", "রতন", "যত", "বন", "যব"], block: 1, teaches: ["ব", "ন", "ত", "শ", "য"] },
-
   // Block 2, one vowel sign: a single vowel sign per level, introduced one at a time in KAR_ORDER.
-  { id: 3, letters: ["ক", "লা", "গা", "ছ", "মা", "থা"], words: ["কলাগাছ", "মাছ", "গাছ", "কলা", "থালা", "মাথা"], block: 2, teaches: ["ল", "ক", "ছ", "থ", "া"] },
-  { id: 4, letters: ["আ", "না", "র", "স", "ল", "ফ"], words: ["আনারস", "আসল", "সফল", "ফসল", "সরল", "ফল", "আনা", "রস"], block: 2, teaches: ["আ", "স", "ফ"] },
-  { id: 5, letters: ["পা", "ঠ", "শা", "লা", "তা", "খা"], words: ["পাঠশালা", "পাতা", "পাঠ", "তালা", "খাতা", "খালা"], block: 2, teaches: ["প", "খ", "ঠ"] },
-
-  // Block 3, vowel signs together: several signs in one word, all of them already taught.
-  { id: 6, letters: ["কা", "ঠ", "বি", "ড়া", "লি", "মা", "ন"], words: ["কাঠবিড়ালি", "বিমান", "মাঠ", "কান", "মালি"], block: 3, teaches: ["ড়", "ি"] },
-  { id: 7, letters: ["প", "ড়া", "লে", "খা", "রা", "ল"], words: ["পড়ালেখা", "রাখাল", "রাখা", "লেখা", "পড়া", "খাল"], block: 3, teaches: ["ে"] },
+  { id: 1, letters: ["আ", "না", "র", "স", "অ", "জ", "গ"], words: ["আজ", "আনারস", "অজগর", "আনা", "রস"], block: 2, teaches: ["অ", "আ", "র", "ন", "স", "গ", "জ", "া"] },
 
   // Block 4, conjuncts: joined consonants, one cluster family at a time.
-  { id: 8, letters: ["ঘ", "র", "বা", "ড়ি", "রা", "ন্না"], words: ["ঘরবাড়ি", "রান্নাঘর", "রাবার", "বাড়ি", "ঘর", "রান্না", "বাঘ", "ঘড়ি"], block: 4, teaches: ["ঘ", "ন্ন"] },
-  { id: 9, letters: ["ব", "র্ষা", "কা", "ল", "ক", "ম্ব"], words: ["বর্ষাকাল", "কম্বল", "বল", "কল", "কাল", "বর্ষা", "কাক", "বক"], block: 4, teaches: ["ম্ব", "র্ষ"] },
-  { id: 10, letters: ["ফু", "ল", "বা", "গা", "ন", "ট্রে", "ঞ্চ"], words: ["ফুলবাগান", "বাগান", "গান", "ফুল", "ট্রেন", "গাল", "নল", "লঞ্চ"], block: 4, teaches: ["ু", "ট্র", "ঞ্চ"] }
+  { id: 2, letters: ["ইঁ", "দু", "র", "উ", "ত্ত", "ট", "ই"], words: ["উট", "ইঁদুর", "উত্তর", "দুই"], block: 4, teaches: ["ই", "উ", "দ", "ট", "ু", "ঁ", "ত্ত"] },
+
+  // Block 3, vowel signs together: several signs in one word, all of them already taught.
+  { id: 3, letters: ["ও", "জ", "ন", "ক", "ঠি", "এ", "ঠা"], words: ["এক", "ওজন", "কঠিন", "জন", "ওঠা"], block: 3, teaches: ["ক", "এ", "ও", "ঠ", "ি"] },
+  { id: 4, letters: ["ক", "বু", "ত", "র", "ল", "ম", "লা"], words: ["কলম", "কবুতর", "কমলা", "কমল", "কম", "কর", "কল", "কলা"], block: 3, teaches: ["ল", "ব", "ম", "ত"] },
+  { id: 5, letters: ["খা", "বা", "র", "খ", "ব", "লা", "খে"], words: ["খালা", "খাবার", "খেলা", "খবর", "বলা"], block: 3, teaches: ["খ", "ে"] },
+  { id: 6, letters: ["গ", "র", "ম", "গা", "জ", "ন", "ছ"], words: ["গরম", "গাছ", "গাজর", "গম", "নগর", "গান"], block: 2, teaches: ["ছ"] },
+  { id: 7, letters: ["ঘ", "র", "বা", "ড়ি", "ণ্টা", "ট", "ঘা"], words: ["ঘরবাড়ি", "ঘর", "ঘণ্টা", "ঘড়ি", "ঘট", "বাঘ", "ঘাট", "বাড়ি"], block: 4, teaches: ["ঘ", "ড়", "ণ্ট"] },
+  { id: 8, letters: ["চা", "ল", "ক", "ম", "চ", "চু"], words: ["চুল", "চালক", "চামচ", "চক", "কচু", "চমক"], block: 3, teaches: ["চ"] },
+  { id: 9, letters: ["ছা", "গ", "ল", "ঈ", "তা", "দ", "য়া"], words: ["ছাতা", "ছাগল", "ঈগল", "ঈদ", "ছাদ", "লতা", "ছায়া"], block: 2, teaches: ["ঈ", "য়"] },
+  { id: 10, letters: ["জা", "হা", "জ", "গ", "ত", "মা", "তি"], words: ["জাহাজ", "জামা", "জগত", "হাত", "হাতি"], block: 3, teaches: ["হ"] }
 ];
 
 
