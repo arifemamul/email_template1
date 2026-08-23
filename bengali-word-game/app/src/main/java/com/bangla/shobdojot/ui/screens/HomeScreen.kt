@@ -41,10 +41,9 @@ import com.bangla.shobdojot.ui.theme.MidIndigo
 import com.bangla.shobdojot.ui.theme.SlateViolet
 import com.bangla.shobdojot.ui.theme.TileInk
 
-/** Title, coin count and the level picker. Locked levels show a padlock. */
+/** Title and the level picker. Locked levels show a padlock. */
 @Composable
 fun HomeScreen(
-    coins: Int,
     unlockedLevel: Int,
     isCompleted: (Int) -> Boolean,
     onPlayLevel: (Int) -> Unit
@@ -72,7 +71,6 @@ fun HomeScreen(
                     fontSize = 15.sp
                 )
             }
-            CoinPill(coins)
         }
 
         Spacer(Modifier.height(20.dp))

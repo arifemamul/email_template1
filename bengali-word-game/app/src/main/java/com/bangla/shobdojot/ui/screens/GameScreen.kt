@@ -24,8 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,7 +36,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.bangla.shobdojot.data.GameRepository
 import com.bangla.shobdojot.data.Levels
 import com.bangla.shobdojot.logic.BanglaText
 import com.bangla.shobdojot.ui.GameUiState
@@ -50,7 +47,6 @@ import com.bangla.shobdojot.ui.theme.DeepIndigo
 import com.bangla.shobdojot.ui.theme.LeafGreen
 import com.bangla.shobdojot.ui.theme.Marigold
 import com.bangla.shobdojot.ui.theme.MidIndigo
-import com.bangla.shobdojot.ui.theme.SlateViolet
 import kotlinx.coroutines.delay
 
 /**
@@ -74,7 +70,6 @@ fun GameScreen(
     var verdict by remember(level.id) { mutableStateOf<Pair<String, WordResult>?>(null) }
     var feedbackTick by remember(level.id) { mutableStateOf(0) }
     var showComplete by remember(level.id) { mutableStateOf(false) }
-    var noCoins by remember { mutableStateOf(false) }
 
     LaunchedEffect(verdict) {
         if (verdict != null) {
@@ -98,7 +93,6 @@ fun GameScreen(
     ) {
         GameTopBar(
             levelId = level.id,
-            coins = state.coins,
             foundCount = state.foundWords.size,
             totalCount = state.totalWords,
             onBack = onBack
@@ -128,10 +122,10 @@ fun GameScreen(
         ) {
             ActionButton(
                 icon = Icons.Filled.Lightbulb,
-                label = "সংকেত ${BanglaText.digits(GameRepository.HINT_COST)}",
+                label = "সংকেত",
                 enabled = !state.completed
             ) {
-                if (state.coins < GameRepository.HINT_COST) noCoins = true else onHint()
+                onHint()
             }
             Spacer(Modifier.width(10.dp))
             ActionButton(icon = Icons.Filled.Refresh, label = "এলোমেলো", enabled = true) {
@@ -158,7 +152,6 @@ fun GameScreen(
     if (showComplete) {
         LevelCompleteDialog(
             levelId = level.id,
-            coins = state.coins,
             hasNext = level.id < Levels.count,
             onNext = {
                 showComplete = false
@@ -175,29 +168,11 @@ fun GameScreen(
         )
     }
 
-    if (noCoins) {
-        AlertDialog(
-            onDismissRequest = { noCoins = false },
-            containerColor = MidIndigo,
-            title = { Text("যথেষ্ট কয়েন নেই", color = Marigold, fontWeight = FontWeight.Bold) },
-            text = {
-                Text(
-                    "সংকেতের জন্য ${BanglaText.digits(GameRepository.HINT_COST)} কয়েন লাগে। " +
-                        "শব্দ খুঁজে কয়েন জমাও।",
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = { noCoins = false }) { Text("ঠিক আছে", color = Marigold) }
-            }
-        )
-    }
 }
 
 @Composable
 private fun GameTopBar(
     levelId: Int,
-    coins: Int,
     foundCount: Int,
     totalCount: Int,
     onBack: () -> Unit
@@ -233,32 +208,6 @@ private fun GameTopBar(
             )
         }
 
-        CoinPill(coins)
-    }
-}
-
-@Composable
-fun CoinPill(coins: Int, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier
-            .clip(RoundedCornerShape(50))
-            .background(MidIndigo)
-            .padding(horizontal = 14.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(16.dp)
-                .clip(CircleShape)
-                .background(Marigold)
-        )
-        Spacer(Modifier.width(8.dp))
-        Text(
-            text = BanglaText.digits(coins),
-            color = Marigold,
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp
-        )
     }
 }
 
@@ -292,7 +241,6 @@ private fun ActionButton(
 @Composable
 private fun LevelCompleteDialog(
     levelId: Int,
-    coins: Int,
     hasNext: Boolean,
     onNext: () -> Unit,
     onReplay: () -> Unit,
@@ -310,7 +258,7 @@ private fun LevelCompleteDialog(
         },
         text = {
             Text(
-                text = "সব শব্দ খুঁজে পেয়েছ। এখন তোমার কয়েন ${BanglaText.digits(coins)}।",
+                text = "সব শব্দ খুঁজে পেয়েছ।",
                 color = MaterialTheme.colorScheme.onSurface
             )
         },

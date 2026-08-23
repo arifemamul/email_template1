@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.bangla.shobdojot.data.GameRepository
 import com.bangla.shobdojot.data.Levels
-import com.bangla.shobdojot.logic.BanglaText
 import com.bangla.shobdojot.logic.CrosswordGenerator
 import com.bangla.shobdojot.model.GridPos
 import com.bangla.shobdojot.model.Level
@@ -31,7 +30,6 @@ data class GameUiState(
     val wheelLetters: List<String> = emptyList(),
     val foundWords: Set<String> = emptySet(),
     val hintedCells: Set<GridPos> = emptySet(),
-    val coins: Int = 0,
     val unlockedLevel: Int = 1,
     val completed: Boolean = false
 ) {
@@ -53,7 +51,7 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     private val repo = GameRepository(application)
 
     private val _state = MutableStateFlow(
-        GameUiState(coins = repo.coins, unlockedLevel = repo.unlockedLevel)
+        GameUiState(unlockedLevel = repo.unlockedLevel)
     )
     val state: StateFlow<GameUiState> = _state.asStateFlow()
 
@@ -70,7 +68,6 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             wheelLetters = level.letters,
             foundWords = found,
             hintedCells = repo.hintedCells(levelId).filter { it in puzzle.cellLetters }.toSet(),
-            coins = repo.coins,
             unlockedLevel = repo.unlockedLevel,
             completed = found.size == level.words.size
         )
@@ -89,18 +86,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         if (result != WordResult.CORRECT) return result
 
         val found = _state.value.foundWords + word
-        val reward = BanglaText.length(word) * GameRepository.COINS_PER_AKSHARA
         val justCompleted = found.size == level.words.size
-        val coins = repo.coins + reward + if (justCompleted) GameRepository.LEVEL_BONUS else 0
 
-        repo.coins = coins
         repo.saveFoundWords(level.id, found)
         if (justCompleted) repo.markCompleted(level.id)
 
         _state.update {
             it.copy(
                 foundWords = found,
-                coins = coins,
                 completed = justCompleted,
                 unlockedLevel = repo.unlockedLevel
             )
@@ -108,12 +101,14 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
         return WordResult.CORRECT
     }
 
-    /** Buys one letter: reveals a cell from a word the player has not solved yet. */
+    /**
+     * Reveals one letter from a word the player has not solved yet. Free, and as many times as
+     * they like: there is no score in this game, so there is nothing for a hint to cost.
+     */
     fun useHint(): Boolean {
         val current = _state.value
         val level = current.level ?: return false
         val puzzle = current.puzzle ?: return false
-        if (current.coins < GameRepository.HINT_COST) return false
 
         val revealed = current.revealedCells
         val target = puzzle.words
@@ -122,12 +117,10 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
             .firstOrNull { it !in revealed }
             ?: return false
 
-        val coins = repo.coins - GameRepository.HINT_COST
         val hinted = current.hintedCells + target
-        repo.coins = coins
         repo.saveHintedCells(level.id, hinted)
 
-        _state.update { it.copy(coins = coins, hintedCells = hinted) }
+        _state.update { it.copy(hintedCells = hinted) }
         return true
     }
 
@@ -148,6 +141,6 @@ class GameViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun refreshProgress() {
-        _state.update { it.copy(coins = repo.coins, unlockedLevel = repo.unlockedLevel) }
+        _state.update { it.copy(unlockedLevel = repo.unlockedLevel) }
     }
 }

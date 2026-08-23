@@ -6,17 +6,13 @@ import com.bangla.shobdojot.model.GridPos
 
 /**
  * Player progress, kept in SharedPreferences. Small enough that a key/value store is the
- * right tool - coins, how far the player has unlocked, and per-level progress so leaving
+ * right tool - how far the player has unlocked, and per-level progress so leaving
  * a half-solved board and coming back does not throw the work away.
  */
 class GameRepository(context: Context) {
 
     private val prefs: SharedPreferences =
         context.getSharedPreferences("shobdojot", Context.MODE_PRIVATE)
-
-    var coins: Int
-        get() = prefs.getInt(KEY_COINS, STARTING_COINS)
-        set(value) = prefs.edit().putInt(KEY_COINS, value.coerceAtLeast(0)).apply()
 
     /** Highest level the player may open; levels above this stay locked. */
     var unlockedLevel: Int
@@ -68,11 +64,6 @@ class GameRepository(context: Context) {
     private fun hintKey(levelId: Int) = "hints_$levelId"
 
     companion object {
-        const val STARTING_COINS = 120
-        const val HINT_COST = 25
-        const val COINS_PER_AKSHARA = 5
-        const val LEVEL_BONUS = 30
-        private const val KEY_COINS = "coins"
         private const val KEY_UNLOCKED = "unlocked"
     }
 }

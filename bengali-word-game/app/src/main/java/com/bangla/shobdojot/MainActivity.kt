@@ -63,7 +63,6 @@ private fun ShobdoJotApp(viewModel: GameViewModel = viewModel()) {
 
     when {
         playingLevel == null -> HomeScreen(
-            coins = state.coins,
             unlockedLevel = state.unlockedLevel,
             isCompleted = viewModel::isCompleted,
             onPlayLevel = { playingLevel = it }

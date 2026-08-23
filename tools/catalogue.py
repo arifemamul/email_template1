@@ -465,8 +465,8 @@ def ordered_levels():
             level['score'] = difficulty(level['tiles'], grown)
         claimed |= set(grown)
 
-    # Then walk the syllabus in order, which is what decides who is teaching what and which
-    # words are old enough to be worth coins.
+    # Then walk the syllabus in order, which is what decides which level is teaching what and
+    # holds the no-repeat rule to account.
     played, taught, out = set(), set(), []
     for level in levels:
         unlisted = [w for w in level['words'] if w in played and w not in SHARED]

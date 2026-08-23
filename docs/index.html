@@ -365,21 +365,6 @@
     color: color-mix(in srgb, var(--parchment) 82%, var(--indigo-700));
   }
 
-  .coins {
-    display: flex; align-items: center; gap: 7px;
-    background: var(--indigo-700);
-    border-radius: 99px;
-    padding: 7px 13px;
-    font-family: var(--bn);
-    font-weight: 700;
-    color: var(--marigold);
-    font-variant-numeric: tabular-nums;
-  }
-  .coins .dot {
-    width: 14px; height: 14px; border-radius: 50%;
-    background: radial-gradient(circle at 32% 30%, #ffd66e, var(--marigold-d));
-  }
-
   /* board - height is assigned in JS, since how much a board needs depends on its rows */
   .board-area { flex: 0 0 auto; min-height: 0; display: grid; place-items: center; }
 
@@ -668,7 +653,7 @@
   .sound-btn[disabled] { opacity: .3; cursor: default; }
 
 
-  /* -- Animation layer: flying tiles, coins, confetti ----------------------- */
+  /* -- Animation layer: flying tiles and confetti ---------------------------- */
   #fx {
     position: absolute;
     inset: 0;
@@ -689,13 +674,8 @@
     will-change: transform, opacity;
   }
 
-  .fly.coin {
-    border-radius: 50%;
-    background: radial-gradient(circle at 32% 30%, #ffd66e, var(--marigold-d));
-  }
-
-  /* Confetti proper. Coins alone read as "money"; a child reads colour as "well done", so
-     the celebration throws paper in the five block colours as well. */
+  /* Confetti. A child reads colour as "well done", so the celebration throws paper in the
+     five block colours. */
   .fly.confetti {
     border-radius: 2px;
     background: var(--conf, var(--marigold));
@@ -731,12 +711,6 @@
     0%,100% { transform: translateY(0); }
     30%     { transform: translateY(-7px); }
     60%     { transform: translateY(2px); }
-  }
-
-  .coins.pulse { animation: coin-pulse .42s cubic-bezier(.2,1.6,.4,1); }
-  @keyframes coin-pulse {
-    0%,100% { transform: scale(1); }
-    45%     { transform: scale(1.14); }
   }
 
   .tile.reject { animation: tile-reject .36s ease; }
@@ -827,7 +801,6 @@
             <div class="sub" id="levelSub">০ / ৪ শব্দ</div>
           </div>
           <button class="icon-btn" id="next" title="পরের লেভেল" aria-label="Next level">›</button>
-          <div class="coins"><span class="dot"></span><span id="coinCount">১২০</span></div>
         </div>
 
         <div class="board-area"><div class="board" id="board"></div></div>
@@ -835,7 +808,7 @@
         <div class="preview" id="preview"></div>
 
         <div class="actions">
-          <button class="action" id="hint"><span class="glyph">◈</span><span class="bn">সংকেত ২৫</span></button>
+          <button class="action" id="hint"><span class="glyph">◈</span><span class="bn">সংকেত</span></button>
           <button class="action" id="shuffle"><span class="glyph">⟳</span><span class="bn">এলোমেলো</span></button>
           <button class="action sound-btn" id="sound" aria-pressed="true"
                   aria-label="উচ্চারণ" title="শব্দের উচ্চারণ">
@@ -882,10 +855,10 @@
         <ul class="how">
           <li><span class="k">drag</span><span>Press a letter and drag across the others. Sliding back onto the previous letter un-picks it.</span></li>
           <li><span class="k">click</span><span>Prefer clicking? Tap letters one at a time, then hit <b>✓</b> on the word - or press <b>Enter</b>. <b>Esc</b> clears.</span></li>
-          <li><span class="k">finish</span><span>Clearing a level moves straight to the next one - no button, no waiting. The coins and confetti play across the change.</span></li>
+          <li><span class="k">finish</span><span>Clearing a level moves straight to the next one - no button, no waiting. The confetti plays across the change.</span></li>
           <li><span class="k">&lsaquo; &rsaquo;</span><span>The arrows step to the previous or next level, and wrap around at either end. The level grid jumps straight to any level, and is coloured by stage of the syllabus. Any level you open starts blank, so an old one can always be played again.</span></li>
           <li><span class="k">sound</span><span>Every word is spoken as you find it. Bengali spelling hides the sound - ব and ভ, শ and ষ and স are each one sound but different letters - so hearing it is how it sticks. The control greys out on a device with no Bengali voice: silence beats an English voice reading Bengali.</span></li>
-          <li><span class="k">◈ 25</span><span>A hint reveals one letter from a word you haven't solved. Words pay 5 coins per letter, plus 30 for clearing the level.</span></li>
+          <li><span class="k">◈</span><span>A hint reveals one letter from a word you haven't solved. It is free and there is no limit - there is no score in this game, and nothing to spend.</span></li>
         </ul>
       </section>
 
@@ -1229,7 +1202,6 @@ const LEVELS = [
   { id: 104, letters: ["আ", "কা", "শ", "লো", "নৌ"], words: ["আকাশ", "কালো", "আলো", "নৌকা"], block: 5 }
 ];
 
-const HINT_COST = 25, PER_AKSHARA = 5, LEVEL_BONUS = 30;
 
 /* ============================================================================
    4. Game state
@@ -1259,7 +1231,6 @@ function migrateCompleted(saved) {
 const saved = store.read();
 const game = {
   index: 0,
-  coins: typeof saved.coins === "number" ? saved.coins : 120,
   found: saved.found || {},          // levelId -> [words] found on THIS attempt
   hints: saved.hints || {},          // levelId -> ["r,c"]
   // Levels ever fully solved. Separate from `found`, which is wiped each time a cleared level
@@ -1281,7 +1252,7 @@ const game = {
 };
 
 const persist = () => store.write({
-  coins: game.coins, found: game.found, hints: game.hints, completed: game.completed
+  found: game.found, hints: game.hints, completed: game.completed
 });
 
 const level = () => LEVELS[game.index];
@@ -1309,7 +1280,6 @@ const el = {
   wheelArea: document.querySelector(".wheel-area"),
   trail: document.getElementById("trail"),
   preview: document.getElementById("preview"),
-  coins: document.getElementById("coinCount"),
   levelSub: document.getElementById("levelSub"),
   levelGrid: document.getElementById("levelGrid"),
   hint: document.getElementById("hint"),
@@ -1474,7 +1444,6 @@ function loadLevel(i) {
 function drawHud() {
   const lv = level();
   el.levelSub.textContent = bn(foundSet().size) + " / " + bn(lv.words.length) + " শব্দ";
-  if (el.coins.textContent !== bn(game.coins)) el.coins.textContent = bn(game.coins);
   el.hint.disabled = isClear();
 }
 
@@ -1824,7 +1793,7 @@ const Speech = {
  * There used to be a card here: a five-second countdown over a panel listing every word from
  * the level to tap and hear. It was cut because the wait was the thing a player noticed, and
  * five seconds of nothing after a win is longer than it sounds when the win is what makes a
- * child want to keep going. The celebration - the coins, the confetti, the board glow - plays
+ * child want to keep going. The celebration - the confetti and the board glow - plays
  * across the change instead of holding it up, and any word can still be heard again from the
  * level list.
  */
@@ -1854,8 +1823,7 @@ function boxOf(node) {
 
 /**
  * Sends a thing from one place to another and cleans up after itself. Everything that moves
- * in this game moves through here: letters to the board, coins to the counter, confetti
- * across it.
+ * in this game moves through here: letters to the board, confetti across it.
  */
 function fly(from, to, { text = '', cls = '', size = null, delay = 0, duration = 460,
                          arc = 0, spin = 0, fade = false, colour = null,
@@ -1890,36 +1858,6 @@ function fly(from, to, { text = '', cls = '', size = null, delay = 0, duration =
 
   const run = el.animate(frames, { duration, delay, easing, fill: 'forwards' });
   return run.finished.then(() => el.remove()).catch(() => el.remove());
-}
-
-/** Counts the coin readout from one value to another, in Bengali digits. */
-function countCoins(from, to, duration = 520) {
-  const node = el.coins;
-  node.classList.remove('pulse');
-  void node.offsetWidth;
-  node.classList.add('pulse');
-  if (reduced() || from === to) { node.textContent = bn(to); return; }
-  const start = performance.now();
-  const step = now => {
-    const t = Math.min(1, (now - start) / duration);
-    const eased = 1 - Math.pow(1 - t, 3);
-    node.textContent = bn(Math.round(from + (to - from) * eased));
-    if (t < 1) requestAnimationFrame(step);
-  };
-  requestAnimationFrame(step);
-}
-
-/** A handful of coins tumbling to the counter. */
-function coinBurst(fromNode, count = 6) {
-  if (reduced()) return;
-  const from = boxOf(fromNode);
-  const to = boxOf(el.coins);
-  for (let i = 0; i < count; i++) {
-    fly({ x: from.x + from.w / 2 - 9, y: from.y + from.h / 2 - 9, w: 18, h: 18 }, to, {
-      cls: 'coin', size: 18, delay: i * 55, duration: 520 + i * 25,
-      arc: 26 + i * 8, spin: 180, fade: true
-    });
-  }
 }
 
 /** Letters leaving the wheel and landing in their cells. */
@@ -1975,7 +1913,7 @@ function rejectWheel() {
   });
 }
 
-/** Cells popping in sequence, then coins raining, when a level is cleared. */
+/** Cells popping in sequence, then confetti, when a level is cleared. */
 const CONFETTI_COLOURS = [
   'var(--block-1)', 'var(--block-2)', 'var(--block-3)', 'var(--block-4)', 'var(--block-5)',
   'var(--marigold)', 'var(--parchment)'
@@ -1997,16 +1935,6 @@ function celebrateLevel() {
   const layer = document.getElementById('fx');
   const width = layer.clientWidth;
   const floor = layer.clientHeight + 40;
-
-  // Coins for the reward, confetti for the feeling. Each piece drifts sideways as it falls
-  // rather than dropping on rails, which is the difference between paper and lifts.
-  for (let i = 0; i < 10; i++) {
-    const x = 10 + Math.random() * Math.max(10, width - 30);
-    fly({ x, y: -24, w: 16, h: 16 }, { x: x + (Math.random() - 0.5) * 60, y: floor, w: 16, h: 16 }, {
-      cls: 'coin', size: 16, delay: 150 + i * 80, duration: 1000 + Math.random() * 500,
-      spin: 360, fade: true
-    });
-  }
 
   for (let i = 0; i < 26; i++) {
     const x = Math.random() * Math.max(10, width - 12);
@@ -2081,10 +2009,7 @@ function submitWord() {
     done.add(word);
     game.found[lv.id] = [...done];
 
-    const reward = splitAksharas(word).length * PER_AKSHARA;
     const cleared = done.size === lv.words.length;
-    const before = game.coins;
-    game.coins += reward + (cleared ? LEVEL_BONUS : 0);
     if (cleared) game.completed[lv.id] = true;
     persist();
 
@@ -2094,8 +2019,6 @@ function submitWord() {
     const settle = placed ? flyLettersToBoard(word, placed.cells) : 0;
     setTimeout(() => {
       refreshBoard();
-      countCoins(before, game.coins);
-      coinBurst(el.board, Math.min(6, splitAksharas(word).length + 2));
       drawHud();
       drawLevelGrid();
     }, settle);
@@ -2200,10 +2123,6 @@ document.addEventListener("keydown", e => {
 
 /* controls */
 el.hint.addEventListener("click", () => {
-  if (game.coins < HINT_COST) {
-    showVerdict("কয়েন নেই", "wrong");
-    return;
-  }
   const lv = level();
   const done = foundSet();
   const shown = revealedCells();
@@ -2216,19 +2135,15 @@ el.hint.addEventListener("click", () => {
     if (target) break;
   }
   if (!target) return;
-  const before = game.coins;
-  game.coins -= HINT_COST;
   game.hints[lv.id] = [...hintSet(), target];
   persist();
   refreshBoard();
-  countCoins(before, game.coins);
   drawHud();
 
   const cell = el.board.querySelector(`[data-pos="${target}"]`);
   if (cell && !reduced()) {
     cell.classList.add('arrive');
     setTimeout(() => cell.classList.remove('arrive'), 460);
-    fly(boxOf(el.coins), boxOf(cell), { cls: 'coin', size: 18, duration: 420, arc: 20, fade: true });
   }
   el.hint.classList.remove('flash');
   void el.hint.offsetWidth;
