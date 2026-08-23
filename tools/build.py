@@ -31,6 +31,10 @@ from vocabulary import theme_of, words as pool_words                            
 REPO = pathlib.Path(__file__).resolve().parent.parent
 KOTLIN = REPO / 'bengali-word-game/app/src/main/java/com/bangla/shobdojot/data/Levels.kt'
 WEB = REPO / 'docs/index.html'
+# The same page with the document wrapper taken off, for hosts that supply their own
+# <!doctype>/<html>/<head>/<body> - claude.ai artifacts among them. Generated, never edited:
+# a hand-maintained copy of a 2000-line file goes stale the first time the original changes.
+LIVE = REPO / 'docs/live.html'
 
 KOTLIN_HEADER = '''package com.bangla.shobdojot.data
 
@@ -149,8 +153,54 @@ def write_builds(levels):
     before_web = html
     WEB.write_text(html[:start] + js_src + html[end:], encoding='utf-8')
 
+    before_live = LIVE.read_text(encoding='utf-8') if LIVE.exists() else ''
+    live_src = unwrap(WEB.read_text(encoding='utf-8'))
+    LIVE.write_text(live_src, encoding='utf-8')
+
     return (before_kt != kotlin_src,
-            before_web != WEB.read_text(encoding='utf-8'))
+            before_web != WEB.read_text(encoding='utf-8'),
+            before_live != live_src)
+
+
+def unwrap(html):
+    """The page's <title>, <style> and body, with the document wrapper removed.
+
+    An embedding host wraps what it is given in its own <!doctype>/<head>/<body>, so shipping
+    those tags a second time is at best ignored and at worst reparsed into something else. The
+    <title> is kept because it names the page wherever it is published; the rest of <head> is
+    metadata for a standalone URL - viewport, icons, Open Graph - which the host provides or
+    does not want.
+    """
+    lines = html.split('\n')
+
+    def only(pred, what):
+        hits = [i for i, l in enumerate(lines) if pred(l)]
+        if len(hits) != 1:
+            raise SystemExit(f'docs/index.html: expected exactly one {what}, found {len(hits)}')
+        return hits[0]
+
+    title = only(lambda l: l.startswith('<title>'), '<title> line')
+    style = only(lambda l: l.strip() == '<style>', '<style> line')
+    head_end = only(lambda l: l.strip() == '</head>', '</head> line')
+    body = only(lambda l: l.strip() == '<body>', '<body> line')
+    if body != head_end + 1:
+        raise SystemExit('docs/index.html: <body> is expected on the line after </head>')
+
+    end = len(lines)
+    while lines[end - 1].strip() in ('', '</html>', '</body>'):
+        end -= 1
+
+    # The artifact gallery shows the title as the page's name, where the standalone page's
+    # search-engine suffix reads as filler.
+    name = lines[title].replace(' - Bengali Word Puzzle', '')
+    out = '\n'.join([name] + lines[style:head_end] + lines[body + 1:end]) + '\n'
+
+    for tag in ('<!doctype', '<html', '<head>', '</head>', '<body>', '</body>', '</html>'):
+        if tag in out.lower():
+            raise SystemExit(f'docs/live.html: {tag} survived the unwrap')
+    if 'const LEVELS = [' not in out or '<style>' not in out:
+        raise SystemExit('docs/live.html: unwrap dropped something it should have kept')
+    return out
 
 
 def report(levels, failures):
@@ -418,10 +468,11 @@ def main(argv):
             report(levels, failures)
             print('\nrefusing to build with rejected levels')
             return 1
-        kt_changed, web_changed = write_builds(levels)
+        kt_changed, web_changed, live_changed = write_builds(levels)
         print(f'{len(levels)} levels written')
         print(f'  {KOTLIN.relative_to(REPO)}  {"updated" if kt_changed else "unchanged"}')
         print(f'  {WEB.relative_to(REPO)}  {"updated" if web_changed else "unchanged"}')
+        print(f'  {LIVE.relative_to(REPO)}  {"updated" if live_changed else "unchanged"}')
         print('\nnow run: cd bengali-word-game && ./gradlew test')
         return 0
 
