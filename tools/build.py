@@ -22,7 +22,7 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
 from bangla import conjunct_tiles, render, split_aksharas            # noqa: E402
-from catalogue import CATALOGUE, MAX_NEW_UNITS, ordered_levels        # noqa: E402
+from catalogue import CATALOGUE, MAX_NEW_UNITS, SHARED, ordered_levels        # noqa: E402
 from curriculum import (BLOCKS, NOT_TAUGHT, alphabet,                  # noqa: E402
                         unit_label)
 from vocabulary import theme_of                                       # noqa: E402
@@ -172,13 +172,34 @@ def report(levels, failures):
         for unit in missing:
             print(f'    {unit_label(unit)}')
 
-    # The chest depends on tile sets spelling more words than the board uses, and a syllabus
-    # that keeps early boards to three tiles cannot do that - three tiles spell three words.
-    # Worth printing rather than discovering later: the mechanic needs to stop asking for an
-    # unlisted word from *these* tiles and start asking for a word from an earlier level.
+    # No word set as a puzzle twice. `ordered_levels` rejects any level that breaks it outside
+    # the documented list, so this is a count of what the documented list is actually covering
+    # rather than a check - it is here so the number cannot grow unnoticed.
+    seen, borrowed = {}, []
+    for i, level in enumerate(levels, 1):
+        for w in level['words']:
+            if w in seen:
+                borrowed.append((i, w, seen[w]))
+            else:
+                seen[w] = i
+    slots = sum(len(l['words']) for l in levels)
+    print(f'\nno repeats: {len(seen)} distinct words across {slots} board slots, '
+          f'{len(borrowed)} borrowed by {len({i for i, _, _ in borrowed})} levels')
+    for i, word, first in borrowed:
+        print(f'  level {i:<3} borrows {word} from level {first}: {SHARED[word]}')
+
+    # What feeds the chest. Since no board repeats a word, the words a wheel can spell that its
+    # own board does not use are what is left - and the best of those are words the player
+    # already solved, which is what turns the chest into spaced review.
     fed = [l for l in levels if l['extras']]
+    played, reviewing = set(), 0
+    for level in levels:
+        if any(w in played for w in level['extras']):
+            reviewing += 1
+        played |= set(level['words'])
     print(f'\nchest: {len(fed)} of {len(levels)} levels can feed it, '
-          f'{sum(len(l["extras"]) for l in levels)} extra words in total')
+          f'{sum(len(l["extras"]) for l in levels)} extra words in total; '
+          f'{reviewing} of them offer a word from an earlier level')
 
     # A level that introduces a pile of new material at once is a lecture, not a lesson. The
     # ordering is greedy, so it can be forced into a jump when a block runs short of gentle

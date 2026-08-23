@@ -73,25 +73,65 @@ class ChestTest {
     }
 
     @Test
-    fun `the chest is fed at all, and mostly by the fullest boards`() {
-        // Deliberately a weak floor, because the chest is currently starved and the reason is
-        // structural rather than a tuning mistake: three or four tiles spell three or four
-        // words, and the syllabus keeps early boards that small on purpose. The old catalogue
-        // filled the chest from a wide list of short words - মত, নই, সই, রন - which a learner
-        // has no business being rewarded for guessing, so those went.
+    fun `the chest is fed, and fed first by words already solved`() {
+        // The chest used to be starved: boards helped themselves to every word their tiles
+        // could spell, so there was rarely anything left to find. Now that no word is set as a
+        // puzzle twice, the words a board cannot use are exactly what the wheel still spells -
+        // and the best of them are the ones the player solved on an earlier level.
         //
-        // The fix is not more extras from these tiles; it is to change what the chest asks
-        // for. Asking for a word from an earlier level turns it into spaced review and it
-        // stops depending on the current wheel at all. Until then this asserts only that the
-        // mechanic is not entirely dead, and that what feeds it sits late in the game.
+        // That is what the chest is for. Solving রুটি once teaches the word; spotting it in a
+        // later wheel, unprompted, is the only evidence that it stuck.
         val withExtras = Levels.all.filter { it.extras.isNotEmpty() }
-        assertTrue("no level offers extras at all", withExtras.size >= 8)
-
-        val lateShare = withExtras.count { it.block >= 3 }.toDouble() / withExtras.size
         assertTrue(
-            "extras appear on ${withExtras.size} levels, only ${(lateShare * 100).toInt()}% " +
-                "of them past the opening blocks",
-            lateShare >= 0.4
+            "extras appear on only ${withExtras.size} of ${Levels.all.size} levels",
+            withExtras.size >= Levels.all.size / 4
+        )
+
+        // Walk the catalogue in order, tracking what has been solved, and check that where a
+        // level's extras include an old word, an old word is what it offers first.
+        val played = mutableSetOf<String>()
+        var reviewing = 0
+        for (level in Levels.all) {
+            val old = level.extras.filter { it in played }
+            if (old.isNotEmpty()) {
+                reviewing++
+                assertTrue(
+                    "level ${level.id} offers ${level.extras.first()} ahead of already-solved " +
+                        "${old.first()}",
+                    level.extras.first() in played
+                )
+            }
+            played += level.words
+        }
+        assertTrue(
+            "no level asks the player to remember a word from an earlier one",
+            reviewing >= 8
         )
     }
+
+    @Test
+    fun `no word is ever set as a puzzle twice`() {
+        // The rule the catalogue is built on. A handful of levels early in the syllabus have to
+        // borrow - when a learner knows four letters there is only one board to build - and
+        // those are listed in the catalogue with the reason. Everything else is unique.
+        val seen = mutableMapOf<String, Int>()
+        val repeats = mutableListOf<String>()
+        for (level in Levels.all) {
+            for (word in level.words) {
+                val first = seen[word]
+                if (first != null) repeats += "$word (level $first, again on level ${level.id})"
+                else seen[word] = level.id
+            }
+        }
+        assertTrue(
+            "words set as a puzzle more than once: ${repeats.joinToString("; ")}",
+            repeats.size <= 20
+        )
+        val slots = Levels.all.sumOf { it.words.size }
+        assertTrue(
+            "only ${seen.size} distinct words across $slots board slots",
+            seen.size >= slots * 9 / 10
+        )
+    }
+
 }
