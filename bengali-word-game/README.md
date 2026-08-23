@@ -3,6 +3,13 @@
 A Bengali word-cross puzzle game for Android. Letters sit on a wheel; drag across them to
 spell a word, and every word you find fills itself into the crossword above.
 
+> **This app is parked, and its screens are behind the web build on purpose.** The design is
+> still being worked out in [`../docs/index.html`](../docs/index.html), and the Compose UI here
+> will be brought up to it in one pass once that is settled - so do not read `ui/` as the
+> current design. What *is* current is the level data: `data/Levels.kt` is generated from
+> `../tools/catalogue.py` and regenerated on every build, and the logic layer (`logic/`) is
+> covered by the unit tests under `src/test/`.
+
 Native Android, Kotlin + Jetpack Compose, no third-party game engine, no network access,
 no ads, no analytics. Progress lives in SharedPreferences on the device.
 

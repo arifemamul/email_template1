@@ -10,27 +10,33 @@ Android and web games.
 A level is written as a word list. The wheel is derived from it (the union of the words'
 aksharas), which is what guarantees every tile is usable.
 
-Levels are grouped into the five blocks of `curriculum.py`, and that grouping is the primary
-ordering: a learner meets plain letters, then one vowel sign at a time, then several signs
-together, then conjuncts, then everything mixed. Puzzle difficulty only decides the order
-*within* a block. Getting this the other way round - ranking purely by how hard a board is to
-solve - is what produced the earlier ordering, which handed out its first vowel sign in level
-6 without ever having introduced one, and whose first conjunct was a three-consonant cluster.
+The game here is an alphabet game: the order is the alphabet, one letter per level, and each
+level's board is the words that begin with that letter. `FULL_SYLLABUS` is False to say so.
 
-Only the first block is written here at the moment. The other four were removed while the way
-a level works is reworked, so the machinery below - blocks, budgets, board targets, the
-coverage report - is sized for a syllabus that is coming back rather than for the ten levels
-that are here now.
+It was previously a teaching syllabus, grouped into the five blocks of `curriculum.py` - plain
+letters, then one vowel sign at a time, then several signs together, then conjuncts, then
+everything mixed - with puzzle difficulty deciding the order only *within* a block. That
+syllabus was removed, but the machinery for it is still here: blocks, budgets, board targets,
+the coverage report, and the checks and tests that are gated behind `FULL_SYLLABUS`. Each
+level still declares which block its words belong to, and that claim is still checked; it just
+no longer decides where the level sits. Set `FULL_SYLLABUS` back to True and the whole set of
+syllabus checks re-arms.
+
+Keeping it costs nothing and the reasoning behind it was expensive: ranking levels purely by
+how hard a board is to solve is what produced an ordering that handed out its first vowel sign
+in level 6 without ever introducing one, and whose first conjunct was a three-consonant
+cluster.
 
 Words come from `vocabulary.py`, which is curated for a child. Corpus frequency is still the
 floor that rejects invented compounds, but it is no longer the selector: rank by frequency
 alone and the game fills with প্রতিষ্ঠান and রাষ্ট্রপতি, which are common in newspapers and
 useless to a seven-year-old.
 
-No word is set as a puzzle twice. An earlier catalogue leaned on a handful of easy words -
-কলম, বল, কল, সব - and reused them across a dozen tile sets, so a learner spent a good part of
-the game re-spelling words they already knew. Four levels here have to borrow anyway - see
-`SHARED` - because a learner who knows three letters has exactly one board available to them.
+No word is set as a puzzle twice, and that is enforced: 181 words across 181 board slots. An
+earlier catalogue leaned on a handful of easy words - কলম, বল, কল, সব - and reused them across
+a dozen tile sets, so a learner spent a good part of the game re-spelling words they already
+knew. `SHARED` is the list of deliberate exceptions and is currently empty; a level borrowing
+without being listed there fails the check, and so does an entry no level actually borrows.
 """
 from bangla import (conjunct_tiles, grid_size, layout, split_aksharas, spellable,
                     stray_runs, tiles_for)
