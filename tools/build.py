@@ -15,6 +15,7 @@ Level pipeline CLI.
 Kotlin tests (`cd bengali-word-game && ./gradlew test`) - they re-verify the same invariants
 against the app's own generator rather than this Python mirror of it.
 """
+import itertools
 import pathlib
 import re
 import sys
@@ -201,6 +202,41 @@ def unwrap(html):
     if 'const LEVELS = [' not in out or '<style>' not in out:
         raise SystemExit('docs/live.html: unwrap dropped something it should have kept')
     return out
+
+
+def ring_run(order, word):
+    """Does `word` sit in an unbroken run around the ring, in the order it is spelled?
+
+    Mirrors `ringRun` in the page: a run may wrap past the last tile, and it counts in either
+    direction, because a ring is read both ways.
+    """
+    n = len(order)
+    at = {a: i for i, a in enumerate(order)}
+    spots = [at.get(a) for a in split_aksharas(word)]
+    if any(s is None for s in spots) or len(spots) < 2:
+        return False
+    step = lambda i: ((spots[i + 1] - spots[i]) + n) % n
+    ahead = all(step(i) == 1 for i in range(len(spots) - 1))
+    behind = all(step(i) == n - 1 for i in range(len(spots) - 1))
+    return ahead or behind
+
+
+def ring_can_hide(tiles, words):
+    """Is there any wheel arrangement that spells out none of the words of 3 or more letters?
+
+    Two-letter words are exempt: they need two tiles side by side, a ring of n tiles has n
+    neighbouring pairs, and a board of n two-letter words needs all of them - something has to
+    touch. Rotations of the same ring are the same wheel, so one tile is held fixed.
+    """
+    longs = [w for w in words if len(split_aksharas(w)) >= 3]
+    if not longs or len(tiles) < 3:
+        return True
+    first, rest = tiles[0], tiles[1:]
+    for perm in itertools.permutations(rest):
+        order = [first] + list(perm)
+        if not any(ring_run(order, w) for w in longs):
+            return True
+    return False
 
 
 def report(levels, failures):
@@ -459,6 +495,22 @@ def main(argv):
         if stale:
             print(f'\ncheck FAILED: SHARED lists {len(stale)} words no level borrows: '
                   f'{" ".join(stale)}')
+            return 1
+
+        # The wheel is scrambled so that no answer is spelled out in sequence around the ring.
+        # That only works if some arrangement exists that hides every word, and on a small
+        # wheel one may not. Caught a real one: a four-tile ক level - কমল কলম কমলা কলা কম কল -
+        # where a four-tile ring has just six possible arrangements and every single one laid
+        # one of those words out in ring order. The answer was drawn on the wheel and no
+        # amount of scrambling could have hidden it.
+        undrawable = []
+        for i, level in enumerate(levels, 1):
+            if not ring_can_hide(level['tiles'], level['words']):
+                undrawable.append(f"level {i} ({level.get('letters', '?')}) on "
+                                  f"{len(level['tiles'])} tiles")
+        if undrawable:
+            print('\ncheck FAILED: no wheel arrangement hides every answer on '
+                  + '; '.join(undrawable))
             return 1
         print('check ok')
         return 0

@@ -79,58 +79,61 @@ from wordpool import zipf
 
 SYLLABUS = [
     # -- the vowels that start words; paired up where one letter cannot carry a board ----
-    ("অআ", BLOCK_ONE_KAR,  ["আজ", "আনারস", "অজগর", "আনা", "রস"]),
+    ("অআ", BLOCK_ONE_KAR, ["আনারস", "অলস", "আনা", "আসল", "রস"]),
     ("ইউ", BLOCK_CONJUNCT, ["উট", "ইঁদুর", "উত্তর", "দুই"]),
     ("ঈ",  BLOCK_CONJUNCT, ["ঈগল", "ঈদ", "লম্বা", "রোদ", "ব্যাগ"]),
-    ("ঊ",  BLOCK_KARS,     ["ঊনিশ", "ঊষা", "নাশতা", "তারা", "রানি"]),
+    ("ঊ",  BLOCK_KARS,   ["ঊনিশ", "ঊষা", "নাশতা", "তারা", "রানি"]),
     ("ঋ",  BLOCK_CONJUNCT, ["ঋণ", "ঋতু", "সেতু", "দক্ষিণ", "চাঁদ"]),
-    ("এও", BLOCK_KARS,     ["এক", "ওজন", "কঠিন", "জন", "ওঠা"]),
+    ("এও", BLOCK_KARS,   ["এক", "ওজন", "কঠিন", "জন", "ওঠা"]),
 
     # -- then the consonants, one at a time, in alphabet order ---------------------------
-    ("ক",  BLOCK_KARS,     ["কলম", "কবুতর", "কমলা", "কমল", "কম", "কর", "কল", "কলা"]),
-    ("খ",  BLOCK_KARS,     ["খালা", "খাবার", "খেলা", "খবর", "বলা"]),
-    ("গ",  BLOCK_ONE_KAR,  ["গরম", "গাছ", "গাজর", "গম", "নগর", "গান"]),
-    ("ঘ",  BLOCK_CONJUNCT, ["ঘরবাড়ি", "ঘর", "ঘণ্টা", "ঘড়ি", "ঘট", "বাঘ", "ঘাট", "বাড়ি"]),
+    # Six tiles rather than four. A four-tile ring has only six possible arrangements, and
+    # every one of them spelled one of these words out in sequence around the wheel - the
+    # answer was drawn on the wheel and no scramble could hide it. See the ring check.
+    ("ক",  BLOCK_KARS,     ["কলম", "কফি", "কমলা", "কমল", "কলা", "কলসি", "কম", "কল"]),
+    ("খ",  BLOCK_KARS,   ["খালা", "খাবার", "খেলা", "খবর", "বলা"]),
+    ("গ",  BLOCK_ONE_KAR, ["গাজর", "গরম", "গাল", "গম", "জল"]),
+    ("ঘ",  BLOCK_KARS,   ["ঘড়ি", "ঘট", "ঘরবাড়ি", "ঘাট", "ঘর"]),
     # ঙ begins no word
-    ("চ",  BLOCK_KARS,     ["চুল", "চালক", "চামচ", "চক", "কচু", "চমক"]),
+    ("চ",  BLOCK_CONJUNCT, ["চিল", "চুল", "চিঠি", "চিঠিপত্র", "চুপ"]),
     # ছ used to run to four ছা- words, held together by ঈগল and ঈদ as bridges. Those two are
     # the whole of word-initial ঈ, so ঈ could have a level or ছ could keep four of its own,
     # not both. ঈ took them; without them no board with more than two ছ words lays out.
-    ("ছ",  BLOCK_ONE_KAR,  ["ছাগল", "ছাতা", "রাখাল", "খাল", "করা", "লতা"]),
-    ("জ",  BLOCK_KARS,     ["জাহাজ", "জামা", "জগত", "হাত", "হাতি"]),
-    ("ঝ",  BLOCK_KARS,     ["ঝড়", "ঝলক", "ঝাল", "কবিতা", "বিল"]),
+    ("ছ",  BLOCK_ONE_KAR, ["ছাগল", "ছাতা", "রাখাল", "খাল", "করা", "লতা"]),
+    ("জ",  BLOCK_KARS,   ["জাহাজ", "জামা", "জগত", "হাত", "হাতি"]),
+    ("ঝ",  BLOCK_KARS,   ["ঝড়", "ঝলক", "ঝাল", "কবিতা", "বিল"]),
     # ঞ begins no word
-    ("ট",  BLOCK_KARS,     ["টিকিট", "টমেটো", "টিয়া", "মেয়ে"]),
-    ("ঠ",  BLOCK_KARS,     ["ঠিকানা", "ঠিক", "বৈঠক", "শোনা"]),
-    ("ড",  BLOCK_KARS,     ["ডিম", "ডালিম", "ডাল", "বিড়াল"]),
-    ("ঢ",  BLOCK_KARS,     ["ঢোল", "ঢাল", "ঢোকা", "ঢালা", "বাংলা"]),
+    ("ট",  BLOCK_KARS,   ["টিকিট", "টমেটো", "টিয়া", "মেয়ে"]),
+    ("ঠ",  BLOCK_KARS,   ["ঠিকানা", "ঠিক", "বৈঠক", "শোনা"]),
+    ("ড",  BLOCK_KARS,   ["ডিম", "ডালিম", "ডাল", "বিড়াল"]),
+    ("ঢ",  BLOCK_KARS,   ["ঢোল", "ঢাল", "ঢোকা", "ঢালা", "বাংলা"]),
     # ণ begins no word
-    ("ত",  BLOCK_KARS,     ["তৈরি", "তরকারি", "তরল", "তেল", "কাল"]),
-    ("থ",  BLOCK_ONE_KAR,  ["থাকা", "থালা", "পাঠশালা", "মাঠ"]),
-    ("দ",  BLOCK_KARS,     ["দিনরাত", "দুধভাত", "দিন", "দুধ", "রাত", "ভাত"]),
-    ("ধ",  BLOCK_KARS,     ["ধরা", "ধনী", "পায়রা", "ধোপা"]),
-    ("ন",  BLOCK_CONJUNCT, ["নয়", "নম্বর", "নজর", "নকল", "নল", "কম্বল", "জল"]),
+    ("ত",  BLOCK_KARS,   ["তোয়ালে", "তোলা", "তালা", "লেখা", "খাতা"]),
+    ("থ",  BLOCK_ONE_KAR, ["থাকা", "থালা", "পাঠশালা", "মাঠ"]),
+    ("দ",  BLOCK_KARS,   ["দিনরাত", "দুধভাত", "দুধ", "দিন", "ভাত"]),
+    ("ধ",  BLOCK_KARS,   ["ধরা", "ধনী", "পায়রা", "ধোপা"]),
+    ("ন",  BLOCK_PLAIN,  ["নগদ", "নরম", "নজর", "নগর", "দম"]),
 
     # -- প onwards ----------------------------------------------------------------------
-    ("প",  BLOCK_CONJUNCT, ["পেন্সিল", "পলক", "পটল", "পেট", "টক"]),
-    ("ফ",  BLOCK_KARS,     ["ফড়িং", "ফসল", "ফলক", "ফল", "ফুল", "সফল", "কফি"]),
-    ("ব",  BLOCK_CONJUNCT, ["বন", "বর্ষাকাল", "বিমান", "বিকাল", "বল", "বর্ষা", "কান"]),
-    ("ভ",  BLOCK_KARS,     ["ভাই", "ভাষা", "কড়াই", "ভালুক", "ভাঙা"]),
-    ("ম",  BLOCK_KARS,     ["মধু", "মৌসুম", "মৌমাছি", "মাছি", "মাসি"]),
+    ("প",  BLOCK_CONJUNCT, ["পেন্সিল", "পেট", "পলক", "পটল", "টক"]),
+    ("ফ",  BLOCK_KARS,   ["ফুল", "ফল", "ফলক", "ফড়িং", "ফসল"]),
+    ("ব",  BLOCK_ONE_KAR, ["বন", "বস", "বাস", "বাসন", "সব"]),
+    ("ভ",  BLOCK_KARS,   ["ভাই", "ভাষা", "কড়াই", "ভালুক", "ভাঙা"]),
+    ("ম",  BLOCK_KARS,   ["মাখন", "মৌমাছি", "মাছি", "মুখ", "নখ"]),
     ("য",  BLOCK_CONJUNCT, ["যন্ত্র", "যত", "গণিত", "বগল", "যব"]),
-    ("র",  BLOCK_CONJUNCT, ["রঙ", "রান্নাঘর", "রাবার", "রান্না", "রথ"]),
-    ("ল",  BLOCK_KARS,     ["লাঠি", "লাল", "বদল", "দল", "লবণ", "নদ"]),
-    ("শ",  BLOCK_KARS,     ["শিয়াল", "শীতকাল", "শীতল", "শিশু", "শীত"]),
+    ("র",  BLOCK_CONJUNCT, ["রতন", "রান্নাঘর", "রাত", "রান্না", "ঘন"]),
+    ("ল",  BLOCK_KARS,   ["লাঠি", "লাল", "বদল", "দল", "লবণ", "নদ"]),
+    ("শ",  BLOCK_KARS,   ["শীত", "শীতকাল", "শীতল", "হালকা", "তরল"]),
     # ষ and স share a level for the same reason the vowels do: ষাঁড় and ষোল are the only two
     # words in the pool that begin with ষ, and they share no letter with each other or with
     # ষষ্ঠ, so no board can be built from them alone. Word-initial ষ is rare in Bengali - it
     # lives inside words, in clusters like ষ্ট and ষ্ঠ.
-    ("ষস", BLOCK_KARS,     ["ষাঁড়", "ষোল", "সকল", "সড়ক", "কলস", "সকাল"]),
+    ("ষস", BLOCK_ONE_KAR, ["সড়ক", "সফল", "ষাঁড়", "সকাল", "সকল"]),
     # হ, the last letter, and the smallest board in the game. Four is the ceiling: every pair of
     # হ words in the pool was tried as an anchor and nothing bigger will lay out. The হ words
     # fall into four groups by their first akshara - হ, হা, হাঁ, হৃ - and only two words from any
     # one group can cross at the akshara they share.
-    ("হ",  BLOCK_KARS,     ["হাসি", "হাতঘড়ি", "হাঁড়ি", "হাঁস"]),
+    ("হ",  BLOCK_KARS,   ["হাসি", "হাতঘড়ি", "হাঁড়ি", "হাঁস"]),
     # ড়, ঢ় and য় begin no Bengali word, so there is nothing after this.
 ]
 
