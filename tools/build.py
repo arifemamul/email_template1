@@ -196,21 +196,18 @@ def report(levels, failures):
               f'syllabus (catalogue.FULL_SYLLABUS),\n  so this is what is not written yet '
               f'rather than a gap in something that claims to be finished.')
 
-    # Which letter each level is about. Not declared anywhere - it is whichever letter the most
-    # words on the board begin with - so this is a reading of the catalogue rather than a
-    # restatement of it, and a level that is not really about a letter shows up as a count of 1.
+    # Each level is named after a letter, and the board has to be about that letter: more of
+    # its words start with it than with any other single letter. Both halves are worth printing
+    # - the words that carry the letter, and the ones that are only there to hold the crossword
+    # together, since a board of nothing but same-letter words often will not lay out at all.
     print('\nalphabet levels:')
     for i, level in enumerate(levels, 1):
-        firsts = {}
-        for w in level['words']:
-            head = split_aksharas(w)[0]
-            # the letter, without whatever vowel sign or nasal mark is hanging off it
-            letter = head[0]
-            firsts.setdefault(letter, []).append(w)
-        letter, words = max(firsts.items(), key=lambda kv: (len(kv[1]), -len(kv[0])))
-        others = sum(1 for w in level['words'] if w not in words)
-        print(f'  level {i:<3} {letter}  {len(words)} of {len(level["words"])} words '
-              f'({" ".join(words)})' + (f'  +{others} to hold the board together' if others else ''))
+        letters = level.get('letters', '')
+        own = [w for w in level['words']
+               if any(split_aksharas(w)[0].startswith(x) for x in letters)]
+        rest = [w for w in level['words'] if w not in own]
+        print(f'  level {i:<3} {letters:3} {len(own)} of {len(level["words"])} words '
+              f'({" ".join(own)})' + (f'  + {" ".join(rest)}' if rest else ''))
 
     # No word set as a puzzle twice. `ordered_levels` rejects any level that breaks it outside
     # the documented list, so this is a count of what the documented list is actually covering
@@ -359,16 +356,31 @@ def main(argv):
         if len(levels) != len(CATALOGUE):
             print('\ncheck FAILED: lost levels between catalogue and output')
             return 1
-        thin = []
+        # The letter a level declares has to be the letter it is about. Caught a real one:
+        # a level named ধ whose board was থাকা থালা পাঠশালা পানি পাঠ - two থ words and three
+        # প ones, which is a প level, and it would have taken three words প's own level needs.
+        wrong = []
         for i, level in enumerate(levels, 1):
-            firsts = {}
+            letters = level.get('letters', '')
+            if not letters:
+                wrong.append(f'level {i} declares no letter')
+                continue
+            own = sum(1 for w in level['words']
+                      if any(split_aksharas(w)[0].startswith(x) for x in letters))
+            others = {}
             for w in level['words']:
-                firsts.setdefault(split_aksharas(w)[0][0], []).append(w)
-            if max(len(v) for v in firsts.values()) < 2:
-                thin.append(i)
-        if thin and not FULL_SYLLABUS:
-            print(f'\ncheck FAILED: {len(thin)} levels are not about a letter - no two words '
-                  f'share a first letter: {" ".join(map(str, thin))}')
+                if any(split_aksharas(w)[0].startswith(x) for x in letters):
+                    continue
+                head = split_aksharas(w)[0][0]
+                others[head] = others.get(head, 0) + 1
+            if own < 2:
+                wrong.append(f'level {i} ({letters}) has {own} word starting with it')
+            elif others and max(others.values()) >= own:
+                loud = max(others, key=lambda k: others[k])
+                wrong.append(f'level {i} ({letters}) has {own} words to {loud}\'s '
+                             f'{others[loud]} - it is a {loud} level')
+        if wrong and not FULL_SYLLABUS:
+            print('\ncheck FAILED: ' + '; '.join(wrong))
             return 1
 
         needed = set()

@@ -25,15 +25,20 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 
 ## Gameplay
 
-- **An alphabet game, ten letters in.** Each level is a letter, and its board is the words that
-  begin with it: ক is কলম কবুতর কমলা কমল কম কর কল কলা, eight words and every one of them ক. The
-  alphabet starts with vowels so those come first, two to a level - অ আ, ই উ, এ ও - because ঊ, এ
-  and ঐ have a single pool word each and cannot carry a level alone. Then the consonants one at
-  a time: ক খ গ ঘ চ ছ জ. ঙ and ঞ are skipped; no Bengali word begins with either.
+- **An alphabet game, twenty letters in.** Each level is a letter, and its board is the words
+  that begin with it: ক is কলম কবুতর কমলা কমল কম কর কল কলা, eight words and every one of them ক.
+  The alphabet starts with vowels so those come first, two to a level - অ আ, ই উ, এ ও - because
+  ঊ, এ and ঐ have a single pool word each and cannot carry a level alone. Then the consonants one
+  at a time, ক through ন. ঙ, ঞ and ণ are skipped; no Bengali word begins with any of them. The
+  next batch picks up at প.
 - **Some words are bridges.** এক and ওজন share no letter, so a board holding both needs কঠিন and
-  জন between them. `build.py check` prints which letter each level is really about and how many
-  of its words start with it, and fails if a level has no two words sharing a first letter -
-  which would mean it is not about a letter at all.
+  জন between them. Each level declares its letter in `catalogue.SYLLABUS`, and `build.py check`
+  fails unless the board is about that letter: at least two words starting with it, and more
+  starting with it than with any other single letter. That caught a level named থ whose board
+  was থাকা থালা পাঠশালা পানি পাঠ - two থ words and three প ones, which is a প level, and which
+  would have taken three words প's own level needs.
+- **A letter's words are reserved for its own level.** ঢ would happily use থাকা and থালা as
+  bridges, and then থ - which has four words in the whole pool - would have none left.
 - **`catalogue.FULL_SYLLABUS` is `False`** and the ordering follows from it: a syllabus is
   ordered by block, an alphabet game by the alphabet, and the two disagree - ক lands in block 3
   and গ in block 2. Checks and tests that only mean something about a complete syllabus report

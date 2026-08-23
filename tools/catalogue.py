@@ -49,9 +49,9 @@ from wordpool import zipf
 # letter, and the words on its board are the words that start with that letter.
 #
 # Written as a list rather than grouped by block, because here the order is the alphabet and
-# nothing else. Each entry still declares the block its words belong to, which `validate`
-# checks against what they actually contain - but the block no longer decides where a level
-# sits. See `ordered_levels`.
+# nothing else. Each entry declares its letter and the block its words belong to, both of which
+# are checked against what the words actually contain - but the block no longer decides where a
+# level sits. See `ordered_levels`.
 #
 # The alphabet opens with eleven vowels, and a vowel level cannot be built one letter at a
 # time: ঊ, এ and ঐ have a single word each in the whole pool. So the vowels that begin words
@@ -61,36 +61,53 @@ from wordpool import zipf
 # Not every word on a board starts with the level's letter. Some are there to hold the
 # crossword together: এক and ওজন share no letter at all, so without কঠিন and জন between them
 # there is no board that holds both.
+#
+# A level cannot take those bridging words from a letter whose own level is still to come. ঢ
+# would happily borrow থাকা and থালা, and then থ - which has two words in the pool to start
+# with - would have none left.
 
 SYLLABUS = [
-    # -- the vowels that start words, two or three to a level ---------------------------
-    (BLOCK_ONE_KAR,  ["আজ", "আনারস", "অজগর", "আনা", "রস"]),                    # অ আ
-    (BLOCK_CONJUNCT, ["উট", "ইঁদুর", "উত্তর", "দুই"]),                          # ই উ
-    (BLOCK_KARS,     ["এক", "ওজন", "কঠিন", "জন", "ওঠা"]),                      # এ ও
+    # -- the vowels that start words, two to a level ------------------------------------
+    ("অআ", BLOCK_ONE_KAR,  ["আজ", "আনারস", "অজগর", "আনা", "রস"]),
+    ("ইউ", BLOCK_CONJUNCT, ["উট", "ইঁদুর", "উত্তর", "দুই"]),
+    ("এও", BLOCK_KARS,     ["এক", "ওজন", "কঠিন", "জন", "ওঠা"]),
 
-    # -- then the consonants, in alphabet order -----------------------------------------
-    (BLOCK_KARS,     ["কলম", "কবুতর", "কমলা", "কমল", "কম", "কর", "কল", "কলা"]),  # ক
-    (BLOCK_KARS,     ["খালা", "খাবার", "খেলা", "খবর", "বলা"]),                   # খ
-    (BLOCK_ONE_KAR,  ["গরম", "গাছ", "গাজর", "গম", "নগর", "গান"]),                # গ
-    (BLOCK_CONJUNCT, ["ঘরবাড়ি", "ঘর", "ঘণ্টা", "ঘড়ি", "ঘট", "বাঘ", "ঘাট", "বাড়ি"]),  # ঘ
-    # ঙ never begins a word
-    (BLOCK_KARS,     ["চুল", "চালক", "চামচ", "চক", "কচু", "চমক"]),               # চ
-    (BLOCK_ONE_KAR,  ["ছাতা", "ছাগল", "ঈগল", "ঈদ", "ছাদ", "লতা", "ছায়া"]),       # ছ
-    (BLOCK_KARS,     ["জাহাজ", "জামা", "জগত", "হাত", "হাতি"]),                   # জ
-    # ঝ, ঞ, ট, ঠ, ড and the rest of the alphabet are where this picks up next
+    # -- then the consonants, one at a time, in alphabet order ---------------------------
+    ("ক",  BLOCK_KARS,     ["কলম", "কবুতর", "কমলা", "কমল", "কম", "কর", "কল", "কলা"]),
+    ("খ",  BLOCK_KARS,     ["খালা", "খাবার", "খেলা", "খবর", "বলা"]),
+    ("গ",  BLOCK_ONE_KAR,  ["গরম", "গাছ", "গাজর", "গম", "নগর", "গান"]),
+    ("ঘ",  BLOCK_CONJUNCT, ["ঘরবাড়ি", "ঘর", "ঘণ্টা", "ঘড়ি", "ঘট", "বাঘ", "ঘাট", "বাড়ি"]),
+    # ঙ begins no word
+    ("চ",  BLOCK_KARS,     ["চুল", "চালক", "চামচ", "চক", "কচু", "চমক"]),
+    ("ছ",  BLOCK_ONE_KAR,  ["ছাতা", "ছাগল", "ঈগল", "ঈদ", "ছাদ", "লতা", "ছায়া"]),
+    ("জ",  BLOCK_KARS,     ["জাহাজ", "জামা", "জগত", "হাত", "হাতি"]),
+    ("ঝ",  BLOCK_KARS,     ["ঝড়", "ঝলক", "ঝাল", "কবিতা", "বিল"]),
+    # ঞ begins no word
+    ("ট",  BLOCK_KARS,     ["টিকিট", "টমেটো", "টিয়া", "মেয়ে"]),
+    ("ঠ",  BLOCK_KARS,     ["ঠিকানা", "ঠিক", "বৈঠক", "শোনা"]),
+    ("ড",  BLOCK_KARS,     ["ডিম", "ডালিম", "ডাল", "বিড়াল"]),
+    ("ঢ",  BLOCK_KARS,     ["ঢোল", "ঢাল", "ঢোকা", "ঢালা", "বাংলা"]),
+    # ণ begins no word
+    ("ত",  BLOCK_KARS,     ["তৈরি", "তরকারি", "তরল", "তেল", "কাল"]),
+    ("থ",  BLOCK_ONE_KAR,  ["থাকা", "থালা", "পাঠশালা", "মাঠ"]),
+    ("দ",  BLOCK_KARS,     ["দিনরাত", "দুধভাত", "দিন", "দুধ", "রাত", "ভাত"]),
+    ("ধ",  BLOCK_KARS,     ["ধরা", "ধনী", "পায়রা", "ধোপা"]),
+    ("ন",  BLOCK_CONJUNCT, ["নয়", "নম্বর", "নজর", "নকল", "নল", "কম্বল", "জল"]),
+    # প, ফ, ব, ভ, ম and the rest of the alphabet are where this picks up next
 ]
 
-# Every level as (declared block, words). The declared block is checked against what the
-# words actually contain, so a level cannot drift out of its block unnoticed.
+# Every level as (letters, declared block, words). Both declarations are checked against what
+# the words actually contain: the block, so a level cannot drift out of it unnoticed, and the
+# letters, so a level named after ছ cannot quietly become a level about something else.
 DECLARED = list(SYLLABUS)
 
-CATALOGUE = [words for _, words in DECLARED]
+CATALOGUE = [words for _, _, words in DECLARED]
 
 # Every word the catalogue was authored around. Boards grow into the pool, and this is what
 # growth may not touch: a word swallowed by an early level is a word missing from the later
 # level that was built on it, and since no word is set twice, that level would have nothing
 # left to make a board from.
-AUTHORED = {w for _, words in DECLARED for w in words}
+AUTHORED = {w for _, _, words in DECLARED for w in words}
 
 # Words a board is allowed to reuse from an earlier board, with the reason. Empty, and worth
 # keeping empty: fifty-nine board words out of a five-hundred-word pool leaves no level short
@@ -304,11 +321,12 @@ def ordered_levels():
     problems rather than silently shipping fewer levels than the catalogue lists.
     """
     levels, failures = [], []
-    for block, words in DECLARED:
+    for letters, block, words in DECLARED:
         level, problems = validate(words, block)
         if problems:
             failures.append((words, problems))
             continue
+        level['letters'] = letters
         levels.append(level)
 
     # Board words are verified vocabulary too, so a level can grow into a word another level was
