@@ -29,16 +29,22 @@ object Levels {
 
     val all: List<Level> = listOf(
         // Block 1, plain letters: consonants and independent vowels on their own, no signs at all.
-        Level(1, listOf("ক", "ল", "ম"), listOf("কলম", "কম", "কল"), block = 1, teaches = listOf("ল", "ক", "ম")),
-        Level(2, listOf("ক", "ল", "ম", "আ"), listOf("কলম", "কম", "কল", "আম"), block = 1, teaches = listOf("আ")),
-        Level(3, listOf("ক", "ল", "ম", "এ"), listOf("কলম", "এক", "কম", "কল"), block = 1, teaches = listOf("এ")),
-        Level(4, listOf("ক", "ম", "ল", "ফ"), listOf("ফল", "কমল", "ফলক"), block = 1, teaches = listOf("ফ")),
-        Level(5, listOf("ক", "ল", "ম", "অ", "ত"), listOf("কলম", "অতল", "কম", "কল"), block = 1, teaches = listOf("অ", "ত")),
-        Level(6, listOf("ব", "দ", "ল"), listOf("বদল", "দল", "বল"), block = 1, teaches = listOf("ব", "দ")),
-        Level(7, listOf("ক", "দ", "ম", "ঈ"), listOf("ঈদ", "কদম", "দম"), block = 1, teaches = listOf("ঈ")),
-        Level(8, listOf("স", "ব", "ক"), listOf("সব", "বস", "বক"), block = 1, teaches = listOf("স")),
-        Level(9, listOf("স", "ব", "ই"), listOf("সব", "বই", "বস"), block = 1, teaches = listOf("ই")),
-        Level(10, listOf("স", "ক", "ল", "র"), listOf("কর", "সকল", "সরল"), block = 1, teaches = listOf("র"))
+        Level(1, listOf("অ", "জ", "গ", "র", "ম", "ট"), listOf("অজগর", "গরম", "মটর", "টগর", "গম"), block = 1, teaches = listOf("অ", "র", "ম", "গ", "ট", "জ")),
+        Level(2, listOf("শ", "র", "ব", "ত", "ন", "য"), listOf("শরবত", "রতন", "যত", "বন", "যব"), block = 1, teaches = listOf("ব", "ন", "ত", "শ", "য")),
+
+        // Block 2, one vowel sign: a single vowel sign per level, introduced one at a time in KAR_ORDER.
+        Level(3, listOf("ক", "লা", "গা", "ছ", "মা", "থা"), listOf("কলাগাছ", "মাছ", "গাছ", "কলা", "থালা", "মাথা"), block = 2, teaches = listOf("ল", "ক", "ছ", "থ", "া")),
+        Level(4, listOf("আ", "না", "র", "স", "ল", "ফ"), listOf("আনারস", "আসল", "সফল", "ফসল", "সরল", "ফল", "আনা", "রস"), block = 2, teaches = listOf("আ", "স", "ফ")),
+        Level(5, listOf("পা", "ঠ", "শা", "লা", "তা", "খা"), listOf("পাঠশালা", "পাতা", "পাঠ", "তালা", "খাতা", "খালা"), block = 2, teaches = listOf("প", "খ", "ঠ")),
+
+        // Block 3, vowel signs together: several signs in one word, all of them already taught.
+        Level(6, listOf("কা", "ঠ", "বি", "ড়া", "লি", "মা", "ন"), listOf("কাঠবিড়ালি", "বিমান", "মাঠ", "কান", "মালি"), block = 3, teaches = listOf("ড়", "ি")),
+        Level(7, listOf("প", "ড়া", "লে", "খা", "রা", "ল"), listOf("পড়ালেখা", "রাখাল", "রাখা", "লেখা", "পড়া", "খাল"), block = 3, teaches = listOf("ে")),
+
+        // Block 4, conjuncts: joined consonants, one cluster family at a time.
+        Level(8, listOf("ঘ", "র", "বা", "ড়ি", "রা", "ন্না"), listOf("ঘরবাড়ি", "রান্নাঘর", "রাবার", "বাড়ি", "ঘর", "রান্না", "বাঘ", "ঘড়ি"), block = 4, teaches = listOf("ঘ", "ন্ন")),
+        Level(9, listOf("ব", "র্ষা", "কা", "ল", "ক", "ম্ব"), listOf("বর্ষাকাল", "কম্বল", "বল", "কল", "কাল", "বর্ষা", "কাক", "বক"), block = 4, teaches = listOf("ম্ব", "র্ষ")),
+        Level(10, listOf("ফু", "ল", "বা", "গা", "ন", "ট্রে", "ঞ্চ"), listOf("ফুলবাগান", "বাগান", "গান", "ফুল", "ট্রেন", "গাল", "নল", "লঞ্চ"), block = 4, teaches = listOf("ু", "ট্র", "ঞ্চ"))
     )
 
     val count: Int get() = all.size
@@ -50,7 +56,13 @@ object Levels {
      * this is what tells them whether they are looking at one. Only block 1 is written at the
      * moment; the tests come back by themselves as soon as the later blocks do.
      */
-    val spansSyllabus: Boolean get() = all.map { it.block }.distinct().size == 5
+    /**
+     * Whether this catalogue is the complete teaching syllabus, or a short game cut out of one.
+     * Several tests only mean something about the complete thing - that it reaches every
+     * letter, that boards get fuller as it advances, that most levels are review - and they
+     * check this first. Generated from `catalogue.FULL_SYLLABUS`.
+     */
+    const val FULL_SYLLABUS = false
 
     fun byId(id: Int): Level? = all.firstOrNull { it.id == id }
 }

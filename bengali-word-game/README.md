@@ -25,33 +25,34 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 
 ## Gameplay
 
-- **Ten levels**, the opening of the teaching order: plain letters on their own, ক ল ম through
-  র, one or two new ones per level, no vowel signs and nothing joined together. There were 104,
-  running through all five blocks of the syllabus to free play and covering every letter and
-  sign in the language; they were deleted on purpose while the way a level works is reworked.
-  `git show d102737:tools/catalogue.py` has all of them, with the `SHARED` entries and the
-  checks that went with them.
-- **Five blocks are still the plan**, each holding the previous one constant and adding one new
-  thing: plain letters, then one vowel sign at a time (া, then ি, then ে, then ু), then several
-  signs in one word, then conjuncts one family at a time (ন্ত, স্ত, ন্ধ, ক্ষ), then free play on
-  the fullest boards. Only the first is written. The machinery for the rest - block budgets,
-  board targets, the coverage report - is still here and sized for the full syllabus.
-- **The whole alphabet was the promise**, and is what the syllabus comes back to: all 11
+- **Ten levels**, authored to be played rather than to teach. Five to eight words a board, six
+  or seven tiles, every board anchored on a long word - ফুলবাগান, কাঠবিড়ালি, রান্নাঘর - which is
+  the one the wheel hides best. The last three carry a conjunct. `catalogue.FULL_SYLLABUS` is
+  `False` and says so: the checks that only mean something about a complete syllabus report
+  instead of failing.
+- **There were 104**, running through all five blocks to free play and covering every letter and
+  sign in the language. They were deleted on purpose while the way a level works is reworked;
+  `git show d102737:tools/catalogue.py` has all of them.
+- **Five blocks are still the ordering**, and still the plan: plain letters, then one vowel sign
+  at a time, then several signs in one word, then conjuncts one family at a time, then free play
+  on the fullest boards. The ten reach into the fourth. The machinery for a full syllabus -
+  block budgets, board targets, the coverage report - is still here and sized for it.
+- **The whole alphabet was the promise**, and is what a rebuilt syllabus comes back to: all 11
   independent vowels, all 10 vowel signs, both nasal marks and every consonant - 57 pieces of
   the writing system, each introduced by name in the level that first uses it. Three are left
   out on purpose and `curriculum.NOT_TAUGHT` says why: ৗ is not a sign of its own in modern
   Bengali, ঃ reaches only দুঃখ and অতঃপর, and ঞ never stands outside a cluster. `build.py
-  check` reports what is missing, and goes back to failing on a gap once the levels span all
-  five blocks again.
+  check` reports what is missing, and goes back to failing on a gap when `FULL_SYLLABUS` is
+  set again.
 - **Each level records what it is first to introduce** - a letter, a vowel sign, a conjunct.
-  All ten introduce something, because a syllabus that stops this early has not reached the
-  point where review levels make sense.
+  All ten introduce something, and several introduce a good deal at once: ten levels reaching
+  from plain letters to conjuncts cannot also spend two of them per level.
 - **No word is set as a puzzle twice.** An earlier catalogue filled 377 board slots with 201
   words, leaning on কলম, বল, কল and সব across a dozen tile sets each, so a good part of the
-  game was re-spelling words the player already knew. Four levels here have to borrow and
-  cannot do otherwise - a learner who knows three letters has exactly one board available to
-  them - and each is listed in `catalogue.SHARED` with the reason. `build.py check` fails on
-  any repeat that is not listed, and on any listing no level needs.
+  game was re-spelling words the player already knew. Nothing borrows now - sixty-five board
+  words out of a five-hundred-word pool leaves no level short of options - so
+  `catalogue.SHARED` is empty. `build.py check` fails on any repeat that is not listed there,
+  and on any listing no level needs.
 - **Every word spoken.** Web build only so far: a word is said the moment it is found.
   This matters more than it sounds - Bengali spelling hides the sound, since ব and ভ, শ and ষ
   and স, ন and ণ are each one sound in speech and different letters on the page, which is

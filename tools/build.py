@@ -22,8 +22,8 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
 from bangla import conjunct_tiles, render, split_aksharas            # noqa: E402
-from catalogue import (CATALOGUE, MAX_NEW_UNITS, SHARED, ordered_levels,       # noqa: E402
-                       spans_syllabus)
+from catalogue import (CATALOGUE, FULL_SYLLABUS, MAX_NEW_UNITS, SHARED,        # noqa: E402
+                       ordered_levels)
 from curriculum import (BLOCKS, NOT_TAUGHT, alphabet,                  # noqa: E402
                         unit_label)
 from vocabulary import theme_of                                       # noqa: E402
@@ -74,7 +74,13 @@ KOTLIN_FOOTER = '''    )
      * this is what tells them whether they are looking at one. Only block 1 is written at the
      * moment; the tests come back by themselves as soon as the later blocks do.
      */
-    val spansSyllabus: Boolean get() = all.map { it.block }.distinct().size == 5
+    /**
+     * Whether this catalogue is the complete teaching syllabus, or a short game cut out of one.
+     * Several tests only mean something about the complete thing - that it reaches every
+     * letter, that boards get fuller as it advances, that most levels are review - and they
+     * check this first. Generated from `catalogue.FULL_SYLLABUS`.
+     */
+    const val FULL_SYLLABUS = %s
 
     fun byId(id: Int): Level? = all.firstOrNull { it.id == id }
 }'''
@@ -120,7 +126,7 @@ def emit(levels):
 
     kt[-1] = kt[-1].rstrip(',')
     js[-1] = js[-1].rstrip(',')
-    kt.append(KOTLIN_FOOTER)
+    kt.append(KOTLIN_FOOTER % ('true' if FULL_SYLLABUS else 'false'))
     js.append('];')
     # Nothing may follow the closing bracket. `write_builds` splices this in by replacing
     # everything from `const LEVELS = [` to the first `];` it finds after it, so anything
@@ -181,14 +187,14 @@ def report(levels, failures):
     missing = [u for u in alphabet() if u not in taught]
     print(f'\nalphabet: {len(alphabet()) - len(missing)} of {len(alphabet())} units taught'
           f' ({len(NOT_TAUGHT)} excluded by design: {" ".join(NOT_TAUGHT)})')
-    if missing and spans_syllabus(levels):
+    if missing and FULL_SYLLABUS:
         print(f'  NOT TAUGHT ANYWHERE ({len(missing)}):')
         for unit in missing:
             print(f'    {unit_label(unit)}')
     elif missing:
-        print(f'  {len(missing)} still to come - the syllabus stops inside block '
-              f'{max(l["block"] for l in levels)} of {len(BLOCKS)}, so this is the blocks that '
-              f'are not written yet rather than a gap in one that is.')
+        print(f'  {len(missing)} still to come. These ten levels are a game rather than a '
+              f'syllabus (catalogue.FULL_SYLLABUS),\n  so this is what is not written yet '
+              f'rather than a gap in something that claims to be finished.')
 
     # No word set as a puzzle twice. `ordered_levels` rejects any level that breaks it outside
     # the documented list, so this is a count of what the documented list is actually covering
@@ -209,13 +215,13 @@ def report(levels, failures):
     if unused:
         print(f'  {len(unused)} SHARED entries no level needs: {" ".join(unused)}')
 
-    # A level that introduces a pile of new material at once is a lecture, not a lesson. The
-    # ordering is greedy, so it can be forced into a jump when a block runs short of gentle
-    # options - which is worth saying out loud rather than hiding.
-    # Level 1 is exempt: it has nothing to build on, so every letter in it is new by
-    # definition.
+    # A level that introduces a pile of new material at once is a lecture, not a lesson - in a
+    # syllabus. Ten levels that skip from plain letters to conjuncts introduce a great deal per
+    # level by construction, and there is nothing to fix, so this only reports while the
+    # catalogue is claiming to teach. Level 1 is exempt either way: it has nothing to build on.
     steep = [(i, level) for i, level in enumerate(levels, 1)
-             if i > 1 and len(level['teaches']) > MAX_NEW_UNITS[level['block']]]
+             if FULL_SYLLABUS and i > 1
+             and len(level['teaches']) > MAX_NEW_UNITS[level['block']]]
     if steep:
         print(f'\n{len(steep)} levels past the first introduce more than their '
               f'block\'s budget:')
@@ -331,7 +337,7 @@ def main(argv):
             return 1
         gaps = [u for u in alphabet()
                 if u not in {t for level in levels for t in level['teaches']}]
-        if gaps and spans_syllabus(levels):
+        if gaps and FULL_SYLLABUS:
             print(f'\ncheck FAILED: {len(gaps)} pieces of the alphabet are never taught')
             return 1
         if len(levels) != len(CATALOGUE):

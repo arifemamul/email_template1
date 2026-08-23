@@ -47,27 +47,49 @@ from wordpool import zipf
 
 SYLLABUS = {
 
-    # Block 1: letters on their own. No vowel signs, no conjuncts, nothing hanging off
-    # anything. One or two new letters per level, with the earlier ones coming back so they
-    # get used rather than met once. Boards stay at three or four words: the thing being
-    # learned here is that a tile is a letter and a drag is a word.
-    #
     # Ten levels, which is the whole game for now. There were 104, running through all five
     # blocks to free play and covering every letter and sign in the language; they were deleted
     # on purpose while the way a level works is reworked. They are in the history rather than
-    # commented out here: `git show d102737:tools/catalogue.py` has all of them, along with the
-    # `SHARED` entries and the checks that went with them.
+    # commented out here: `git show d102737:tools/catalogue.py` has all of them.
+    #
+    # These ten are not the opening of that syllabus. That opening was as gentle as the game
+    # gets - three two-letter words off a three-tile wheel - and with the rest of the levels
+    # gone there is nothing for it to be gentle in preparation for. So they are authored to be
+    # played rather than to teach: every board is anchored on a long word, five to eight words
+    # to a board, six or seven tiles, and the last three carry a conjunct. The wheel no longer
+    # tells you how many letters the answer has.
+    #
+    # No word appears on two boards, and here that costs nothing: sixty-five words out of a
+    # pool of five hundred, so `SHARED` is empty and the rule holds outright.
+
+    # Plain letters, no signs. A bigger wheel than the alphabet needs, because the difficulty
+    # here is scanning it rather than reading anything new.
     BLOCK_PLAIN: [
-        ["কলম", "কম", "কল"],             # ল, ক, ম - the first three letters of the game
-        ["কলম", "কম", "কল", "আম"],       # আ
-        ["কলম", "এক", "কম", "কল"],       # এ
-        ["ফল", "কমল", "ফলক"],            # ফ
-        ["কলম", "অতল", "কম", "কল"],      # অ, ত
-        ["বদল", "দল", "বল"],             # ব, দ
-        ["ঈদ", "কদম", "দম"],             # ঈ
-        ["সব", "বস", "বক"],              # স
-        ["সব", "বই", "বস"],              # ই
-        ["কর", "সকল", "সরল"],            # র
+        ["শরবত", "রতন", "যত", "বন", "যব"],
+        ["অজগর", "গরম", "মটর", "টগর", "গম"],
+    ],
+
+    # One vowel sign per board - all া here, which is the sign that does the most work in
+    # Bengali - so the sign is never the puzzle; the board is.
+    BLOCK_ONE_KAR: [
+        ["কলাগাছ", "মাছ", "গাছ", "কলা", "থালা", "মাথা"],
+        ["পাঠশালা", "পাতা", "পাঠ", "তালা", "খাতা", "খালা"],
+        ["আনারস", "আসল", "সফল", "ফসল", "সরল", "ফল", "আনা", "রস"],
+    ],
+
+    # Several signs in one word, which is where ordinary Bengali vocabulary starts.
+    BLOCK_KARS: [
+        ["পড়ালেখা", "রাখাল", "রাখা", "লেখা", "পড়া", "খাল"],
+        ["কাঠবিড়ালি", "বিমান", "মাঠ", "কান", "মালি"],
+    ],
+
+    # Joined consonants, on the fullest boards the phone can hold. ন্ন, র্ষ, ম্ব, ট্র and ঞ্চ,
+    # each sitting in a word a child would recognise rather than in a word chosen to show the
+    # cluster off.
+    BLOCK_CONJUNCT: [
+        ["ঘরবাড়ি", "রান্নাঘর", "রাবার", "বাড়ি", "ঘর", "রান্না", "বাঘ", "ঘড়ি"],
+        ["বর্ষাকাল", "কম্বল", "বল", "কল", "কাল", "বর্ষা", "কাক", "বক"],
+        ["ফুলবাগান", "বাগান", "গান", "ফুল", "ট্রেন", "গাল", "নল", "লঞ্চ"],
     ],
 }
 
@@ -83,22 +105,24 @@ CATALOGUE = [words for _, words in DECLARED]
 # have nothing left to teach its cluster with.
 AUTHORED = {w for _, words in DECLARED for w in words}
 
-# A word is set as a puzzle once. Four levels break that rule, and every one of them is a
-# level introducing a letter early enough that there is nothing else to build a board from -
-# so these are the words they have to borrow, with what makes each one unavoidable. The check
-# below fails on any repeat that is not listed here, and on any entry here that no level
-# actually needs, which is the only thing that keeps the list honest in both directions.
-SHARED = {
-    'কলম': 'the opening level teaches ল, ক and ম, and কলম, কম and কল are every word those '
-            'three letters spell. The three levels that add one more letter to them - আ, এ '
-            'and অ - have nothing else to cross the new letter with, because at that point in '
-            'the syllabus there is nothing else the learner can read',
-    'কম': 'same three letters, same three levels',
-    'কল': 'same three letters, same three levels',
-    'সব': 'ব and স are taught two levels before ই, and সব and বস are the only words a learner '
-           'who knows ল ক ম ব দ র স can read that will cross বই',
-    'বস': 'same, and for the same level',
-}
+# Words a board is allowed to reuse from an earlier board, with the reason. Empty, and worth
+# keeping empty: sixty-five board words out of a five-hundred-word pool leaves no level short
+# of options. It was not empty when the catalogue was a hundred levels long - the opening
+# levels there had three letters to build from and no choice but to borrow - so this comes
+# back if the syllabus does. `check` fails on any repeat that is not listed here, and on any
+# entry here that no level actually borrows.
+SHARED = {}
+
+# Whether this catalogue is the complete teaching syllabus, or a short game cut out of one.
+# Several checks only mean something about the complete thing - that it reaches every letter,
+# that no level introduces more than a couple of new pieces at a time - and they are reported
+# rather than enforced while this is False.
+#
+# Stated rather than worked out from the levels. The obvious guess - "does it use all five
+# blocks?" - is wrong for exactly the catalogue that exists now: ten levels reaching into the
+# conjunct block are not a syllabus, and a tenth level of free play would flip the guess
+# without changing that. Set this to True when the levels are written to teach again.
+FULL_SYLLABUS = False
 
 MIN_ZIPF = 2.0          # below this, treat a "word" as invented rather than Bengali
 MAX_ROWS, MAX_COLS = 8, 9
@@ -119,7 +143,7 @@ MAX_NEW_UNITS = {
 # climbs with the syllabus rather than with raw level number - a learner meeting their first
 # vowel sign does not also need a seven-word board.
 BOARD_TARGET = {
-    BLOCK_PLAIN: 3, BLOCK_ONE_KAR: 3, BLOCK_KARS: 4, BLOCK_CONJUNCT: 5, BLOCK_FREE: 6,
+    BLOCK_PLAIN: 5, BLOCK_ONE_KAR: 6, BLOCK_KARS: 6, BLOCK_CONJUNCT: 8, BLOCK_FREE: 8,
 }
 
 
@@ -268,17 +292,6 @@ def order_block(group, known):
         ordered.append(pick)
         remaining.remove(pick)
     return ordered, known
-
-
-def spans_syllabus(levels):
-    """
-    Whether the catalogue runs the whole way through the teaching order rather than stopping
-    part-way. Several checks only mean something about a finished syllabus - that it reaches
-    every letter, that boards get fuller as it advances - and this is what tells them whether
-    they are looking at one. Derived from the levels rather than declared, so the checks come
-    back by themselves as soon as the later blocks do.
-    """
-    return {l['block'] for l in levels} == set(BLOCKS)
 
 
 def ordered_levels():
