@@ -25,7 +25,7 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 
 ## Gameplay
 
-- **An alphabet game, thirty levels, ক through স.** Each level is a letter, and its board is the
+- **An alphabet game, thirty-one levels, ক through হ.** Each level is a letter, and its board is the
   words that begin with it: ক is কলম কবুতর কমলা কমল কম কর কল কলা, eight words and every one of
   them ক. ম, র and শ are five words each and nothing else.
 - **Some letters have to share.** The alphabet opens with vowels, and ঊ, এ and ঐ have one pool
@@ -34,7 +34,11 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
   with each other, so no board can be built from them alone. Word-initial ষ is rare in Bengali -
   it lives inside words, in clusters like ষ্ট and ষ্ঠ. ঙ, ঞ and ণ are skipped outright; no
   Bengali word begins with any of them, and neither do ড়, ঢ় or য়.
-- **হ is what is left**, and finishes the alphabet.
+- **Five vowels have no level yet**: ঈ, ঊ, ঋ, ঐ and ঔ, which between them begin seven words in
+  the whole pool. ঋ could have one today (ঋণ ঋতু সেতু দক্ষিণ দম); ঈ could if level 9 gave back
+  ঈগল and ঈদ, which it currently uses as bridges; ঊ, ঐ and ঔ have a single word each and no
+  board can be built from one word. `build.py check` prints the gap rather than letting "we did
+  ক through হ" stand as if the alphabet were finished.
 - **Some words are bridges.** এক and ওজন share no letter, so a board holding both needs কঠিন and
   জন between them. Each level declares its letter in `catalogue.SYLLABUS`, and `build.py check`
   fails unless the board is about that letter: at least two words starting with it, and more

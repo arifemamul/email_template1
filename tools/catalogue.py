@@ -109,7 +109,12 @@ SYLLABUS = [
     # ষষ্ঠ, so no board can be built from them alone. Word-initial ষ is rare in Bengali - it
     # lives inside words, in clusters like ষ্ট and ষ্ঠ.
     ("ষস", BLOCK_KARS,     ["ষাঁড়", "ষোল", "সকল", "সড়ক", "কলস", "সকাল"]),
-    # হ is what is left, and finishes the alphabet: ড়, ঢ় and য় begin no Bengali word either.
+    # হ, the last letter, and the smallest board in the game. Four is the ceiling: every pair of
+    # হ words in the pool was tried as an anchor and nothing bigger will lay out. The হ words
+    # fall into four groups by their first akshara - হ, হা, হাঁ, হৃ - and only two words from any
+    # one group can cross at the akshara they share.
+    ("হ",  BLOCK_KARS,     ["হাসি", "হাতঘড়ি", "হাঁড়ি", "হাঁস"]),
+    # ড়, ঢ় and য় begin no Bengali word, so there is nothing after this.
 ]
 
 # Every level as (letters, declared block, words). Both declarations are checked against what

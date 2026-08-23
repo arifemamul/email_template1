@@ -26,7 +26,7 @@ from catalogue import (CATALOGUE, FULL_SYLLABUS, MAX_NEW_UNITS, SHARED,        #
                        ordered_levels)
 from curriculum import (BLOCKS, NOT_TAUGHT, alphabet,                  # noqa: E402
                         unit_label)
-from vocabulary import theme_of                                       # noqa: E402
+from vocabulary import theme_of, words as pool_words                                       # noqa: E402
 
 REPO = pathlib.Path(__file__).resolve().parent.parent
 KOTLIN = REPO / 'bengali-word-game/app/src/main/java/com/bangla/shobdojot/data/Levels.kt'
@@ -208,6 +208,21 @@ def report(levels, failures):
         rest = [w for w in level['words'] if w not in own]
         print(f'  level {i:<3} {letters:3} {len(own)} of {len(level["words"])} words '
               f'({" ".join(own)})' + (f'  + {" ".join(rest)}' if rest else ''))
+
+    # Whether the alphabet run is actually complete: every letter that begins a word in the
+    # pool should have a level. Worth stating out loud rather than assuming, because "we did
+    # ক through হ" is easy to say and easy to be wrong about.
+    covered = {x for level in levels for x in level.get('letters', '')}
+    initial = {}
+    for word in pool_words():
+        initial.setdefault(split_aksharas(word)[0][0], []).append(word)
+    uncovered = sorted(set(initial) - covered, key=lambda c: -len(initial[c]))
+    print(f'\nalphabet run: {len(covered)} letters have a level')
+    if uncovered:
+        print(f'  {len(uncovered)} letters begin a pool word but have none:')
+        for c in uncovered:
+            words = sorted(initial[c])
+            print(f'    {c}  {len(words)} word(s): {" ".join(words[:6])}')
 
     # No word set as a puzzle twice. `ordered_levels` rejects any level that breaks it outside
     # the documented list, so this is a count of what the documented list is actually covering
