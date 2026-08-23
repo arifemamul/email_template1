@@ -53,10 +53,15 @@ from wordpool import zipf
 # are checked against what the words actually contain - but the block no longer decides where a
 # level sits. See `ordered_levels`.
 #
-# The alphabet opens with eleven vowels, and a vowel level cannot be built one letter at a
-# time: ঊ, এ and ঐ have a single word each in the whole pool. So the vowels that begin words
-# are paired up into the first three levels and the consonants follow one at a time. ঙ, ঞ and ণ
-# never begin a Bengali word and are skipped when their turn comes.
+# The alphabet opens with eleven vowels, and not all of them can hold a level of their own.
+# অ and ই have a single word each in the whole pool, so they are paired with আ and উ; ঈ, ঊ and ঋ
+# have two each, which is exactly enough. ঐ and ঔ have one each and no second spelling to pair
+# with, so they get no level at all - ঐক্য and ঔষধ are the only pool words that begin with them,
+# and ওষুধ, which is ঔষধ respelled, is the same word and cannot appear on a second board.
+# ঙ, ঞ and ণ never begin a Bengali word and are skipped when their turn comes.
+#
+# Strict alphabet order is therefore impossible for the vowels: ই and ঈ cannot each hold a
+# level, so the run is অআ, ইউ, ঈ, ঊ, ঋ, এও rather than one letter per step.
 #
 # Not every word on a board starts with the level's letter. Some are there to hold the
 # crossword together: এক and ওজন share no letter at all, so without কঠিন and জন between them
@@ -67,9 +72,12 @@ from wordpool import zipf
 # with - would have none left.
 
 SYLLABUS = [
-    # -- the vowels that start words, two to a level ------------------------------------
+    # -- the vowels that start words; paired up where one letter cannot carry a board ----
     ("অআ", BLOCK_ONE_KAR,  ["আজ", "আনারস", "অজগর", "আনা", "রস"]),
     ("ইউ", BLOCK_CONJUNCT, ["উট", "ইঁদুর", "উত্তর", "দুই"]),
+    ("ঈ",  BLOCK_CONJUNCT, ["ঈগল", "ঈদ", "লম্বা", "রোদ", "ব্যাগ"]),
+    ("ঊ",  BLOCK_KARS,     ["ঊনিশ", "ঊষা", "নাশতা", "তারা", "রানি"]),
+    ("ঋ",  BLOCK_CONJUNCT, ["ঋণ", "ঋতু", "সেতু", "দক্ষিণ", "চাঁদ"]),
     ("এও", BLOCK_KARS,     ["এক", "ওজন", "কঠিন", "জন", "ওঠা"]),
 
     # -- then the consonants, one at a time, in alphabet order ---------------------------
@@ -79,7 +87,10 @@ SYLLABUS = [
     ("ঘ",  BLOCK_CONJUNCT, ["ঘরবাড়ি", "ঘর", "ঘণ্টা", "ঘড়ি", "ঘট", "বাঘ", "ঘাট", "বাড়ি"]),
     # ঙ begins no word
     ("চ",  BLOCK_KARS,     ["চুল", "চালক", "চামচ", "চক", "কচু", "চমক"]),
-    ("ছ",  BLOCK_ONE_KAR,  ["ছাতা", "ছাগল", "ঈগল", "ঈদ", "ছাদ", "লতা", "ছায়া"]),
+    # ছ used to run to four ছা- words, held together by ঈগল and ঈদ as bridges. Those two are
+    # the whole of word-initial ঈ, so ঈ could have a level or ছ could keep four of its own,
+    # not both. ঈ took them; without them no board with more than two ছ words lays out.
+    ("ছ",  BLOCK_ONE_KAR,  ["ছাগল", "ছাতা", "রাখাল", "খাল", "করা", "লতা"]),
     ("জ",  BLOCK_KARS,     ["জাহাজ", "জামা", "জগত", "হাত", "হাতি"]),
     ("ঝ",  BLOCK_KARS,     ["ঝড়", "ঝলক", "ঝাল", "কবিতা", "বিল"]),
     # ঞ begins no word
