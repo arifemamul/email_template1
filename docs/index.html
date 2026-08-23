@@ -1348,7 +1348,11 @@ function allocateSpace() {
   const width = screenEl.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
 
   const gap = 5;
-  const IDEAL_CELL = 46, MIN_CELL = 26, MAX_CELL = 64;
+  // MIN_CELL is the glyph's floor - below it the letter would not fit. MAX_CELL used to be
+  // 64, which spent spare desktop height on ever-bigger boxes; with the letter fixed at
+  // GLYPH that just draws a small letter in a large square, so cells stop at the comfortable
+  // size and the leftover height goes to the wheel instead.
+  const IDEAL_CELL = 46, MIN_CELL = GLYPH_BOX, MAX_CELL = 46;
   const byWidth = Math.floor((width - gap * (p.cols - 1)) / p.cols);
   const rowGaps = gap * (p.rows - 1);
   const boardFor = c => p.rows * c + rowGaps;
@@ -1403,6 +1407,33 @@ function allocateSpace() {
   return { cell, wheel: Math.round(wheel), deficit: Math.ceil(deficit) };
 }
 
+/*
+ * A letter is the same size wherever it appears - in a board cell, on a wheel tile, on level
+ * 1 and on level 34, on a 320px phone and on a desktop. What adapts to the screen is the box
+ * around the letter, not the letter inside it.
+ *
+ * It used to be the other way round: the glyph was a fraction of its box (0.42 of a cell, 0.4
+ * of a tile), so a seven-column board on a small phone drew its letters at 13px and the wheel
+ * at its floor drew them at 11px - and the levels with the most to read were the ones that
+ * rendered smallest. A learner meeting ন্ধু for the first time should not have to meet it
+ * smaller because the board it sits on is wide.
+ *
+ * GLYPH_BOX is the other half of the deal: no box may be smaller than this, or the fixed
+ * letter would not fit inside it. Every akshara in the game is measured against it - see the
+ * glyph check - because a conjunct is taller than a bare consonant and the tall ones decide
+ * the floor.
+ */
+/*
+ * These two numbers are a pair and the glyph check enforces the relationship. GLYPH_BOX is
+ * bounded from above by the smallest screen: an eight-row board plus the wheel's floor has to
+ * fit the height of a 320x568 phone, which puts the ceiling near 30px. GLYPH is then bounded
+ * by GLYPH_BOX, and by the widest akshara in the game rather than the tallest - ড়িং, from
+ * ফড়িং, sets it, measuring about 1.45x its font size across. Raise either one and the check
+ * says which letter stopped fitting.
+ */
+const GLYPH = 17;       // px - board cells and wheel tiles alike
+const GLYPH_BOX = 30;   // px - the smallest box that holds a GLYPH letter with air around it
+
 function drawBoard(alloc) {
   const p = game.puzzle;
   const gap = 5;
@@ -1425,8 +1456,7 @@ function drawBoard(alloc) {
       if (letter !== undefined) {
         const span = document.createElement("span");
         span.textContent = letter;
-        // Conjuncts need vertical room, so small cells get a proportionally larger glyph.
-        span.style.fontSize = Math.round(cell * (cell < 40 ? 0.5 : 0.42)) + "px";
+        span.style.fontSize = GLYPH + "px";
         div.appendChild(span);
         if (shown.has(k)) div.classList.add("on");
         if (hinted.has(k) && !div.classList.contains("blank")) div.classList.add("hinted");
@@ -1468,7 +1498,10 @@ function drawWheel(alloc) {
   // `.screen`, which hides its overflow, ate the difference along with the letters in it.
   const size = alloc.wheel;
   const n = game.wheel.length;
-  const tile = Math.round(size * (n <= 4 ? 0.30 : n <= 6 ? 0.26 : 0.21));
+  // Never below GLYPH_BOX: the letter no longer shrinks with the tile, so the tile is what
+  // has to give way. Seven tiles at the wheel's floor sit 45px apart centre to centre, so
+  // holding them at 28px cannot make them touch.
+  const tile = Math.max(GLYPH_BOX, Math.round(size * (n <= 4 ? 0.30 : n <= 6 ? 0.26 : 0.21)));
   const radius = size / 2 - tile / 2;
 
   el.wheel.style.width = el.wheel.style.height = size + "px";
@@ -1491,7 +1524,7 @@ function drawWheel(alloc) {
     btn.style.width = btn.style.height = tile + "px";
     btn.style.left = (cx - tile / 2) + "px";
     btn.style.top = (cy - tile / 2) + "px";
-    btn.style.fontSize = Math.round(tile * 0.4) + "px";
+    btn.style.fontSize = GLYPH + "px";
     el.wheel.appendChild(btn);
   }
   drawTrail();
