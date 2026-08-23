@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>শব্দজট Shobdojot - Bengali Word Puzzle</title>
-<meta name="description" content="শব্দজট - a Bengali word-cross puzzle. Drag across the letters to spell words and fill the crossword. 104 levels in a teaching order, free, works offline, no ads.">
+<meta name="description" content="শব্দজট - a Bengali word-cross puzzle. Drag across the letters to spell words and fill the crossword. Levels in a teaching order, free, works offline, no ads.">
 <meta name="theme-color" content="#1B1035">
 <meta name="color-scheme" content="dark">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231B1035'/%3E%3Cpath d='M32 36 L68 36 L50 68 Z' fill='none' stroke='%23FFB020' stroke-width='7' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='36' r='11' fill='%23FFB020'/%3E%3Ccircle cx='68' cy='36' r='11' fill='%23FFB020'/%3E%3Ccircle cx='50' cy='68' r='11' fill='%2335C08A'/%3E%3C/svg%3E">
@@ -14,7 +14,7 @@
 <meta name="apple-mobile-web-app-title" content="শব্দজট">
 <meta property="og:type" content="website">
 <meta property="og:title" content="শব্দজট Shobdojot - Bengali Word Puzzle">
-<meta property="og:description" content="শব্দজট - a Bengali word-cross puzzle. Drag across the letters to spell words and fill the crossword. 104 levels in a teaching order, free, works offline, no ads.">
+<meta property="og:description" content="শব্দজট - a Bengali word-cross puzzle. Drag across the letters to spell words and fill the crossword. Levels in a teaching order, free, works offline, no ads.">
 <meta property="og:locale" content="bn_BD">
 <meta name="twitter:card" content="summary">
 <style>
@@ -777,7 +777,7 @@
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">বাংলা শব্দ খেলা / 104 levels / plays in your browser</p>
+    <p class="eyebrow">বাংলা শব্দ খেলা / <span id="eyebrowCount">levels</span> / plays in your browser</p>
     <h1>শব্দজট</h1>
   </header>
 
@@ -839,14 +839,19 @@
         <h3>What this is</h3>
         <p class="deck">
           A Bengali word-cross puzzle. Drag across the letters to spell a word; each word you find
-          writes itself into the crossword above. <b>104 levels in a teaching order</b>, for
-          anyone learning to read Bengali rather than only to speak it: plain letters first, then
-          one vowel sign at a time, then several signs together, then conjuncts one family at a
-          time - ন্ধ, স্ত, ক্ষ - and finally free play on the fullest boards. Between them they
-          cover the whole alphabet: all 11 vowels, all 10 vowel signs, both nasal marks and every
-          consonant, across 348 different words - no word is ever set as a puzzle twice, so
-          nothing here is a board you have already solved. Nothing to install, no sign-up, no
-          ads - your progress is saved in this browser.
+          writes itself into the crossword above. <b><span id="deckCount">Levels</span> in a
+          teaching order</b>, for anyone learning to read Bengali rather than only to speak it,
+          starting where the writing system starts: plain letters on their own, one or two new
+          ones per level, no vowel signs and nothing joined together yet.
+          <br><br>
+          The syllabus behind it runs a good deal further - a vowel sign at a time, then several
+          in one word, then conjuncts one family at a time (ন্ধ, স্ত, ক্ষ), then free play on the
+          fullest boards, covering all 11 vowels, all 10 vowel signs, both nasal marks and every
+          consonant. Those levels are written and checked; they are out of the game while the way
+          a level works is being reworked, and they go back in afterwards.
+          <br><br>
+          No word is ever set as a puzzle twice. Nothing to install, no sign-up, no ads - your
+          progress is saved in this browser.
         </p>
       </section>
 
@@ -881,10 +886,10 @@
     <footer>
       Every board is generated from a word list when you open the level, not hand-drawn: words are
       placed by backtracking search so each one crosses another and no accidental word ever appears
-      on the grid. All 348 board words are attested in real Bengali text - checked against corpus
+      on the grid. Every board word is attested in real Bengali text - checked against corpus
       frequency data, then hand-picked from a vocabulary curated for a learner, because frequency
       alone offers verb inflections and newspaper register. No word is set as a puzzle twice, bar
-      nine early levels that have no other board available to them. Levels run in the order the writing
+      a few levels at the very start that have no other board available to them. Levels run in the order the writing
       system is taught rather than by puzzle difficulty alone, and each one records what it is the
       first to introduce. Tiles hold <b>aksharas</b> - the letter units a Bengali reader sees - so
       মাছ is two tiles, মা and ছ, and the conjunct ন্ধু in বন্ধু is one. Bengali text is rendered
@@ -1084,7 +1089,7 @@ function normalise(occ, placed) {
 }
 
 /* ============================================================================
-   3. Levels - data/Levels.kt, all 105
+   3. Levels - generated from data/Levels.kt
    ============================================================================ */
 const LEVELS = [
   // Block 1, plain letters: consonants and independent vowels on their own, no signs at all.
@@ -1097,109 +1102,7 @@ const LEVELS = [
   { id: 7, letters: ["ক", "দ", "ম", "ঈ"], words: ["ঈদ", "কদম", "দম"], block: 1, teaches: ["ঈ"] },
   { id: 8, letters: ["স", "ব", "ক"], words: ["সব", "বস", "বক"], block: 1, teaches: ["স"] },
   { id: 9, letters: ["স", "ব", "ই"], words: ["সব", "বই", "বস"], block: 1, teaches: ["ই"] },
-  { id: 10, letters: ["স", "ক", "ল", "র"], words: ["কর", "সকল", "সরল"], block: 1, teaches: ["র"] },
-  { id: 11, letters: ["গ", "র", "ম", "ক"], words: ["গরম", "রকম", "গম"], block: 1, teaches: ["গ"] },
-  { id: 12, letters: ["ব", "র", "ফ", "ত", "ল", "গ"], words: ["বরফ", "তরল", "বগল"], block: 1 },
-  { id: 13, letters: ["ন", "গ", "র", "ম"], words: ["মন", "নগর", "নরম"], block: 1, teaches: ["ন"] },
-  { id: 14, letters: ["ন", "গ", "দ", "শ"], words: ["দশ", "নগদ", "নদ"], block: 1, teaches: ["শ"] },
-  { id: 15, letters: ["জ", "ল", "ন"], words: ["জল", "জন", "নল"], block: 1, teaches: ["জ"] },
-  { id: 16, letters: ["ও", "জ", "ন", "র", "আ"], words: ["ওজন", "নজর", "আজ"], block: 1, teaches: ["ও"] },
-  { id: 17, letters: ["ধ", "ন", "ব", "ল"], words: ["ধন", "বন", "বল"], block: 1, teaches: ["ধ"] },
-  { id: 18, letters: ["স", "ড়", "ক", "অ", "ল"], words: ["সড়ক", "অলস", "কলস"], block: 1, teaches: ["ড়"] },
-  { id: 19, letters: ["ঝ", "ল", "ক", "ন", "ড়"], words: ["ঝলক", "নকল", "ঝড়"], block: 1, teaches: ["ঝ"] },
-  { id: 20, letters: ["জ", "গ", "ত", "য", "ব"], words: ["যত", "জগত", "যব"], block: 1, teaches: ["য"] },
-  { id: 21, letters: ["ম", "ট", "র", "গ", "উ"], words: ["উট", "মটর", "টগর"], block: 1, teaches: ["উ", "ট"] },
-  { id: 22, letters: ["ল", "ব", "ণ", "ঋ"], words: ["ঋণ", "লবণ", "বল"], block: 1, teaches: ["ঋ", "ণ"] },
-  { id: 23, letters: ["ঔ", "ষ", "ধ", "ন", "ল"], words: ["ঔষধ", "ধন", "নল"], block: 1, teaches: ["ঔ", "ষ"] },
-
-  // Block 2, one vowel sign: a single vowel sign per level, introduced one at a time in KAR_ORDER.
-  { id: 24, letters: ["সা", "দা", "ত", "কা"], words: ["সাদা", "সাত", "কাদা"], block: 2, teaches: ["া"] },
-  { id: 25, letters: ["ক", "রা", "তা", "লা"], words: ["করা", "তারা", "কলা", "তালা"], block: 2 },
-  { id: 26, letters: ["স", "কা", "ল", "টা", "ঝা"], words: ["সকাল", "কাটা", "ঝাল"], block: 2 },
-  { id: 27, letters: ["বা", "তা", "স", "গা", "ন"], words: ["বাতাস", "বাগান", "বাসন"], block: 2 },
-  { id: 28, letters: ["দ", "র", "জা", "কা", "মা"], words: ["দরজা", "কামার", "জামা"], block: 2 },
-  { id: 29, letters: ["না", "ট", "ক", "ম", "লা", "উ"], words: ["নাটক", "কমলা", "লাউ"], block: 2 },
-  { id: 30, letters: ["স", "ম", "ত", "ল", "মা", "শা"], words: ["সমতল", "মাস", "মশা"], block: 2 },
-  { id: 31, letters: ["গ", "ত", "কা", "ল", "ঈ", "তা"], words: ["গতকাল", "ঈগল", "লতা"], block: 2 },
-  { id: 32, letters: ["অ", "জ", "গ", "র", "সা", "গা"], words: ["অজগর", "সাগর", "গাজর"], block: 2 },
-  { id: 33, letters: ["ক", "লা", "গা", "ছ"], words: ["লাগা", "গাছ", "কলাগাছ"], block: 2, teaches: ["ছ"] },
-  { id: 34, letters: ["না", "শ", "তা", "ছা", "দ"], words: ["নাশতা", "ছাতা", "ছাদ"], block: 2 },
-  { id: 35, letters: ["রা", "খা", "ল", "গ"], words: ["রাখা", "রাখাল", "রাগ", "খাল"], block: 2, teaches: ["খ"] },
-  { id: 36, letters: ["খা", "বা", "র", "না", "ন", "ত"], words: ["খাবার", "বানান", "রতন"], block: 2 },
-  { id: 37, letters: ["বা", "ন", "র", "ঘ"], words: ["ঘর", "বানর", "ঘন", "বাঘ"], block: 2, teaches: ["ঘ"] },
-  { id: 38, letters: ["শ", "র", "ব", "ত", "হ", "হা"], words: ["শরবত", "শহর", "হাত"], block: 2, teaches: ["হ"] },
-  { id: 39, letters: ["পা", "হা", "ড়"], words: ["পাড়", "হাড়", "পাহাড়"], block: 2, teaches: ["প"] },
-  { id: 40, letters: ["ভা", "ই", "ত", "দ"], words: ["ভাই", "ভাত", "দই"], block: 2, teaches: ["ভ"] },
-  { id: 41, letters: ["ঊ", "ষা", "ভা", "ত"], words: ["ঊষা", "ভাষা", "ভাত"], block: 2, teaches: ["ঊ"] },
-  { id: 42, letters: ["মা", "খ", "ন", "থা"], words: ["মাথা", "মাখন", "নখ"], block: 2, teaches: ["থ"] },
-  { id: 43, letters: ["পা", "ঠ", "শা", "লা"], words: ["পাঠ", "পালা", "পাঠশালা", "পাশা"], block: 2, teaches: ["ঠ"] },
-  { id: 44, letters: ["মা", "ছ", "রা", "ঙা"], words: ["মাছ", "মারা", "মাছরাঙা", "রাঙা"], block: 2, teaches: ["ঙ"] },
-  { id: 45, letters: ["পা", "থ", "র", "ঙ", "খা"], words: ["পাথর", "রঙ", "পাখা", "রথ"], block: 2 },
-  { id: 46, letters: ["ডা", "ল", "লা", "ফ"], words: ["ডাল", "লাল", "লাফ"], block: 2, teaches: ["ড"] },
-  { id: 47, letters: ["ঢা", "ল", "কা", "ক"], words: ["ঢাল", "কাল", "কাক"], block: 2, teaches: ["ঢ"] },
-  { id: 48, letters: ["গা", "ঢ়", "ন", "কা"], words: ["গাঢ়", "গান", "কান"], block: 2, teaches: ["ঢ়"] },
-  { id: 49, letters: ["স", "ফ", "ল", "বি"], words: ["বিল", "সফল", "ফসল"], block: 2, teaches: ["ি"] },
-  { id: 50, letters: ["ব", "ছ", "র", "খ", "বি"], words: ["বছর", "খবর", "ছবি"], block: 2 },
-  { id: 51, letters: ["ভ", "ব", "ন", "স", "জি"], words: ["ভবন", "সবজি", "জিভ"], block: 2 },
-  { id: 52, letters: ["আ", "পে", "ল", "ট"], words: ["আপেল", "আট", "পেট"], block: 2, teaches: ["ে"] },
-  { id: 53, letters: ["লে", "খ", "ক", "ছে", "ট"], words: ["লেখক", "ছেলে", "টক"], block: 2 },
-  { id: 54, letters: ["স", "হ", "জ", "বু", "ক"], words: ["সহজ", "সবুজ", "বুক"], block: 2, teaches: ["ু"] },
-  { id: 55, letters: ["দু", "পু", "র", "কু", "ই"], words: ["দুপুর", "পুকুর", "দুই"], block: 2 },
-  { id: 56, letters: ["প", "শ", "ম", "থ", "ঘু"], words: ["পশম", "পথ", "ঘুম"], block: 2 },
-  { id: 57, letters: ["আ", "ঙু", "ল", "স", "র"], words: ["আঙুল", "আসল", "আঙুর", "রস"], block: 2 },
-  { id: 58, letters: ["প", "ল", "ক", "চু"], words: ["চুল", "পলক", "কচু", "চুপ"], block: 2, teaches: ["চ"] },
-  { id: 59, letters: ["ম", "হ", "ল", "জ", "মূ"], words: ["মূল", "মহল", "হজম"], block: 2, teaches: ["ূ"] },
-  { id: 60, letters: ["বৈ", "ঠ", "ক", "চ", "ম"], words: ["বৈঠক", "চমক", "চক"], block: 2, teaches: ["ৈ"] },
-  { id: 61, letters: ["কৃ", "ষ", "ক", "ল", "ম"], words: ["কৃষক", "কলম", "কম", "কল"], block: 2, teaches: ["ৃ"] },
-  { id: 62, letters: ["বাং", "লা", "খা", "তা"], words: ["বাংলা", "খালা", "খাতা"], block: 2, teaches: ["ং"] },
-  { id: 63, letters: ["কাঁ", "টা", "আ", "দা"], words: ["কাঁটা", "আটা", "কাঁদা", "আদা"], block: 2, teaches: ["ঁ"] },
-
-  // Block 3, vowel signs together: several signs in one word, all of them already taught.
-  { id: 64, letters: ["ধ", "রা", "নি", "কাঁ"], words: ["ধরা", "রানি", "কাঁধ"], block: 3 },
-  { id: 65, letters: ["ক", "পা", "ল", "নি", "চি"], words: ["কপাল", "পানি", "চিল", "চিনি"], block: 3 },
-  { id: 66, letters: ["মে", "ঘ", "লা", "খে", "ঝে"], words: ["মেঘলা", "খেলা", "মেঘ", "মেঝে"], block: 3 },
-  { id: 67, letters: ["বি", "ছা", "না", "চা", "তি"], words: ["বিছানা", "চাবি", "নাতি", "নাচা"], block: 3 },
-  { id: 68, letters: ["প", "রি", "বা", "র", "ছু", "টি", "সা"], words: ["পরিবার", "বাছুর", "ছুটি", "সাপ"], block: 3 },
-  { id: 69, letters: ["ই", "তি", "হা", "স", "হাঁ", "ড়ি"], words: ["ইতিহাস", "হাতি", "হাঁস", "হাঁড়ি"], block: 3 },
-  { id: 70, letters: ["আ", "ল", "মা", "রি", "তৈ", "ঝি"], words: ["আলমারি", "তৈরি", "তৈল", "ঝিল"], block: 3 },
-  { id: 71, letters: ["প", "ড়া", "লে", "খা", "লি", "চু"], words: ["পড়ালেখা", "লেখা", "পড়া", "খালি", "লিচু"], block: 3 },
-  { id: 72, letters: ["ঘ", "র", "বা", "ড়ি", "গা", "কুঁ"], words: ["ঘরবাড়ি", "বাড়ি", "গাড়ি", "ঘড়ি", "কুঁড়ি"], block: 3 },
-  { id: 73, letters: ["কা", "ঠ", "বি", "ড়া", "লি", "ল", "আঁ"], words: ["কাঠবিড়ালি", "বিকাল", "বিড়াল", "আঁকা"], block: 3 },
-  { id: 74, letters: ["ফু", "ল", "বা", "গা", "ন", "তি", "তা"], words: ["ফুলবাগান", "বালতি", "ফুল", "তিতা"], block: 3 },
-  { id: 75, letters: ["পা", "য়ে", "স", "মে"], words: ["পাস", "পায়ে", "পায়েস", "মেয়ে"], block: 3, teaches: ["য়"] },
-  { id: 76, letters: ["স", "ম", "য়", "ডি", "রু"], words: ["সময়", "ডিম", "সরু", "মরু"], block: 3 },
-  { id: 77, letters: ["ন", "দী", "র", "পা"], words: ["নদী", "পান", "নদীর", "পার"], block: 3, teaches: ["ী"] },
-  { id: 78, letters: ["মৌ", "মা", "ছি", "ঠ", "লি"], words: ["মৌমাছি", "মাঠ", "মাছি", "মালি"], block: 3, teaches: ["ৌ"] },
-
-  // Block 4, conjuncts: joined consonants, one cluster family at a time.
-  { id: 79, letters: ["ব", "স", "ন্ত", "ড়", "ঘা", "মাং"], words: ["বসন্ত", "বড়", "ঘাস", "ঘাড়", "মাংস"], block: 4, teaches: ["ন্ত"] },
-  { id: 80, letters: ["সু", "ন্দ", "র", "আ", "ন", "গু", "দূ"], words: ["সুন্দর", "আনন্দ", "রসুন", "আগুন", "দূর"], block: 4, teaches: ["ন্দ"] },
-  { id: 81, letters: ["বা", "রা", "ন্দা", "জা", "র", "ভ"], words: ["বারান্দা", "বাজার", "রাবার", "রাজা", "ভরা"], block: 4 },
-  { id: 82, letters: ["রা", "স্তা", "ঘা", "ট", "টি", "কি", "রু"], words: ["রাস্তা", "রাস্তাঘাট", "ঘাট", "টিকিট", "রুটি"], block: 4, teaches: ["স্ত"] },
-  { id: 83, letters: ["শী", "ত", "কা", "ল", "স্কু", "দাঁ"], words: ["স্কুল", "শীতল", "শীত", "দাঁত", "শীতকাল"], block: 4, teaches: ["স্ক"] },
-  { id: 84, letters: ["ছা", "গ", "ল", "ল্প", "ড়া", "তে"], words: ["গল্প", "গড়া", "ছাড়া", "ছাগল", "তেল"], block: 4, teaches: ["ল্প"] },
-  { id: 85, letters: ["দি", "ন", "রা", "ত", "ন্না", "দা"], words: ["দিনরাত", "দিন", "রাত", "রান্না", "দাদি"], block: 4, teaches: ["ন্ন"] },
-  { id: 86, letters: ["ব", "ন্ধ", "লা", "গ"], words: ["বন্ধ", "বলা", "গলা"], block: 4, teaches: ["ন্ধ"] },
-  { id: 87, letters: ["বা", "লি", "শ", "সা", "ন", "ক্ত"], words: ["বালিশ", "শক্ত", "বালি", "সাবান"], block: 4, teaches: ["ক্ত"] },
-  { id: 88, letters: ["পে", "ন্সি", "ল", "গা", "ম", "ছা", "পেঁ"], words: ["পেন্সিল", "গাল", "পেঁপে", "গামছা"], block: 4, teaches: ["ন্স"] },
-  { id: 89, letters: ["চা", "দ", "র", "স্বা", "ধী"], words: ["স্বাদ", "চাদর", "চার", "ধীর"], block: 4, teaches: ["স্ব"] },
-  { id: 90, letters: ["ব", "র্ষা", "কা", "ল", "সা", "আ", "নী"], words: ["বর্ষাকাল", "বর্ষা", "বসা", "আসা", "নীল"], block: 4, teaches: ["র্ষ"] },
-  { id: 91, letters: ["চি", "ঠি", "প", "ত্র", "ছা", "ত্রী", "কাঁ"], words: ["চিঠিপত্র", "ছাত্র", "চিঠি", "ছাত্রী", "কাঁচি"], block: 4, teaches: ["ত্র"] },
-  { id: 92, letters: ["শি", "ক্ষ", "ক", "ড়", "ফি", "দৌ"], words: ["শিক্ষক", "শিকড়", "কফি", "দৌড়"], block: 4, teaches: ["ক্ষ"] },
-  { id: 93, letters: ["স", "মু", "দ্র", "বা", "খ"], words: ["সমুদ্র", "বাস", "মুখ"], block: 4, teaches: ["দ্র"] },
-  { id: 94, letters: ["গ্রা", "ম", "ধু", "লা"], words: ["গ্রাম", "মধু", "ধুলা"], block: 4, teaches: ["গ্র"] },
-  { id: 95, letters: ["বি", "দ্যা", "ল", "য়", "টে", "ছ"], words: ["লয়", "বিদ্যালয়", "বিদ্যা", "ছয়", "টেবিল"], block: 4, teaches: ["দ্য"] },
-  { id: 96, letters: ["জ", "ন্ম", "দি", "ন", "তি", "বী"], words: ["জন্মদিন", "তিন", "বীজ"], block: 4, teaches: ["ন্ম"] },
-  { id: 97, letters: ["র", "স", "গো", "ল্লা", "আ", "না", "শো"], words: ["রসগোল্লা", "আনারস", "আনা", "শোনা"], block: 4, teaches: ["ো", "ল্ল"] },
-  { id: 98, letters: ["ঐ", "ক্য", "বা", "টি"], words: ["ঐক্য", "বাক্য", "বাটি"], block: 4, teaches: ["ঐ", "ক্য"] },
-
-  // Block 5, free play: everything taught, mixed, longest words and fullest boards.
-  { id: 99, letters: ["ক", "ঠি", "ন", "গা", "য়"], words: ["কঠিন", "গায়ক", "নয়"], block: 5 },
-  { id: 100, letters: ["দে", "ও", "য়া", "গা", "খা"], words: ["দেওয়া", "গাওয়া", "দেখা"], block: 5 },
-  { id: 101, letters: ["যা", "ও", "য়া", "ঠা", "ছা"], words: ["যাওয়া", "ওঠা", "ছায়া"], block: 5 },
-  { id: 102, letters: ["মা", "নু", "ষ", "সি", "পৌ"], words: ["মানুষ", "মাসি", "পৌষ"], block: 5 },
-  { id: 103, letters: ["মি", "নি", "ট", "চু", "ঘ"], words: ["মিনিট", "নিচু", "ঘট"], block: 5 },
-  { id: 104, letters: ["আ", "কা", "শ", "লো", "নৌ"], words: ["আকাশ", "কালো", "আলো", "নৌকা"], block: 5 }
+  { id: 10, letters: ["স", "ক", "ল", "র"], words: ["কর", "সকল", "সরল"], block: 1, teaches: ["র"] }
 ];
 
 
@@ -1695,7 +1598,7 @@ function drawLevelGrid() {
  * Two sources, in order of preference:
  *
  *   1. RECORDINGS. `VOICE_CLIPS` maps a word to an audio source - a bundled data: URI or a
- *      file beside the page. It ships empty: recording 348 words needs a native speaker,
+ *      file beside the page. It ships empty: recording every board word needs a native speaker,
  *      and `python3 tools/build.py voice` prints exactly which words in exactly what order.
  *      Drop them in and they take over automatically.
  *
@@ -2190,6 +2093,21 @@ function closeGuide() {
 Speech.init();
 
 el.sound.addEventListener("click", () => Speech.toggle());
+
+/* The level count is stated twice in the prose. Both come from the table rather than from a
+   number typed into the copy, because the catalogue ships a slice of itself while the game is
+   being reworked and a hardcoded count would be wrong the moment that slice changes. */
+function drawLevelCount() {
+  const n = LEVELS.length;
+  const plural = n === 1 ? "level" : "levels";
+  const words = ["zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight",
+                 "Nine", "Ten", "Eleven", "Twelve"][n];
+  const eyebrow = document.getElementById("eyebrowCount");
+  const deck = document.getElementById("deckCount");
+  if (eyebrow) eyebrow.textContent = `${n} ${plural}`;
+  if (deck) deck.textContent = `${words || n} ${plural}`;
+}
+drawLevelCount();
 
 el.guideOpen.addEventListener("click", openGuide);
 el.guideClose.addEventListener("click", closeGuide);

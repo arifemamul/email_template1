@@ -238,6 +238,18 @@ SHARED = {
 MIN_ZIPF = 2.0          # below this, treat a "word" as invented rather than Bengali
 MAX_ROWS, MAX_COLS = 8, 9
 
+# How many levels actually ship, counted from the start of the syllabus. The catalogue below
+# is authored in full and validated in full - `build.py check` still holds all 104 levels to
+# every rule, including the promise that the syllabus reaches the whole alphabet - but only
+# this many are written into the two builds.
+#
+# It exists because the game is being reworked and there is no point carrying a hundred levels
+# through changes to how a level works. The rest are parked, not deleted: set this to None and
+# the full catalogue ships again, unchanged, because nothing about the levels themselves
+# depends on it. The cap is applied after ordering and after the boards are settled, so the
+# levels that do ship are byte-identical to the opening of the full catalogue.
+SHIP_LEVELS = 10
+
 # The widest wheel worth drawing. A board grows by taking on words, and a word it has no tile
 # for brings its own - so this is what stops a level from ending up with a wheel too crowded to
 # drag across on a phone.
@@ -405,10 +417,21 @@ def order_block(group, known):
     return ordered, known
 
 
+def shipped(levels):
+    """
+    The levels that go into the builds: the first `SHIP_LEVELS` of the syllabus, or all of them
+    when the cap is off. Kept separate from `ordered_levels` so the checks still see the whole
+    catalogue - a parked level that has quietly broken is worth knowing about before it is
+    un-parked, not after.
+    """
+    return levels if SHIP_LEVELS is None else levels[:SHIP_LEVELS]
+
+
 def ordered_levels():
     """
-    Every valid level in teaching order. Returns (levels, failures) so callers can report
-    problems rather than silently shipping fewer levels than the catalogue lists.
+    Every valid level in teaching order - the whole catalogue, cap or no cap. Returns
+    (levels, failures) so callers can report problems rather than silently shipping fewer
+    levels than the catalogue lists.
     """
     levels, failures = [], []
     for block, words in DECLARED:

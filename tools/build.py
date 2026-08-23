@@ -22,7 +22,8 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
 from bangla import conjunct_tiles, render, split_aksharas            # noqa: E402
-from catalogue import CATALOGUE, MAX_NEW_UNITS, SHARED, ordered_levels        # noqa: E402
+from catalogue import (CATALOGUE, MAX_NEW_UNITS, SHARED, SHIP_LEVELS,          # noqa: E402
+                       ordered_levels, shipped)
 from curriculum import (BLOCKS, NOT_TAUGHT, alphabet,                  # noqa: E402
                         unit_label)
 from vocabulary import theme_of                                       # noqa: E402
@@ -66,6 +67,17 @@ KOTLIN_FOOTER = '''    )
 
     val count: Int get() = all.size
 
+    /**
+     * How many levels the catalogue holds, as opposed to how many ship. The two differ while
+     * the game is being reworked: `catalogue.SHIP_LEVELS` caps what is written out, and the
+     * levels beyond the cap are parked rather than deleted. A test that asserts something
+     * about the *whole* syllabus - that it reaches every letter, that it spans all five
+     * blocks - can only hold when these two agree, so it checks first.
+     */
+    const val AUTHORED = %d
+
+    val isComplete: Boolean get() = count == AUTHORED
+
     fun byId(id: Int): Level? = all.firstOrNull { it.id == id }
 }'''
 
@@ -84,7 +96,12 @@ def milestones(levels):
     return marks
 
 
-def emit(levels):
+def emit(levels, authored=None):
+    """
+    The two generated tables. `authored` is the size of the whole catalogue, which is not the
+    same as `len(levels)` when `SHIP_LEVELS` is capping what goes out.
+    """
+    authored = len(levels) if authored is None else authored
     marks = milestones(levels)
     kt, js = [KOTLIN_HEADER], ['const LEVELS = [']
 
@@ -110,18 +127,24 @@ def emit(levels):
 
     kt[-1] = kt[-1].rstrip(',')
     js[-1] = js[-1].rstrip(',')
-    kt.append(KOTLIN_FOOTER)
+    kt.append(KOTLIN_FOOTER % authored)
     js.append('];')
+    # Nothing may follow the closing bracket. `write_builds` splices this in by replacing
+    # everything from `const LEVELS = [` to the first `];` it finds after it, so anything
+    # emitted past that point is left behind on the next build instead of being replaced -
+    # which, for a `const`, means a duplicate declaration and a page that will not parse.
     return '\n'.join(kt) + '\n', '\n'.join(js)
 
 
-def write_builds(levels):
-    kotlin_src, js_src = emit(levels)
+def write_builds(levels, authored=None):
+    kotlin_src, js_src = emit(levels, authored)
 
     before_kt = KOTLIN.read_text(encoding='utf-8') if KOTLIN.exists() else ''
     KOTLIN.write_text(kotlin_src, encoding='utf-8')
 
     html = WEB.read_text(encoding='utf-8')
+    if html.count('const LEVELS = [') != 1:
+        raise SystemExit('docs/index.html: expected exactly one `const LEVELS = [` to replace')
     start = html.index('const LEVELS = [')
     end = html.index('];', start) + 2
     before_web = html
@@ -149,6 +172,11 @@ def report(levels, failures):
         print(f'  {i:<3} {level["block"]:<4} {len(level["tiles"]):<6} '
               f'{len(level["words"]):<6} {longest:<8} {rows}x{cols:<5} {new:<12} '
               f'{" ".join(level["words"])}{mark}')
+
+    if SHIP_LEVELS is not None and SHIP_LEVELS < len(levels):
+        print(f'\nshipping the first {SHIP_LEVELS} of {len(levels)} levels; the rest are parked '
+              f'(catalogue.SHIP_LEVELS).\nEverything below still checks the whole catalogue, '
+              f'so a parked level cannot rot unnoticed.')
 
     words = {w for level in levels for w in level['words']}
     aksharas = {a for w in words for a in split_aksharas(w)}
@@ -319,8 +347,11 @@ def main(argv):
             report(levels, failures)
             print('\nrefusing to build with rejected levels')
             return 1
-        kt_changed, web_changed = write_builds(levels)
-        print(f'{len(levels)} levels written')
+        going = shipped(levels)
+        kt_changed, web_changed = write_builds(going, authored=len(levels))
+        print(f'{len(going)} levels written'
+              + (f' - {len(levels) - len(going)} parked, see catalogue.SHIP_LEVELS'
+                 if len(going) != len(levels) else ''))
         print(f'  {KOTLIN.relative_to(REPO)}  {"updated" if kt_changed else "unchanged"}')
         print(f'  {WEB.relative_to(REPO)}  {"updated" if web_changed else "unchanged"}')
         print('\nnow run: cd bengali-word-game && ./gradlew test')
