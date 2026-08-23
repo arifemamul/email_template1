@@ -425,7 +425,6 @@
     white-space: nowrap;
   }
   .chip.good { background: var(--leaf); }
-  .chip.extra { background: #3FA9F5; }
   .chip.bad  { background: var(--coral); }
   .chip.dup  { background: var(--marigold-d); }
   .chip.shake { animation: shake .34s ease; }
@@ -436,16 +435,6 @@
     38% { transform: translateX(-11px); }
     60% { transform: translateX(8px); }
     82% { transform: translateX(-4px); }
-  }
-
-  .chip .badge {
-    font-style: normal;
-    font-size: 12px;
-    font-weight: 700;
-    background: color-mix(in srgb, var(--ink) 18%, transparent);
-    color: var(--ink);
-    border-radius: 99px;
-    padding: 2px 8px;
   }
 
   .chip .go {
@@ -638,118 +627,6 @@
   }
 
 
-  /* -- Extra words: the chest ----------------------------------------------- */
-  .chest-btn { position: relative; }
-
-  .chest-btn .fill {
-    position: absolute;
-    left: 0; bottom: 0;
-    height: 3px;
-    background: var(--leaf);
-    border-radius: 0 99px 99px 0;
-    transition: width .45s cubic-bezier(.2,.8,.3,1);
-  }
-  .chest-btn.bump { animation: chest-bump .5s cubic-bezier(.2,1.6,.4,1); }
-  .chest-btn.full { background: var(--leaf); }
-  .chest-btn.full .glyph, .chest-btn.full span { color: var(--ink); }
-
-  @keyframes chest-bump {
-    0%   { transform: scale(1); }
-    35%  { transform: scale(1.16) rotate(-4deg); }
-    70%  { transform: scale(.97) rotate(2deg); }
-    100% { transform: scale(1); }
-  }
-
-  .sheet {
-    position: absolute;
-    inset: 0;
-    background: color-mix(in srgb, var(--indigo-900) 82%, transparent);
-    backdrop-filter: blur(3px);
-    display: grid;
-    place-items: center;
-    padding: 22px;
-    z-index: 7;
-  }
-  .sheet[hidden] { display: none; }
-
-  .sheet-card {
-    background: var(--indigo-700);
-    border-radius: 22px;
-    padding: 22px 20px;
-    width: 100%;
-    max-width: 290px;
-    box-shadow: 0 24px 60px -20px #000;
-    animation: card-in .28s cubic-bezier(.2,1.5,.4,1);
-  }
-
-  @keyframes card-in {
-    from { transform: scale(.9) translateY(8px); opacity: 0; }
-    to   { transform: scale(1) translateY(0); opacity: 1; }
-  }
-
-  .sheet-card h2 {
-    font-family: var(--bn);
-    margin: 0 0 6px;
-    font-size: 21px;
-    color: var(--marigold);
-    text-align: center;
-  }
-  .sheet-card .lead {
-    font-family: var(--bn);
-    margin: 0 0 16px;
-    font-size: 13.5px;
-    line-height: 1.55;
-    text-align: center;
-    color: color-mix(in srgb, var(--parchment) 72%, var(--indigo-700));
-  }
-
-  .track {
-    height: 12px;
-    border-radius: 99px;
-    background: var(--violet-600);
-    overflow: hidden;
-    margin-bottom: 8px;
-  }
-  .track > i {
-    display: block;
-    height: 100%;
-    background: linear-gradient(90deg, var(--leaf), #7ce0b8);
-    border-radius: 99px;
-    transition: width .5s cubic-bezier(.2,.8,.3,1);
-  }
-
-  .track-note {
-    font-family: var(--bn);
-    font-size: 12.5px;
-    display: flex;
-    justify-content: space-between;
-    color: color-mix(in srgb, var(--parchment) 62%, var(--indigo-700));
-    margin-bottom: 16px;
-  }
-
-  .found-words {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 7px;
-    justify-content: center;
-    margin-bottom: 18px;
-    min-height: 30px;
-  }
-  .found-words .w {
-    font-family: var(--bn);
-    font-size: 15px;
-    font-weight: 700;
-    background: var(--leaf);
-    color: var(--ink);
-    border-radius: 99px;
-    padding: 3px 12px;
-  }
-  .found-words .none {
-    font-family: var(--bn);
-    font-size: 13px;
-    color: color-mix(in srgb, var(--parchment) 50%, var(--indigo-700));
-  }
-
   /* -- Pronunciation ---------------------------------------------------------
        A learner who cannot hear a word cannot learn it, and Bengali spelling hides the
        sound: ব and ভ, শ and ষ and স are each one sound in speech but different letters on
@@ -783,54 +660,13 @@
     opacity: .85;
   }
 
-  /* Icon only: with the chest, hint and shuffle already labelled, a fourth label does not
-     fit a 360px phone - and a speaker reads the same in every language anyway. */
+  /* Icon only: with hint and shuffle already labelled, a third label does not fit a 360px
+     phone - and a speaker reads the same in every language anyway. */
   .sound-btn { padding: 9px 12px; }
   .sound-btn[aria-pressed="false"] { opacity: .45; }
   .sound-btn[aria-pressed="false"] .wave::after { opacity: .25; }
   .sound-btn[disabled] { opacity: .3; cursor: default; }
 
-  /* An inline speaker beside a sentence. */
-  .say {
-    border: 0;
-    background: transparent;
-    color: color-mix(in srgb, var(--marigold) 82%, var(--parchment));
-    padding: 2px 4px;
-    margin-left: 4px;
-    cursor: pointer;
-    vertical-align: middle;
-    line-height: 1;
-  }
-  .say:hover { color: var(--marigold); }
-  .say:active { transform: scale(.9); }
-  .say[disabled] { opacity: .3; cursor: default; }
-
-  /* The letter this level is the first to use. Tapping it says it on its own. */
-  .new-letter {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    align-self: center;
-    border: 1px solid color-mix(in srgb, var(--marigold) 34%, transparent);
-    background: color-mix(in srgb, var(--marigold) 12%, transparent);
-    border-radius: 99px;
-    padding: 5px 12px 5px 10px;
-    cursor: pointer;
-    color: var(--marigold);
-    font: inherit;
-  }
-  .new-letter[hidden] { display: none; }
-  .new-letter .tag {
-    font-family: var(--bn);
-    font-size: 11.5px;
-    opacity: .8;
-  }
-  .new-letter .face { font-size: 19px; font-weight: 700; line-height: 1; }
-  .new-letter:active { transform: scale(.96); }
-
-
-  /* The chest list becomes tappable for the same reason. */
-  .found-words .w { cursor: pointer; }
 
   /* -- Animation layer: flying tiles, coins, confetti ----------------------- */
   #fx {
@@ -909,8 +745,6 @@
     25%     { transform: translateX(-4px) rotate(-3deg); }
     75%     { transform: translateX(4px) rotate(3deg); }
   }
-
-  .action.flash { animation: chest-bump .45s cubic-bezier(.2,1.6,.4,1); }
 
   @media (prefers-reduced-motion: reduce) {
     #fx { display: none; }
@@ -996,20 +830,11 @@
           <div class="coins"><span class="dot"></span><span id="coinCount">১২০</span></div>
         </div>
 
-        <button class="new-letter" id="newLetter" hidden>
-          <span class="tag">নতুন</span><span class="face bn" id="newLetterFace"></span>
-          <span class="glyph wave" aria-hidden="true"></span>
-        </button>
-
         <div class="board-area"><div class="board" id="board"></div></div>
 
         <div class="preview" id="preview"></div>
 
         <div class="actions">
-          <button class="action chest-btn" id="chest" title="বাড়তি শব্দের বাক্স">
-            <span class="glyph">▧</span><span class="bn" id="chestCount">০/৩</span>
-            <i class="fill" id="chestFill"></i>
-          </button>
           <button class="action" id="hint"><span class="glyph">◈</span><span class="bn">সংকেত ২৫</span></button>
           <button class="action" id="shuffle"><span class="glyph">⟳</span><span class="bn">এলোমেলো</span></button>
           <button class="action sound-btn" id="sound" aria-pressed="true"
@@ -1019,23 +844,6 @@
         </div>
 
         <div class="wheel-area"><div class="wheel" id="wheel"><svg id="trail"></svg></div></div>
-
-        <div class="sheet" id="chestSheet" hidden>
-          <div class="sheet-card">
-            <h2 class="bn">বাড়তি শব্দ</h2>
-            <p class="lead">
-              <span id="chestLead">বোর্ডে নেই এমন শব্দও বানাও - বাক্স ভরলে কয়েন পাবে।</span>
-              <button class="say" data-say-from="chestLead" aria-label="Hear this"><span class="wave" aria-hidden="true"></span></button>
-            </p>
-            <div class="track"><i id="chestTrack"></i></div>
-            <div class="track-note">
-              <span class="bn" id="chestProgress">০ / ৩</span>
-              <span class="bn" id="chestReward">+১৫ কয়েন</span>
-            </div>
-            <div class="found-words" id="chestWords"></div>
-            <button class="primary bn" id="chestClose">ঠিক আছে</button>
-          </div>
-        </div>
 
         <div id="fx"></div>
 
@@ -1064,8 +872,8 @@
           time - ন্ধ, স্ত, ক্ষ - and finally free play on the fullest boards. Between them they
           cover the whole alphabet: all 11 vowels, all 10 vowel signs, both nasal marks and every
           consonant, across 348 different words - no word is ever set as a puzzle twice, so
-          meeting one again means spotting it in the wheel for bonus coins. Nothing to install,
-          no sign-up, no ads - your progress is saved in this browser.
+          nothing here is a board you have already solved. Nothing to install, no sign-up, no
+          ads - your progress is saved in this browser.
         </p>
       </section>
 
@@ -1076,10 +884,8 @@
           <li><span class="k">click</span><span>Prefer clicking? Tap letters one at a time, then hit <b>✓</b> on the word - or press <b>Enter</b>. <b>Esc</b> clears.</span></li>
           <li><span class="k">finish</span><span>Clearing a level moves straight to the next one - no button, no waiting. The coins and confetti play across the change.</span></li>
           <li><span class="k">&lsaquo; &rsaquo;</span><span>The arrows step to the previous or next level, and wrap around at either end. The level grid jumps straight to any level, and is coloured by stage of the syllabus. Any level you open starts blank, so an old one can always be played again.</span></li>
-          <li><span class="k">sound</span><span>Every word is spoken as you find it, and the speaker marks replay any word or sentence. Bengali spelling hides the sound - ব and ভ, শ and ষ and স are each one sound but different letters - so hearing it is how it sticks. The control greys out on a device with no Bengali voice: silence beats an English voice reading Bengali.</span></li>
-          <li><span class="k">নতুন</span><span>The chip above the board is the letter or sign this level is the first to use. Tap it to hear it on its own.</span></li>
+          <li><span class="k">sound</span><span>Every word is spoken as you find it. Bengali spelling hides the sound - ব and ভ, শ and ষ and স are each one sound but different letters - so hearing it is how it sticks. The control greys out on a device with no Bengali voice: silence beats an English voice reading Bengali.</span></li>
           <li><span class="k">◈ 25</span><span>A hint reveals one letter from a word you haven't solved. Words pay 5 coins per letter, plus 30 for clearing the level.</span></li>
-          <li><span class="k">▧ chest</span><span>Some words the letters can spell aren't on the board - spell one anyway and it goes in the chest. <b>Three fills it</b> and pays 15 coins. No word is ever set as a puzzle twice, so a word you solved earlier turning up in a later wheel is a chest word: remembering it is what pays.</span></li>
         </ul>
       </section>
 
@@ -1102,9 +908,10 @@
     <footer>
       Every board is generated from a word list when you open the level, not hand-drawn: words are
       placed by backtracking search so each one crosses another and no accidental word ever appears
-      on the grid. All 201 board words are attested in real Bengali text - checked against corpus
+      on the grid. All 348 board words are attested in real Bengali text - checked against corpus
       frequency data, then hand-picked from a vocabulary curated for a learner, because frequency
-      alone offers verb inflections and newspaper register. Levels run in the order the writing
+      alone offers verb inflections and newspaper register. No word is set as a puzzle twice, bar
+      nine early levels that have no other board available to them. Levels run in the order the writing
       system is taught rather than by puzzle difficulty alone, and each one records what it is the
       first to introduce. Tiles hold <b>aksharas</b> - the letter units a Bengali reader sees - so
       মাছ is two tiles, মা and ছ, and the conjunct ন্ধু in বন্ধু is one. Bengali text is rendered
@@ -1308,44 +1115,44 @@ function normalise(occ, placed) {
    ============================================================================ */
 const LEVELS = [
   // Block 1, plain letters: consonants and independent vowels on their own, no signs at all.
-  { id: 1, letters: ["ক", "ল", "ম"], words: ["কলম", "কম", "কল"], block: 1, teaches: ["ল", "ক", "ম"], extras: ["কমল"] },
-  { id: 2, letters: ["ক", "ল", "ম", "আ"], words: ["কলম", "কম", "কল", "আম"], block: 1, teaches: ["আ"], extras: ["কমল"] },
-  { id: 3, letters: ["ক", "ল", "ম", "এ"], words: ["কলম", "এক", "কম", "কল"], block: 1, teaches: ["এ"], extras: ["কমল"] },
-  { id: 4, letters: ["ক", "ম", "ল", "ফ"], words: ["ফল", "কমল", "ফলক"], block: 1, teaches: ["ফ"], extras: ["কম", "কল", "কলম"] },
-  { id: 5, letters: ["ক", "ল", "ম", "অ", "ত"], words: ["কলম", "অতল", "কম", "কল"], block: 1, teaches: ["অ", "ত"], extras: ["কমল"] },
+  { id: 1, letters: ["ক", "ল", "ম"], words: ["কলম", "কম", "কল"], block: 1, teaches: ["ল", "ক", "ম"] },
+  { id: 2, letters: ["ক", "ল", "ম", "আ"], words: ["কলম", "কম", "কল", "আম"], block: 1, teaches: ["আ"] },
+  { id: 3, letters: ["ক", "ল", "ম", "এ"], words: ["কলম", "এক", "কম", "কল"], block: 1, teaches: ["এ"] },
+  { id: 4, letters: ["ক", "ম", "ল", "ফ"], words: ["ফল", "কমল", "ফলক"], block: 1, teaches: ["ফ"] },
+  { id: 5, letters: ["ক", "ল", "ম", "অ", "ত"], words: ["কলম", "অতল", "কম", "কল"], block: 1, teaches: ["অ", "ত"] },
   { id: 6, letters: ["ব", "দ", "ল"], words: ["বদল", "দল", "বল"], block: 1, teaches: ["ব", "দ"] },
-  { id: 7, letters: ["ক", "দ", "ম", "ঈ"], words: ["ঈদ", "কদম", "দম"], block: 1, teaches: ["ঈ"], extras: ["কম"] },
+  { id: 7, letters: ["ক", "দ", "ম", "ঈ"], words: ["ঈদ", "কদম", "দম"], block: 1, teaches: ["ঈ"] },
   { id: 8, letters: ["স", "ব", "ক"], words: ["সব", "বস", "বক"], block: 1, teaches: ["স"] },
   { id: 9, letters: ["স", "ব", "ই"], words: ["সব", "বই", "বস"], block: 1, teaches: ["ই"] },
-  { id: 10, letters: ["স", "ক", "ল", "র"], words: ["কর", "সকল", "সরল"], block: 1, teaches: ["র"], extras: ["কল", "রস", "কলস"] },
-  { id: 11, letters: ["গ", "র", "ম", "ক"], words: ["গরম", "রকম", "গম"], block: 1, teaches: ["গ"], extras: ["কম", "কর"] },
-  { id: 12, letters: ["ব", "র", "ফ", "ত", "ল", "গ"], words: ["বরফ", "তরল", "বগল"], block: 1, extras: ["বল", "ফল"] },
-  { id: 13, letters: ["ন", "গ", "র", "ম"], words: ["মন", "নগর", "নরম"], block: 1, teaches: ["ন"], extras: ["গরম", "গম"] },
+  { id: 10, letters: ["স", "ক", "ল", "র"], words: ["কর", "সকল", "সরল"], block: 1, teaches: ["র"] },
+  { id: 11, letters: ["গ", "র", "ম", "ক"], words: ["গরম", "রকম", "গম"], block: 1, teaches: ["গ"] },
+  { id: 12, letters: ["ব", "র", "ফ", "ত", "ল", "গ"], words: ["বরফ", "তরল", "বগল"], block: 1 },
+  { id: 13, letters: ["ন", "গ", "র", "ম"], words: ["মন", "নগর", "নরম"], block: 1, teaches: ["ন"] },
   { id: 14, letters: ["ন", "গ", "দ", "শ"], words: ["দশ", "নগদ", "নদ"], block: 1, teaches: ["শ"] },
   { id: 15, letters: ["জ", "ল", "ন"], words: ["জল", "জন", "নল"], block: 1, teaches: ["জ"] },
-  { id: 16, letters: ["ও", "জ", "ন", "র", "আ"], words: ["ওজন", "নজর", "আজ"], block: 1, teaches: ["ও"], extras: ["জন"] },
-  { id: 17, letters: ["ধ", "ন", "ব", "ল"], words: ["ধন", "বন", "বল"], block: 1, teaches: ["ধ"], extras: ["নল"] },
-  { id: 18, letters: ["স", "ড়", "ক", "অ", "ল"], words: ["সড়ক", "অলস", "কলস"], block: 1, teaches: ["ড়"], extras: ["সকল", "কল"] },
-  { id: 19, letters: ["ঝ", "ল", "ক", "ন", "ড়"], words: ["ঝলক", "নকল", "ঝড়"], block: 1, teaches: ["ঝ"], extras: ["কল", "নল"] },
+  { id: 16, letters: ["ও", "জ", "ন", "র", "আ"], words: ["ওজন", "নজর", "আজ"], block: 1, teaches: ["ও"] },
+  { id: 17, letters: ["ধ", "ন", "ব", "ল"], words: ["ধন", "বন", "বল"], block: 1, teaches: ["ধ"] },
+  { id: 18, letters: ["স", "ড়", "ক", "অ", "ল"], words: ["সড়ক", "অলস", "কলস"], block: 1, teaches: ["ড়"] },
+  { id: 19, letters: ["ঝ", "ল", "ক", "ন", "ড়"], words: ["ঝলক", "নকল", "ঝড়"], block: 1, teaches: ["ঝ"] },
   { id: 20, letters: ["জ", "গ", "ত", "য", "ব"], words: ["যত", "জগত", "যব"], block: 1, teaches: ["য"] },
-  { id: 21, letters: ["ম", "ট", "র", "গ", "উ"], words: ["উট", "মটর", "টগর"], block: 1, teaches: ["উ", "ট"], extras: ["গরম", "গম"] },
+  { id: 21, letters: ["ম", "ট", "র", "গ", "উ"], words: ["উট", "মটর", "টগর"], block: 1, teaches: ["উ", "ট"] },
   { id: 22, letters: ["ল", "ব", "ণ", "ঋ"], words: ["ঋণ", "লবণ", "বল"], block: 1, teaches: ["ঋ", "ণ"] },
   { id: 23, letters: ["ঔ", "ষ", "ধ", "ন", "ল"], words: ["ঔষধ", "ধন", "নল"], block: 1, teaches: ["ঔ", "ষ"] },
 
   // Block 2, one vowel sign: a single vowel sign per level, introduced one at a time in KAR_ORDER.
   { id: 24, letters: ["সা", "দা", "ত", "কা"], words: ["সাদা", "সাত", "কাদা"], block: 2, teaches: ["া"] },
   { id: 25, letters: ["ক", "রা", "তা", "লা"], words: ["করা", "তারা", "কলা", "তালা"], block: 2 },
-  { id: 26, letters: ["স", "কা", "ল", "টা", "ঝা"], words: ["সকাল", "কাটা", "ঝাল"], block: 2, extras: ["কাল"] },
-  { id: 27, letters: ["বা", "তা", "স", "গা", "ন"], words: ["বাতাস", "বাগান", "বাসন"], block: 2, extras: ["বাস", "গান"] },
+  { id: 26, letters: ["স", "কা", "ল", "টা", "ঝা"], words: ["সকাল", "কাটা", "ঝাল"], block: 2 },
+  { id: 27, letters: ["বা", "তা", "স", "গা", "ন"], words: ["বাতাস", "বাগান", "বাসন"], block: 2 },
   { id: 28, letters: ["দ", "র", "জা", "কা", "মা"], words: ["দরজা", "কামার", "জামা"], block: 2 },
-  { id: 29, letters: ["না", "ট", "ক", "ম", "লা", "উ"], words: ["নাটক", "কমলা", "লাউ"], block: 2, extras: ["কম", "কলা", "উট", "টক"] },
+  { id: 29, letters: ["না", "ট", "ক", "ম", "লা", "উ"], words: ["নাটক", "কমলা", "লাউ"], block: 2 },
   { id: 30, letters: ["স", "ম", "ত", "ল", "মা", "শা"], words: ["সমতল", "মাস", "মশা"], block: 2 },
-  { id: 31, letters: ["গ", "ত", "কা", "ল", "ঈ", "তা"], words: ["গতকাল", "ঈগল", "লতা"], block: 2, extras: ["কাল"] },
+  { id: 31, letters: ["গ", "ত", "কা", "ল", "ঈ", "তা"], words: ["গতকাল", "ঈগল", "লতা"], block: 2 },
   { id: 32, letters: ["অ", "জ", "গ", "র", "সা", "গা"], words: ["অজগর", "সাগর", "গাজর"], block: 2 },
-  { id: 33, letters: ["ক", "লা", "গা", "ছ"], words: ["লাগা", "গাছ", "কলাগাছ"], block: 2, teaches: ["ছ"], extras: ["কলা"] },
-  { id: 34, letters: ["না", "শ", "তা", "ছা", "দ"], words: ["নাশতা", "ছাতা", "ছাদ"], block: 2, extras: ["দশ"] },
+  { id: 33, letters: ["ক", "লা", "গা", "ছ"], words: ["লাগা", "গাছ", "কলাগাছ"], block: 2, teaches: ["ছ"] },
+  { id: 34, letters: ["না", "শ", "তা", "ছা", "দ"], words: ["নাশতা", "ছাতা", "ছাদ"], block: 2 },
   { id: 35, letters: ["রা", "খা", "ল", "গ"], words: ["রাখা", "রাখাল", "রাগ", "খাল"], block: 2, teaches: ["খ"] },
-  { id: 36, letters: ["খা", "বা", "র", "না", "ন", "ত"], words: ["খাবার", "বানান", "রতন"], block: 2, extras: ["বানর"] },
+  { id: 36, letters: ["খা", "বা", "র", "না", "ন", "ত"], words: ["খাবার", "বানান", "রতন"], block: 2 },
   { id: 37, letters: ["বা", "ন", "র", "ঘ"], words: ["ঘর", "বানর", "ঘন", "বাঘ"], block: 2, teaches: ["ঘ"] },
   { id: 38, letters: ["শ", "র", "ব", "ত", "হ", "হা"], words: ["শরবত", "শহর", "হাত"], block: 2, teaches: ["হ"] },
   { id: 39, letters: ["পা", "হা", "ড়"], words: ["পাড়", "হাড়", "পাহাড়"], block: 2, teaches: ["প"] },
@@ -1354,67 +1161,67 @@ const LEVELS = [
   { id: 42, letters: ["মা", "খ", "ন", "থা"], words: ["মাথা", "মাখন", "নখ"], block: 2, teaches: ["থ"] },
   { id: 43, letters: ["পা", "ঠ", "শা", "লা"], words: ["পাঠ", "পালা", "পাঠশালা", "পাশা"], block: 2, teaches: ["ঠ"] },
   { id: 44, letters: ["মা", "ছ", "রা", "ঙা"], words: ["মাছ", "মারা", "মাছরাঙা", "রাঙা"], block: 2, teaches: ["ঙ"] },
-  { id: 45, letters: ["পা", "থ", "র", "ঙ", "খা"], words: ["পাথর", "রঙ", "পাখা", "রথ"], block: 2, extras: ["পার"] },
-  { id: 46, letters: ["ডা", "ল", "লা", "ফ"], words: ["ডাল", "লাল", "লাফ"], block: 2, teaches: ["ড"], extras: ["ফল"] },
-  { id: 47, letters: ["ঢা", "ল", "কা", "ক"], words: ["ঢাল", "কাল", "কাক"], block: 2, teaches: ["ঢ"], extras: ["কল"] },
+  { id: 45, letters: ["পা", "থ", "র", "ঙ", "খা"], words: ["পাথর", "রঙ", "পাখা", "রথ"], block: 2 },
+  { id: 46, letters: ["ডা", "ল", "লা", "ফ"], words: ["ডাল", "লাল", "লাফ"], block: 2, teaches: ["ড"] },
+  { id: 47, letters: ["ঢা", "ল", "কা", "ক"], words: ["ঢাল", "কাল", "কাক"], block: 2, teaches: ["ঢ"] },
   { id: 48, letters: ["গা", "ঢ়", "ন", "কা"], words: ["গাঢ়", "গান", "কান"], block: 2, teaches: ["ঢ়"] },
-  { id: 49, letters: ["স", "ফ", "ল", "বি"], words: ["বিল", "সফল", "ফসল"], block: 2, teaches: ["ি"], extras: ["ফল"] },
+  { id: 49, letters: ["স", "ফ", "ল", "বি"], words: ["বিল", "সফল", "ফসল"], block: 2, teaches: ["ি"] },
   { id: 50, letters: ["ব", "ছ", "র", "খ", "বি"], words: ["বছর", "খবর", "ছবি"], block: 2 },
-  { id: 51, letters: ["ভ", "ব", "ন", "স", "জি"], words: ["ভবন", "সবজি", "জিভ"], block: 2, extras: ["সব", "বন", "বস"] },
+  { id: 51, letters: ["ভ", "ব", "ন", "স", "জি"], words: ["ভবন", "সবজি", "জিভ"], block: 2 },
   { id: 52, letters: ["আ", "পে", "ল", "ট"], words: ["আপেল", "আট", "পেট"], block: 2, teaches: ["ে"] },
   { id: 53, letters: ["লে", "খ", "ক", "ছে", "ট"], words: ["লেখক", "ছেলে", "টক"], block: 2 },
   { id: 54, letters: ["স", "হ", "জ", "বু", "ক"], words: ["সহজ", "সবুজ", "বুক"], block: 2, teaches: ["ু"] },
   { id: 55, letters: ["দু", "পু", "র", "কু", "ই"], words: ["দুপুর", "পুকুর", "দুই"], block: 2 },
   { id: 56, letters: ["প", "শ", "ম", "থ", "ঘু"], words: ["পশম", "পথ", "ঘুম"], block: 2 },
-  { id: 57, letters: ["আ", "ঙু", "ল", "স", "র"], words: ["আঙুল", "আসল", "আঙুর", "রস"], block: 2, extras: ["সরল"] },
-  { id: 58, letters: ["প", "ল", "ক", "চু"], words: ["চুল", "পলক", "কচু", "চুপ"], block: 2, teaches: ["চ"], extras: ["কল"] },
-  { id: 59, letters: ["ম", "হ", "ল", "জ", "মূ"], words: ["মূল", "মহল", "হজম"], block: 2, teaches: ["ূ"], extras: ["জল"] },
-  { id: 60, letters: ["বৈ", "ঠ", "ক", "চ", "ম"], words: ["বৈঠক", "চমক", "চক"], block: 2, teaches: ["ৈ"], extras: ["কম"] },
-  { id: 61, letters: ["কৃ", "ষ", "ক", "ল", "ম"], words: ["কৃষক", "কলম", "কম", "কল"], block: 2, teaches: ["ৃ"], extras: ["কমল"] },
-  { id: 62, letters: ["বাং", "লা", "খা", "তা"], words: ["বাংলা", "খালা", "খাতা"], block: 2, teaches: ["ং"], extras: ["তালা"] },
+  { id: 57, letters: ["আ", "ঙু", "ল", "স", "র"], words: ["আঙুল", "আসল", "আঙুর", "রস"], block: 2 },
+  { id: 58, letters: ["প", "ল", "ক", "চু"], words: ["চুল", "পলক", "কচু", "চুপ"], block: 2, teaches: ["চ"] },
+  { id: 59, letters: ["ম", "হ", "ল", "জ", "মূ"], words: ["মূল", "মহল", "হজম"], block: 2, teaches: ["ূ"] },
+  { id: 60, letters: ["বৈ", "ঠ", "ক", "চ", "ম"], words: ["বৈঠক", "চমক", "চক"], block: 2, teaches: ["ৈ"] },
+  { id: 61, letters: ["কৃ", "ষ", "ক", "ল", "ম"], words: ["কৃষক", "কলম", "কম", "কল"], block: 2, teaches: ["ৃ"] },
+  { id: 62, letters: ["বাং", "লা", "খা", "তা"], words: ["বাংলা", "খালা", "খাতা"], block: 2, teaches: ["ং"] },
   { id: 63, letters: ["কাঁ", "টা", "আ", "দা"], words: ["কাঁটা", "আটা", "কাঁদা", "আদা"], block: 2, teaches: ["ঁ"] },
 
   // Block 3, vowel signs together: several signs in one word, all of them already taught.
   { id: 64, letters: ["ধ", "রা", "নি", "কাঁ"], words: ["ধরা", "রানি", "কাঁধ"], block: 3 },
-  { id: 65, letters: ["ক", "পা", "ল", "নি", "চি"], words: ["কপাল", "পানি", "চিল", "চিনি"], block: 3, extras: ["কল"] },
+  { id: 65, letters: ["ক", "পা", "ল", "নি", "চি"], words: ["কপাল", "পানি", "চিল", "চিনি"], block: 3 },
   { id: 66, letters: ["মে", "ঘ", "লা", "খে", "ঝে"], words: ["মেঘলা", "খেলা", "মেঘ", "মেঝে"], block: 3 },
   { id: 67, letters: ["বি", "ছা", "না", "চা", "তি"], words: ["বিছানা", "চাবি", "নাতি", "নাচা"], block: 3 },
-  { id: 68, letters: ["প", "রি", "বা", "র", "ছু", "টি", "সা"], words: ["পরিবার", "বাছুর", "ছুটি", "সাপ"], block: 3, extras: ["বাটি"] },
+  { id: 68, letters: ["প", "রি", "বা", "র", "ছু", "টি", "সা"], words: ["পরিবার", "বাছুর", "ছুটি", "সাপ"], block: 3 },
   { id: 69, letters: ["ই", "তি", "হা", "স", "হাঁ", "ড়ি"], words: ["ইতিহাস", "হাতি", "হাঁস", "হাঁড়ি"], block: 3 },
   { id: 70, letters: ["আ", "ল", "মা", "রি", "তৈ", "ঝি"], words: ["আলমারি", "তৈরি", "তৈল", "ঝিল"], block: 3 },
-  { id: 71, letters: ["প", "ড়া", "লে", "খা", "লি", "চু"], words: ["পড়ালেখা", "লেখা", "পড়া", "খালি", "লিচু"], block: 3, extras: ["চুপ"] },
-  { id: 72, letters: ["ঘ", "র", "বা", "ড়ি", "গা", "কুঁ"], words: ["ঘরবাড়ি", "বাড়ি", "গাড়ি", "ঘড়ি", "কুঁড়ি"], block: 3, extras: ["ঘর", "বাঘ"] },
-  { id: 73, letters: ["কা", "ঠ", "বি", "ড়া", "লি", "ল", "আঁ"], words: ["কাঠবিড়ালি", "বিকাল", "বিড়াল", "আঁকা"], block: 3, extras: ["কাল", "বিল"] },
-  { id: 74, letters: ["ফু", "ল", "বা", "গা", "ন", "তি", "তা"], words: ["ফুলবাগান", "বালতি", "ফুল", "তিতা"], block: 3, extras: ["গান", "বাগান", "লতা", "নল", "তিন", "গাল"] },
+  { id: 71, letters: ["প", "ড়া", "লে", "খা", "লি", "চু"], words: ["পড়ালেখা", "লেখা", "পড়া", "খালি", "লিচু"], block: 3 },
+  { id: 72, letters: ["ঘ", "র", "বা", "ড়ি", "গা", "কুঁ"], words: ["ঘরবাড়ি", "বাড়ি", "গাড়ি", "ঘড়ি", "কুঁড়ি"], block: 3 },
+  { id: 73, letters: ["কা", "ঠ", "বি", "ড়া", "লি", "ল", "আঁ"], words: ["কাঠবিড়ালি", "বিকাল", "বিড়াল", "আঁকা"], block: 3 },
+  { id: 74, letters: ["ফু", "ল", "বা", "গা", "ন", "তি", "তা"], words: ["ফুলবাগান", "বালতি", "ফুল", "তিতা"], block: 3 },
   { id: 75, letters: ["পা", "য়ে", "স", "মে"], words: ["পাস", "পায়ে", "পায়েস", "মেয়ে"], block: 3, teaches: ["য়"] },
   { id: 76, letters: ["স", "ম", "য়", "ডি", "রু"], words: ["সময়", "ডিম", "সরু", "মরু"], block: 3 },
   { id: 77, letters: ["ন", "দী", "র", "পা"], words: ["নদী", "পান", "নদীর", "পার"], block: 3, teaches: ["ী"] },
   { id: 78, letters: ["মৌ", "মা", "ছি", "ঠ", "লি"], words: ["মৌমাছি", "মাঠ", "মাছি", "মালি"], block: 3, teaches: ["ৌ"] },
 
   // Block 4, conjuncts: joined consonants, one cluster family at a time.
-  { id: 79, letters: ["ব", "স", "ন্ত", "ড়", "ঘা", "মাং"], words: ["বসন্ত", "বড়", "ঘাস", "ঘাড়", "মাংস"], block: 4, teaches: ["ন্ত"], extras: ["সব", "বস"] },
+  { id: 79, letters: ["ব", "স", "ন্ত", "ড়", "ঘা", "মাং"], words: ["বসন্ত", "বড়", "ঘাস", "ঘাড়", "মাংস"], block: 4, teaches: ["ন্ত"] },
   { id: 80, letters: ["সু", "ন্দ", "র", "আ", "ন", "গু", "দূ"], words: ["সুন্দর", "আনন্দ", "রসুন", "আগুন", "দূর"], block: 4, teaches: ["ন্দ"] },
   { id: 81, letters: ["বা", "রা", "ন্দা", "জা", "র", "ভ"], words: ["বারান্দা", "বাজার", "রাবার", "রাজা", "ভরা"], block: 4 },
   { id: 82, letters: ["রা", "স্তা", "ঘা", "ট", "টি", "কি", "রু"], words: ["রাস্তা", "রাস্তাঘাট", "ঘাট", "টিকিট", "রুটি"], block: 4, teaches: ["স্ত"] },
-  { id: 83, letters: ["শী", "ত", "কা", "ল", "স্কু", "দাঁ"], words: ["স্কুল", "শীতল", "শীত", "দাঁত", "শীতকাল"], block: 4, teaches: ["স্ক"], extras: ["কাল"] },
+  { id: 83, letters: ["শী", "ত", "কা", "ল", "স্কু", "দাঁ"], words: ["স্কুল", "শীতল", "শীত", "দাঁত", "শীতকাল"], block: 4, teaches: ["স্ক"] },
   { id: 84, letters: ["ছা", "গ", "ল", "ল্প", "ড়া", "তে"], words: ["গল্প", "গড়া", "ছাড়া", "ছাগল", "তেল"], block: 4, teaches: ["ল্প"] },
   { id: 85, letters: ["দি", "ন", "রা", "ত", "ন্না", "দা"], words: ["দিনরাত", "দিন", "রাত", "রান্না", "দাদি"], block: 4, teaches: ["ন্ন"] },
   { id: 86, letters: ["ব", "ন্ধ", "লা", "গ"], words: ["বন্ধ", "বলা", "গলা"], block: 4, teaches: ["ন্ধ"] },
   { id: 87, letters: ["বা", "লি", "শ", "সা", "ন", "ক্ত"], words: ["বালিশ", "শক্ত", "বালি", "সাবান"], block: 4, teaches: ["ক্ত"] },
   { id: 88, letters: ["পে", "ন্সি", "ল", "গা", "ম", "ছা", "পেঁ"], words: ["পেন্সিল", "গাল", "পেঁপে", "গামছা"], block: 4, teaches: ["ন্স"] },
   { id: 89, letters: ["চা", "দ", "র", "স্বা", "ধী"], words: ["স্বাদ", "চাদর", "চার", "ধীর"], block: 4, teaches: ["স্ব"] },
-  { id: 90, letters: ["ব", "র্ষা", "কা", "ল", "সা", "আ", "নী"], words: ["বর্ষাকাল", "বর্ষা", "বসা", "আসা", "নীল"], block: 4, teaches: ["র্ষ"], extras: ["বল", "কাল"] },
+  { id: 90, letters: ["ব", "র্ষা", "কা", "ল", "সা", "আ", "নী"], words: ["বর্ষাকাল", "বর্ষা", "বসা", "আসা", "নীল"], block: 4, teaches: ["র্ষ"] },
   { id: 91, letters: ["চি", "ঠি", "প", "ত্র", "ছা", "ত্রী", "কাঁ"], words: ["চিঠিপত্র", "ছাত্র", "চিঠি", "ছাত্রী", "কাঁচি"], block: 4, teaches: ["ত্র"] },
   { id: 92, letters: ["শি", "ক্ষ", "ক", "ড়", "ফি", "দৌ"], words: ["শিক্ষক", "শিকড়", "কফি", "দৌড়"], block: 4, teaches: ["ক্ষ"] },
   { id: 93, letters: ["স", "মু", "দ্র", "বা", "খ"], words: ["সমুদ্র", "বাস", "মুখ"], block: 4, teaches: ["দ্র"] },
   { id: 94, letters: ["গ্রা", "ম", "ধু", "লা"], words: ["গ্রাম", "মধু", "ধুলা"], block: 4, teaches: ["গ্র"] },
-  { id: 95, letters: ["বি", "দ্যা", "ল", "য়", "টে", "ছ"], words: ["লয়", "বিদ্যালয়", "বিদ্যা", "ছয়", "টেবিল"], block: 4, teaches: ["দ্য"], extras: ["ছবি", "বিল"] },
-  { id: 96, letters: ["জ", "ন্ম", "দি", "ন", "তি", "বী"], words: ["জন্মদিন", "তিন", "বীজ"], block: 4, teaches: ["ন্ম"], extras: ["দিন", "জন"] },
-  { id: 97, letters: ["র", "স", "গো", "ল্লা", "আ", "না", "শো"], words: ["রসগোল্লা", "আনারস", "আনা", "শোনা"], block: 4, teaches: ["ো", "ল্ল"], extras: ["রস"] },
+  { id: 95, letters: ["বি", "দ্যা", "ল", "য়", "টে", "ছ"], words: ["লয়", "বিদ্যালয়", "বিদ্যা", "ছয়", "টেবিল"], block: 4, teaches: ["দ্য"] },
+  { id: 96, letters: ["জ", "ন্ম", "দি", "ন", "তি", "বী"], words: ["জন্মদিন", "তিন", "বীজ"], block: 4, teaches: ["ন্ম"] },
+  { id: 97, letters: ["র", "স", "গো", "ল্লা", "আ", "না", "শো"], words: ["রসগোল্লা", "আনারস", "আনা", "শোনা"], block: 4, teaches: ["ো", "ল্ল"] },
   { id: 98, letters: ["ঐ", "ক্য", "বা", "টি"], words: ["ঐক্য", "বাক্য", "বাটি"], block: 4, teaches: ["ঐ", "ক্য"] },
 
   // Block 5, free play: everything taught, mixed, longest words and fullest boards.
-  { id: 99, letters: ["ক", "ঠি", "ন", "গা", "য়"], words: ["কঠিন", "গায়ক", "নয়"], block: 5, extras: ["গান"] },
+  { id: 99, letters: ["ক", "ঠি", "ন", "গা", "য়"], words: ["কঠিন", "গায়ক", "নয়"], block: 5 },
   { id: 100, letters: ["দে", "ও", "য়া", "গা", "খা"], words: ["দেওয়া", "গাওয়া", "দেখা"], block: 5 },
   { id: 101, letters: ["যা", "ও", "য়া", "ঠা", "ছা"], words: ["যাওয়া", "ওঠা", "ছায়া"], block: 5 },
   { id: 102, letters: ["মা", "নু", "ষ", "সি", "পৌ"], words: ["মানুষ", "মাসি", "পৌষ"], block: 5 },
@@ -1423,10 +1230,6 @@ const LEVELS = [
 ];
 
 const HINT_COST = 25, PER_AKSHARA = 5, LEVEL_BONUS = 30;
-// Three extra words fill the chest and pay out. The chest is shared across levels: with
-// three- and four-tile boards there are not always extras to find, and a chest that sits
-// empty teaches the player to ignore it.
-const CHEST_TARGET = 3, CHEST_REWARD = 15;
 
 /* ============================================================================
    4. Game state
@@ -1459,8 +1262,6 @@ const game = {
   coins: typeof saved.coins === "number" ? saved.coins : 120,
   found: saved.found || {},          // levelId -> [words] found on THIS attempt
   hints: saved.hints || {},          // levelId -> ["r,c"]
-  extras: saved.extras || {},        // levelId -> [extra words found]
-  chest: saved.chest || 0,           // extra words toward the next payout, across all levels
   // Levels ever fully solved. Separate from `found`, which is wiped each time a cleared level
   // is revisited so it can be played again - a board sitting there fully lit with nothing left
   // to drag is not a level, it is a screenshot of one. `completed` is what remembers progress
@@ -1480,15 +1281,12 @@ const game = {
 };
 
 const persist = () => store.write({
-  coins: game.coins, found: game.found, hints: game.hints,
-  extras: game.extras, chest: game.chest, completed: game.completed
+  coins: game.coins, found: game.found, hints: game.hints, completed: game.completed
 });
 
 const level = () => LEVELS[game.index];
 const foundSet = () => new Set(game.found[level().id] || []);
 const hintSet = () => new Set(game.hints[level().id] || []);
-const extraSet = () => new Set(game.extras[level().id] || []);
-const levelExtras = () => new Set(level().extras || []);
 
 function revealedCells() {
   const done = foundSet();
@@ -1518,21 +1316,10 @@ const el = {
   shuffle: document.getElementById("shuffle"),
   prev: document.getElementById("prev"),
   next: document.getElementById("next"),
-  chest: document.getElementById("chest"),
-  chestCount: document.getElementById("chestCount"),
-  chestFill: document.getElementById("chestFill"),
-  chestSheet: document.getElementById("chestSheet"),
-  chestTrack: document.getElementById("chestTrack"),
-  chestProgress: document.getElementById("chestProgress"),
-  chestReward: document.getElementById("chestReward"),
-  chestWords: document.getElementById("chestWords"),
-  chestClose: document.getElementById("chestClose"),
   guide: document.getElementById("guide"),
   guideOpen: document.getElementById("guideOpen"),
   guideClose: document.getElementById("guideClose"),
   sound: document.getElementById("sound"),
-  newLetter: document.getElementById("newLetter"),
-  newLetterFace: document.getElementById("newLetterFace"),
   device: document.querySelector(".device")
 };
 
@@ -1675,11 +1462,9 @@ function loadLevel(i) {
   game.picked = [];
   game.verdict = null;
   game.tapMode = false;
-  el.chestSheet.hidden = true;
   // Before the layout is measured, not after: the chip is a flex child of the screen, so a
   // level that newly shows one would otherwise be allocated space as though it were not
   // there, and the wheel would be pushed off the bottom by exactly the chip plus its gap.
-  drawNewLetter(lv);
   drawScreen();
   drawHud();
   drawPreview();
@@ -1688,11 +1473,9 @@ function loadLevel(i) {
 
 function drawHud() {
   const lv = level();
-  drawNewLetter(lv);
   el.levelSub.textContent = bn(foundSet().size) + " / " + bn(lv.words.length) + " শব্দ";
   if (el.coins.textContent !== bn(game.coins)) el.coins.textContent = bn(game.coins);
   el.hint.disabled = isClear();
-  drawChest();
 }
 
 /**
@@ -1706,9 +1489,9 @@ function allocateSpace() {
   const screenEl = document.querySelector('.screen');
   const style = getComputedStyle(screenEl);
   // Everything in the screen that is not the board or the wheel, measured rather than
-  // guessed. Counting the flex gaps by hand was wrong the moment a sixth child appeared -
-  // the "new letter" chip - and it under-reserved by exactly one gap, which the wheel then
-  // spent and had clipped off the bottom.
+  // guessed. Counting the flex gaps by hand went wrong the moment the number of children
+  // changed: it under-reserved by exactly one gap, which the wheel then spent and had
+  // clipped off the bottom.
   const inFlow = [...screenEl.children].filter(c => {
     if (c.hidden) return false;
     const cs = getComputedStyle(c);
@@ -1904,34 +1687,14 @@ function drawPreview() {
   }
   const tone = game.verdict ? ({
     correct: " good",
-    extra: " extra",
     dup: " dup shake",
     wrong: " bad shake"
   }[game.verdict.result] || "") : "";
   const submit = (!game.verdict && game.tapMode)
     ? `<button class="go" id="submitWord" title="মিলিয়ে দেখো" aria-label="Check word">✓</button>` : "";
-  const badge = game.verdict?.result === "extra"
-    ? `<em class="badge bn">বাড়তি</em>` : "";
-  el.preview.innerHTML = `<div class="chip${tone}">${word}${badge}${submit}</div>`;
+  el.preview.innerHTML = `<div class="chip${tone}">${word}${submit}</div>`;
   const go = document.getElementById("submitWord");
   if (go) go.addEventListener("click", () => submitWord());
-}
-
-/** The chest button and its sheet: progress toward the next payout. */
-function drawChest() {
-  const filled = game.chest % CHEST_TARGET;
-  el.chestCount.textContent = `${bn(filled)}/${bn(CHEST_TARGET)}`;
-  el.chestFill.style.width = `${(filled / CHEST_TARGET) * 100}%`;
-  el.chest.classList.toggle('full', filled === 0 && game.chest > 0);
-
-  el.chestTrack.style.width = `${(filled / CHEST_TARGET) * 100}%`;
-  el.chestProgress.textContent = `${bn(filled)} / ${bn(CHEST_TARGET)}`;
-  el.chestReward.textContent = `+${bn(CHEST_REWARD)} কয়েন`;
-
-  const mine = [...extraSet()];
-  el.chestWords.innerHTML = mine.length
-    ? mine.map(w => `<span class="w" data-say="${w}">${w}</span>`).join('')
-    : `<span class="none">এই লেভেলে এখনো কিছু পাওনি</span>`;
 }
 
 function drawLevelGrid() {
@@ -1951,19 +1714,19 @@ function drawLevelGrid() {
 
 
 /* ============================================================================
-   6. Pronunciation - so a learner hears every word and sentence
+   6. Pronunciation - so a learner hears every word
    ============================================================================ */
 /*
  * Bengali spelling does not tell you the sound. ব and ভ, শ and ষ and স, ন and ণ, ড় and র
  * are each one sound in speech and different letters on the page, which is exactly where a
  * child who speaks Bengali at home but reads none of it goes wrong. Hearing the word while
- * seeing it is the thing that fixes that, so every word and every Bengali sentence here can
- * be spoken.
+ * seeing it is the thing that fixes that, so every word a player spells is spoken as it
+ * lands.
  *
  * Two sources, in order of preference:
  *
  *   1. RECORDINGS. `VOICE_CLIPS` maps a word to an audio source - a bundled data: URI or a
- *      file beside the page. It ships empty: recording ~180 words needs a native speaker,
+ *      file beside the page. It ships empty: recording 348 words needs a native speaker,
  *      and `python3 tools/build.py voice` prints exactly which words in exactly what order.
  *      Drop them in and they take over automatically.
  *
@@ -2053,34 +1816,7 @@ const Speech = {
     return true;
   },
 
-  /**
-   * A whole sentence, slower again, and only when asked for. 0.5 is about the floor worth
-   * using - below that most speech engines start slurring rather than enunciating, which
-   * defeats the point.
-   */
-  sentence(text) { return this.say(text, { rate: 0.5 }); },
-
-  /** One akshara on its own - the "new letter" chip. */
-  letter(akshara) { return this.say(akshara, { rate: 0.5 }); }
 };
-
-/** Reflects whether sound is on, and whether it is possible at all. */
-/**
- * The chip naming what this level is the first to use. The level data carries the piece of
- * the writing system - a letter, a vowel sign, a cluster - and a sign on its own is not
- * pronounceable, so it is shown attached to the tile that carries it.
- */
-function drawNewLetter(lv) {
-  const teaches = lv.teaches || [];
-  if (!teaches.length) { el.newLetter.hidden = true; return; }
-
-  const symbol = teaches[0];
-  // A vowel sign cannot be said by itself; find the tile it sits on and say that instead.
-  const carrier = lv.letters.find(a => a.includes(symbol) && a !== symbol) || symbol;
-  el.newLetter.hidden = false;
-  el.newLetterFace.textContent = symbol.length === carrier.length ? symbol : `${symbol} - ${carrier}`;
-  el.newLetter.dataset.say = carrier;
-}
 
 /*
  * Finishing a level moves on by itself, the moment the last word settles onto the board.
@@ -2101,8 +1837,6 @@ function drawSound() {
   el.sound.title = !usable
     ? "এই ডিভাইসে বাংলা কণ্ঠ নেই"
     : Speech.on ? "উচ্চারণ চালু" : "উচ্চারণ বন্ধ";
-  for (const b of document.querySelectorAll(".say")) b.disabled = !usable || !Speech.on;
-  el.newLetter.disabled = !usable || !Speech.on;
 }
 
 /* ============================================================================
@@ -2120,8 +1854,8 @@ function boxOf(node) {
 
 /**
  * Sends a thing from one place to another and cleans up after itself. Everything that moves
- * in this game moves through here: letters to the board, coins to the counter, words to the
- * chest.
+ * in this game moves through here: letters to the board, coins to the counter, confetti
+ * across it.
  */
 function fly(from, to, { text = '', cls = '', size = null, delay = 0, duration = 460,
                          arc = 0, spin = 0, fade = false, colour = null,
@@ -2241,20 +1975,6 @@ function rejectWheel() {
   });
 }
 
-/** An extra word travelling into the chest. */
-function flyWordToChest(word) {
-  const chip = el.preview.querySelector('.chip');
-  const target = boxOf(el.chest);
-  if (chip && !reduced()) {
-    fly(boxOf(chip), target, { text: word, cls: 'word', duration: 520, arc: 34, fade: true });
-  }
-  setTimeout(() => {
-    el.chest.classList.remove('bump');
-    void el.chest.offsetWidth;
-    el.chest.classList.add('bump');
-  }, reduced() ? 0 : 420);
-}
-
 /** Cells popping in sequence, then coins raining, when a level is cleared. */
 const CONFETTI_COLOURS = [
   'var(--block-1)', 'var(--block-2)', 'var(--block-3)', 'var(--block-4)', 'var(--block-5)',
@@ -2349,8 +2069,6 @@ function submitWord() {
 
   const lv = level();
   const done = foundSet();
-  const extrasAvailable = levelExtras();
-  const extrasFound = extraSet();
 
   // -- a word on the board ---------------------------------------------------
   if (lv.words.includes(word)) {
@@ -2388,32 +2106,6 @@ function submitWord() {
       // it is replaced, short enough that nobody is sitting there wondering what happens next.
       setTimeout(() => loadLevel(game.index + 1), settle + CLEAR_BEAT);
     }
-    return;
-  }
-
-  // -- an extra word: not on the board, but real -----------------------------
-  if (extrasAvailable.has(word)) {
-    if (extrasFound.has(word)) { showVerdict(word, "dup"); return; }
-
-    extrasFound.add(word);
-    game.extras[lv.id] = [...extrasFound];
-    game.chest += 1;
-    const full = game.chest % CHEST_TARGET === 0;
-    const before = game.coins;
-    if (full) game.coins += CHEST_REWARD;
-    persist();
-
-    showVerdict(word, "extra");
-    Speech.say(word);
-    flyWordToChest(word);
-    setTimeout(() => {
-      drawChest();
-      if (full) {
-        coinBurst(el.chest, 8);
-        countCoins(before, game.coins);
-        drawHud();
-      }
-    }, reduced() ? 0 : 460);
     return;
   }
 
@@ -2501,7 +2193,6 @@ document.addEventListener("keydown", e => {
   if (e.key === "Enter" && game.picked.length) { e.preventDefault(); submitWord(); }
   if (e.key === "Escape") {
     if (guideIsOpen()) { closeGuide(); return; }
-    if (!el.chestSheet.hidden) { el.chestSheet.hidden = true; return; }
     game.picked = []; game.tapMode = false;
     markTiles(); drawTrail(); drawPreview();
   }
@@ -2560,10 +2251,6 @@ el.shuffle.addEventListener("click", () => {
   animateShuffle(before);
 });
 
-el.chest.addEventListener("click", () => {
-  drawChest();
-  el.chestSheet.hidden = false;
-});
 /* The guide sheet. On a wide screen the notes are simply on the page and this never runs;
    the class it toggles has no styling above the touch breakpoint. */
 const guideIsOpen = () => el.guide.classList.contains("open");
@@ -2588,21 +2275,6 @@ function closeGuide() {
 Speech.init();
 
 el.sound.addEventListener("click", () => Speech.toggle());
-el.newLetter.addEventListener("click", () => Speech.letter(el.newLetter.dataset.say));
-
-// The inline speakers read whatever element they name, so the copy stays in one place.
-for (const b of document.querySelectorAll(".say")) {
-  b.addEventListener("click", () => {
-    const source = document.getElementById(b.dataset.sayFrom);
-    if (source) Speech.sentence(source.textContent.trim());
-  });
-}
-
-// Chest words are rendered as markup, so delegate rather than rebind on every open.
-el.chestWords.addEventListener("click", e => {
-  const word = e.target.closest("[data-say]");
-  if (word) Speech.say(word.dataset.say);
-});
 
 el.guideOpen.addEventListener("click", openGuide);
 el.guideClose.addEventListener("click", closeGuide);
@@ -2610,11 +2282,6 @@ el.guideClose.addEventListener("click", closeGuide);
 // Picking a level from inside the sheet means the player wants to play it, so get out of the way.
 el.levelGrid.addEventListener("click", e => {
   if (e.target.closest(".lv") && guideIsOpen()) closeGuide();
-});
-
-el.chestClose.addEventListener("click", () => { el.chestSheet.hidden = true; });
-el.chestSheet.addEventListener("click", e => {
-  if (e.target === el.chestSheet) el.chestSheet.hidden = true;
 });
 
 drawSound();

@@ -25,28 +25,27 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 
 ## Gameplay
 
-- **105 levels in teaching order**, for someone learning to read Bengali rather than only to
+- **104 levels in teaching order**, for someone learning to read Bengali rather than only to
   speak it. Five blocks, each holding the previous one constant and adding one new thing:
   plain letters, then one vowel sign at a time (া, then ি, then ে, then ু), then several signs
   in one word, then conjuncts one family at a time (ন্ত, স্ত, ন্ধ, ক্ষ), then free play on the
-  fullest boards. Puzzle difficulty orders levels only *within* a block. 201 distinct words,
-  up to six per board.
+  fullest boards. Puzzle difficulty orders levels only *within* a block. 348 distinct words,
+  three to five per board.
 - **The whole alphabet, by the end**: all 11 independent vowels, all 10 vowel signs, both
   nasal marks and every consonant - 57 pieces of the writing system, each introduced by name
   in the level that first uses it. Three are left out on purpose and `curriculum.NOT_TAUGHT`
   says why: ৗ is not a sign of its own in modern Bengali, ঃ reaches only দুঃখ and অতঃপর, and
   ঞ never stands outside a cluster. `build.py check` fails if anything else goes missing.
 - **Each level records what it is first to introduce** - a letter, a vowel sign, a conjunct -
-  so the app can show it before the board. Thirty-eight of the 105 introduce nothing at all: a
-  shape met once and never seen again has not been learned.
-- **Extra words.** Some words the tiles can spell are not on the board. Spell one anyway and
-  it goes into the chest; three fills it and pays 15 coins. The chest is shared across levels
-  rather than reset with each one. It is currently thin - only nine levels can feed it, because
-  a syllabus that keeps early boards to three tiles cannot also have those tiles spell spare
-  words. The fix is to change what the chest asks for, not to pad the boards: a word from an
-  earlier level makes it spaced review and stops it depending on the current wheel.
-- **Every word spoken.** Web build only so far: a word is said the moment it is found, and
-  speaker marks replay any word, any Bengali sentence, and the letter each level introduces.
+  Thirty-seven of the 104 introduce nothing at all: a shape met once and never seen again has
+  not been learned.
+- **No word is set as a puzzle twice.** The catalogue used to fill 377 board slots with 201
+  words, leaning on কলম, বল, কল and সব across a dozen tile sets each, so a good part of the
+  game was re-spelling words the player already knew. Now every board is words no earlier
+  board has used. Nine levels early in block 1 have to borrow and cannot do otherwise - a
+  learner who knows four letters has exactly one board available to them - and each is listed
+  in `catalogue.SHARED` with the reason. `build.py check` fails on any repeat that is not.
+- **Every word spoken.** Web build only so far: a word is said the moment it is found.
   This matters more than it sounds - Bengali spelling hides the sound, since ব and ভ, শ and ষ
   and স, ন and ণ are each one sound in speech and different letters on the page, which is
   exactly where a child who speaks Bengali at home but reads none of it goes wrong. Recorded
@@ -57,23 +56,25 @@ as three separate tiles, which is not how anyone reads or writes Bengali.
 - **Coins** for each word found (5 per akshara) and a 30-coin bonus for finishing a level.
 - **Hints** cost 25 coins and reveal one letter from a word you have not solved.
 - **Shuffle** rearranges the wheel and is free.
-- **Finishing a level moves on by itself** (web build), after a five-second pause on a card
-  that lists the level's words to tap and hear. Touching the card stops the countdown, so a
-  child listening to words is never yanked onward.
+- **Finishing a level moves on by itself** (web build), the moment the last word settles onto
+  the board. No card and no countdown: the coins and confetti play across the change.
 - **Every level opens blank.** Leaving a level discards the attempt rather than saving it -
   going back to a level means wanting to play it again, and a board arriving part-filled with
   letters you cannot remember placing is worse than a clean one. Which levels you have
   finished is remembered separately, and shows in the level picker.
+- **The wheel is scrambled**, from a seed fixed by the level id - so a level looks the same
+  every time you return to it, and no wheel lays a word of three or more letters out in
+  sequence around the ring.
 - The level picker is colour-coded by syllabus block, so it reads as five stages rather than
-  83 identical chips.
+  104 identical chips.
 
 ## Play it on the web
 
 `docs/index.html` (repo root, one level up from this folder) is a complete, self-contained
 build of the same game for the browser - one file, no build step, no dependencies, no
-network calls. Bengali splitting, the crossword generator and all 105 levels are ported from
+network calls. Bengali splitting, the crossword generator and all 104 levels are ported from
 this app's Kotlin, and the port is checked by diffing generated boards against the compiled
-Kotlin: all 105 come out identical, cell for cell.
+Kotlin: all 104 come out identical, cell for cell.
 
 Launch it any of these ways:
 
@@ -166,10 +167,9 @@ with the rejections written down in `tools/vocabulary.py`.
 app/src/main/java/com/bangla/shobdojot/
   logic/BanglaText.kt           akshara splitting, spellability, Bengali digits
   logic/CrosswordGenerator.kt   backtracking crossword layout
-  logic/Chest.kt                extra-word chest: fill, reward, reset
   model/Models.kt               Level, Puzzle, PlacedWord, GridPos
-  data/Levels.kt                the 105 levels, generated by tools/build.py
-  data/GameRepository.kt        coins, unlocks, per-level progress, chest
+  data/Levels.kt                the 104 levels, generated by tools/build.py
+  data/GameRepository.kt        coins, unlocks, per-level progress
   ui/GameViewModel.kt           game state and rules
   ui/components/LetterWheel.kt  the drag-to-connect wheel
   ui/components/CrosswordGrid.kt

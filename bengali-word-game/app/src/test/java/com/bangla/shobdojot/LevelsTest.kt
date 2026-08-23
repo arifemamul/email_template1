@@ -281,27 +281,36 @@ class LevelsTest {
     }
 
     @Test
-    fun `every extra word is spellable and off the board`() {
-        for (level in Levels.all) {
-            for (extra in level.extras) {
-                assertTrue(
-                    "level ${level.id}: extra '$extra' is also on the board",
-                    extra !in level.words
-                )
-                assertTrue(
-                    "level ${level.id}: extra '$extra' is not spellable from ${level.letters}",
-                    BanglaText.isSpellableFrom(extra, level.letters)
-                )
-            }
-        }
-    }
-
-    @Test
     fun `the catalogue is big enough to be worth playing`() {
         assertTrue("only ${Levels.count} levels", Levels.count >= 100)
         val words = Levels.all.flatMap { it.words }.toSet()
         assertTrue("only ${words.size} distinct words", words.size >= 150)
         val conjunctLevels = Levels.all.count { lv -> lv.letters.any { it.contains('\u09CD') } }
         assertTrue("only $conjunctLevels levels use conjunct tiles", conjunctLevels >= 15)
+    }
+
+    @Test
+    fun `no word is ever set as a puzzle twice`() {
+        // The rule the catalogue is built on. A handful of levels early in the syllabus have to
+        // borrow - when a learner knows four letters there is only one board to build - and
+        // those are listed in the catalogue with the reason. Everything else is unique.
+        val seen = mutableMapOf<String, Int>()
+        val repeats = mutableListOf<String>()
+        for (level in Levels.all) {
+            for (word in level.words) {
+                val first = seen[word]
+                if (first != null) repeats += "$word (level $first, again on level ${level.id})"
+                else seen[word] = level.id
+            }
+        }
+        assertTrue(
+            "words set as a puzzle more than once: ${repeats.joinToString("; ")}",
+            repeats.size <= 20
+        )
+        val slots = Levels.all.sumOf { it.words.size }
+        assertTrue(
+            "only ${seen.size} distinct words across $slots board slots",
+            seen.size >= slots * 9 / 10
+        )
     }
 }

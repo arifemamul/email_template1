@@ -25,10 +25,8 @@ useless to a seven-year-old.
 No word is set as a puzzle twice. The earlier catalogue leaned on a handful of easy words -
 কলম, বল, কল, সব, রুটি - and reused them across a dozen tile sets, so a learner spent a good
 part of the game re-spelling words they already knew. The rule that forbids it is what forced
-the pool up past five hundred words, and what pays for the chest: a word you solved on level 3
-appearing in the wheel on level 40 is a bonus word, and spotting it is the only evidence the
-word stuck. Nine early levels have to borrow anyway - see `SHARED` - because a learner who
-knows four letters has exactly one board available to them.
+the pool up past five hundred words. Nine early levels have to borrow anyway - see `SHARED` -
+because a learner who knows four letters has exactly one board available to them.
 
 The rule costs board size. Boards used to grow to seven words by leaning on the same common
 words everywhere; now the whole catalogue has to come out of one pool without repeats, so they
@@ -237,13 +235,6 @@ SHARED = {
             'word that crosses it - which leaves ভাত as the third',
 }
 
-# Three extra words fill the chest; a full chest pays out and starts again. The chest is
-# shared across levels rather than reset each time - with three- and four-tile boards there
-# are not always extras to find, so a per-level chest would sit empty and teach the player to
-# ignore it.
-CHEST_TARGET = 3
-CHEST_REWARD = 15
-
 MIN_ZIPF = 2.0          # below this, treat a "word" as invented rather than Bengali
 MAX_ROWS, MAX_COLS = 8, 9
 
@@ -340,7 +331,6 @@ def validate(words, block=None):
         'score': difficulty(tiles, words),
         'block': block if block is not None else actual,
         'teaches': [],         # filled in by ordered_levels, which knows what came before
-        'extras': [],          # likewise: extras depend on what has been taught
     }
     return level, problems
 
@@ -391,24 +381,6 @@ def grow_board(seed, candidates, target, max_tiles=None):
     return board
 
 
-def teachable(vocabulary, tiles, words, known, played=()):
-    """
-    Words those tiles can spell that a learner is equipped to read - every piece of the
-    writing system in them has already been taught. A bonus word built on an untaught
-    conjunct is worse than no bonus word: it is a puzzle the player cannot see the answer to
-    even when staring at it.
-
-    Words the player has already solved on an earlier board come first. No word is set as a
-    puzzle twice, so the only way to meet রুটি again after solving it is to spot it in a later
-    wheel - and that is worth paying for, because remembering a word is the thing the game is
-    actually for.
-    """
-    found = [w for w in vocabulary
-             if w not in words and spellable(w, tiles) and set(units_in([w])) <= known]
-    found.sort(key=lambda w: (w not in played, -zipf(w), w))
-    return found
-
-
 def order_block(group, known):
     """
     Order one block gently: at each step take the level that introduces the least new
@@ -446,7 +418,8 @@ def ordered_levels():
             continue
         levels.append(level)
 
-    # Board words are verified vocabulary too, so they can serve as bonus words elsewhere.
+    # Board words are verified vocabulary too, so a level can grow into a word another level was
+    # authored around - it just cannot take one another level has already set.
     vocabulary = list(dict.fromkeys(pool_words() + [w for l in levels for w in l['words']]))
 
     # Blocks in order; inside each, the gentlest step first.
@@ -459,9 +432,8 @@ def ordered_levels():
     levels = out
 
     # No word is a puzzle twice. That rule is what decides the rest: a board grows only into
-    # words no other level has claimed, and a word the player has already solved turns up in
-    # later wheels as a bonus instead - which is how the chest gets fed now that boards cannot
-    # help themselves to the same handful of common words over and over.
+    # words no other level has claimed, so no level can help itself to the same handful of
+    # common words the level before it used.
 
     # What a learner can read by the time they reach each level. Growth only ever adds words
     # made of units the level's own authored words have already introduced, so this is fixed
@@ -506,7 +478,6 @@ def ordered_levels():
         known_before = set(taught)
         taught |= set(units_in(level['words']))
         level['teaches'] = new_units(level['words'], known_before)
-        level['extras'] = teachable(vocabulary, level['tiles'], level['words'], taught, played)
         played |= set(level['words'])
         out.append(level)
 

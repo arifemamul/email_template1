@@ -30,19 +30,6 @@ class GameRepository(context: Context) {
         if (levelId + 1 > unlockedLevel) unlockedLevel = levelId + 1
     }
 
-    /** Extra words found on a level, so none is ever credited twice. */
-    fun extraWords(levelId: Int): Set<String> =
-        prefs.getStringSet(extrasKey(levelId), emptySet())!!.toSet()
-
-    fun saveExtraWords(levelId: Int, words: Set<String>) {
-        prefs.edit().putStringSet(extrasKey(levelId), words).apply()
-    }
-
-    /** Total extra words found across every level; the chest fills from this. */
-    var extrasCollected: Int
-        get() = prefs.getInt(KEY_EXTRAS, 0)
-        set(value) = prefs.edit().putInt(KEY_EXTRAS, value.coerceAtLeast(0)).apply()
-
     fun foundWords(levelId: Int): Set<String> =
         prefs.getStringSet(foundKey(levelId), emptySet())!!.toSet()
 
@@ -71,7 +58,6 @@ class GameRepository(context: Context) {
     }
 
     fun resetLevelProgress(levelId: Int) {
-        // The chest total is deliberately left alone: it is earned across the whole game.
         prefs.edit().remove(foundKey(levelId)).remove(hintKey(levelId)).apply()
     }
 
@@ -80,7 +66,6 @@ class GameRepository(context: Context) {
     private fun completedKey(levelId: Int) = "completed_$levelId"
     private fun foundKey(levelId: Int) = "found_$levelId"
     private fun hintKey(levelId: Int) = "hints_$levelId"
-    private fun extrasKey(levelId: Int) = "extras_$levelId"
 
     companion object {
         const val STARTING_COINS = 120
@@ -89,6 +74,5 @@ class GameRepository(context: Context) {
         const val LEVEL_BONUS = 30
         private const val KEY_COINS = "coins"
         private const val KEY_UNLOCKED = "unlocked"
-        private const val KEY_EXTRAS = "extras_collected"
     }
 }

@@ -4,9 +4,7 @@ package com.bangla.shobdojot.model
 data class GridPos(val row: Int, val col: Int)
 
 /**
- * One level's content: the tiles on the wheel, the words hidden in the grid, and the extra
- * words those same tiles can spell without being on the board. Finding an extra fills the
- * chest rather than the grid.
+ * One level's content: the tiles on the wheel and the words hidden in the grid.
  *
  * [block] is the stage of the syllabus this level belongs to - 1 plain letters, 2 one vowel
  * sign, 3 several signs, 4 conjuncts, 5 free play - and levels ship in that order.
@@ -20,8 +18,7 @@ data class Level(
     val letters: List<String>,
     val words: List<String>,
     val block: Int = 1,
-    val teaches: List<String> = emptyList(),
-    val extras: List<String> = emptyList()
+    val teaches: List<String> = emptyList()
 )
 
 /** A word after the generator has decided where it sits on the board. */

@@ -23,7 +23,6 @@ import com.bangla.shobdojot.ui.WordResult
 import com.bangla.shobdojot.ui.theme.Coral
 import com.bangla.shobdojot.ui.theme.LeafGreen
 import com.bangla.shobdojot.ui.theme.Marigold
-import com.bangla.shobdojot.ui.theme.SkyBlue
 import com.bangla.shobdojot.ui.theme.TileInk
 
 /**
@@ -59,7 +58,6 @@ fun WordPreview(
         } else {
             val background = when (lastResult) {
                 WordResult.CORRECT -> LeafGreen
-                WordResult.EXTRA -> SkyBlue
                 WordResult.ALREADY_FOUND -> Marigold
                 WordResult.WRONG -> Coral
                 null -> Marigold
