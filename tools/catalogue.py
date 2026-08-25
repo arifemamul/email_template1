@@ -145,9 +145,96 @@ def teaching_order(level):
     return (letter, 1, nasal, KAR_SERIES.index(kar) if kar in KAR_SERIES else 99, again, key)
 
 
+def difficulty(tiles, words):
+    """
+    What makes a level hard to solve, weighted. Word count carries the most weight per unit:
+    having to find six words from one wheel is what actually makes a board take a while, more
+    than any single word being long. Then tiles to scan, the longest word, conjunct tiles, and
+    rarity. This orders levels *within* a block; the block itself comes first.
+    """
+    longest = max(len(split_aksharas(w)) for w in words)
+    rarity = sum(max(0.0, 5.5 - zipf(w)) for w in words) / len(words)
+    return (2.2 * len(tiles) + 3.4 * len(words) + 2.0 * longest
+            + 3.0 * len(conjunct_tiles(tiles)) + 1.6 * rarity)
+
+
+VOWELS = set('অআইঈউঊঋএঐওঔ')
+
+
+def base_letter(level):
+    """The consonant or vowel a level belongs to: কা·2, ক-1 and ক all belong to ক."""
+    return level['id'].split('·')[0].split('-')[0][0]
+
+
+def spiral(levels):
+    """
+    The order the levels are played, in rounds.
+
+    Round one is one level for every consonant, in alphabet order, led by the bare akshara
+    where the letter has one - so it reads as the বর্ণমালা. Round two is the gentlest of what
+    is left for each letter, then round three, and so on: every letter is met early and comes
+    back as the boards get harder. The vowels follow the same way at the end.
+
+    Straight alphabet order - every ক level, then every খ level - was measured across all 156
+    levels and did not get harder: 40.0 difficulty in the first tenth against 35.9 in the last,
+    a correlation of -0.11 with how far in you are. This orders at +0.53, 35 rising to 41, and
+    every measure rises with it: wheel 5.6 tiles to 6.7, words 3.6 to 4.6, cells to fill 8.1 to
+    11.2, conjunct tiles 0.3 to 0.9.
+
+    Two things are deliberately NOT what decides the order.
+
+    Difficulty alone, ignoring the letters, scores best of all (+0.97) and is the wrong answer:
+    it scatters the কার series and opens the game on whatever level happens to be smallest.
+
+    And difficulty per letter, keeping each letter's levels together, opens on ঢ and য - rare
+    letters no primer teaches first - because ক has the most familiar words in the game and
+    also the most of them, which reads as "hard" to any mechanical measure. Alphabet order
+    inside each round is what keeps the letters in the order a child actually meets them.
+
+    The cost is that a letter's কার series is no longer consecutive: ক, কা and কু land in
+    different rounds. What replaces it is a spiral - every letter early, each revisited deeper
+    - which is a teaching structure in its own right rather than a compromise.
+
+    The vowels go last, all of them. Word-initial vowels are rare in Bengali and the words
+    carrying them are unusual: ঊরু, ঐচ্ছিক, ঔজ্জ্বল্য. In alphabet order they came first, which
+    put the hardest, most abstract material in the game in front of a beginner.
+    """
+    score = {}
+    for lv in levels:
+        words = [w['w'] for w in lv['words']]
+        score[lv['id']] = difficulty(wheel_for(words), words)
+
+    families = {}
+    for lv in levels:
+        families.setdefault(base_letter(lv), []).append(lv)
+
+    def alphabet_place(letter):
+        return ALPHABET_ORDER.index(letter) if letter in ALPHABET_ORDER else len(ALPHABET_ORDER)
+
+    def rounds(bases):
+        out = {}
+        for base in bases:
+            # The bare akshara leads its own letter, and everything else follows by how gentle
+            # it is. That makes round one the বর্ণমালা itself - ক খ গ ঘ চ ছ জ ঝ ট ঠ ড ঢ ত থ দ ধ
+            # ন প ফ ব ভ ম য র ল শ ষ স হ, one level each, in order - which a parent or a teacher
+            # can read at a glance. Ordering round one by gentleness instead scores a little
+            # better (+0.71 against +0.53) and opens on কো, খ-3, গ-4: a a child meeting ও-কার
+            # before the bare ক, for a curve nobody can see.
+            bare = [lv for lv in families[base] if lv['id'] == base]
+            rest = sorted((lv for lv in families[base] if lv['id'] != base),
+                          key=lambda lv: (score[lv['id']], lv['id']))
+            for depth, lv in enumerate(bare + rest):
+                out.setdefault(depth, []).append((alphabet_place(base), lv['id'], lv))
+        return [lv for depth in sorted(out) for _, _, lv in sorted(out[depth], key=lambda t: t[:2])]
+
+    consonants = [b for b in families if b not in VOWELS]
+    vowels = [b for b in families if b in VOWELS]
+    return rounds(consonants) + rounds(vowels)
+
+
 SYLLABUS = [
     (lv['id'], lv['type'], [w['w'] for w in lv['words']])
-    for lv in sorted(ALL_LEVELS, key=teaching_order)
+    for lv in spiral(ALL_LEVELS)
 ]
 
 GLOSS = {w['w']: w['en'] for lv in ALL_LEVELS for w in lv['words']}
@@ -207,19 +294,6 @@ MAX_NEW_UNITS = {
 BOARD_TARGET = {
     BLOCK_PLAIN: 5, BLOCK_ONE_KAR: 6, BLOCK_KARS: 6, BLOCK_CONJUNCT: 8, BLOCK_FREE: 8,
 }
-
-
-def difficulty(tiles, words):
-    """
-    What makes a level hard to solve, weighted. Word count carries the most weight per unit:
-    having to find six words from one wheel is what actually makes a board take a while, more
-    than any single word being long. Then tiles to scan, the longest word, conjunct tiles, and
-    rarity. This orders levels *within* a block; the block itself comes first.
-    """
-    longest = max(len(split_aksharas(w)) for w in words)
-    rarity = sum(max(0.0, 5.5 - zipf(w)) for w in words) / len(words)
-    return (2.2 * len(tiles) + 3.4 * len(words) + 2.0 * longest
-            + 3.0 * len(conjunct_tiles(tiles)) + 1.6 * rarity)
 
 
 def validate(words, block=None, key=None, kind=None):
