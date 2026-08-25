@@ -162,7 +162,7 @@ MIN_ZIPF = 2.0          # below this, treat a "word" as invented rather than Ben
 # numbers matter for more than fitting: a box is sized for the largest board in the game, so
 # the widest and tallest board decides how big a box can be on every level. Loosening either
 # one costs every level a smaller box.
-MAX_ROWS, MAX_COLS = 5, 6
+MAX_ROWS, MAX_COLS = 5, 7
 
 # The widest wheel worth drawing. A board grows by taking on words, and a word it has no tile
 # for brings its own - so this is what stops a level from ending up with a wheel too crowded to
