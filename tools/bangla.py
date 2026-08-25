@@ -73,6 +73,35 @@ def tiles_for(words):
     return seen
 
 
+def wheel_for(words):
+    """
+    The wheel for a level, with a tile repeated when a word needs it twice.
+
+    `tiles_for` returns each akshara once, which is right until a word says the same one
+    twice: কুকুর is কু + কু + র, and ঘুঘু is ঘু + ঘু. One tile cannot spell those, because a
+    tile is used up as the drag passes through it.
+
+    Two tiles can. The alternative - letting a drag re-enter a tile it has already used -
+    collides with both gestures the wheel already has: dragging back onto the previous tile
+    undoes it, and tapping the last tile again undoes it too, so tapping ঘু twice would mean
+    both "double it" and "cancel it". A second tile has no such ambiguity, and ঘু ঘু is a
+    clearer thing to ask a child to trace than leaving a tile and coming back to it.
+
+    Order follows `tiles_for`, with each repeat sitting straight after the tile it copies.
+    """
+    need = {}
+    for w in words:
+        counts = {}
+        for a in split_aksharas(w):
+            counts[a] = counts.get(a, 0) + 1
+        for a, n in counts.items():
+            need[a] = max(need.get(a, 0), n)
+    out = []
+    for a in tiles_for(words):
+        out += [a] * need[a]
+    return out
+
+
 def conjunct_tiles(tiles):
     return [t for t in tiles if HASANTA in t]
 

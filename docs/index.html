@@ -776,25 +776,30 @@
       <section class="card">
         <h3>What this is</h3>
         <p class="deck">
-          A Bengali word-cross puzzle, one letter of the alphabet at a time. Drag across the
-          letters to spell a word; each word you find writes itself into the crossword above.
-          <b><span id="deckCount">Levels</span></b>, and each one is a letter: the board for ক is
-          কলম, কবুতর, কমলা, কমল, কম, কর, কল, কলা - eight words, all of them ক.
+          A Bengali word puzzle, one <b>akshara</b> at a time. Drag across the letters to
+          spell a word; each word you find writes itself into the grid above.
+          <b><span id="deckCount">Levels</span></b>, and each one is a single akshara: the
+          board for কা is কাক, কাঠ, কান, কাচ, কাপ, কাঠি - six words, every one of them
+          starting with কা.
           <br><br>
-          The alphabet opens with vowels, and those come first - অ আ and ই উ two to a level,
-          then ঈ, ঊ and ঋ one each, then এ ও. Then the consonants one at a time, ক all the way
-          through to হ. ঙ, ঞ and ণ are skipped, since no Bengali word begins with any of them,
-          and neither do ড়, ঢ় or য়. ষ shares a level with স for much the same reason: ষাঁড় and
-          ষোল are almost the whole of word-initial ষ, which otherwise lives inside words.
+          That is the point of it. Bengali is taught as a letter and then the same letter
+          under each vowel sign - ক, কা, কি, কু, কে, কো, কাঁ - and a level per akshara is a
+          level per step of that series. A child who can read কাক can read কাঠ and কান
+          without being taught them twice, and the level is where that clicks.
           <br><br>
-          ঐ and ঔ are the two vowels with no level. Each begins exactly one word - ঐক্য and ঔষধ -
-          and a level needs two of its own to be about its letter rather than about whatever was
-          brought in to hold the board together. ঔষধ has no second spelling to pair with either:
-          ওষুধ is the same word, and the same word cannot appear twice.
+          Levels run in alphabet order by base letter, and inside a letter the bare form
+          comes first, then its vowel signs, then a level of mixed signs for the letters whose
+          single aksharas have too few words to fill a wheel on their own. ঙ, ঞ and ণ are
+          skipped - no Bengali word begins with them - and neither do ড়, ঢ় or য়.
           <br><br>
-          A few words on each board are there to hold the crossword together rather than for
-          their letter - এক and ওজন share no letter at all, so something has to sit between
-          them. No word is ever set as a puzzle twice. Nothing to install, no sign-up, no ads -
+          A board is not always one joined-up crossword. Words cross wherever they share a
+          letter, but on a level where every word starts with the same akshara the only cell
+          any two can share is that one - and a cell takes two words, not six. So a board is
+          one, two or three islands, and the words in each still cross.
+          <br><br>
+          Everything is Bangladeshi Bengali: পানি rather than জল, চাচা and ফুফু rather than
+          কাকা and পিসি. No word is ever set as a puzzle twice. Nothing to install, no
+          sign-up, no ads -
           your progress is saved in this browser.
         </p>
       </section>
@@ -828,19 +833,19 @@
     </div>
 
     <footer>
-      Every board is generated from a word list when you open the level, not hand-drawn: words are
-      placed by backtracking search so each one crosses another and no accidental word ever appears
-      on the grid. Every board word is attested in real Bengali text - checked against corpus
-      frequency data, then hand-picked from a vocabulary curated for a learner, because frequency
-      alone offers verb inflections and newspaper register. No word is set as a puzzle twice - not once
-      across the whole run. Levels run in alphabet order, one letter each, and every level is
-      checked to be about its own letter rather than about the words brought in to hold its
-      board together. Tiles hold <b>aksharas</b> - the letter units a Bengali reader sees - so
-      মাছ is two tiles, মা and ছ, and the conjunct ন্ধু in বন্ধু is one. Bengali text is rendered
-      with the embedded font, and every word is spoken as it lands, using the device's own
-      Bengali voice where there is one - recorded clips drop in over the top of that when they
-      exist. An Android build shares the same levels and the same layout code,
-      and is parked while the design here settles.
+      Every board is generated from its word list when you open the level, not hand-drawn: words
+      are placed so that they cross wherever they can, and no accidental word ever appears on the
+      grid. Every word is a concrete thing a picture could show - a thing, a number, a colour or
+      an everyday action - and carries an English gloss, so the whole set can be illustrated.
+      No word is set as a puzzle twice, not once across all 118 levels. Every level is checked to
+      be about its own akshara: a কা level is all কা words, and the check fails if one is not.
+      Tiles hold <b>aksharas</b> - the letter units a Bengali reader sees - so মাছ is two tiles,
+      মা and ছ, and the conjunct ন্ধু in বন্ধু is one. A wheel carries a letter twice when a word
+      needs it twice, as ঘুঘু and বাবা do, and the two are kept apart on the ring so a drag from
+      one to the other does not run over its twin. Bengali text is rendered with the embedded
+      font, and every word is spoken as it lands, using the device's own Bengali voice where
+      there is one. This is the web build and it is the whole product; an Android app in the
+      repository is parked and does not share this layout code.
     </footer>
     </div>
   </div>
@@ -961,7 +966,35 @@ function candidates(occ, aks) {
   );
 }
 
-const NODE_LIMIT = 200000;
+/*
+ * Lay a level's words out. Words cross wherever they share an akshara; a word that can cross
+ * nothing starts a new island, below the board or beside it, whichever leaves the board
+ * shallower. Fewest islands wins, then the shallowest board, then the smallest.
+ *
+ * A board used to have to be one connected crossword, with backtracking to find it. That
+ * ruled out most of the curriculum: an akshara-keyed level has every word starting with the
+ * same akshara - কাক কাঠ কান কাচ কাপ কাঠি - so the only cell any two of them can share is
+ * that key, and a cell takes at most two words. Six such words cannot connect at all.
+ *
+ * This must stay a line-for-line match with `cluster_layout` in tools/bangla.py, which is
+ * what the checks run against: the page lays boards out here at runtime, so a difference
+ * between the two means the checks are validating a board the player never sees. There is no
+ * randomness for that reason - each word is taken as the starting one in turn and the best
+ * result kept.
+ */
+const MAX_BOARD_ROWS = 8, MAX_BOARD_COLS = 7;
+
+/* Element-wise compare, the way Python orders tuples. `<` on two arrays stringifies them, so
+   [10, 0] < [2, 0] would come out true - which silently picks the wrong board the moment a
+   level is wide enough for a two-digit measure. */
+function ranks(a, b) {
+  for (let i = 0; i < Math.max(a.length, b.length); i++) {
+    const x = a[i] === undefined ? -Infinity : a[i];
+    const y = b[i] === undefined ? -Infinity : b[i];
+    if (x !== y) return x < y;
+  }
+  return false;
+}
 
 function generate(words) {
   const tokens = words
@@ -973,46 +1006,51 @@ function generate(words) {
 
   const place = (occ, placed, t, start, horizontal) => {
     const cells = cellsFor(start, horizontal, t.aks.length);
-    const added = cells.filter(([r, c]) => !occ.has(key(r, c)));
     cells.forEach(([r, c], i) => occ.set(key(r, c), t.aks[i]));
     placed.push({ word: t.word, aks: t.aks, cells, horizontal });
-    return added;
   };
 
+  let best = null;
   for (let seed = 0; seed < tokens.length; seed++) {
     const order = [tokens[seed], ...tokens.filter((_, i) => i !== seed)];
     const occ = new Map(), placed = [];
+    let islands = 1;
     place(occ, placed, order[0], [0, 0], true);
 
-    let nodes = 0;
-    const solve = idx => {
-      if (idx === order.length) return true;
-      if (++nodes > NODE_LIMIT) return false;
-      for (const cand of candidates(occ, order[idx].aks)) {
-        const added = place(occ, placed, order[idx], cand.start, cand.horizontal);
-        if (solve(idx + 1)) return true;
-        placed.pop();
-        added.forEach(([r, c]) => occ.delete(key(r, c)));
+    for (const t of order.slice(1)) {
+      const spots = candidates(occ, t.aks);
+      let start, horizontal = true;
+      if (spots.length) {
+        start = spots[0].start;
+        horizontal = spots[0].horizontal;
+      } else {
+        const ks = [...occ.keys()].map(k => k.split(",").map(Number));
+        const low = [Math.max(...ks.map(p => p[0])) + 2, Math.min(...ks.map(p => p[1]))];
+        const side = [Math.min(...ks.map(p => p[0])), Math.max(...ks.map(p => p[1])) + 2];
+        let pick = null;
+        for (const at of [low, side]) {
+          const [rows, area] = boundsExtent(occ, cellsFor(at, true, t.aks.length));
+          const cols = rows ? Math.floor(area / rows) : 0;
+          const over = (rows > MAX_BOARD_ROWS ? 1 : 0) + (cols > MAX_BOARD_COLS ? 1 : 0);
+          const rank = [over, rows, area, at[0], at[1]];
+          if (!pick || ranks(rank, pick.rank)) pick = { rank, at };
+        }
+        start = pick.at;
+        islands += 1;
       }
-      return false;
-    };
+      place(occ, placed, t, start, horizontal);
+    }
 
-    if (solve(1)) return normalise(occ, placed);
+    const ks = [...occ.keys()].map(k => k.split(",").map(Number));
+    const rows = Math.max(...ks.map(p => p[0])) - Math.min(...ks.map(p => p[0])) + 1;
+    const cols = Math.max(...ks.map(p => p[1])) - Math.min(...ks.map(p => p[1])) + 1;
+    const rank = [islands, rows, rows * cols, seed];
+    if (!best || ranks(rank, best.rank)) best = { rank, occ, placed, islands };
   }
 
-  // No fully connected board exists - greedy, leftovers on their own row.
-  const occ = new Map(), placed = [];
-  tokens.forEach((t, i) => {
-    if (i === 0) { place(occ, placed, t, [0, 0], true); return; }
-    const best = candidates(occ, t.aks)[0];
-    if (best) place(occ, placed, t, best.start, best.horizontal);
-    else {
-      const rows = [...occ.keys()].map(k => +k.split(",")[0]);
-      const cols = [...occ.keys()].map(k => +k.split(",")[1]);
-      place(occ, placed, t, [Math.max(...rows) + 2, Math.min(...cols)], true);
-    }
-  });
-  return normalise(occ, placed);
+  const board = normalise(best.occ, best.placed);
+  board.islands = best.islands;
+  return board;
 }
 
 function normalise(occ, placed) {
@@ -1036,47 +1074,131 @@ function normalise(occ, placed) {
    3. Levels - generated from data/Levels.kt
    ============================================================================ */
 const LEVELS = [
-  // Block 2, one vowel sign: a single vowel sign per level, introduced one at a time in KAR_ORDER.
-  { id: 1, letters: ["আ", "না", "র", "স", "অ", "ল"], words: ["আনারস", "অলস", "আনা", "আসল", "রস"], block: 2, teaches: ["অ", "ল", "আ", "র", "ন", "স", "া"] },
-
   // Block 4, conjuncts: joined consonants, one cluster family at a time.
-  { id: 2, letters: ["ইঁ", "দু", "র", "উ", "ত্ত", "ট", "ই"], words: ["উট", "ইঁদুর", "উত্তর", "দুই"], block: 4, teaches: ["ই", "উ", "দ", "ট", "ু", "ঁ", "ত্ত"] },
-  { id: 3, letters: ["ঈ", "গ", "ল", "দ", "ম্বা", "রো", "ব্যা"], words: ["ঈগল", "ঈদ", "লম্বা", "রোদ", "ব্যাগ"], block: 4, teaches: ["ঈ", "গ", "ো", "ম্ব", "ব্য"] },
+  { id: 1, letters: ["অ", "জ", "গ", "র", "ক্ষ", "টো"], words: ["অজগর", "অক্ষর", "অটো"], block: 4, teaches: ["অ", "র", "গ", "ট", "জ", "ো", "ক্ষ"] },
 
   // Block 3, vowel signs together: several signs in one word, all of them already taught.
-  { id: 4, letters: ["ঊ", "নি", "শ", "না", "তা", "ষা", "রা"], words: ["ঊনিশ", "ঊষা", "নাশতা", "তারা", "রানি"], block: 3, teaches: ["ঊ", "ত", "শ", "ষ", "ি"] },
-  { id: 5, letters: ["দ", "ক্ষি", "ণ", "ঋ", "তু", "সে", "চাঁ"], words: ["ঋণ", "ঋতু", "সেতু", "দক্ষিণ", "চাঁদ"], block: 4, teaches: ["ঋ", "চ", "ণ", "ে", "ক্ষ"] },
-  { id: 6, letters: ["ও", "জ", "ন", "ক", "ঠি", "এ", "ঠা"], words: ["এক", "ওজন", "কঠিন", "জন", "ওঠা"], block: 3, teaches: ["ক", "এ", "ও", "জ", "ঠ"] },
-  { id: 7, letters: ["ক", "ল", "ম", "লা", "সি", "ফি"], words: ["কলম", "কফি", "কমলা", "কমল", "কলা", "কলসি", "কম", "কল"], block: 3, teaches: ["ম", "ফ"] },
-  { id: 8, letters: ["খা", "বা", "র", "খ", "ব", "লা", "খে"], words: ["খালা", "খাবার", "খেলা", "খবর", "বলা"], block: 3, teaches: ["ব", "খ"] },
-  { id: 9, letters: ["গা", "জ", "র", "গ", "ম", "ল"], words: ["গাজর", "গরম", "গাল", "গম", "জল"], block: 2 },
-  { id: 10, letters: ["ঘ", "র", "বা", "ড়ি", "ট", "ঘা"], words: ["ঘড়ি", "ঘট", "ঘরবাড়ি", "ঘাট", "ঘর"], block: 3, teaches: ["ঘ", "ড়"] },
-  { id: 11, letters: ["চি", "ঠি", "প", "ত্র", "ল", "চু"], words: ["চিল", "চুল", "চিঠি", "চিঠিপত্র", "চুপ"], block: 4, teaches: ["প", "ত্র"] },
-  { id: 12, letters: ["ছা", "গ", "ল", "রা", "খা", "তা", "ক"], words: ["ছাগল", "ছাতা", "রাখাল", "খাল", "করা", "লতা"], block: 2, teaches: ["ছ"] },
-  { id: 13, letters: ["জা", "হা", "জ", "গ", "ত", "মা", "তি"], words: ["জাহাজ", "জামা", "জগত", "হাত", "হাতি"], block: 3, teaches: ["হ"] },
-  { id: 14, letters: ["ঝ", "ল", "ক", "বি", "তা", "ড়", "ঝা"], words: ["ঝড়", "ঝলক", "ঝাল", "কবিতা", "বিল"], block: 3, teaches: ["ঝ"] },
-  { id: 15, letters: ["টি", "কি", "ট", "মে", "টো", "য়া", "য়ে"], words: ["টিকিট", "টমেটো", "টিয়া", "মেয়ে"], block: 3, teaches: ["য়"] },
-  { id: 16, letters: ["ঠি", "কা", "না", "বৈ", "ঠ", "ক", "শো"], words: ["ঠিকানা", "ঠিক", "বৈঠক", "শোনা"], block: 3, teaches: ["ৈ"] },
-  { id: 17, letters: ["ডা", "লি", "ম", "বি", "ড়া", "ল", "ডি"], words: ["ডিম", "ডালিম", "ডাল", "বিড়াল"], block: 3, teaches: ["ড"] },
-  { id: 18, letters: ["ঢো", "ল", "ঢা", "কা", "লা", "বাং"], words: ["ঢোল", "ঢাল", "ঢোকা", "ঢালা", "বাংলা"], block: 3, teaches: ["ঢ", "ং"] },
-  { id: 19, letters: ["তো", "য়া", "লে", "লা", "তা", "খা"], words: ["তোয়ালে", "তোলা", "তালা", "লেখা", "খাতা"], block: 3 },
-  { id: 20, letters: ["পা", "ঠ", "শা", "লা", "থা", "কা", "মা"], words: ["থাকা", "থালা", "পাঠশালা", "মাঠ"], block: 2, teaches: ["থ"] },
-  { id: 21, letters: ["দি", "ন", "রা", "ত", "দু", "ধ", "ভা"], words: ["দিনরাত", "দুধভাত", "দুধ", "দিন", "ভাত"], block: 3, teaches: ["ভ", "ধ"] },
-  { id: 22, letters: ["পা", "য়", "রা", "ধ", "নী", "ধো"], words: ["ধরা", "ধনী", "পায়রা", "ধোপা"], block: 3, teaches: ["ী"] },
+  { id: 2, letters: ["আ", "খ", "রো", "ট", "ঠা", "ম", "টা"], words: ["আম", "আট", "আটা", "আঠা", "আখ", "আঠারো", "আখরোট"], block: 3, teaches: ["আ", "ম", "খ", "ঠ", "া"] },
+  { id: 3, letters: ["আঁ", "চ", "ল", "কা", "টি", "শ"], words: ["আঁকা", "আঁচল", "আঁটি", "আঁশ"], block: 3, teaches: ["ল", "ক", "চ", "শ", "ি", "ঁ"] },
+  { id: 4, letters: ["ই", "লি", "শ", "ঞ্জি", "ন", "ট"], words: ["ইট", "ইলিশ", "ইঞ্জিন"], block: 4, teaches: ["ই", "ন", "ঞ্জ"] },
+  { id: 5, letters: ["উ", "কু", "ন", "ঠা", "ট", "ল"], words: ["উট", "উল", "উকুন", "উঠান"], block: 3, teaches: ["উ", "ু"] },
+  { id: 6, letters: ["এ", "গা", "রো", "কু", "শ", "ক"], words: ["এক", "এগারো", "একুশ", "একশ"], block: 3, teaches: ["এ"] },
+  { id: 7, letters: ["ও", "ষু", "ধ", "ড়", "না", "ঠা", "ড়া"], words: ["ওষুধ", "ওড়না", "ওঠা", "ওড়া"], block: 3, teaches: ["ও", "ধ", "ষ", "ড়"] },
+  { id: 8, letters: ["ক", "ল", "ম", "লা", "ম্ব", "সি", "পা"], words: ["কলম", "কলা", "কমলা", "কম্বল", "কলসি", "কপাল"], block: 4, teaches: ["প", "স", "ম্ব"] },
+  { id: 9, letters: ["কা", "ক", "ঠ", "ন", "চ", "প", "ঠি"], words: ["কাক", "কাঠ", "কান", "কাচ", "কাপ", "কাঠি"], block: 3 },
+  { id: 10, letters: ["কু", "কু", "র", "মি", "ঠা", "য়া", "শা"], words: ["কুকুর", "কুমির", "কুঠার", "কুয়া", "কুয়াশা"], block: 3, teaches: ["য়"] },
+  { id: 11, letters: ["কে", "ত", "লি", "ক", "ল্লা", "না"], words: ["কেক", "কেতলি", "কেল্লা", "কেনা"], block: 4, teaches: ["ত", "ে", "ল্ল"] },
+  { id: 12, letters: ["কো", "দা", "ল", "কি", "ট"], words: ["কোদাল", "কোকিল", "কোল", "কোট"], block: 3, teaches: ["দ"] },
+  { id: 13, letters: ["কাঁ", "টা", "ধ", "চি", "থা", "দা"], words: ["কাঁটা", "কাঁধ", "কাঁচি", "কাঁথা", "কাঁদা"], block: 3, teaches: ["থ"] },
+  { id: 14, letters: ["কি", "শ", "শ", "মি", "কৃ", "ষ", "ক", "মা"], words: ["কিমা", "কিশমিশ", "কৃষক"], block: 3, teaches: ["ৃ"] },
+
+  // Block 2, one vowel sign: a single vowel sign per level, introduced one at a time in KAR_ORDER.
+  { id: 15, letters: ["খ", "র", "গো", "শ", "ই", "ড়"], words: ["খরগোশ", "খই", "খড়"], block: 2 },
+  { id: 16, letters: ["খা", "লা", "ট", "তা", "খো", "সা", "ম"], words: ["খালা", "খাট", "খাতা", "খোলা", "খোসা", "খাম"], block: 3 },
+  { id: 17, letters: ["খে", "ল", "না", "ত", "খা", "লা"], words: ["খেলনা", "খেত", "খাল", "খেলা"], block: 3 },
+  { id: 18, letters: ["খে", "জু", "র", "খু", "ন্তি", "কি"], words: ["খুন্তি", "খুকি", "খেজুর"], block: 4, teaches: ["ন্ত"] },
+  { id: 19, letters: ["গ", "রু", "লি", "লা", "গে", "ঞ্জি", "ম"], words: ["গরু", "গলি", "গলা", "গেলা", "গেঞ্জি", "গম"], block: 4 },
+  { id: 20, letters: ["গো", "স", "ল", "গা", "ড়ি", "ধা", "ছ"], words: ["গোসল", "গোল", "গাল", "গাড়ি", "গাধা", "গাছ"], block: 3, teaches: ["ছ"] },
+  { id: 21, letters: ["গি", "গি", "র", "টি", "টা", "র্জা", "গু", "ড়"], words: ["গিরগিটি", "গির্জা", "গিটার", "গুটি", "গুড়"], block: 4, teaches: ["র্জ"] },
+  { id: 22, letters: ["গো", "লা", "প", "পি", "গু", "হা"], words: ["গোলাপ", "গোলাপি", "গুহা"], block: 3, teaches: ["হ"] },
+  { id: 23, letters: ["গ", "র", "ম", "গু", "ল", "তি", "র্ত"], words: ["গরম", "গর্ত", "গুলতি"], block: 4, teaches: ["র্ত"] },
+  { id: 24, letters: ["ঘ", "র", "ড়ি", "ষা"], words: ["ঘর", "ঘড়ি", "ঘষা"], block: 3, teaches: ["ঘ"] },
+  { id: 25, letters: ["ঘা", "মা", "চি", "স", "ড়", "ম", "ট"], words: ["ঘাস", "ঘাড়", "ঘাম", "ঘাট", "ঘামাচি"], block: 3 },
+  { id: 26, letters: ["ঘু", "ঘু", "মা", "নো", "ঙু", "র", "ম", "ড়ি"], words: ["ঘুম", "ঘুড়ি", "ঘুঘু", "ঘুমানো", "ঘুঙুর"], block: 3, teaches: ["ঙ"] },
+  { id: 27, letters: ["ঘো", "ম", "টা", "ড়া", "রা", "ল"], words: ["ঘোড়া", "ঘোরা", "ঘোল", "ঘোমটা"], block: 3 },
+  { id: 28, letters: ["চো", "খ", "চা", "চা", "ল", "চু", "মু", "র"], words: ["চোখ", "চাচা", "চাল", "চুল", "চুমু", "চার"], block: 3 },
+  { id: 29, letters: ["চি", "রু", "নি", "ড়া", "ঠি", "ল"], words: ["চিরুনি", "চিনি", "চিড়া", "চিঠি", "চিল"], block: 3 },
+  { id: 30, letters: ["চ", "ক", "লে", "ট", "চৌ", "কি", "দ্দ"], words: ["চকলেট", "চক", "চৌকি", "চৌদ্দ"], block: 4, teaches: ["ৌ", "দ্দ"] },
+  { id: 31, letters: ["চো", "য়া", "ল", "চে", "র", "ষা"], words: ["চোয়াল", "চোষা", "চেয়ার"], block: 3 },
+  { id: 32, letters: ["চৌ", "কা", "ঠ", "চা", "কু", "বি"], words: ["চাকা", "চাকু", "চাবি", "চৌকাঠ"], block: 3, teaches: ["ব"] },
+  { id: 33, letters: ["চ", "শ", "মা", "চু", "লা", "ড়ি"], words: ["চশমা", "চুলা", "চুড়ি"], block: 3 },
+  { id: 34, letters: ["ছ", "ড়া", "নো", "বি", "ড়ি", "য়", "ছো"], words: ["ছবি", "ছড়ি", "ছয়", "ছড়ানো", "ছোড়া"], block: 3 },
+  { id: 35, letters: ["ছা", "গ", "ল", "না", "ই", "তা", "দ"], words: ["ছাগল", "ছাল", "ছানা", "ছাই", "ছাতা", "ছাদ"], block: 2 },
+  { id: 36, letters: ["জি", "লা", "পি", "রা", "ফ", "ভ"], words: ["জিলাপি", "জিভ", "জিরা", "জিরাফ"], block: 3, teaches: ["ফ", "ভ"] },
+  { id: 37, letters: ["জা", "ম", "রু", "ল", "মা", "জ", "গ"], words: ["জামরুল", "জাম", "জাল", "জামা", "জগ"], block: 3 },
+  { id: 38, letters: ["জে", "তা", "লে", "লি", "ব্রা", "জু"], words: ["জেতা", "জেলে", "জেলি", "জেব্রা", "জুতা"], block: 4, teaches: ["ব্র"] },
+  { id: 39, letters: ["জ", "ঙ্গ", "ল", "জো", "না", "কি", "বা"], words: ["জঙ্গল", "জবা", "জোনাকি"], block: 4, teaches: ["ঙ্গ"] },
+  { id: 40, letters: ["ঝ", "র", "না", "ড়", "রা"], words: ["ঝড়", "ঝরনা", "ঝরা"], block: 2, teaches: ["ঝ"] },
+  { id: 41, letters: ["ঝা", "ল", "মু", "ড়ি", "ড়ু", "ড়া"], words: ["ঝাড়ু", "ঝালমুড়ি", "ঝাড়া"], block: 3 },
+  { id: 42, letters: ["ট", "মে", "টো", "ব", "র্চ"], words: ["টব", "টমেটো", "টর্চ"], block: 4, teaches: ["র্চ"] },
+  { id: 43, letters: ["টা", "কা", "ক", "ট্টু"], words: ["টাকা", "টাক", "টাট্টু"], block: 4, teaches: ["ট্ট"] },
+  { id: 44, letters: ["টি", "প", "য়া", "ভি", "ন"], words: ["টিপ", "টিয়া", "টিভি", "টিন"], block: 3 },
+  { id: 45, letters: ["টু", "টু", "ন", "নি", "ক", "রো", "পি"], words: ["টুপি", "টুকরো", "টুনটুনি"], block: 3 },
+  { id: 46, letters: ["টে", "বি", "ল", "প", "পা"], words: ["টেবিল", "টেপ", "টেপা"], block: 3 },
+  { id: 47, letters: ["ডা", "না", "ল", "ব", "কা"], words: ["ডানা", "ডাল", "ডাব", "ডাকা"], block: 2, teaches: ["ড"] },
+  { id: 48, letters: ["ডে", "ক", "চি", "ডি", "ম", "ঙি", "গ"], words: ["ডিম", "ডিঙি", "ডেকচি", "ডেগ"], block: 3 },
+  { id: 49, letters: ["ত", "র", "মু", "জ", "ব", "লা", "ক্তা"], words: ["তরমুজ", "তবলা", "তক্তা"], block: 4, teaches: ["ক্ত"] },
+  { id: 50, letters: ["তা", "রা", "লা", "লি", "ল", "ক", "স"], words: ["তারা", "তালা", "তালি", "তাল", "তাক", "তাস"], block: 3 },
+  { id: 51, letters: ["তি", "ন", "মি", "ল", "র"], words: ["তিন", "তিমি", "তিল", "তির"], block: 2 },
+  { id: 52, letters: ["তু", "ল", "সী", "লি", "লা"], words: ["তুলি", "তুলা", "তুলসী"], block: 3, teaches: ["ী"] },
+  { id: 53, letters: ["তে", "লা", "পো", "কা", "ল", "রো"], words: ["তেল", "তেরো", "তেলাপোকা"], block: 3 },
+  { id: 54, letters: ["তো", "য়া", "লে", "তা", "ড়া", "লা"], words: ["তোতা", "তোয়ালে", "তোড়া", "তোলা"], block: 3 },
+  { id: 55, letters: ["থা", "লা", "বা", "না", "মা"], words: ["থালা", "থাবা", "থানা", "থামা"], block: 2 },
+  { id: 56, letters: ["দ", "র", "জা", "ই", "ড়ি", "র্জি"], words: ["দরজা", "দই", "দড়ি", "দর্জি"], block: 4 },
+  { id: 57, letters: ["দা", "দা", "দি", "ড়ি", "গ", "না"], words: ["দাদা", "দাদি", "দাড়ি", "দাগ", "দানা"], block: 3 },
+  { id: 58, letters: ["দু", "ধ", "ল", "ই"], words: ["দুধ", "দুল", "দুই"], block: 2 },
+  { id: 59, letters: ["দে", "ও", "য়া", "ল", "খা", "ড়"], words: ["দেখা", "দেওয়া", "দেয়াল", "দেড়"], block: 3 },
+  { id: 60, letters: ["দো", "কা", "ন", "ল", "না", "য়ে", "লা"], words: ["দোকান", "দোলনা", "দোলা", "দোয়েল"], block: 3 },
+  { id: 61, letters: ["ধ", "নে", "পা", "তা", "নু", "ক", "রা"], words: ["ধরা", "ধনুক", "ধনেপাতা"], block: 3 },
+  { id: 62, letters: ["ধা", "ও", "য়া", "ন", "ধু", "লা"], words: ["ধান", "ধাওয়া", "ধুলা"], block: 3 },
+  { id: 63, letters: ["ন", "দী", "খ", "য়"], words: ["নদী", "নখ", "নয়"], block: 2 },
+  { id: 64, letters: ["না", "না", "ক", "চ", "নি", "তি", "ড়ু"], words: ["নাক", "নাচ", "নানা", "নানি", "নাতি", "নাড়ু"], block: 3 },
+  { id: 65, letters: ["নে", "ক", "ড়ে", "ও", "য়া", "ভা"], words: ["নেকড়ে", "নেওয়া", "নেভা"], block: 3 },
+  { id: 66, letters: ["নি", "ম", "কি", "নো", "ঙ", "র"], words: ["নিম", "নিমকি", "নোঙর"], block: 3 },
+  { id: 67, letters: ["নো", "ল", "ক", "নী", "নৌ", "কা"], words: ["নোলক", "নীল", "নৌকা"], block: 3 },
+  { id: 68, letters: ["প", "থ", "ড়া", "চা", "রী", "র্দা"], words: ["পথ", "পড়া", "পচা", "পরী", "পর্দা"], block: 4, teaches: ["র্দ"] },
+  { id: 69, letters: ["পা", "খি", "খা", "তা", "নি", "ন"], words: ["পাখি", "পাখা", "পাতা", "পানি", "পান"], block: 3 },
+  { id: 70, letters: ["পি", "রি", "চ", "ঠ", "ঠা", "ন"], words: ["পিঠ", "পিঠা", "পিন", "পিরিচ"], block: 3 },
+  { id: 71, letters: ["পু", "তু", "ল", "কু", "র", "রি"], words: ["পুতুল", "পুকুর", "পুল", "পুরি"], block: 3 },
+  { id: 72, letters: ["পে", "য়া", "রা", "রে", "ক", "ট"], words: ["পেট", "পেয়ারা", "পেরেক"], block: 3 },
+  { id: 73, letters: ["পো", "শা", "ক", "কা", "না", "ড়া"], words: ["পোকা", "পোনা", "পোশাক", "পোড়া"], block: 3 },
+  { id: 74, letters: ["ফ", "স", "ল", "ড়িং"], words: ["ফল", "ফসল", "ফড়িং"], block: 2, teaches: ["ং"] },
+  { id: 75, letters: ["ফি", "র", "নি", "তা", "ঙে"], words: ["ফিতা", "ফিঙে", "ফিরনি"], block: 3 },
+  { id: 76, letters: ["ফু", "ফু", "ট", "ব", "ল", "ফা", "টো"], words: ["ফুল", "ফুফু", "ফুফা", "ফুটো", "ফুটবল"], block: 3 },
+  { id: 77, letters: ["ফে", "না", "রি", "রা", "লা"], words: ["ফেনা", "ফেরি", "ফেরা", "ফেলা"], block: 3 },
+  { id: 78, letters: ["ফা", "টা", "লি", "ফো", "ন"], words: ["ফাটা", "ফালি", "ফোন", "ফোটা"], block: 3 },
 
   // Block 1, plain letters: consonants and independent vowels on their own, no signs at all.
-  { id: 23, letters: ["ন", "গ", "দ", "র", "ম", "জ"], words: ["নগদ", "নরম", "নজর", "নগর", "দম"], block: 1 },
-  { id: 24, letters: ["পে", "ন্সি", "ল", "প", "ক", "ট"], words: ["পেন্সিল", "পেট", "পলক", "পটল", "টক"], block: 4, teaches: ["ন্স"] },
-  { id: 25, letters: ["ফ", "ল", "ক", "স", "ফু", "ড়িং"], words: ["ফুল", "ফল", "ফলক", "ফড়িং", "ফসল"], block: 3 },
-  { id: 26, letters: ["বা", "স", "ন", "ব"], words: ["বন", "বস", "বাস", "বাসন", "সব"], block: 2 },
-  { id: 27, letters: ["ক", "ড়া", "ই", "ভা", "লু", "ষা", "ঙা"], words: ["ভাই", "ভাষা", "কড়াই", "ভালুক", "ভাঙা"], block: 3, teaches: ["ঙ"] },
-  { id: 28, letters: ["মা", "খ", "ন", "মৌ", "ছি", "মু"], words: ["মাখন", "মৌমাছি", "মাছি", "মুখ", "নখ"], block: 3, teaches: ["ৌ"] },
-  { id: 29, letters: ["গ", "ণি", "ত", "ব", "ল", "য", "ন্ত্র"], words: ["যন্ত্র", "যত", "গণিত", "বগল", "যব"], block: 4, teaches: ["য", "ন্ত্র"] },
-  { id: 30, letters: ["রা", "ন্না", "ঘ", "র", "ত", "ন"], words: ["রতন", "রান্নাঘর", "রাত", "রান্না", "ঘন"], block: 4, teaches: ["ন্ন"] },
-  { id: 31, letters: ["ব", "দ", "ল", "ণ", "লা", "ঠি", "ন"], words: ["লাঠি", "লাল", "বদল", "দল", "লবণ", "নদ"], block: 3 },
-  { id: 32, letters: ["শী", "ত", "কা", "ল", "হা", "র"], words: ["শীত", "শীতকাল", "শীতল", "হালকা", "তরল"], block: 3 },
-  { id: 33, letters: ["স", "ড়", "ক", "ফ", "ল", "কা", "ষাঁ"], words: ["সড়ক", "সফল", "ষাঁড়", "সকাল", "সকল"], block: 2 },
-  { id: 34, letters: ["হা", "ত", "ঘ", "ড়ি", "সি", "হাঁ", "স"], words: ["হাসি", "হাতঘড়ি", "হাঁড়ি", "হাঁস"], block: 3 }
+  { id: 79, letters: ["ব", "র", "ই", "ফ", "ল", "ন", "ক"], words: ["বই", "বরই", "বরফ", "বল", "বন", "বক"], block: 1 },
+  { id: 80, letters: ["বা", "বা", "গা", "ন", "স", "ঘ", "ক্স", "চ্চা"], words: ["বাবা", "বাঘ", "বাগান", "বাক্স", "বাস", "বাসন", "বাচ্চা"], block: 4, teaches: ["ক্স", "চ্চ"] },
+  { id: 81, letters: ["বি", "ড়া", "ল", "শ", "য়ে"], words: ["বিড়াল", "বিশ", "বিয়ে"], block: 3 },
+  { id: 82, letters: ["বু", "বু", "দ", "দ", "ক", "ড়ো", "ড়ি"], words: ["বুক", "বুড়ো", "বুড়ি", "বুদবুদ"], block: 3 },
+  { id: 83, letters: ["বে", "লু", "ন", "ল", "চা", "গু"], words: ["বেল", "বেলুন", "বেলচা", "বেগুন"], block: 3 },
+  { id: 84, letters: ["বো", "ত", "ল", "য়া", "ন"], words: ["বোন", "বোতল", "বোয়াল"], block: 3 },
+  { id: 85, letters: ["বাঁ", "ধা", "ক", "পি", "শ", "শি", "ধ"], words: ["বাঁশ", "বাঁশি", "বাঁধ", "বাঁধা", "বাঁধাকপি"], block: 3 },
+  { id: 86, letters: ["ভা", "লু", "ক", "ই", "ত", "জা", "ঙা"], words: ["ভাই", "ভাত", "ভাজা", "ভাঙা", "ভালুক"], block: 3 },
+  { id: 87, letters: ["ভে", "ড়া", "লা", "জা"], words: ["ভেড়া", "ভেলা", "ভেজা"], block: 3 },
+  { id: 88, letters: ["ভ", "রা", "ভি", "ড়", "ভো", "র"], words: ["ভরা", "ভিড়", "ভোর"], block: 3 },
+  { id: 89, letters: ["ভো", "ম", "রা", "ভা", "বি", "ভাঁ", "ড়"], words: ["ভোমরা", "ভাবি", "ভাঁড়"], block: 3 },
+  { id: 90, letters: ["ম", "শা", "রি", "চ", "ল", "ই", "ধু"], words: ["মই", "মধু", "মশা", "মশারি", "মরিচ", "মশাল"], block: 3 },
+  { id: 91, letters: ["মা", "ছ", "থা", "টি", "ঠ", "লা", "ছি"], words: ["মাছ", "মাথা", "মাটি", "মাঠ", "মালা", "মাছি"], block: 3 },
+  { id: 92, letters: ["মু", "খ", "ড়ি", "লা", "ঠি", "দি"], words: ["মুখ", "মুড়ি", "মুলা", "মুঠি", "মুদি"], block: 3 },
+  { id: 93, letters: ["মে", "ঘ", "ঝে", "লা", "য়ে", "থি"], words: ["মেঘ", "মেঝে", "মেলা", "মেয়ে", "মেথি"], block: 3 },
+  { id: 94, letters: ["মো", "র", "গ", "জা", "ম", "ছা"], words: ["মোজা", "মোম", "মোছা", "মোরগ"], block: 3 },
+  { id: 95, letters: ["মি", "না", "র", "ষ্টি", "মা", "মা"], words: ["মিষ্টি", "মিনার", "মামা"], block: 4, teaches: ["ষ্ট"] },
+  { id: 96, letters: ["রা", "ত", "স্তা", "নী", "ন্না", "জা"], words: ["রাত", "রাস্তা", "রানী", "রান্না", "রাজা"], block: 4, teaches: ["স্ত", "ন্ন"] },
+  { id: 97, letters: ["রু", "মা", "ল", "ই", "টি", "র", "স"], words: ["রুমাল", "রুই", "রুটি", "রস"], block: 3 },
+  { id: 98, letters: ["রে", "ল", "গা", "ড়ি", "র", "ঙ", "শি"], words: ["রেলগাড়ি", "রঙ", "রশি"], block: 3 },
+  { id: 99, letters: ["রো", "ব", "ট", "রি", "ক", "শা", "দ"], words: ["রোবট", "রোদ", "রিকশা"], block: 3 },
+  { id: 100, letters: ["লা", "ল", "ঠি", "ফ", "উ"], words: ["লাল", "লাঠি", "লাফ", "লাউ"], block: 3 },
+  { id: 101, letters: ["লি", "প", "স্টি", "ক", "ফ", "ট", "চু"], words: ["লিচু", "লিফট", "লিপস্টিক"], block: 4, teaches: ["স্ট"] },
+  { id: 102, letters: ["লু", "কা", "নো", "ঙ্গি", "ডু", "চি"], words: ["লুকানো", "লুঙ্গি", "লুডু", "লুচি"], block: 4 },
+  { id: 103, letters: ["লে", "বু", "জ", "খা", "প"], words: ["লেবু", "লেজ", "লেখা", "লেপ"], block: 3 },
+  { id: 104, letters: ["লো", "হা", "ক", "ম"], words: ["লোহা", "লোক", "লোম"], block: 3 },
+  { id: 105, letters: ["শ", "র", "ব", "ত", "রী", "হ", "সা"], words: ["শরীর", "শহর", "শরবত", "শসা"], block: 3 },
+  { id: 106, letters: ["শা", "মু", "ক", "লি", "খা", "ড়ি", "ল"], words: ["শাক", "শাখা", "শাড়ি", "শামুক", "শালিক", "শাল"], block: 3 },
+  { id: 107, letters: ["শি", "শি", "য়া", "ল", "ক", "শু", "ম"], words: ["শিশু", "শিশি", "শিম", "শিয়াল", "শিকল"], block: 3 },
+  { id: 108, letters: ["শো", "ল", "না", "য়া"], words: ["শোল", "শোনা", "শোয়া"], block: 3 },
+  { id: 109, letters: ["শু", "শু", "কা", "নো", "ক", "না"], words: ["শুকানো", "শুশুক", "শুকনা"], block: 3 },
+  { id: 110, letters: ["স", "ব", "জি", "বু", "জ", "র", "ই"], words: ["সবজি", "সবুজ", "সর", "সই"], block: 3 },
+  { id: 111, letters: ["সা", "গ", "র", "স", "দা", "ত", "প"], words: ["সাদা", "সাত", "সাপ", "সাগর", "সারস"], block: 2 },
+  { id: 112, letters: ["সু", "পা", "রি", "তা", "জি"], words: ["সুতা", "সুজি", "সুপারি"], block: 3 },
+  { id: 113, letters: ["সে", "মা", "ই", "লা", "তু"], words: ["সেতু", "সেমাই", "সেলাই"], block: 3 },
+  { id: 114, letters: ["সি", "ন্দু", "ক", "ট", "সো", "না"], words: ["সিন্দুক", "সিট", "সোনা"], block: 4, teaches: ["ন্দ"] },
+  { id: 115, letters: ["হা", "ত", "তি", "ড়", "ট"], words: ["হাত", "হাতি", "হাড়", "হাট"], block: 3 },
+  { id: 116, letters: ["হাঁ", "স", "টু", "টা", "চি", "ড়ি"], words: ["হাঁস", "হাঁটু", "হাঁটা", "হাঁচি", "হাঁড়ি"], block: 3 },
+  { id: 117, letters: ["হ", "রি", "ণ", "লু", "দ", "হু", "ক"], words: ["হরিণ", "হলুদ", "হুক"], block: 3, teaches: ["ণ"] },
+  { id: 118, letters: ["হি", "জি", "জি", "বি", "হো", "টে", "ল", "ম"], words: ["হিজিবিজি", "হিম", "হোটেল"], block: 3 }
 ];
 
 
@@ -1270,6 +1392,13 @@ function tellsCost(order, lv, pairs) {
     if (!at.has(a) || !at.has(b)) continue;
     const gap = Math.abs(at.get(a) - at.get(b));
     cost += n - Math.min(gap, n - gap);
+  }
+  // Two tiles carrying the same akshara must not sit next to each other. A word that needs
+  // both - হিজিবিজি needs জি twice - is traced by dragging from one to the other, and a
+  // straight drag between neighbours runs over the twin on the way, which adds it to the word
+  // instead. Pushed apart, the line between them passes through the empty middle.
+  for (let i = 0; i < n; i++) {
+    if (order[i] === order[(i + 1) % n]) cost += 500;
   }
   return cost;
 }

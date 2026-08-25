@@ -141,10 +141,12 @@ def emit(levels):
 
 
 def write_builds(levels):
-    kotlin_src, js_src = emit(levels)
-
-    before_kt = KOTLIN.read_text(encoding='utf-8') if KOTLIN.exists() else ''
-    KOTLIN.write_text(kotlin_src, encoding='utf-8')
+    # The web build is the product. The Android app is parked, and it can no longer be
+    # generated into honestly: its CrosswordGenerator lays boards out as one connected
+    # crossword, which is exactly what the akshara-keyed curriculum cannot be, so writing
+    # these levels into Levels.kt would hand it data it cannot place. Reviving the app means
+    # porting `cluster_layout` to Kotlin first; until then it keeps the levels it had.
+    _, js_src = emit(levels)
 
     html = WEB.read_text(encoding='utf-8')
     if html.count('const LEVELS = [') != 1:
@@ -158,7 +160,7 @@ def write_builds(levels):
     live_src = unwrap(WEB.read_text(encoding='utf-8'))
     LIVE.write_text(live_src, encoding='utf-8')
 
-    return (before_kt != kotlin_src,
+    return (False,
             before_web != WEB.read_text(encoding='utf-8'),
             before_live != live_src)
 
@@ -295,20 +297,24 @@ def report(levels, failures):
         print(f'  level {i:<3} {letters:3} {len(own)} of {len(level["words"])} words '
               f'({" ".join(own)})' + (f'  + {" ".join(rest)}' if rest else ''))
 
-    # Whether the alphabet run is actually complete: every letter that begins a word in the
-    # pool should have a level. Worth stating out loud rather than assuming, because "we did
-    # ক through হ" is easy to say and easy to be wrong about.
-    covered = {x for level in levels for x in level.get('letters', '')}
-    initial = {}
-    for word in pool_words():
-        initial.setdefault(split_aksharas(word)[0][0], []).append(word)
-    uncovered = sorted(set(initial) - covered, key=lambda c: -len(initial[c]))
-    print(f'\nalphabet run: {len(covered)} letters have a level')
-    if uncovered:
-        print(f'  {len(uncovered)} letters begin a pool word but have none:')
-        for c in uncovered:
-            words = sorted(initial[c])
-            print(f'    {c}  {len(words)} word(s): {" ".join(words[:6])}')
+    # Which letters the curriculum covers, and how far each one's kar series goes. Worth
+    # stating out loud rather than assuming: "we did ক through হ" is easy to say and easy to be
+    # wrong about, and the uploaded curriculum in fact has no ঠ, ঢ, য or ষ at all.
+    series = {}
+    for level in levels:
+        key = level.get('letters', '')
+        base = key.split('-')[0][0] if key else '?'
+        series.setdefault(base, []).append(key)
+    letters = [c for kind, c in alphabet() if kind in ('vowel', 'consonant')]
+    missing = [c for c in letters if c not in series]
+    print(f'\nalphabet run: {len(series)} base letters have at least one level, '
+          f'{len(levels)} levels in all')
+    for base in letters:
+        if base in series:
+            print(f'    {base}  {len(series[base])}: {" ".join(series[base])}')
+    if missing:
+        print(f'  {len(missing)} letters have no level at all: {" ".join(missing)}')
+        print('    (ঙ ঞ ণ ড় ঢ় য় are left out by design - no Bengali word begins with them)')
 
     # No word set as a puzzle twice. `ordered_levels` rejects any level that breaks it outside
     # the documented list, so this is a count of what the documented list is actually covering
@@ -522,7 +528,7 @@ def main(argv):
             return 1
         kt_changed, web_changed, live_changed = write_builds(levels)
         print(f'{len(levels)} levels written')
-        print(f'  {KOTLIN.relative_to(REPO)}  {"updated" if kt_changed else "unchanged"}')
+        print(f'  {KOTLIN.relative_to(REPO)}  not written - the app is parked, see write_builds')
         print(f'  {WEB.relative_to(REPO)}  {"updated" if web_changed else "unchanged"}')
         print(f'  {LIVE.relative_to(REPO)}  {"updated" if live_changed else "unchanged"}')
         print('\nnow run: cd bengali-word-game && ./gradlew test')

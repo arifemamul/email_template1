@@ -38,8 +38,11 @@ a dozen tile sets, so a learner spent a good part of the game re-spelling words 
 knew. `SHARED` is the list of deliberate exceptions and is currently empty; a level borrowing
 without being listed there fails the check, and so does an entry no level actually borrows.
 """
-from bangla import (conjunct_tiles, grid_size, layout, split_aksharas, spellable,
-                    stray_runs, tiles_for)
+import json
+import pathlib
+
+from bangla import (cluster_layout, conjunct_tiles, grid_size, layout, split_aksharas,
+                    spellable, stray_runs, tiles_for, wheel_for)
 from curriculum import (BLOCK_CONJUNCT, BLOCK_FREE, BLOCK_KARS, BLOCK_ONE_KAR, BLOCK_PLAIN,
                         BLOCKS,
                         block_for, new_units, teaching_rank, units_in)
@@ -77,69 +80,47 @@ from wordpool import zipf
 # would happily borrow থাকা and থালা, and then থ - which has two words in the pool to start
 # with - would have none left.
 
+# -- the levels, read from levels.json ----------------------------------------------------
+# The curriculum is data, not code: 118 levels and 478 words with English glosses,
+# spoken-corpus counts and per-word caveats, in `levels.json`. A level is keyed on an
+# AKSHARA - ক, কা, কু, কে, কো, কাঁ - which is the কার series a Bengali child is taught, rather
+# than on a bare letter. Levels of type "letter" hold one letter with mixed signs, for letters
+# whose single aksharas have too few words to fill a wheel on their own.
+#
+# The file's own order puts all 38 mixed-sign levels after all 80 akshara levels, so a player
+# would meet ক, then ঘ, then ঝ, and not reach খ or গ until level 82. `LEVEL_ORDER` regroups
+# them: base letters in alphabet order, and within a letter the bare akshara first, then the
+# kar series, then that letter's mixed-sign levels.
+
+LEVELS_FILE = pathlib.Path(__file__).resolve().parent / 'levels.json'
+_DATA = json.loads(LEVELS_FILE.read_text(encoding='utf-8'))
+
+ALPHABET_ORDER = list("অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ")
+KAR_SERIES = ['', 'া', 'ি', 'ী', 'ু', 'ূ', 'ৃ', 'ে', 'ৈ', 'ো', 'ৌ']
+
+
+def teaching_order(level):
+    """Where a level sits: base letter, then its own akshara series, then its mixed-sign ones."""
+    key = level['id']
+    base = key[0]
+    letter = ALPHABET_ORDER.index(base) if base in ALPHABET_ORDER else len(ALPHABET_ORDER)
+    if level['type'] == 'letter':
+        return (letter, 2, int(key.split('-')[1]), key)
+    rest = key[1:]
+    nasal = 1 if 'ঁ' in rest else 0
+    kar = rest.replace('ঁ', '')
+    return (letter, 1, nasal, KAR_SERIES.index(kar) if kar in KAR_SERIES else 99, key)
+
+
 SYLLABUS = [
-    # -- the vowels that start words; paired up where one letter cannot carry a board ----
-    ("অআ", BLOCK_ONE_KAR, ["আনারস", "অলস", "আনা", "আসল", "রস"]),
-    ("ইউ", BLOCK_CONJUNCT, ["উট", "ইঁদুর", "উত্তর", "দুই"]),
-    ("ঈ",  BLOCK_CONJUNCT, ["ঈগল", "ঈদ", "লম্বা", "রোদ", "ব্যাগ"]),
-    ("ঊ",  BLOCK_KARS,   ["ঊনিশ", "ঊষা", "নাশতা", "তারা", "রানি"]),
-    ("ঋ",  BLOCK_CONJUNCT, ["ঋণ", "ঋতু", "সেতু", "দক্ষিণ", "চাঁদ"]),
-    ("এও", BLOCK_KARS,   ["এক", "ওজন", "কঠিন", "জন", "ওঠা"]),
-
-    # -- then the consonants, one at a time, in alphabet order ---------------------------
-    # Six tiles rather than four. A four-tile ring has only six possible arrangements, and
-    # every one of them spelled one of these words out in sequence around the wheel - the
-    # answer was drawn on the wheel and no scramble could hide it. See the ring check.
-    ("ক",  BLOCK_KARS,     ["কলম", "কফি", "কমলা", "কমল", "কলা", "কলসি", "কম", "কল"]),
-    ("খ",  BLOCK_KARS,   ["খালা", "খাবার", "খেলা", "খবর", "বলা"]),
-    ("গ",  BLOCK_ONE_KAR, ["গাজর", "গরম", "গাল", "গম", "জল"]),
-    ("ঘ",  BLOCK_KARS,   ["ঘড়ি", "ঘট", "ঘরবাড়ি", "ঘাট", "ঘর"]),
-    # ঙ begins no word
-    ("চ",  BLOCK_CONJUNCT, ["চিল", "চুল", "চিঠি", "চিঠিপত্র", "চুপ"]),
-    # ছ used to run to four ছা- words, held together by ঈগল and ঈদ as bridges. Those two are
-    # the whole of word-initial ঈ, so ঈ could have a level or ছ could keep four of its own,
-    # not both. ঈ took them; without them no board with more than two ছ words lays out.
-    ("ছ",  BLOCK_ONE_KAR, ["ছাগল", "ছাতা", "রাখাল", "খাল", "করা", "লতা"]),
-    ("জ",  BLOCK_KARS,   ["জাহাজ", "জামা", "জগত", "হাত", "হাতি"]),
-    ("ঝ",  BLOCK_KARS,   ["ঝড়", "ঝলক", "ঝাল", "কবিতা", "বিল"]),
-    # ঞ begins no word
-    ("ট",  BLOCK_KARS,   ["টিকিট", "টমেটো", "টিয়া", "মেয়ে"]),
-    ("ঠ",  BLOCK_KARS,   ["ঠিকানা", "ঠিক", "বৈঠক", "শোনা"]),
-    ("ড",  BLOCK_KARS,   ["ডিম", "ডালিম", "ডাল", "বিড়াল"]),
-    ("ঢ",  BLOCK_KARS,   ["ঢোল", "ঢাল", "ঢোকা", "ঢালা", "বাংলা"]),
-    # ণ begins no word
-    ("ত",  BLOCK_KARS,   ["তোয়ালে", "তোলা", "তালা", "লেখা", "খাতা"]),
-    ("থ",  BLOCK_ONE_KAR, ["থাকা", "থালা", "পাঠশালা", "মাঠ"]),
-    ("দ",  BLOCK_KARS,   ["দিনরাত", "দুধভাত", "দুধ", "দিন", "ভাত"]),
-    ("ধ",  BLOCK_KARS,   ["ধরা", "ধনী", "পায়রা", "ধোপা"]),
-    ("ন",  BLOCK_PLAIN,  ["নগদ", "নরম", "নজর", "নগর", "দম"]),
-
-    # -- প onwards ----------------------------------------------------------------------
-    ("প",  BLOCK_CONJUNCT, ["পেন্সিল", "পেট", "পলক", "পটল", "টক"]),
-    ("ফ",  BLOCK_KARS,   ["ফুল", "ফল", "ফলক", "ফড়িং", "ফসল"]),
-    ("ব",  BLOCK_ONE_KAR, ["বন", "বস", "বাস", "বাসন", "সব"]),
-    ("ভ",  BLOCK_KARS,   ["ভাই", "ভাষা", "কড়াই", "ভালুক", "ভাঙা"]),
-    ("ম",  BLOCK_KARS,   ["মাখন", "মৌমাছি", "মাছি", "মুখ", "নখ"]),
-    ("য",  BLOCK_CONJUNCT, ["যন্ত্র", "যত", "গণিত", "বগল", "যব"]),
-    ("র",  BLOCK_CONJUNCT, ["রতন", "রান্নাঘর", "রাত", "রান্না", "ঘন"]),
-    ("ল",  BLOCK_KARS,   ["লাঠি", "লাল", "বদল", "দল", "লবণ", "নদ"]),
-    ("শ",  BLOCK_KARS,   ["শীত", "শীতকাল", "শীতল", "হালকা", "তরল"]),
-    # ষ and স share a level for the same reason the vowels do: ষাঁড় and ষোল are the only two
-    # words in the pool that begin with ষ, and they share no letter with each other or with
-    # ষষ্ঠ, so no board can be built from them alone. Word-initial ষ is rare in Bengali - it
-    # lives inside words, in clusters like ষ্ট and ষ্ঠ.
-    ("ষস", BLOCK_ONE_KAR, ["সড়ক", "সফল", "ষাঁড়", "সকাল", "সকল"]),
-    # হ, the last letter, and the smallest board in the game. Four is the ceiling: every pair of
-    # হ words in the pool was tried as an anchor and nothing bigger will lay out. The হ words
-    # fall into four groups by their first akshara - হ, হা, হাঁ, হৃ - and only two words from any
-    # one group can cross at the akshara they share.
-    ("হ",  BLOCK_KARS,   ["হাসি", "হাতঘড়ি", "হাঁড়ি", "হাঁস"]),
-    # ড়, ঢ় and য় begin no Bengali word, so there is nothing after this.
+    (lv['id'], lv['type'], [w['w'] for w in lv['words']])
+    for lv in sorted(_DATA['levels'], key=teaching_order)
 ]
 
-# Every level as (letters, declared block, words). Both declarations are checked against what
-# the words actually contain: the block, so a level cannot drift out of it unnoticed, and the
-# letters, so a level named after ছ cannot quietly become a level about something else.
+GLOSS = {w['w']: w['en'] for lv in _DATA['levels'] for w in lv['words']}
+CAVEAT = {w['w']: w['flag'] for lv in _DATA['levels'] for w in lv['words'] if w.get('flag')}
+SPOKEN_FREQ = {w['w']: w.get('freq', 0) for lv in _DATA['levels'] for w in lv['words']}
+
 DECLARED = list(SYLLABUS)
 
 CATALOGUE = [words for _, _, words in DECLARED]
@@ -170,12 +151,12 @@ SHARED = {}
 FULL_SYLLABUS = False
 
 MIN_ZIPF = 2.0          # below this, treat a "word" as invented rather than Bengali
-MAX_ROWS, MAX_COLS = 8, 9
+MAX_ROWS, MAX_COLS = 8, 7
 
 # The widest wheel worth drawing. A board grows by taking on words, and a word it has no tile
 # for brings its own - so this is what stops a level from ending up with a wheel too crowded to
 # drag across on a phone.
-MAX_TILES = 7
+MAX_TILES = 8
 
 # How many pieces of the writing system one level may introduce. Two is a lesson; five is a
 # lecture. Levels that exceed it are reported by `check` rather than rejected, because the
@@ -205,25 +186,40 @@ def difficulty(tiles, words):
             + 3.0 * len(conjunct_tiles(tiles)) + 1.6 * rarity)
 
 
-def validate(words, block=None):
+def validate(words, block=None, key=None, kind=None):
     """Everything that has to be true before a level can ship. Returns (level, problems)."""
     problems = []
-    tiles = tiles_for(words)
+    tiles = wheel_for(words)
 
     if len(words) != len(set(words)):
         problems.append('repeats a word')
     if len(words) < 3:
         problems.append(f'only {len(words)} words; a level needs at least 3')
+    if len(tiles) > MAX_TILES:
+        problems.append(f'wheel of {len(tiles)} tiles, over the {MAX_TILES} a wheel holds')
+
+    # A level is named after an akshara, and every word on it has to start with that
+    # akshara - that is the whole teaching claim. A 'letter' level makes the weaker claim:
+    # same letter, any vowel sign.
+    if key:
+        if kind == 'akshara':
+            off = [w for w in words if split_aksharas(w)[0] != key]
+            if off:
+                problems.append(f'{key} level, but {" ".join(off)} do not start with {key}')
+        else:
+            base = key.split('-')[0]
+            off = [w for w in words if split_aksharas(w)[0][0] != base]
+            if off:
+                problems.append(f'{base} level, but {" ".join(off)} do not start with {base}')
 
     for w in words:
         aksharas = split_aksharas(w)
-        z = zipf(w)
-        if z < MIN_ZIPF:
-            problems.append(f'{w} is unattested in Bengali text (zipf {z:.2f})')
+        # Frequency was the gate that caught invented compounds when words were chosen by
+        # corpus rank. These are hand-curated with glosses, so it reports instead: three of
+        # the 478 sit under the old floor - নিমকি, ডেগ, নেভা - all real, all rare in the
+        # subtitle corpus the numbers come from. See the `thin:` line in the report.
         if len(aksharas) < 2:
             problems.append(f'{w} is a single akshara')
-        if len(set(aksharas)) != len(aksharas):
-            problems.append(f'{w} repeats an akshara {aksharas}, so tiles cannot spell it')
         if not spellable(w, tiles):
             problems.append(f'{w} is not spellable from {" ".join(tiles)}')
         if w in REJECTED:
@@ -241,12 +237,14 @@ def validate(words, block=None):
     elif block is not None and actual != block:
         problems.append(f'declared block {block} but its words need block {actual}')
 
-    placed = layout(words)
+    # Islands allowed: an akshara-keyed level has every word starting with the same
+    # akshara, so at most two of them can ever connect. See `cluster_layout`.
+    placed = cluster_layout(words, max_rows=MAX_ROWS, max_cols=MAX_COLS)
     if not placed:
-        problems.append('no connected crossword exists for these words')
+        problems.append('the words cannot be placed at all')
         return None, problems
 
-    occupied, words_placed = placed
+    occupied, words_placed, islands = placed
     rows, cols = grid_size(occupied)
     if rows > MAX_ROWS or cols > MAX_COLS:
         problems.append(f'board is {rows}x{cols}, too big for a phone screen')
@@ -264,6 +262,7 @@ def validate(words, block=None):
         'size': (rows, cols),
         'score': difficulty(tiles, words),
         'block': block if block is not None else actual,
+        'islands': islands,
         'teaches': [],         # filled in by ordered_levels, which knows what came before
     }
     return level, problems
@@ -362,12 +361,13 @@ def ordered_levels():
     problems rather than silently shipping fewer levels than the catalogue lists.
     """
     levels, failures = [], []
-    for letters, block, words in DECLARED:
-        level, problems = validate(words, block)
+    for key, kind, words in DECLARED:
+        level, problems = validate(words, None, key=key, kind=kind)
         if problems:
             failures.append((words, problems))
             continue
-        level['letters'] = letters
+        level['letters'] = key
+        level['kind'] = kind
         levels.append(level)
 
     # Board words are verified vocabulary too, so a level can grow into a word another level was
@@ -379,6 +379,7 @@ def ordered_levels():
     # inside a block. An alphabet game is ordered by the alphabet, which is the order it is
     # written in, and sorting by block would scatter it: ক lands in block 3 and গ in block 2,
     # so ক would be played second.
+    # Order is decided by `teaching_order` when SYLLABUS is built, so nothing re-sorts here.
     known, out = set(), []
     if FULL_SYLLABUS:
         for block in sorted({l['block'] for l in levels}):
