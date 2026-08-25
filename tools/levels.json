@@ -1,0 +1,6327 @@
+{
+ "name": "Bengali akshara word-puzzle vocabulary",
+ "language": "Bengali (bn-BD, Bangladeshi standard)",
+ "audience": "children ~7 years old learning to read",
+ "counts": {
+  "levels": 118,
+  "akshara_keyed": 80,
+  "letter_packed": 38,
+  "words": 478
+ },
+ "HOW_TO_READ_THIS": [
+  "An AKSHARA is one game tile: a consonant cluster plus its vowel sign, or an independent vowel.",
+  "মাছ = মা + ছ (2 tiles). কলম = ক + ল + ম (3 tiles). কমলা = ক + ম + লা (3 tiles).",
+  "A bare consonant carrying no vowel sign is its own tile. A conjunct is ONE tile (কচ্ছপ = ক + চ্ছ + প).",
+  "Each level's 'wheel' is the set of DISTINCT aksharas across its words. It is never more than 7.",
+  "Every word in the level is buildable from the wheel tiles, and tiles may be reused within a word.",
+  "type=akshara: every word starts with the SAME akshara (level 'key'). These teach the কার/মাত্রা series.",
+  "type=letter: every word starts with the same LETTER but different matras. Used where a single akshara could not fill a wheel."
+ ],
+ "RULES_THE_WORDS_ALREADY_SATISFY": [
+  "Concrete: a picture can replace the gloss. Or a number, a colour, or an everyday action.",
+  "2 to 4 aksharas. Never 1, never 5+.",
+  "Dictionary base forms. No verb inflections, case endings or plurals.",
+  "Bangladeshi Bengali. No West Bengal-only words (no জল/কাকা/পিসি/দিদি/লঙ্কা - use পানি/চাচা/ফুফু/আপা/মরিচ).",
+  "No two spellings of the same word. Each word appears in exactly one level."
+ ],
+ "CRITICAL_ENCODING_WARNING": [
+  "ড় ঢ় য় are Unicode COMPOSITION EXCLUSIONS. NFC will NOT unify the precomposed letters",
+  "(U+09DC/09DD/09DF) with their consonant+nukta spellings (U+09A1/09A2/09AF + U+09BC).",
+  "Both forms occur in real Bengali text. If you compare a player's tile taps against a stored",
+  "word without canonicalising, roughly 12% of ordinary words silently fail to match -",
+  "including ঘোড়া, ঘড়ি, মেয়ে, পড়া, চেয়ার. Normalise BOTH sides to the precomposed form first.",
+  "The 'split' array in this file is already correctly segmented - use it, do not re-derive it."
+ ],
+ "FIELD_NOTES": {
+  "w": "the Bengali word",
+  "split": "its aksharas, in order - one tile each",
+  "en": "one or two word English gloss, intended as the illustration brief",
+  "freq": "frequency in a Bengali spoken corpus (film subtitles). 0 is common and NOT a defect: the corpus underrepresents household nouns like ডাব, দই, শালিক.",
+  "flag": "present only when the word needs care. regional-BD = Bangladesh-specific. Others are illustration or familiarity caveats."
+ },
+ "levels": [
+  {
+   "id": "অ",
+   "type": "akshara",
+   "key": "অ",
+   "wheel": [
+    "অ",
+    "জ",
+    "গ",
+    "র",
+    "ক্ষ",
+    "টো"
+   ],
+   "words": [
+    {
+     "w": "অজগর",
+     "split": [
+      "অ",
+      "জ",
+      "গ",
+      "র"
+     ],
+     "en": "python (snake)",
+     "freq": 2
+    },
+    {
+     "w": "অক্ষর",
+     "split": [
+      "অ",
+      "ক্ষ",
+      "র"
+     ],
+     "en": "letter of the alphabet",
+     "freq": 32
+    },
+    {
+     "w": "অটো",
+     "split": [
+      "অ",
+      "টো"
+     ],
+     "en": "auto-rickshaw",
+     "freq": 48
+    }
+   ]
+  },
+  {
+   "id": "আ",
+   "type": "akshara",
+   "key": "আ",
+   "wheel": [
+    "আ",
+    "ম",
+    "ট",
+    "টা",
+    "ঠা",
+    "খ",
+    "রো"
+   ],
+   "words": [
+    {
+     "w": "আম",
+     "split": [
+      "আ",
+      "ম"
+     ],
+     "en": "mango",
+     "freq": 51
+    },
+    {
+     "w": "আট",
+     "split": [
+      "আ",
+      "ট"
+     ],
+     "en": "eight",
+     "freq": 148
+    },
+    {
+     "w": "আটা",
+     "split": [
+      "আ",
+      "টা"
+     ],
+     "en": "flour",
+     "freq": 8
+    },
+    {
+     "w": "আঠা",
+     "split": [
+      "আ",
+      "ঠা"
+     ],
+     "en": "glue",
+     "freq": 15
+    },
+    {
+     "w": "আখ",
+     "split": [
+      "আ",
+      "খ"
+     ],
+     "en": "sugarcane",
+     "freq": 3
+    },
+    {
+     "w": "আঠারো",
+     "split": [
+      "আ",
+      "ঠা",
+      "রো"
+     ],
+     "en": "eighteen",
+     "freq": 10
+    },
+    {
+     "w": "আখরোট",
+     "split": [
+      "আ",
+      "খ",
+      "রো",
+      "ট"
+     ],
+     "en": "walnut",
+     "freq": 2
+    }
+   ]
+  },
+  {
+   "id": "আঁ",
+   "type": "akshara",
+   "key": "আঁ",
+   "wheel": [
+    "আঁ",
+    "কা",
+    "চ",
+    "ল",
+    "টি",
+    "শ"
+   ],
+   "words": [
+    {
+     "w": "আঁকা",
+     "split": [
+      "আঁ",
+      "কা"
+     ],
+     "en": "to draw",
+     "freq": 41
+    },
+    {
+     "w": "আঁচল",
+     "split": [
+      "আঁ",
+      "চ",
+      "ল"
+     ],
+     "en": "loose end of a sari",
+     "freq": 0
+    },
+    {
+     "w": "আঁটি",
+     "split": [
+      "আঁ",
+      "টি"
+     ],
+     "en": "fruit stone",
+     "freq": 1
+    },
+    {
+     "w": "আঁশ",
+     "split": [
+      "আঁ",
+      "শ"
+     ],
+     "en": "fish scale",
+     "freq": 2
+    }
+   ]
+  },
+  {
+   "id": "ই",
+   "type": "akshara",
+   "key": "ই",
+   "wheel": [
+    "ই",
+    "ট",
+    "লি",
+    "শ",
+    "ঞ্জি",
+    "ন"
+   ],
+   "words": [
+    {
+     "w": "ইট",
+     "split": [
+      "ই",
+      "ট"
+     ],
+     "en": "brick",
+     "freq": 48
+    },
+    {
+     "w": "ইলিশ",
+     "split": [
+      "ই",
+      "লি",
+      "শ"
+     ],
+     "en": "hilsa fish",
+     "freq": 1
+    },
+    {
+     "w": "ইঞ্জিন",
+     "split": [
+      "ই",
+      "ঞ্জি",
+      "ন"
+     ],
+     "en": "engine",
+     "freq": 174
+    }
+   ]
+  },
+  {
+   "id": "উ",
+   "type": "akshara",
+   "key": "উ",
+   "wheel": [
+    "উ",
+    "ট",
+    "ল",
+    "কু",
+    "ন",
+    "ঠা"
+   ],
+   "words": [
+    {
+     "w": "উট",
+     "split": [
+      "উ",
+      "ট"
+     ],
+     "en": "camel",
+     "freq": 15
+    },
+    {
+     "w": "উল",
+     "split": [
+      "উ",
+      "ল"
+     ],
+     "en": "wool",
+     "freq": 15
+    },
+    {
+     "w": "উকুন",
+     "split": [
+      "উ",
+      "কু",
+      "ন"
+     ],
+     "en": "louse",
+     "freq": 9
+    },
+    {
+     "w": "উঠান",
+     "split": [
+      "উ",
+      "ঠা",
+      "ন"
+     ],
+     "en": "courtyard",
+     "freq": 15
+    }
+   ]
+  },
+  {
+   "id": "এ",
+   "type": "akshara",
+   "key": "এ",
+   "wheel": [
+    "এ",
+    "ক",
+    "গা",
+    "রো",
+    "কু",
+    "শ"
+   ],
+   "words": [
+    {
+     "w": "এক",
+     "split": [
+      "এ",
+      "ক"
+     ],
+     "en": "one (1)",
+     "freq": 5538
+    },
+    {
+     "w": "এগারো",
+     "split": [
+      "এ",
+      "গা",
+      "রো"
+     ],
+     "en": "eleven (11)",
+     "freq": 10
+    },
+    {
+     "w": "একুশ",
+     "split": [
+      "এ",
+      "কু",
+      "শ"
+     ],
+     "en": "twenty-one (21)",
+     "freq": 6
+    },
+    {
+     "w": "একশ",
+     "split": [
+      "এ",
+      "ক",
+      "শ"
+     ],
+     "en": "hundred (100)",
+     "freq": 44
+    }
+   ]
+  },
+  {
+   "id": "ও",
+   "type": "akshara",
+   "key": "ও",
+   "wheel": [
+    "ও",
+    "ষু",
+    "ধ",
+    "ড়",
+    "না",
+    "ঠা",
+    "ড়া"
+   ],
+   "words": [
+    {
+     "w": "ওষুধ",
+     "split": [
+      "ও",
+      "ষু",
+      "ধ"
+     ],
+     "en": "medicine",
+     "freq": 146
+    },
+    {
+     "w": "ওড়না",
+     "split": [
+      "ও",
+      "ড়",
+      "না"
+     ],
+     "en": "dupatta, long scarf",
+     "freq": 1
+    },
+    {
+     "w": "ওঠা",
+     "split": [
+      "ও",
+      "ঠা"
+     ],
+     "en": "to get up, to rise",
+     "freq": 63
+    },
+    {
+     "w": "ওড়া",
+     "split": [
+      "ও",
+      "ড়া"
+     ],
+     "en": "to fly",
+     "freq": 6
+    }
+   ]
+  },
+  {
+   "id": "ক",
+   "type": "akshara",
+   "key": "ক",
+   "wheel": [
+    "ক",
+    "ল",
+    "ম",
+    "লা",
+    "ম্ব",
+    "সি",
+    "পা"
+   ],
+   "words": [
+    {
+     "w": "কলম",
+     "split": [
+      "ক",
+      "ল",
+      "ম"
+     ],
+     "en": "pen",
+     "freq": 53
+    },
+    {
+     "w": "কলা",
+     "split": [
+      "ক",
+      "লা"
+     ],
+     "en": "banana",
+     "freq": 59
+    },
+    {
+     "w": "কমলা",
+     "split": [
+      "ক",
+      "ম",
+      "লা"
+     ],
+     "en": "orange (fruit)",
+     "freq": 39
+    },
+    {
+     "w": "কম্বল",
+     "split": [
+      "ক",
+      "ম্ব",
+      "ল"
+     ],
+     "en": "blanket",
+     "freq": 11
+    },
+    {
+     "w": "কলসি",
+     "split": [
+      "ক",
+      "ল",
+      "সি"
+     ],
+     "en": "water pitcher",
+     "freq": 2
+    },
+    {
+     "w": "কপাল",
+     "split": [
+      "ক",
+      "পা",
+      "ল"
+     ],
+     "en": "forehead",
+     "freq": 74
+    }
+   ]
+  },
+  {
+   "id": "কা",
+   "type": "akshara",
+   "key": "কা",
+   "wheel": [
+    "কা",
+    "ক",
+    "ঠ",
+    "ন",
+    "চ",
+    "প",
+    "ঠি"
+   ],
+   "words": [
+    {
+     "w": "কাক",
+     "split": [
+      "কা",
+      "ক"
+     ],
+     "en": "crow",
+     "freq": 23
+    },
+    {
+     "w": "কাঠ",
+     "split": [
+      "কা",
+      "ঠ"
+     ],
+     "en": "wood",
+     "freq": 43
+    },
+    {
+     "w": "কান",
+     "split": [
+      "কা",
+      "ন"
+     ],
+     "en": "ear",
+     "freq": 149
+    },
+    {
+     "w": "কাচ",
+     "split": [
+      "কা",
+      "চ"
+     ],
+     "en": "glass (the material)",
+     "freq": 7
+    },
+    {
+     "w": "কাপ",
+     "split": [
+      "কা",
+      "প"
+     ],
+     "en": "cup",
+     "freq": 104
+    },
+    {
+     "w": "কাঠি",
+     "split": [
+      "কা",
+      "ঠি"
+     ],
+     "en": "stick",
+     "freq": 11
+    }
+   ]
+  },
+  {
+   "id": "কু",
+   "type": "akshara",
+   "key": "কু",
+   "wheel": [
+    "কু",
+    "র",
+    "মি",
+    "ঠা",
+    "য়া",
+    "শা"
+   ],
+   "words": [
+    {
+     "w": "কুকুর",
+     "split": [
+      "কু",
+      "কু",
+      "র"
+     ],
+     "en": "dog",
+     "freq": 224
+    },
+    {
+     "w": "কুমির",
+     "split": [
+      "কু",
+      "মি",
+      "র"
+     ],
+     "en": "crocodile",
+     "freq": 10
+    },
+    {
+     "w": "কুঠার",
+     "split": [
+      "কু",
+      "ঠা",
+      "র"
+     ],
+     "en": "axe",
+     "freq": 6
+    },
+    {
+     "w": "কুয়া",
+     "split": [
+      "কু",
+      "য়া"
+     ],
+     "en": "water well",
+     "flag": "regional-BD",
+     "freq": 11
+    },
+    {
+     "w": "কুয়াশা",
+     "split": [
+      "কু",
+      "য়া",
+      "শা"
+     ],
+     "en": "fog",
+     "freq": 12
+    }
+   ]
+  },
+  {
+   "id": "কে",
+   "type": "akshara",
+   "key": "কে",
+   "wheel": [
+    "কে",
+    "ক",
+    "ত",
+    "লি",
+    "ল্লা",
+    "না"
+   ],
+   "words": [
+    {
+     "w": "কেক",
+     "split": [
+      "কে",
+      "ক"
+     ],
+     "en": "cake",
+     "freq": 107
+    },
+    {
+     "w": "কেতলি",
+     "split": [
+      "কে",
+      "ত",
+      "লি"
+     ],
+     "en": "kettle",
+     "freq": 5
+    },
+    {
+     "w": "কেল্লা",
+     "split": [
+      "কে",
+      "ল্লা"
+     ],
+     "en": "fort",
+     "flag": "borderline familiarity: least-known word in this level; the level survives at 3 without it",
+     "freq": 15
+    },
+    {
+     "w": "কেনা",
+     "split": [
+      "কে",
+      "না"
+     ],
+     "en": "to buy",
+     "freq": 41
+    }
+   ]
+  },
+  {
+   "id": "কো",
+   "type": "akshara",
+   "key": "কো",
+   "wheel": [
+    "কো",
+    "দা",
+    "ল",
+    "কি",
+    "ট"
+   ],
+   "words": [
+    {
+     "w": "কোদাল",
+     "split": [
+      "কো",
+      "দা",
+      "ল"
+     ],
+     "en": "spade",
+     "freq": 12
+    },
+    {
+     "w": "কোকিল",
+     "split": [
+      "কো",
+      "কি",
+      "ল"
+     ],
+     "en": "cuckoo",
+     "freq": 11
+    },
+    {
+     "w": "কোল",
+     "split": [
+      "কো",
+      "ল"
+     ],
+     "en": "lap",
+     "freq": 18
+    },
+    {
+     "w": "কোট",
+     "split": [
+      "কো",
+      "ট"
+     ],
+     "en": "coat",
+     "freq": 52
+    }
+   ]
+  },
+  {
+   "id": "কাঁ",
+   "type": "akshara",
+   "key": "কাঁ",
+   "wheel": [
+    "কাঁ",
+    "টা",
+    "ধ",
+    "চি",
+    "থা",
+    "দা"
+   ],
+   "words": [
+    {
+     "w": "কাঁটা",
+     "split": [
+      "কাঁ",
+      "টা"
+     ],
+     "en": "thorn",
+     "freq": 46
+    },
+    {
+     "w": "কাঁধ",
+     "split": [
+      "কাঁ",
+      "ধ"
+     ],
+     "en": "shoulder",
+     "freq": 10
+    },
+    {
+     "w": "কাঁচি",
+     "split": [
+      "কাঁ",
+      "চি"
+     ],
+     "en": "scissors",
+     "freq": 3
+    },
+    {
+     "w": "কাঁথা",
+     "split": [
+      "কাঁ",
+      "থা"
+     ],
+     "en": "quilt",
+     "freq": 3
+    },
+    {
+     "w": "কাঁদা",
+     "split": [
+      "কাঁ",
+      "দা"
+     ],
+     "en": "to cry",
+     "flag": "borderline-verb",
+     "freq": 6
+    }
+   ]
+  },
+  {
+   "id": "ঘ",
+   "type": "akshara",
+   "key": "ঘ",
+   "wheel": [
+    "ঘ",
+    "র",
+    "ড়ি",
+    "ষা"
+   ],
+   "words": [
+    {
+     "w": "ঘর",
+     "split": [
+      "ঘ",
+      "র"
+     ],
+     "en": "room; house",
+     "freq": 332
+    },
+    {
+     "w": "ঘড়ি",
+     "split": [
+      "ঘ",
+      "ড়ি"
+     ],
+     "en": "clock, watch",
+     "freq": 108
+    },
+    {
+     "w": "ঘষা",
+     "split": [
+      "ঘ",
+      "ষা"
+     ],
+     "en": "to rub, to scrub",
+     "freq": 6
+    }
+   ]
+  },
+  {
+   "id": "ঘা",
+   "type": "akshara",
+   "key": "ঘা",
+   "wheel": [
+    "ঘা",
+    "স",
+    "ড়",
+    "ম",
+    "ট",
+    "মা",
+    "চি"
+   ],
+   "words": [
+    {
+     "w": "ঘাস",
+     "split": [
+      "ঘা",
+      "স"
+     ],
+     "en": "grass",
+     "freq": 43
+    },
+    {
+     "w": "ঘাড়",
+     "split": [
+      "ঘা",
+      "ড়"
+     ],
+     "en": "back of the neck, nape",
+     "freq": 42
+    },
+    {
+     "w": "ঘাম",
+     "split": [
+      "ঘা",
+      "ম"
+     ],
+     "en": "sweat",
+     "freq": 19
+    },
+    {
+     "w": "ঘাট",
+     "split": [
+      "ঘা",
+      "ট"
+     ],
+     "en": "riverbank steps, landing",
+     "freq": 7
+    },
+    {
+     "w": "ঘামাচি",
+     "split": [
+      "ঘা",
+      "মা",
+      "চি"
+     ],
+     "en": "prickly heat rash",
+     "freq": 2
+    }
+   ]
+  },
+  {
+   "id": "ঘু",
+   "type": "akshara",
+   "key": "ঘু",
+   "wheel": [
+    "ঘু",
+    "ম",
+    "ড়ি",
+    "মা",
+    "নো",
+    "ঙু",
+    "র"
+   ],
+   "words": [
+    {
+     "w": "ঘুম",
+     "split": [
+      "ঘু",
+      "ম"
+     ],
+     "en": "sleep",
+     "freq": 304
+    },
+    {
+     "w": "ঘুড়ি",
+     "split": [
+      "ঘু",
+      "ড়ি"
+     ],
+     "en": "kite",
+     "freq": 1
+    },
+    {
+     "w": "ঘুঘু",
+     "split": [
+      "ঘু",
+      "ঘু"
+     ],
+     "en": "dove",
+     "freq": 5
+    },
+    {
+     "w": "ঘুমানো",
+     "split": [
+      "ঘু",
+      "মা",
+      "নো"
+     ],
+     "en": "to sleep",
+     "freq": 22
+    },
+    {
+     "w": "ঘুঙুর",
+     "split": [
+      "ঘু",
+      "ঙু",
+      "র"
+     ],
+     "en": "ankle bells",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "ঘো",
+   "type": "akshara",
+   "key": "ঘো",
+   "wheel": [
+    "ঘো",
+    "ড়া",
+    "রা",
+    "ল",
+    "ম",
+    "টা"
+   ],
+   "words": [
+    {
+     "w": "ঘোড়া",
+     "split": [
+      "ঘো",
+      "ড়া"
+     ],
+     "en": "horse",
+     "freq": 141
+    },
+    {
+     "w": "ঘোরা",
+     "split": [
+      "ঘো",
+      "রা"
+     ],
+     "en": "to go round, to turn",
+     "freq": 16
+    },
+    {
+     "w": "ঘোল",
+     "split": [
+      "ঘো",
+      "ল"
+     ],
+     "en": "buttermilk",
+     "freq": 1
+    },
+    {
+     "w": "ঘোমটা",
+     "split": [
+      "ঘো",
+      "ম",
+      "টা"
+     ],
+     "en": "veil (sari drawn over the head)",
+     "freq": 7
+    }
+   ]
+  },
+  {
+   "id": "ঝ",
+   "type": "akshara",
+   "key": "ঝ",
+   "wheel": [
+    "ঝ",
+    "ড়",
+    "র",
+    "না",
+    "রা"
+   ],
+   "words": [
+    {
+     "w": "ঝড়",
+     "split": [
+      "ঝ",
+      "ড়"
+     ],
+     "en": "storm",
+     "freq": 82
+    },
+    {
+     "w": "ঝরনা",
+     "split": [
+      "ঝ",
+      "র",
+      "না"
+     ],
+     "en": "waterfall",
+     "freq": 12
+    },
+    {
+     "w": "ঝরা",
+     "split": [
+      "ঝ",
+      "রা"
+     ],
+     "en": "to fall, to shed (leaves, hair)",
+     "freq": 2
+    }
+   ]
+  },
+  {
+   "id": "ঝা",
+   "type": "akshara",
+   "key": "ঝা",
+   "wheel": [
+    "ঝা",
+    "ড়ু",
+    "ল",
+    "মু",
+    "ড়ি",
+    "ড়া"
+   ],
+   "words": [
+    {
+     "w": "ঝাড়ু",
+     "split": [
+      "ঝা",
+      "ড়ু"
+     ],
+     "en": "broom",
+     "freq": 18
+    },
+    {
+     "w": "ঝালমুড়ি",
+     "split": [
+      "ঝা",
+      "ল",
+      "মু",
+      "ড়ি"
+     ],
+     "en": "puffed-rice street snack",
+     "freq": 2
+    },
+    {
+     "w": "ঝাড়া",
+     "split": [
+      "ঝা",
+      "ড়া"
+     ],
+     "en": "to shake out, to dust off",
+     "freq": 5
+    }
+   ]
+  },
+  {
+   "id": "ট",
+   "type": "akshara",
+   "key": "ট",
+   "wheel": [
+    "ট",
+    "ব",
+    "মে",
+    "টো",
+    "র্চ"
+   ],
+   "words": [
+    {
+     "w": "টব",
+     "split": [
+      "ট",
+      "ব"
+     ],
+     "en": "flowerpot",
+     "freq": 2
+    },
+    {
+     "w": "টমেটো",
+     "split": [
+      "ট",
+      "মে",
+      "টো"
+     ],
+     "en": "tomato",
+     "freq": 29
+    },
+    {
+     "w": "টর্চ",
+     "split": [
+      "ট",
+      "র্চ"
+     ],
+     "en": "flashlight, torch",
+     "freq": 6
+    }
+   ]
+  },
+  {
+   "id": "টা",
+   "type": "akshara",
+   "key": "টা",
+   "wheel": [
+    "টা",
+    "কা",
+    "ক",
+    "ট্টু"
+   ],
+   "words": [
+    {
+     "w": "টাকা",
+     "split": [
+      "টা",
+      "কা"
+     ],
+     "en": "money; the taka",
+     "freq": 2032
+    },
+    {
+     "w": "টাক",
+     "split": [
+      "টা",
+      "ক"
+     ],
+     "en": "baldness, bald patch",
+     "freq": 20
+    },
+    {
+     "w": "টাট্টু",
+     "split": [
+      "টা",
+      "ট্টু"
+     ],
+     "en": "pony",
+     "freq": 1
+    }
+   ]
+  },
+  {
+   "id": "টি",
+   "type": "akshara",
+   "key": "টি",
+   "wheel": [
+    "টি",
+    "প",
+    "য়া",
+    "ভি",
+    "ন"
+   ],
+   "words": [
+    {
+     "w": "টিপ",
+     "split": [
+      "টি",
+      "প"
+     ],
+     "en": "bindi (forehead dot)",
+     "freq": 26
+    },
+    {
+     "w": "টিয়া",
+     "split": [
+      "টি",
+      "য়া"
+     ],
+     "en": "parakeet",
+     "freq": 3
+    },
+    {
+     "w": "টিভি",
+     "split": [
+      "টি",
+      "ভি"
+     ],
+     "en": "television",
+     "freq": 134
+    },
+    {
+     "w": "টিন",
+     "split": [
+      "টি",
+      "ন"
+     ],
+     "en": "tin sheet",
+     "freq": 9
+    }
+   ]
+  },
+  {
+   "id": "টু",
+   "type": "akshara",
+   "key": "টু",
+   "wheel": [
+    "টু",
+    "পি",
+    "ক",
+    "রো",
+    "ন",
+    "নি"
+   ],
+   "words": [
+    {
+     "w": "টুপি",
+     "split": [
+      "টু",
+      "পি"
+     ],
+     "en": "cap",
+     "freq": 72
+    },
+    {
+     "w": "টুকরো",
+     "split": [
+      "টু",
+      "ক",
+      "রো"
+     ],
+     "en": "piece, fragment",
+     "freq": 133
+    },
+    {
+     "w": "টুনটুনি",
+     "split": [
+      "টু",
+      "ন",
+      "টু",
+      "নি"
+     ],
+     "en": "tailorbird",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "টে",
+   "type": "akshara",
+   "key": "টে",
+   "wheel": [
+    "টে",
+    "বি",
+    "ল",
+    "প",
+    "পা"
+   ],
+   "words": [
+    {
+     "w": "টেবিল",
+     "split": [
+      "টে",
+      "বি",
+      "ল"
+     ],
+     "en": "table",
+     "flag": "loanword",
+     "freq": 85
+    },
+    {
+     "w": "টেপ",
+     "split": [
+      "টে",
+      "প"
+     ],
+     "en": "sticky tape",
+     "flag": "loanword; homograph of টেপ, the imperative of টেপা in this same level — art must show a roll of tape",
+     "freq": 59
+    },
+    {
+     "w": "টেপা",
+     "split": [
+      "টে",
+      "পা"
+     ],
+     "en": "to press",
+     "freq": 4
+    }
+   ]
+  },
+  {
+   "id": "ডা",
+   "type": "akshara",
+   "key": "ডা",
+   "wheel": [
+    "ডা",
+    "না",
+    "ল",
+    "ব",
+    "কা"
+   ],
+   "words": [
+    {
+     "w": "ডানা",
+     "split": [
+      "ডা",
+      "না"
+     ],
+     "en": "wing",
+     "freq": 64
+    },
+    {
+     "w": "ডাল",
+     "split": [
+      "ডা",
+      "ল"
+     ],
+     "en": "lentils, dal",
+     "flag": "illustrator: commit to the food sense; ডাল also means 'branch'",
+     "freq": 19
+    },
+    {
+     "w": "ডাব",
+     "split": [
+      "ডা",
+      "ব"
+     ],
+     "en": "green coconut",
+     "flag": "freq 0 is the subtitle-corpus gap, not obscurity",
+     "freq": 0
+    },
+    {
+     "w": "ডাকা",
+     "split": [
+      "ডা",
+      "কা"
+     ],
+     "en": "to call",
+     "freq": 112
+    }
+   ]
+  },
+  {
+   "id": "ত",
+   "type": "akshara",
+   "key": "ত",
+   "wheel": [
+    "ত",
+    "র",
+    "মু",
+    "জ",
+    "ব",
+    "লা",
+    "ক্তা"
+   ],
+   "words": [
+    {
+     "w": "তরমুজ",
+     "split": [
+      "ত",
+      "র",
+      "মু",
+      "জ"
+     ],
+     "en": "watermelon",
+     "freq": 3
+    },
+    {
+     "w": "তবলা",
+     "split": [
+      "ত",
+      "ব",
+      "লা"
+     ],
+     "en": "tabla drum",
+     "freq": 1
+    },
+    {
+     "w": "তক্তা",
+     "split": [
+      "ত",
+      "ক্তা"
+     ],
+     "en": "wooden plank",
+     "freq": 11
+    }
+   ]
+  },
+  {
+   "id": "তা",
+   "type": "akshara",
+   "key": "তা",
+   "wheel": [
+    "তা",
+    "রা",
+    "লা",
+    "লি",
+    "ল",
+    "ক",
+    "স"
+   ],
+   "words": [
+    {
+     "w": "তারা",
+     "split": [
+      "তা",
+      "রা"
+     ],
+     "en": "star (in the sky)",
+     "freq": 6718
+    },
+    {
+     "w": "তালা",
+     "split": [
+      "তা",
+      "লা"
+     ],
+     "en": "padlock",
+     "freq": 65
+    },
+    {
+     "w": "তালি",
+     "split": [
+      "তা",
+      "লি"
+     ],
+     "en": "clap of the hands",
+     "freq": 34
+    },
+    {
+     "w": "তাল",
+     "split": [
+      "তা",
+      "ল"
+     ],
+     "en": "palm fruit",
+     "freq": 34
+    },
+    {
+     "w": "তাক",
+     "split": [
+      "তা",
+      "ক"
+     ],
+     "en": "shelf",
+     "freq": 75
+    },
+    {
+     "w": "তাস",
+     "split": [
+      "তা",
+      "স"
+     ],
+     "en": "playing cards",
+     "freq": 31
+    }
+   ]
+  },
+  {
+   "id": "তি",
+   "type": "akshara",
+   "key": "তি",
+   "wheel": [
+    "তি",
+    "ন",
+    "মি",
+    "ল",
+    "র"
+   ],
+   "words": [
+    {
+     "w": "তিন",
+     "split": [
+      "তি",
+      "ন"
+     ],
+     "en": "three",
+     "freq": 783
+    },
+    {
+     "w": "তিমি",
+     "split": [
+      "তি",
+      "মি"
+     ],
+     "en": "whale",
+     "freq": 40
+    },
+    {
+     "w": "তিল",
+     "split": [
+      "তি",
+      "ল"
+     ],
+     "en": "sesame seed",
+     "freq": 2
+    },
+    {
+     "w": "তির",
+     "split": [
+      "তি",
+      "র"
+     ],
+     "en": "arrow",
+     "freq": 3
+    }
+   ]
+  },
+  {
+   "id": "তু",
+   "type": "akshara",
+   "key": "তু",
+   "wheel": [
+    "তু",
+    "লি",
+    "লা",
+    "ল",
+    "সী"
+   ],
+   "words": [
+    {
+     "w": "তুলি",
+     "split": [
+      "তু",
+      "লি"
+     ],
+     "en": "paintbrush",
+     "flag": "homograph-of-1st-person-of-তোলা-to-lift",
+     "freq": 27
+    },
+    {
+     "w": "তুলা",
+     "split": [
+      "তু",
+      "লা"
+     ],
+     "en": "cotton",
+     "freq": 19
+    },
+    {
+     "w": "তুলসী",
+     "split": [
+      "তু",
+      "ল",
+      "সী"
+     ],
+     "en": "holy basil plant (tulsi)",
+     "flag": "marginal: photo can read as গাছ; level falls to 2 without it",
+     "freq": 2
+    }
+   ]
+  },
+  {
+   "id": "তে",
+   "type": "akshara",
+   "key": "তে",
+   "wheel": [
+    "তে",
+    "ল",
+    "রো",
+    "লা",
+    "পো",
+    "কা"
+   ],
+   "words": [
+    {
+     "w": "তেল",
+     "split": [
+      "তে",
+      "ল"
+     ],
+     "en": "oil",
+     "freq": 106
+    },
+    {
+     "w": "তেরো",
+     "split": [
+      "তে",
+      "রো"
+     ],
+     "en": "thirteen",
+     "freq": 4
+    },
+    {
+     "w": "তেলাপোকা",
+     "split": [
+      "তে",
+      "লা",
+      "পো",
+      "কা"
+     ],
+     "en": "cockroach",
+     "flag": "regional-BD",
+     "freq": 10
+    }
+   ]
+  },
+  {
+   "id": "তো",
+   "type": "akshara",
+   "key": "তো",
+   "wheel": [
+    "তো",
+    "তা",
+    "য়া",
+    "লে",
+    "ড়া",
+    "লা"
+   ],
+   "words": [
+    {
+     "w": "তোতা",
+     "split": [
+      "তো",
+      "তা"
+     ],
+     "en": "parrot",
+     "freq": 2
+    },
+    {
+     "w": "তোয়ালে",
+     "split": [
+      "তো",
+      "য়া",
+      "লে"
+     ],
+     "en": "towel",
+     "freq": 18
+    },
+    {
+     "w": "তোড়া",
+     "split": [
+      "তো",
+      "ড়া"
+     ],
+     "en": "flower bouquet",
+     "freq": 3
+    },
+    {
+     "w": "তোলা",
+     "split": [
+      "তো",
+      "লা"
+     ],
+     "en": "to lift, to pick up",
+     "freq": 95
+    }
+   ]
+  },
+  {
+   "id": "থা",
+   "type": "akshara",
+   "key": "থা",
+   "wheel": [
+    "থা",
+    "লা",
+    "বা",
+    "না",
+    "মা"
+   ],
+   "words": [
+    {
+     "w": "থালা",
+     "split": [
+      "থা",
+      "লা"
+     ],
+     "en": "plate",
+     "freq": 18
+    },
+    {
+     "w": "থাবা",
+     "split": [
+      "থা",
+      "বা"
+     ],
+     "en": "paw",
+     "freq": 20
+    },
+    {
+     "w": "থানা",
+     "split": [
+      "থা",
+      "না"
+     ],
+     "en": "police station",
+     "freq": 6
+    },
+    {
+     "w": "থামা",
+     "split": [
+      "থা",
+      "মা"
+     ],
+     "en": "to stop",
+     "freq": 34
+    }
+   ]
+  },
+  {
+   "id": "দ",
+   "type": "akshara",
+   "key": "দ",
+   "wheel": [
+    "দ",
+    "র",
+    "জা",
+    "ই",
+    "ড়ি",
+    "র্জি"
+   ],
+   "words": [
+    {
+     "w": "দরজা",
+     "split": [
+      "দ",
+      "র",
+      "জা"
+     ],
+     "en": "door",
+     "freq": 800
+    },
+    {
+     "w": "দই",
+     "split": [
+      "দ",
+      "ই"
+     ],
+     "en": "yogurt",
+     "freq": 0
+    },
+    {
+     "w": "দড়ি",
+     "split": [
+      "দ",
+      "ড়ি"
+     ],
+     "en": "rope",
+     "freq": 97
+    },
+    {
+     "w": "দর্জি",
+     "split": [
+      "দ",
+      "র্জি"
+     ],
+     "en": "tailor",
+     "flag": "advanced-conjunct",
+     "freq": 11
+    }
+   ]
+  },
+  {
+   "id": "দা",
+   "type": "akshara",
+   "key": "দা",
+   "wheel": [
+    "দা",
+    "দি",
+    "ড়ি",
+    "গ",
+    "না"
+   ],
+   "words": [
+    {
+     "w": "দাদা",
+     "split": [
+      "দা",
+      "দা"
+     ],
+     "en": "paternal grandfather",
+     "flag": "regional-BD",
+     "freq": 153
+    },
+    {
+     "w": "দাদি",
+     "split": [
+      "দা",
+      "দি"
+     ],
+     "en": "paternal grandmother",
+     "flag": "regional-BD",
+     "freq": 11
+    },
+    {
+     "w": "দাড়ি",
+     "split": [
+      "দা",
+      "ড়ি"
+     ],
+     "en": "beard",
+     "freq": 19
+    },
+    {
+     "w": "দাগ",
+     "split": [
+      "দা",
+      "গ"
+     ],
+     "en": "stain, mark",
+     "freq": 133
+    },
+    {
+     "w": "দানা",
+     "split": [
+      "দা",
+      "না"
+     ],
+     "en": "grain, seed",
+     "freq": 10
+    }
+   ]
+  },
+  {
+   "id": "দু",
+   "type": "akshara",
+   "key": "দু",
+   "wheel": [
+    "দু",
+    "ধ",
+    "ল",
+    "ই"
+   ],
+   "words": [
+    {
+     "w": "দুধ",
+     "split": [
+      "দু",
+      "ধ"
+     ],
+     "en": "milk",
+     "freq": 110
+    },
+    {
+     "w": "দুল",
+     "split": [
+      "দু",
+      "ল"
+     ],
+     "en": "earring",
+     "freq": 10
+    },
+    {
+     "w": "দুই",
+     "split": [
+      "দু",
+      "ই"
+     ],
+     "en": "two",
+     "freq": 1242
+    }
+   ]
+  },
+  {
+   "id": "দে",
+   "type": "akshara",
+   "key": "দে",
+   "wheel": [
+    "দে",
+    "খা",
+    "ও",
+    "য়া",
+    "ল",
+    "ড়"
+   ],
+   "words": [
+    {
+     "w": "দেখা",
+     "split": [
+      "দে",
+      "খা"
+     ],
+     "en": "to see, to look at",
+     "freq": 3225
+    },
+    {
+     "w": "দেওয়া",
+     "split": [
+      "দে",
+      "ও",
+      "য়া"
+     ],
+     "en": "to give",
+     "freq": 710
+    },
+    {
+     "w": "দেয়াল",
+     "split": [
+      "দে",
+      "য়া",
+      "ল"
+     ],
+     "en": "wall",
+     "freq": 81
+    },
+    {
+     "w": "দেড়",
+     "split": [
+      "দে",
+      "ড়"
+     ],
+     "en": "one and a half",
+     "flag": "draw as one whole object plus one half of the same object (a roti, an apple), not as a numeral",
+     "freq": 25
+    }
+   ]
+  },
+  {
+   "id": "দো",
+   "type": "akshara",
+   "key": "দো",
+   "wheel": [
+    "দো",
+    "কা",
+    "ন",
+    "ল",
+    "না",
+    "লা",
+    "য়ে"
+   ],
+   "words": [
+    {
+     "w": "দোকান",
+     "split": [
+      "দো",
+      "কা",
+      "ন"
+     ],
+     "en": "shop",
+     "freq": 149
+    },
+    {
+     "w": "দোলনা",
+     "split": [
+      "দো",
+      "ল",
+      "না"
+     ],
+     "en": "swing, cradle",
+     "freq": 6
+    },
+    {
+     "w": "দোলা",
+     "split": [
+      "দো",
+      "লা"
+     ],
+     "en": "to swing, to sway",
+     "freq": 2
+    },
+    {
+     "w": "দোয়েল",
+     "split": [
+      "দো",
+      "য়ে",
+      "ল"
+     ],
+     "en": "magpie robin",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "ধ",
+   "type": "akshara",
+   "key": "ধ",
+   "wheel": [
+    "ধ",
+    "রা",
+    "নু",
+    "ক",
+    "নে",
+    "পা",
+    "তা"
+   ],
+   "words": [
+    {
+     "w": "ধরা",
+     "split": [
+      "ধ",
+      "রা"
+     ],
+     "en": "to catch",
+     "freq": 403
+    },
+    {
+     "w": "ধনুক",
+     "split": [
+      "ধ",
+      "নু",
+      "ক"
+     ],
+     "en": "bow (for arrows)",
+     "freq": 27
+    },
+    {
+     "w": "ধনেপাতা",
+     "split": [
+      "ধ",
+      "নে",
+      "পা",
+      "তা"
+     ],
+     "en": "coriander leaf",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "ন",
+   "type": "akshara",
+   "key": "ন",
+   "wheel": [
+    "ন",
+    "দী",
+    "খ",
+    "য়"
+   ],
+   "words": [
+    {
+     "w": "নদী",
+     "split": [
+      "ন",
+      "দী"
+     ],
+     "en": "river",
+     "freq": 84
+    },
+    {
+     "w": "নখ",
+     "split": [
+      "ন",
+      "খ"
+     ],
+     "en": "fingernail",
+     "freq": 32
+    },
+    {
+     "w": "নয়",
+     "split": [
+      "ন",
+      "য়"
+     ],
+     "en": "nine",
+     "freq": 3471
+    }
+   ]
+  },
+  {
+   "id": "না",
+   "type": "akshara",
+   "key": "না",
+   "wheel": [
+    "না",
+    "ক",
+    "চ",
+    "নি",
+    "তি",
+    "ড়ু"
+   ],
+   "words": [
+    {
+     "w": "নাক",
+     "split": [
+      "না",
+      "ক"
+     ],
+     "en": "nose",
+     "freq": 154
+    },
+    {
+     "w": "নাচ",
+     "split": [
+      "না",
+      "চ"
+     ],
+     "en": "dance",
+     "freq": 96
+    },
+    {
+     "w": "নানা",
+     "split": [
+      "না",
+      "না"
+     ],
+     "en": "maternal grandfather",
+     "flag": "regional-BD",
+     "freq": 46
+    },
+    {
+     "w": "নানি",
+     "split": [
+      "না",
+      "নি"
+     ],
+     "en": "maternal grandmother",
+     "flag": "regional-BD",
+     "freq": 11
+    },
+    {
+     "w": "নাতি",
+     "split": [
+      "না",
+      "তি"
+     ],
+     "en": "grandson",
+     "freq": 35
+    },
+    {
+     "w": "নাড়ু",
+     "split": [
+      "না",
+      "ড়ু"
+     ],
+     "en": "sweet ball (laddu)",
+     "freq": 9
+    }
+   ]
+  },
+  {
+   "id": "নে",
+   "type": "akshara",
+   "key": "নে",
+   "wheel": [
+    "নে",
+    "ক",
+    "ড়ে",
+    "ও",
+    "য়া",
+    "ভা"
+   ],
+   "words": [
+    {
+     "w": "নেকড়ে",
+     "split": [
+      "নে",
+      "ক",
+      "ড়ে"
+     ],
+     "en": "wolf",
+     "freq": 31
+    },
+    {
+     "w": "নেওয়া",
+     "split": [
+      "নে",
+      "ও",
+      "য়া"
+     ],
+     "en": "to take",
+     "freq": 190
+    },
+    {
+     "w": "নেভা",
+     "split": [
+      "নে",
+      "ভা"
+     ],
+     "en": "to go out (of a flame or light)",
+     "flag": "base form freq 0 but stem alive in imperatives (নেভাও:11); transitive is নেভানো",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "প",
+   "type": "akshara",
+   "key": "প",
+   "wheel": [
+    "প",
+    "থ",
+    "ড়া",
+    "চা",
+    "রী",
+    "র্দা"
+   ],
+   "words": [
+    {
+     "w": "পথ",
+     "split": [
+      "প",
+      "থ"
+     ],
+     "en": "road",
+     "freq": 787
+    },
+    {
+     "w": "পড়া",
+     "split": [
+      "প",
+      "ড়া"
+     ],
+     "en": "to read",
+     "freq": 146
+    },
+    {
+     "w": "পচা",
+     "split": [
+      "প",
+      "চা"
+     ],
+     "en": "rotten",
+     "freq": 36
+    },
+    {
+     "w": "পরী",
+     "split": [
+      "প",
+      "রী"
+     ],
+     "en": "fairy",
+     "freq": 89
+    },
+    {
+     "w": "পর্দা",
+     "split": [
+      "প",
+      "র্দা"
+     ],
+     "en": "curtain",
+     "freq": 37
+    }
+   ]
+  },
+  {
+   "id": "পা",
+   "type": "akshara",
+   "key": "পা",
+   "wheel": [
+    "পা",
+    "খি",
+    "খা",
+    "তা",
+    "নি",
+    "ন"
+   ],
+   "words": [
+    {
+     "w": "পাখি",
+     "split": [
+      "পা",
+      "খি"
+     ],
+     "en": "bird",
+     "freq": 163
+    },
+    {
+     "w": "পাখা",
+     "split": [
+      "পা",
+      "খা"
+     ],
+     "en": "fan",
+     "freq": 41
+    },
+    {
+     "w": "পাতা",
+     "split": [
+      "পা",
+      "তা"
+     ],
+     "en": "leaf",
+     "freq": 94
+    },
+    {
+     "w": "পানি",
+     "split": [
+      "পা",
+      "নি"
+     ],
+     "en": "water",
+     "flag": "regional-BD",
+     "freq": 717
+    },
+    {
+     "w": "পান",
+     "split": [
+      "পা",
+      "ন"
+     ],
+     "en": "betel leaf",
+     "freq": 468
+    }
+   ]
+  },
+  {
+   "id": "পি",
+   "type": "akshara",
+   "key": "পি",
+   "wheel": [
+    "পি",
+    "ঠ",
+    "ঠা",
+    "ন",
+    "রি",
+    "চ"
+   ],
+   "words": [
+    {
+     "w": "পিঠ",
+     "split": [
+      "পি",
+      "ঠ"
+     ],
+     "en": "back (of the body)",
+     "freq": 37
+    },
+    {
+     "w": "পিঠা",
+     "split": [
+      "পি",
+      "ঠা"
+     ],
+     "en": "rice cake",
+     "flag": "regional-BD",
+     "freq": 25
+    },
+    {
+     "w": "পিন",
+     "split": [
+      "পি",
+      "ন"
+     ],
+     "en": "pin",
+     "flag": "loanword-off-dict",
+     "freq": 30
+    },
+    {
+     "w": "পিরিচ",
+     "split": [
+      "পি",
+      "রি",
+      "চ"
+     ],
+     "en": "saucer",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "পু",
+   "type": "akshara",
+   "key": "পু",
+   "wheel": [
+    "পু",
+    "তু",
+    "ল",
+    "কু",
+    "র",
+    "রি"
+   ],
+   "words": [
+    {
+     "w": "পুতুল",
+     "split": [
+      "পু",
+      "তু",
+      "ল"
+     ],
+     "en": "doll",
+     "freq": 72
+    },
+    {
+     "w": "পুকুর",
+     "split": [
+      "পু",
+      "কু",
+      "র"
+     ],
+     "en": "pond",
+     "freq": 5
+    },
+    {
+     "w": "পুল",
+     "split": [
+      "পু",
+      "ল"
+     ],
+     "en": "bridge",
+     "freq": 35
+    },
+    {
+     "w": "পুরি",
+     "split": [
+      "পু",
+      "রি"
+     ],
+     "en": "puri, fried bread",
+     "freq": 6
+    }
+   ]
+  },
+  {
+   "id": "পে",
+   "type": "akshara",
+   "key": "পে",
+   "wheel": [
+    "পে",
+    "ট",
+    "য়া",
+    "রা",
+    "রে",
+    "ক"
+   ],
+   "words": [
+    {
+     "w": "পেট",
+     "split": [
+      "পে",
+      "ট"
+     ],
+     "en": "stomach",
+     "freq": 106
+    },
+    {
+     "w": "পেয়ারা",
+     "split": [
+      "পে",
+      "য়া",
+      "রা"
+     ],
+     "en": "guava",
+     "freq": 4
+    },
+    {
+     "w": "পেরেক",
+     "split": [
+      "পে",
+      "রে",
+      "ক"
+     ],
+     "en": "metal nail",
+     "freq": 24
+    }
+   ]
+  },
+  {
+   "id": "পো",
+   "type": "akshara",
+   "key": "পো",
+   "wheel": [
+    "পো",
+    "কা",
+    "না",
+    "শা",
+    "ক",
+    "ড়া"
+   ],
+   "words": [
+    {
+     "w": "পোকা",
+     "split": [
+      "পো",
+      "কা"
+     ],
+     "en": "insect",
+     "freq": 28
+    },
+    {
+     "w": "পোনা",
+     "split": [
+      "পো",
+      "না"
+     ],
+     "en": "baby fish, fish fry",
+     "flag": "usually heard as পোনা মাছ; art should contrast a fry with a full-grown fish",
+     "freq": 1
+    },
+    {
+     "w": "পোশাক",
+     "split": [
+      "পো",
+      "শা",
+      "ক"
+     ],
+     "en": "clothes",
+     "freq": 179
+    },
+    {
+     "w": "পোড়া",
+     "split": [
+      "পো",
+      "ড়া"
+     ],
+     "en": "to burn",
+     "freq": 24
+    }
+   ]
+  },
+  {
+   "id": "ফ",
+   "type": "akshara",
+   "key": "ফ",
+   "wheel": [
+    "ফ",
+    "ল",
+    "স",
+    "ড়িং"
+   ],
+   "words": [
+    {
+     "w": "ফল",
+     "split": [
+      "ফ",
+      "ল"
+     ],
+     "en": "fruit",
+     "freq": 99
+    },
+    {
+     "w": "ফসল",
+     "split": [
+      "ফ",
+      "স",
+      "ল"
+     ],
+     "en": "crops, harvest",
+     "flag": "art should show a ripe paddy field or a harvest heap",
+     "freq": 60
+    },
+    {
+     "w": "ফড়িং",
+     "split": [
+      "ফ",
+      "ড়িং"
+     ],
+     "en": "dragonfly",
+     "flag": "gloss NARROWED to dragonfly for the artwork; the grasshopper is ঘাসফড়িং — do not illustrate both",
+     "freq": 3
+    }
+   ]
+  },
+  {
+   "id": "ফি",
+   "type": "akshara",
+   "key": "ফি",
+   "wheel": [
+    "ফি",
+    "তা",
+    "ঙে",
+    "র",
+    "নি"
+   ],
+   "words": [
+    {
+     "w": "ফিতা",
+     "split": [
+      "ফি",
+      "তা"
+     ],
+     "en": "ribbon",
+     "freq": 25
+    },
+    {
+     "w": "ফিঙে",
+     "split": [
+      "ফি",
+      "ঙে"
+     ],
+     "en": "drongo (a common black bird)",
+     "freq": 0
+    },
+    {
+     "w": "ফিরনি",
+     "split": [
+      "ফি",
+      "র",
+      "নি"
+     ],
+     "en": "firni (sweet rice pudding)",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "ফু",
+   "type": "akshara",
+   "key": "ফু",
+   "wheel": [
+    "ফু",
+    "ল",
+    "ফা",
+    "টো",
+    "ট",
+    "ব"
+   ],
+   "words": [
+    {
+     "w": "ফুল",
+     "split": [
+      "ফু",
+      "ল"
+     ],
+     "en": "flower",
+     "freq": 203
+    },
+    {
+     "w": "ফুফু",
+     "split": [
+      "ফু",
+      "ফু"
+     ],
+     "en": "paternal aunt",
+     "flag": "regional-BD",
+     "freq": 25
+    },
+    {
+     "w": "ফুফা",
+     "split": [
+      "ফু",
+      "ফা"
+     ],
+     "en": "paternal aunt's husband",
+     "flag": "regional-BD",
+     "freq": 32
+    },
+    {
+     "w": "ফুটো",
+     "split": [
+      "ফু",
+      "টো"
+     ],
+     "en": "hole",
+     "freq": 19
+    },
+    {
+     "w": "ফুটবল",
+     "split": [
+      "ফু",
+      "ট",
+      "ব",
+      "ল"
+     ],
+     "en": "football",
+     "freq": 90
+    }
+   ]
+  },
+  {
+   "id": "ফে",
+   "type": "akshara",
+   "key": "ফে",
+   "wheel": [
+    "ফে",
+    "না",
+    "রি",
+    "রা",
+    "লা"
+   ],
+   "words": [
+    {
+     "w": "ফেনা",
+     "split": [
+      "ফে",
+      "না"
+     ],
+     "en": "foam",
+     "freq": 3
+    },
+    {
+     "w": "ফেরি",
+     "split": [
+      "ফে",
+      "রি"
+     ],
+     "en": "ferry (river boat)",
+     "freq": 9
+    },
+    {
+     "w": "ফেরা",
+     "split": [
+      "ফে",
+      "রা"
+     ],
+     "en": "to return, to come back",
+     "flag": "dict-gap: absent from hunspell, which carries only the i-grade ফিরা/vi and ফিরে; ফেরো and ফেরে are equally absent. Standard verbal-noun base form, not an inflection.",
+     "freq": 36
+    },
+    {
+     "w": "ফেলা",
+     "split": [
+      "ফে",
+      "লা"
+     ],
+     "en": "to drop, to throw (away)",
+     "freq": 236
+    }
+   ]
+  },
+  {
+   "id": "ব",
+   "type": "akshara",
+   "key": "ব",
+   "wheel": [
+    "ব",
+    "ই",
+    "র",
+    "ফ",
+    "ল",
+    "ন",
+    "ক"
+   ],
+   "words": [
+    {
+     "w": "বই",
+     "split": [
+      "ব",
+      "ই"
+     ],
+     "en": "book",
+     "freq": 336
+    },
+    {
+     "w": "বরই",
+     "split": [
+      "ব",
+      "র",
+      "ই"
+     ],
+     "en": "jujube",
+     "freq": 0
+    },
+    {
+     "w": "বরফ",
+     "split": [
+      "ব",
+      "র",
+      "ফ"
+     ],
+     "en": "ice",
+     "freq": 100
+    },
+    {
+     "w": "বল",
+     "split": [
+      "ব",
+      "ল"
+     ],
+     "en": "ball",
+     "freq": 1482
+    },
+    {
+     "w": "বন",
+     "split": [
+      "ব",
+      "ন"
+     ],
+     "en": "forest",
+     "freq": 81
+    },
+    {
+     "w": "বক",
+     "split": [
+      "ব",
+      "ক"
+     ],
+     "en": "heron",
+     "freq": 11
+    }
+   ]
+  },
+  {
+   "id": "বা",
+   "type": "akshara",
+   "key": "বা",
+   "wheel": [
+    "বা",
+    "ঘ",
+    "গা",
+    "ন",
+    "ক্স",
+    "স",
+    "চ্চা"
+   ],
+   "words": [
+    {
+     "w": "বাবা",
+     "split": [
+      "বা",
+      "বা"
+     ],
+     "en": "father",
+     "freq": 3660
+    },
+    {
+     "w": "বাঘ",
+     "split": [
+      "বা",
+      "ঘ"
+     ],
+     "en": "tiger",
+     "freq": 55
+    },
+    {
+     "w": "বাগান",
+     "split": [
+      "বা",
+      "গা",
+      "ন"
+     ],
+     "en": "garden",
+     "freq": 44
+    },
+    {
+     "w": "বাক্স",
+     "split": [
+      "বা",
+      "ক্স"
+     ],
+     "en": "box",
+     "freq": 68
+    },
+    {
+     "w": "বাস",
+     "split": [
+      "বা",
+      "স"
+     ],
+     "en": "bus",
+     "freq": 344
+    },
+    {
+     "w": "বাসন",
+     "split": [
+      "বা",
+      "স",
+      "ন"
+     ],
+     "en": "dishes, utensils",
+     "freq": 9
+    },
+    {
+     "w": "বাচ্চা",
+     "split": [
+      "বা",
+      "চ্চা"
+     ],
+     "en": "child",
+     "freq": 913
+    }
+   ]
+  },
+  {
+   "id": "বি",
+   "type": "akshara",
+   "key": "বি",
+   "wheel": [
+    "বি",
+    "ড়া",
+    "ল",
+    "শ",
+    "য়ে"
+   ],
+   "words": [
+    {
+     "w": "বিড়াল",
+     "split": [
+      "বি",
+      "ড়া",
+      "ল"
+     ],
+     "en": "cat",
+     "freq": 113
+    },
+    {
+     "w": "বিশ",
+     "split": [
+      "বি",
+      "শ"
+     ],
+     "en": "twenty (20)",
+     "freq": 71
+    },
+    {
+     "w": "বিয়ে",
+     "split": [
+      "বি",
+      "য়ে"
+     ],
+     "en": "wedding",
+     "flag": "event noun kept on the picture test; maintainer may overrule",
+     "freq": 801
+    }
+   ]
+  },
+  {
+   "id": "বু",
+   "type": "akshara",
+   "key": "বু",
+   "wheel": [
+    "বু",
+    "ক",
+    "ড়ো",
+    "ড়ি",
+    "দ"
+   ],
+   "words": [
+    {
+     "w": "বুক",
+     "split": [
+      "বু",
+      "ক"
+     ],
+     "en": "chest",
+     "freq": 108
+    },
+    {
+     "w": "বুড়ো",
+     "split": [
+      "বু",
+      "ড়ো"
+     ],
+     "en": "old man",
+     "freq": 217
+    },
+    {
+     "w": "বুড়ি",
+     "split": [
+      "বু",
+      "ড়ি"
+     ],
+     "en": "old woman",
+     "freq": 59
+    },
+    {
+     "w": "বুদবুদ",
+     "split": [
+      "বু",
+      "দ",
+      "বু",
+      "দ"
+     ],
+     "en": "bubble",
+     "freq": 3
+    }
+   ]
+  },
+  {
+   "id": "বে",
+   "type": "akshara",
+   "key": "বে",
+   "wheel": [
+    "বে",
+    "ল",
+    "লু",
+    "ন",
+    "চা",
+    "গু"
+   ],
+   "words": [
+    {
+     "w": "বেল",
+     "split": [
+      "বে",
+      "ল"
+     ],
+     "en": "wood apple (bael fruit)",
+     "freq": 110
+    },
+    {
+     "w": "বেলুন",
+     "split": [
+      "বে",
+      "লু",
+      "ন"
+     ],
+     "en": "balloon",
+     "freq": 28
+    },
+    {
+     "w": "বেলচা",
+     "split": [
+      "বে",
+      "ল",
+      "চা"
+     ],
+     "en": "shovel, spade",
+     "freq": 4
+    },
+    {
+     "w": "বেগুন",
+     "split": [
+      "বে",
+      "গু",
+      "ন"
+     ],
+     "en": "eggplant, brinjal",
+     "freq": 1
+    }
+   ]
+  },
+  {
+   "id": "বো",
+   "type": "akshara",
+   "key": "বো",
+   "wheel": [
+    "বো",
+    "ন",
+    "ত",
+    "ল",
+    "য়া"
+   ],
+   "words": [
+    {
+     "w": "বোন",
+     "split": [
+      "বো",
+      "ন"
+     ],
+     "en": "sister",
+     "freq": 356
+    },
+    {
+     "w": "বোতল",
+     "split": [
+      "বো",
+      "ত",
+      "ল"
+     ],
+     "en": "bottle",
+     "freq": 93
+    },
+    {
+     "w": "বোয়াল",
+     "split": [
+      "বো",
+      "য়া",
+      "ল"
+     ],
+     "en": "boal (catfish)",
+     "freq": 2
+    }
+   ]
+  },
+  {
+   "id": "বাঁ",
+   "type": "akshara",
+   "key": "বাঁ",
+   "wheel": [
+    "বাঁ",
+    "শ",
+    "শি",
+    "ধ",
+    "ধা",
+    "ক",
+    "পি"
+   ],
+   "words": [
+    {
+     "w": "বাঁশ",
+     "split": [
+      "বাঁ",
+      "শ"
+     ],
+     "en": "bamboo",
+     "freq": 31
+    },
+    {
+     "w": "বাঁশি",
+     "split": [
+      "বাঁ",
+      "শি"
+     ],
+     "en": "flute",
+     "freq": 19
+    },
+    {
+     "w": "বাঁধ",
+     "split": [
+      "বাঁ",
+      "ধ"
+     ],
+     "en": "dam, embankment",
+     "freq": 41
+    },
+    {
+     "w": "বাঁধা",
+     "split": [
+      "বাঁ",
+      "ধা"
+     ],
+     "en": "to tie",
+     "freq": 112
+    },
+    {
+     "w": "বাঁধাকপি",
+     "split": [
+      "বাঁ",
+      "ধা",
+      "ক",
+      "পি"
+     ],
+     "en": "cabbage",
+     "freq": 3
+    }
+   ]
+  },
+  {
+   "id": "ভা",
+   "type": "akshara",
+   "key": "ভা",
+   "wheel": [
+    "ভা",
+    "ই",
+    "ত",
+    "জা",
+    "ঙা",
+    "লু",
+    "ক"
+   ],
+   "words": [
+    {
+     "w": "ভাই",
+     "split": [
+      "ভা",
+      "ই"
+     ],
+     "en": "brother",
+     "freq": 1724
+    },
+    {
+     "w": "ভাত",
+     "split": [
+      "ভা",
+      "ত"
+     ],
+     "en": "cooked rice",
+     "freq": 49
+    },
+    {
+     "w": "ভাজা",
+     "split": [
+      "ভা",
+      "জা"
+     ],
+     "en": "to fry",
+     "freq": 37
+    },
+    {
+     "w": "ভাঙা",
+     "split": [
+      "ভা",
+      "ঙা"
+     ],
+     "en": "to break",
+     "freq": 53
+    },
+    {
+     "w": "ভালুক",
+     "split": [
+      "ভা",
+      "লু",
+      "ক"
+     ],
+     "en": "bear",
+     "freq": 35
+    }
+   ]
+  },
+  {
+   "id": "ভে",
+   "type": "akshara",
+   "key": "ভে",
+   "wheel": [
+    "ভে",
+    "ড়া",
+    "লা",
+    "জা"
+   ],
+   "words": [
+    {
+     "w": "ভেড়া",
+     "split": [
+      "ভে",
+      "ড়া"
+     ],
+     "en": "sheep",
+     "freq": 15
+    },
+    {
+     "w": "ভেলা",
+     "split": [
+      "ভে",
+      "লা"
+     ],
+     "en": "raft",
+     "freq": 10
+    },
+    {
+     "w": "ভেজা",
+     "split": [
+      "ভে",
+      "জা"
+     ],
+     "en": "to get wet",
+     "freq": 35
+    }
+   ]
+  },
+  {
+   "id": "ম",
+   "type": "akshara",
+   "key": "ম",
+   "wheel": [
+    "ম",
+    "ই",
+    "ধু",
+    "শা",
+    "রি",
+    "চ",
+    "ল"
+   ],
+   "words": [
+    {
+     "w": "মই",
+     "split": [
+      "ম",
+      "ই"
+     ],
+     "en": "ladder",
+     "freq": 10
+    },
+    {
+     "w": "মধু",
+     "split": [
+      "ম",
+      "ধু"
+     ],
+     "en": "honey",
+     "freq": 67
+    },
+    {
+     "w": "মশা",
+     "split": [
+      "ম",
+      "শা"
+     ],
+     "en": "mosquito",
+     "freq": 16
+    },
+    {
+     "w": "মশারি",
+     "split": [
+      "ম",
+      "শা",
+      "রি"
+     ],
+     "en": "mosquito net",
+     "freq": 4
+    },
+    {
+     "w": "মরিচ",
+     "split": [
+      "ম",
+      "রি",
+      "চ"
+     ],
+     "en": "chilli pepper",
+     "flag": "regional-BD",
+     "freq": 8
+    },
+    {
+     "w": "মশাল",
+     "split": [
+      "ম",
+      "শা",
+      "ল"
+     ],
+     "en": "flaming torch",
+     "freq": 8
+    }
+   ]
+  },
+  {
+   "id": "মা",
+   "type": "akshara",
+   "key": "মা",
+   "wheel": [
+    "মা",
+    "ছ",
+    "থা",
+    "টি",
+    "ঠ",
+    "লা",
+    "ছি"
+   ],
+   "words": [
+    {
+     "w": "মাছ",
+     "split": [
+      "মা",
+      "ছ"
+     ],
+     "en": "fish",
+     "freq": 211
+    },
+    {
+     "w": "মাথা",
+     "split": [
+      "মা",
+      "থা"
+     ],
+     "en": "head",
+     "freq": 999
+    },
+    {
+     "w": "মাটি",
+     "split": [
+      "মা",
+      "টি"
+     ],
+     "en": "soil",
+     "freq": 129
+    },
+    {
+     "w": "মাঠ",
+     "split": [
+      "মা",
+      "ঠ"
+     ],
+     "en": "open field, ground",
+     "freq": 41
+    },
+    {
+     "w": "মালা",
+     "split": [
+      "মা",
+      "লা"
+     ],
+     "en": "garland",
+     "freq": 11
+    },
+    {
+     "w": "মাছি",
+     "split": [
+      "মা",
+      "ছি"
+     ],
+     "en": "fly",
+     "freq": 24
+    }
+   ]
+  },
+  {
+   "id": "মু",
+   "type": "akshara",
+   "key": "মু",
+   "wheel": [
+    "মু",
+    "খ",
+    "ড়ি",
+    "লা",
+    "ঠি",
+    "দি"
+   ],
+   "words": [
+    {
+     "w": "মুখ",
+     "split": [
+      "মু",
+      "খ"
+     ],
+     "en": "face",
+     "freq": 644
+    },
+    {
+     "w": "মুড়ি",
+     "split": [
+      "মু",
+      "ড়ি"
+     ],
+     "en": "puffed rice",
+     "freq": 8
+    },
+    {
+     "w": "মুলা",
+     "split": [
+      "মু",
+      "লা"
+     ],
+     "en": "radish",
+     "freq": 2
+    },
+    {
+     "w": "মুঠি",
+     "split": [
+      "মু",
+      "ঠি"
+     ],
+     "en": "fist, handful",
+     "freq": 3
+    },
+    {
+     "w": "মুদি",
+     "split": [
+      "মু",
+      "দি"
+     ],
+     "en": "grocer, shopkeeper",
+     "freq": 10
+    }
+   ]
+  },
+  {
+   "id": "মে",
+   "type": "akshara",
+   "key": "মে",
+   "wheel": [
+    "মে",
+    "ঘ",
+    "ঝে",
+    "লা",
+    "য়ে",
+    "থি"
+   ],
+   "words": [
+    {
+     "w": "মেঘ",
+     "split": [
+      "মে",
+      "ঘ"
+     ],
+     "en": "cloud",
+     "freq": 47
+    },
+    {
+     "w": "মেঝে",
+     "split": [
+      "মে",
+      "ঝে"
+     ],
+     "en": "floor",
+     "freq": 17
+    },
+    {
+     "w": "মেলা",
+     "split": [
+      "মে",
+      "লা"
+     ],
+     "en": "fair, village fair",
+     "freq": 13
+    },
+    {
+     "w": "মেয়ে",
+     "split": [
+      "মে",
+      "য়ে"
+     ],
+     "en": "girl; daughter",
+     "freq": 1279
+    },
+    {
+     "w": "মেথি",
+     "split": [
+      "মে",
+      "থি"
+     ],
+     "en": "fenugreek",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "মো",
+   "type": "akshara",
+   "key": "মো",
+   "wheel": [
+    "মো",
+    "জা",
+    "ম",
+    "ছা",
+    "র",
+    "গ"
+   ],
+   "words": [
+    {
+     "w": "মোজা",
+     "split": [
+      "মো",
+      "জা"
+     ],
+     "en": "sock",
+     "freq": 17
+    },
+    {
+     "w": "মোম",
+     "split": [
+      "মো",
+      "ম"
+     ],
+     "en": "wax",
+     "flag": "draw a block or drip of wax, never a candle, or the child reads মোমবাতি",
+     "freq": 3
+    },
+    {
+     "w": "মোছা",
+     "split": [
+      "মো",
+      "ছা"
+     ],
+     "en": "to wipe",
+     "freq": 4
+    },
+    {
+     "w": "মোরগ",
+     "split": [
+      "মো",
+      "র",
+      "গ"
+     ],
+     "en": "rooster",
+     "flag": "draw a cockerel, kept visually distinct from মুরগি",
+     "freq": 14
+    }
+   ]
+  },
+  {
+   "id": "লা",
+   "type": "akshara",
+   "key": "লা",
+   "wheel": [
+    "লা",
+    "ল",
+    "ঠি",
+    "ফ",
+    "উ"
+   ],
+   "words": [
+    {
+     "w": "লাল",
+     "split": [
+      "লা",
+      "ল"
+     ],
+     "en": "red",
+     "freq": 282
+    },
+    {
+     "w": "লাঠি",
+     "split": [
+      "লা",
+      "ঠি"
+     ],
+     "en": "stick",
+     "freq": 67
+    },
+    {
+     "w": "লাফ",
+     "split": [
+      "লা",
+      "ফ"
+     ],
+     "en": "jump",
+     "freq": 204
+    },
+    {
+     "w": "লাউ",
+     "split": [
+      "লা",
+      "উ"
+     ],
+     "en": "bottle gourd",
+     "freq": 3
+    }
+   ]
+  },
+  {
+   "id": "লি",
+   "type": "akshara",
+   "key": "লি",
+   "wheel": [
+    "লি",
+    "চু",
+    "ফ",
+    "ট",
+    "প",
+    "স্টি",
+    "ক"
+   ],
+   "words": [
+    {
+     "w": "লিচু",
+     "split": [
+      "লি",
+      "চু"
+     ],
+     "en": "lychee",
+     "flag": "freq 0 is the fruit-vocabulary corpus gap",
+     "freq": 0
+    },
+    {
+     "w": "লিফট",
+     "split": [
+      "লি",
+      "ফ",
+      "ট"
+     ],
+     "en": "elevator, lift",
+     "freq": 55
+    },
+    {
+     "w": "লিপস্টিক",
+     "split": [
+      "লি",
+      "প",
+      "স্টি",
+      "ক"
+     ],
+     "en": "lipstick",
+     "flag": "স্টি is a unique cluster tile; this word alone pins the wheel to the 7-tile cap",
+     "freq": 11
+    }
+   ]
+  },
+  {
+   "id": "লু",
+   "type": "akshara",
+   "key": "লু",
+   "wheel": [
+    "লু",
+    "কা",
+    "নো",
+    "ঙ্গি",
+    "ডু",
+    "চি"
+   ],
+   "words": [
+    {
+     "w": "লুকানো",
+     "split": [
+      "লু",
+      "কা",
+      "নো"
+     ],
+     "en": "to hide",
+     "freq": 71
+    },
+    {
+     "w": "লুঙ্গি",
+     "split": [
+      "লু",
+      "ঙ্গি"
+     ],
+     "en": "lungi (wrapped garment)",
+     "freq": 11
+    },
+    {
+     "w": "লুডু",
+     "split": [
+      "লু",
+      "ডু"
+     ],
+     "en": "ludo (board game)",
+     "freq": 0
+    },
+    {
+     "w": "লুচি",
+     "split": [
+      "লু",
+      "চি"
+     ],
+     "en": "luchi (fried flatbread)",
+     "freq": 2
+    }
+   ]
+  },
+  {
+   "id": "লে",
+   "type": "akshara",
+   "key": "লে",
+   "wheel": [
+    "লে",
+    "বু",
+    "জ",
+    "খা",
+    "প"
+   ],
+   "words": [
+    {
+     "w": "লেবু",
+     "split": [
+      "লে",
+      "বু"
+     ],
+     "en": "lemon",
+     "freq": 18
+    },
+    {
+     "w": "লেজ",
+     "split": [
+      "লে",
+      "জ"
+     ],
+     "en": "tail",
+     "freq": 49
+    },
+    {
+     "w": "লেখা",
+     "split": [
+      "লে",
+      "খা"
+     ],
+     "en": "to write",
+     "freq": 388
+    },
+    {
+     "w": "লেপ",
+     "split": [
+      "লে",
+      "প"
+     ],
+     "en": "quilt",
+     "freq": 4
+    }
+   ]
+  },
+  {
+   "id": "লো",
+   "type": "akshara",
+   "key": "লো",
+   "wheel": [
+    "লো",
+    "হা",
+    "ক",
+    "ম"
+   ],
+   "words": [
+    {
+     "w": "লোহা",
+     "split": [
+      "লো",
+      "হা"
+     ],
+     "en": "iron (the metal)",
+     "freq": 21
+    },
+    {
+     "w": "লোক",
+     "split": [
+      "লো",
+      "ক"
+     ],
+     "en": "person, man",
+     "freq": 1577
+    },
+    {
+     "w": "লোম",
+     "split": [
+      "লো",
+      "ম"
+     ],
+     "en": "fur, body hair",
+     "freq": 12
+    }
+   ]
+  },
+  {
+   "id": "শ",
+   "type": "akshara",
+   "key": "শ",
+   "wheel": [
+    "শ",
+    "রী",
+    "র",
+    "হ",
+    "ব",
+    "ত",
+    "সা"
+   ],
+   "words": [
+    {
+     "w": "শরীর",
+     "split": [
+      "শ",
+      "রী",
+      "র"
+     ],
+     "en": "body",
+     "freq": 290
+    },
+    {
+     "w": "শহর",
+     "split": [
+      "শ",
+      "হ",
+      "র"
+     ],
+     "en": "city",
+     "freq": 350
+    },
+    {
+     "w": "শরবত",
+     "split": [
+      "শ",
+      "র",
+      "ব",
+      "ত"
+     ],
+     "en": "sweet drink, sherbet",
+     "freq": 19
+    },
+    {
+     "w": "শসা",
+     "split": [
+      "শ",
+      "সা"
+     ],
+     "en": "cucumber",
+     "freq": 1
+    }
+   ]
+  },
+  {
+   "id": "শা",
+   "type": "akshara",
+   "key": "শা",
+   "wheel": [
+    "শা",
+    "ক",
+    "খা",
+    "ড়ি",
+    "মু",
+    "লি",
+    "ল"
+   ],
+   "words": [
+    {
+     "w": "শাক",
+     "split": [
+      "শা",
+      "ক"
+     ],
+     "en": "leafy greens",
+     "freq": 5
+    },
+    {
+     "w": "শাখা",
+     "split": [
+      "শা",
+      "খা"
+     ],
+     "en": "tree branch",
+     "freq": 19
+    },
+    {
+     "w": "শাড়ি",
+     "split": [
+      "শা",
+      "ড়ি"
+     ],
+     "en": "sari",
+     "freq": 16
+    },
+    {
+     "w": "শামুক",
+     "split": [
+      "শা",
+      "মু",
+      "ক"
+     ],
+     "en": "snail",
+     "freq": 8
+    },
+    {
+     "w": "শালিক",
+     "split": [
+      "শা",
+      "লি",
+      "ক"
+     ],
+     "en": "myna bird",
+     "freq": 0
+    },
+    {
+     "w": "শাল",
+     "split": [
+      "শা",
+      "ল"
+     ],
+     "en": "shawl (winter wrap)",
+     "freq": 1
+    }
+   ]
+  },
+  {
+   "id": "শি",
+   "type": "akshara",
+   "key": "শি",
+   "wheel": [
+    "শি",
+    "শু",
+    "ম",
+    "য়া",
+    "ল",
+    "ক"
+   ],
+   "words": [
+    {
+     "w": "শিশু",
+     "split": [
+      "শি",
+      "শু"
+     ],
+     "en": "child",
+     "freq": 153
+    },
+    {
+     "w": "শিশি",
+     "split": [
+      "শি",
+      "শি"
+     ],
+     "en": "small bottle",
+     "freq": 3
+    },
+    {
+     "w": "শিম",
+     "split": [
+      "শি",
+      "ম"
+     ],
+     "en": "bean",
+     "freq": 37
+    },
+    {
+     "w": "শিয়াল",
+     "split": [
+      "শি",
+      "য়া",
+      "ল"
+     ],
+     "en": "jackal",
+     "freq": 6
+    },
+    {
+     "w": "শিকল",
+     "split": [
+      "শি",
+      "ক",
+      "ল"
+     ],
+     "en": "chain",
+     "freq": 19
+    }
+   ]
+  },
+  {
+   "id": "শো",
+   "type": "akshara",
+   "key": "শো",
+   "wheel": [
+    "শো",
+    "ল",
+    "না",
+    "য়া"
+   ],
+   "words": [
+    {
+     "w": "শোল",
+     "split": [
+      "শো",
+      "ল"
+     ],
+     "en": "shol, snakehead fish",
+     "freq": 0
+    },
+    {
+     "w": "শোনা",
+     "split": [
+      "শো",
+      "না"
+     ],
+     "en": "to hear, to listen",
+     "flag": "dict-gap: absent from hunspell, which carries only শুনা/vi; শোনো and শোনে are equally absent. Standard verbal-noun base form, not an inflection.",
+     "freq": 146
+    },
+    {
+     "w": "শোয়া",
+     "split": [
+      "শো",
+      "য়া"
+     ],
+     "en": "to lie down",
+     "freq": 2
+    }
+   ]
+  },
+  {
+   "id": "স",
+   "type": "akshara",
+   "key": "স",
+   "wheel": [
+    "স",
+    "ব",
+    "জি",
+    "বু",
+    "জ",
+    "র",
+    "ই"
+   ],
+   "words": [
+    {
+     "w": "সবজি",
+     "split": [
+      "স",
+      "ব",
+      "জি"
+     ],
+     "en": "vegetable",
+     "freq": 31
+    },
+    {
+     "w": "সবুজ",
+     "split": [
+      "স",
+      "বু",
+      "জ"
+     ],
+     "en": "green",
+     "freq": 155
+    },
+    {
+     "w": "সর",
+     "split": [
+      "স",
+      "র"
+     ],
+     "en": "cream (the layer on milk)",
+     "freq": 119
+    },
+    {
+     "w": "সই",
+     "split": [
+      "স",
+      "ই"
+     ],
+     "en": "signature",
+     "freq": 82
+    }
+   ]
+  },
+  {
+   "id": "সা",
+   "type": "akshara",
+   "key": "সা",
+   "wheel": [
+    "সা",
+    "দা",
+    "ত",
+    "প",
+    "গ",
+    "র",
+    "স"
+   ],
+   "words": [
+    {
+     "w": "সাদা",
+     "split": [
+      "সা",
+      "দা"
+     ],
+     "en": "white",
+     "freq": 229
+    },
+    {
+     "w": "সাত",
+     "split": [
+      "সা",
+      "ত"
+     ],
+     "en": "seven",
+     "freq": 180
+    },
+    {
+     "w": "সাপ",
+     "split": [
+      "সা",
+      "প"
+     ],
+     "en": "snake",
+     "freq": 76
+    },
+    {
+     "w": "সাগর",
+     "split": [
+      "সা",
+      "গ",
+      "র"
+     ],
+     "en": "sea",
+     "freq": 78
+    },
+    {
+     "w": "সারস",
+     "split": [
+      "সা",
+      "র",
+      "স"
+     ],
+     "en": "crane (bird)",
+     "freq": 4
+    }
+   ]
+  },
+  {
+   "id": "সু",
+   "type": "akshara",
+   "key": "সু",
+   "wheel": [
+    "সু",
+    "তা",
+    "জি",
+    "পা",
+    "রি"
+   ],
+   "words": [
+    {
+     "w": "সুতা",
+     "split": [
+      "সু",
+      "তা"
+     ],
+     "en": "thread",
+     "flag": "regional-BD",
+     "freq": 18
+    },
+    {
+     "w": "সুজি",
+     "split": [
+      "সু",
+      "জি"
+     ],
+     "en": "semolina",
+     "freq": 7
+    },
+    {
+     "w": "সুপারি",
+     "split": [
+      "সু",
+      "পা",
+      "রি"
+     ],
+     "en": "betel nut",
+     "freq": 4
+    }
+   ]
+  },
+  {
+   "id": "সে",
+   "type": "akshara",
+   "key": "সে",
+   "wheel": [
+    "সে",
+    "তু",
+    "মা",
+    "ই",
+    "লা"
+   ],
+   "words": [
+    {
+     "w": "সেতু",
+     "split": [
+      "সে",
+      "তু"
+     ],
+     "en": "bridge",
+     "freq": 24
+    },
+    {
+     "w": "সেমাই",
+     "split": [
+      "সে",
+      "মা",
+      "ই"
+     ],
+     "en": "vermicelli (semai)",
+     "freq": 0
+    },
+    {
+     "w": "সেলাই",
+     "split": [
+      "সে",
+      "লা",
+      "ই"
+     ],
+     "en": "sewing",
+     "freq": 48
+    }
+   ]
+  },
+  {
+   "id": "হা",
+   "type": "akshara",
+   "key": "হা",
+   "wheel": [
+    "হা",
+    "ত",
+    "তি",
+    "ড়",
+    "ট"
+   ],
+   "words": [
+    {
+     "w": "হাত",
+     "split": [
+      "হা",
+      "ত"
+     ],
+     "en": "hand",
+     "freq": 1527
+    },
+    {
+     "w": "হাতি",
+     "split": [
+      "হা",
+      "তি"
+     ],
+     "en": "elephant",
+     "freq": 51
+    },
+    {
+     "w": "হাড়",
+     "split": [
+      "হা",
+      "ড়"
+     ],
+     "en": "bone",
+     "freq": 47
+    },
+    {
+     "w": "হাট",
+     "split": [
+      "হা",
+      "ট"
+     ],
+     "en": "market",
+     "freq": 19
+    }
+   ]
+  },
+  {
+   "id": "হাঁ",
+   "type": "akshara",
+   "key": "হাঁ",
+   "wheel": [
+    "হাঁ",
+    "স",
+    "টু",
+    "টা",
+    "চি",
+    "ড়ি"
+   ],
+   "words": [
+    {
+     "w": "হাঁস",
+     "split": [
+      "হাঁ",
+      "স"
+     ],
+     "en": "duck",
+     "freq": 21
+    },
+    {
+     "w": "হাঁটু",
+     "split": [
+      "হাঁ",
+      "টু"
+     ],
+     "en": "knee",
+     "freq": 61
+    },
+    {
+     "w": "হাঁটা",
+     "split": [
+      "হাঁ",
+      "টা"
+     ],
+     "en": "to walk",
+     "freq": 32
+    },
+    {
+     "w": "হাঁচি",
+     "split": [
+      "হাঁ",
+      "চি"
+     ],
+     "en": "sneeze",
+     "freq": 2
+    },
+    {
+     "w": "হাঁড়ি",
+     "split": [
+      "হাঁ",
+      "ড়ি"
+     ],
+     "en": "cooking pot",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "ক-1",
+   "type": "letter",
+   "key": "ক",
+   "wheel": [
+    "কি",
+    "মা",
+    "শ",
+    "মি",
+    "কৃ",
+    "ষ",
+    "ক"
+   ],
+   "words": [
+    {
+     "w": "কিমা",
+     "split": [
+      "কি",
+      "মা"
+     ],
+     "en": "minced meat",
+     "freq": 11
+    },
+    {
+     "w": "কিশমিশ",
+     "split": [
+      "কি",
+      "শ",
+      "মি",
+      "শ"
+     ],
+     "en": "raisin",
+     "freq": 3
+    },
+    {
+     "w": "কৃষক",
+     "split": [
+      "কৃ",
+      "ষ",
+      "ক"
+     ],
+     "en": "farmer",
+     "freq": 55
+    }
+   ]
+  },
+  {
+   "id": "খ-1",
+   "type": "letter",
+   "key": "খ",
+   "wheel": [
+    "খ",
+    "র",
+    "গো",
+    "শ",
+    "ই",
+    "ড়"
+   ],
+   "words": [
+    {
+     "w": "খরগোশ",
+     "split": [
+      "খ",
+      "র",
+      "গো",
+      "শ"
+     ],
+     "en": "rabbit",
+     "freq": 19
+    },
+    {
+     "w": "খই",
+     "split": [
+      "খ",
+      "ই"
+     ],
+     "en": "popped rice (popped paddy, not muri)",
+     "freq": 3
+    },
+    {
+     "w": "খড়",
+     "split": [
+      "খ",
+      "ড়"
+     ],
+     "en": "straw",
+     "freq": 4
+    }
+   ]
+  },
+  {
+   "id": "খ-2",
+   "type": "letter",
+   "key": "খ",
+   "wheel": [
+    "খা",
+    "লা",
+    "ট",
+    "তা",
+    "খো",
+    "সা",
+    "ম"
+   ],
+   "words": [
+    {
+     "w": "খালা",
+     "split": [
+      "খা",
+      "লা"
+     ],
+     "en": "maternal aunt (mother's sister)",
+     "flag": "regional-BD",
+     "freq": 20
+    },
+    {
+     "w": "খাট",
+     "split": [
+      "খা",
+      "ট"
+     ],
+     "en": "bed",
+     "freq": 5
+    },
+    {
+     "w": "খাতা",
+     "split": [
+      "খা",
+      "তা"
+     ],
+     "en": "notebook",
+     "freq": 10
+    },
+    {
+     "w": "খোলা",
+     "split": [
+      "খো",
+      "লা"
+     ],
+     "en": "to open",
+     "flag": "polysemous: draw the action of opening a door or a box, never an open field",
+     "freq": 319
+    },
+    {
+     "w": "খোসা",
+     "split": [
+      "খো",
+      "সা"
+     ],
+     "en": "peel (of fruit or vegetable)",
+     "freq": 11
+    },
+    {
+     "w": "খাম",
+     "split": [
+      "খা",
+      "ম"
+     ],
+     "en": "envelope",
+     "freq": 12
+    }
+   ]
+  },
+  {
+   "id": "খ-3",
+   "type": "letter",
+   "key": "খ",
+   "wheel": [
+    "খে",
+    "ল",
+    "না",
+    "ত",
+    "খা",
+    "লা"
+   ],
+   "words": [
+    {
+     "w": "খেলনা",
+     "split": [
+      "খে",
+      "ল",
+      "না"
+     ],
+     "en": "toy",
+     "freq": 77
+    },
+    {
+     "w": "খেত",
+     "split": [
+      "খে",
+      "ত"
+     ],
+     "en": "crop field",
+     "freq": 12
+    },
+    {
+     "w": "খাল",
+     "split": [
+      "খা",
+      "ল"
+     ],
+     "en": "canal",
+     "freq": 30
+    },
+    {
+     "w": "খেলা",
+     "split": [
+      "খে",
+      "লা"
+     ],
+     "en": "game, playing",
+     "freq": 590
+    }
+   ]
+  },
+  {
+   "id": "খ-4",
+   "type": "letter",
+   "key": "খ",
+   "wheel": [
+    "খু",
+    "ন্তি",
+    "কি",
+    "খে",
+    "জু",
+    "র"
+   ],
+   "words": [
+    {
+     "w": "খুন্তি",
+     "split": [
+      "খু",
+      "ন্তি"
+     ],
+     "en": "cooking spatula, turner",
+     "flag": "freq 0 is the subtitle-corpus artifact; it hangs in every Bangladeshi kitchen",
+     "freq": 0
+    },
+    {
+     "w": "খুকি",
+     "split": [
+      "খু",
+      "কি"
+     ],
+     "en": "little girl",
+     "freq": 15
+    },
+    {
+     "w": "খেজুর",
+     "split": [
+      "খে",
+      "জু",
+      "র"
+     ],
+     "en": "date fruit",
+     "freq": 28
+    }
+   ]
+  },
+  {
+   "id": "গ-1",
+   "type": "letter",
+   "key": "গ",
+   "wheel": [
+    "গ",
+    "রু",
+    "লি",
+    "লা",
+    "গে",
+    "ঞ্জি",
+    "ম"
+   ],
+   "words": [
+    {
+     "w": "গরু",
+     "split": [
+      "গ",
+      "রু"
+     ],
+     "en": "cow",
+     "freq": 51
+    },
+    {
+     "w": "গলি",
+     "split": [
+      "গ",
+      "লি"
+     ],
+     "en": "alley",
+     "freq": 20
+    },
+    {
+     "w": "গলা",
+     "split": [
+      "গ",
+      "লা"
+     ],
+     "en": "throat",
+     "freq": 165
+    },
+    {
+     "w": "গেলা",
+     "split": [
+      "গে",
+      "লা"
+     ],
+     "en": "to swallow",
+     "freq": 6
+    },
+    {
+     "w": "গেঞ্জি",
+     "split": [
+      "গে",
+      "ঞ্জি"
+     ],
+     "en": "vest, T-shirt",
+     "freq": 2
+    },
+    {
+     "w": "গম",
+     "split": [
+      "গ",
+      "ম"
+     ],
+     "en": "wheat",
+     "freq": 18
+    }
+   ]
+  },
+  {
+   "id": "গ-2",
+   "type": "letter",
+   "key": "গ",
+   "wheel": [
+    "গো",
+    "স",
+    "ল",
+    "গা",
+    "ড়ি",
+    "ধা",
+    "ছ"
+   ],
+   "words": [
+    {
+     "w": "গোসল",
+     "split": [
+      "গো",
+      "স",
+      "ল"
+     ],
+     "en": "bath",
+     "flag": "regional-BD",
+     "freq": 92
+    },
+    {
+     "w": "গোল",
+     "split": [
+      "গো",
+      "ল"
+     ],
+     "en": "round",
+     "freq": 54
+    },
+    {
+     "w": "গাল",
+     "split": [
+      "গা",
+      "ল"
+     ],
+     "en": "cheek",
+     "freq": 15
+    },
+    {
+     "w": "গাড়ি",
+     "split": [
+      "গা",
+      "ড়ি"
+     ],
+     "en": "car",
+     "freq": 950
+    },
+    {
+     "w": "গাধা",
+     "split": [
+      "গা",
+      "ধা"
+     ],
+     "en": "donkey",
+     "freq": 223
+    },
+    {
+     "w": "গাছ",
+     "split": [
+      "গা",
+      "ছ"
+     ],
+     "en": "tree",
+     "freq": 301
+    }
+   ]
+  },
+  {
+   "id": "গ-3",
+   "type": "letter",
+   "key": "গ",
+   "wheel": [
+    "গি",
+    "র",
+    "টি",
+    "র্জা",
+    "টা",
+    "গু",
+    "ড়"
+   ],
+   "words": [
+    {
+     "w": "গিরগিটি",
+     "split": [
+      "গি",
+      "র",
+      "গি",
+      "টি"
+     ],
+     "en": "chameleon",
+     "freq": 18
+    },
+    {
+     "w": "গির্জা",
+     "split": [
+      "গি",
+      "র্জা"
+     ],
+     "en": "church",
+     "freq": 25
+    },
+    {
+     "w": "গিটার",
+     "split": [
+      "গি",
+      "টা",
+      "র"
+     ],
+     "en": "guitar",
+     "freq": 9
+    },
+    {
+     "w": "গুটি",
+     "split": [
+      "গু",
+      "টি"
+     ],
+     "en": "board-game piece",
+     "freq": 12
+    },
+    {
+     "w": "গুড়",
+     "split": [
+      "গু",
+      "ড়"
+     ],
+     "en": "jaggery",
+     "freq": 2
+    }
+   ]
+  },
+  {
+   "id": "গ-4",
+   "type": "letter",
+   "key": "গ",
+   "wheel": [
+    "গো",
+    "লা",
+    "প",
+    "পি",
+    "গু",
+    "হা"
+   ],
+   "words": [
+    {
+     "w": "গোলাপ",
+     "split": [
+      "গো",
+      "লা",
+      "প"
+     ],
+     "en": "rose",
+     "freq": 23
+    },
+    {
+     "w": "গোলাপি",
+     "split": [
+      "গো",
+      "লা",
+      "পি"
+     ],
+     "en": "pink",
+     "freq": 33
+    },
+    {
+     "w": "গুহা",
+     "split": [
+      "গু",
+      "হা"
+     ],
+     "en": "cave",
+     "freq": 56
+    }
+   ]
+  },
+  {
+   "id": "গ-5",
+   "type": "letter",
+   "key": "গ",
+   "wheel": [
+    "গ",
+    "র",
+    "ম",
+    "র্ত",
+    "গু",
+    "ল",
+    "তি"
+   ],
+   "words": [
+    {
+     "w": "গরম",
+     "split": [
+      "গ",
+      "র",
+      "ম"
+     ],
+     "en": "hot",
+     "flag": "borderline-adjective",
+     "freq": 329
+    },
+    {
+     "w": "গর্ত",
+     "split": [
+      "গ",
+      "র্ত"
+     ],
+     "en": "hole",
+     "freq": 98
+    },
+    {
+     "w": "গুলতি",
+     "split": [
+      "গু",
+      "ল",
+      "তি"
+     ],
+     "en": "slingshot",
+     "freq": 5
+    }
+   ]
+  },
+  {
+   "id": "চ-1",
+   "type": "letter",
+   "key": "চ",
+   "wheel": [
+    "চো",
+    "খ",
+    "চা",
+    "ল",
+    "চু",
+    "মু",
+    "র"
+   ],
+   "words": [
+    {
+     "w": "চোখ",
+     "split": [
+      "চো",
+      "খ"
+     ],
+     "en": "eye",
+     "freq": 781
+    },
+    {
+     "w": "চাচা",
+     "split": [
+      "চা",
+      "চা"
+     ],
+     "en": "paternal uncle (father's brother)",
+     "flag": "regional-BD",
+     "freq": 137
+    },
+    {
+     "w": "চাল",
+     "split": [
+      "চা",
+      "ল"
+     ],
+     "en": "raw rice",
+     "freq": 75
+    },
+    {
+     "w": "চুল",
+     "split": [
+      "চু",
+      "ল"
+     ],
+     "en": "hair",
+     "freq": 264
+    },
+    {
+     "w": "চুমু",
+     "split": [
+      "চু",
+      "মু"
+     ],
+     "en": "kiss",
+     "freq": 143
+    },
+    {
+     "w": "চার",
+     "split": [
+      "চা",
+      "র"
+     ],
+     "en": "four",
+     "freq": 376
+    }
+   ]
+  },
+  {
+   "id": "চ-2",
+   "type": "letter",
+   "key": "চ",
+   "wheel": [
+    "চি",
+    "রু",
+    "নি",
+    "ড়া",
+    "ঠি",
+    "ল"
+   ],
+   "words": [
+    {
+     "w": "চিরুনি",
+     "split": [
+      "চি",
+      "রু",
+      "নি"
+     ],
+     "en": "comb",
+     "freq": 11
+    },
+    {
+     "w": "চিনি",
+     "split": [
+      "চি",
+      "নি"
+     ],
+     "en": "sugar",
+     "freq": 362
+    },
+    {
+     "w": "চিড়া",
+     "split": [
+      "চি",
+      "ড়া"
+     ],
+     "en": "flattened rice",
+     "flag": "regional-BD",
+     "freq": 3
+    },
+    {
+     "w": "চিঠি",
+     "split": [
+      "চি",
+      "ঠি"
+     ],
+     "en": "letter (posted mail)",
+     "freq": 240
+    },
+    {
+     "w": "চিল",
+     "split": [
+      "চি",
+      "ল"
+     ],
+     "en": "kite (bird of prey)",
+     "freq": 9
+    }
+   ]
+  },
+  {
+   "id": "চ-3",
+   "type": "letter",
+   "key": "চ",
+   "wheel": [
+    "চ",
+    "ক",
+    "লে",
+    "ট",
+    "চৌ",
+    "কি",
+    "দ্দ"
+   ],
+   "words": [
+    {
+     "w": "চকলেট",
+     "split": [
+      "চ",
+      "ক",
+      "লে",
+      "ট"
+     ],
+     "en": "chocolate",
+     "freq": 88
+    },
+    {
+     "w": "চক",
+     "split": [
+      "চ",
+      "ক"
+     ],
+     "en": "chalk",
+     "freq": 1
+    },
+    {
+     "w": "চৌকি",
+     "split": [
+      "চৌ",
+      "কি"
+     ],
+     "en": "low wooden cot",
+     "freq": 4
+    },
+    {
+     "w": "চৌদ্দ",
+     "split": [
+      "চৌ",
+      "দ্দ"
+     ],
+     "en": "fourteen (14)",
+     "freq": 21
+    }
+   ]
+  },
+  {
+   "id": "চ-4",
+   "type": "letter",
+   "key": "চ",
+   "wheel": [
+    "চো",
+    "য়া",
+    "ল",
+    "ষা",
+    "চে",
+    "র"
+   ],
+   "words": [
+    {
+     "w": "চোয়াল",
+     "split": [
+      "চো",
+      "য়া",
+      "ল"
+     ],
+     "en": "jaw",
+     "freq": 13
+    },
+    {
+     "w": "চোষা",
+     "split": [
+      "চো",
+      "ষা"
+     ],
+     "en": "to suck",
+     "freq": 6
+    },
+    {
+     "w": "চেয়ার",
+     "split": [
+      "চে",
+      "য়া",
+      "র"
+     ],
+     "en": "chair",
+     "freq": 42
+    }
+   ]
+  },
+  {
+   "id": "চ-5",
+   "type": "letter",
+   "key": "চ",
+   "wheel": [
+    "চা",
+    "কা",
+    "কু",
+    "বি",
+    "চৌ",
+    "ঠ"
+   ],
+   "words": [
+    {
+     "w": "চাকা",
+     "split": [
+      "চা",
+      "কা"
+     ],
+     "en": "wheel",
+     "freq": 39
+    },
+    {
+     "w": "চাকু",
+     "split": [
+      "চা",
+      "কু"
+     ],
+     "en": "knife",
+     "flag": "regional-BD",
+     "freq": 42
+    },
+    {
+     "w": "চাবি",
+     "split": [
+      "চা",
+      "বি"
+     ],
+     "en": "key",
+     "freq": 257
+    },
+    {
+     "w": "চৌকাঠ",
+     "split": [
+      "চৌ",
+      "কা",
+      "ঠ"
+     ],
+     "en": "doorframe, threshold",
+     "flag": "marginal: art must highlight the frame or it reads as দরজা",
+     "freq": 1
+    }
+   ]
+  },
+  {
+   "id": "চ-6",
+   "type": "letter",
+   "key": "চ",
+   "wheel": [
+    "চ",
+    "শ",
+    "মা",
+    "চু",
+    "লা",
+    "ড়ি"
+   ],
+   "words": [
+    {
+     "w": "চশমা",
+     "split": [
+      "চ",
+      "শ",
+      "মা"
+     ],
+     "en": "glasses",
+     "freq": 70
+    },
+    {
+     "w": "চুলা",
+     "split": [
+      "চু",
+      "লা"
+     ],
+     "en": "stove",
+     "freq": 10
+    },
+    {
+     "w": "চুড়ি",
+     "split": [
+      "চু",
+      "ড়ি"
+     ],
+     "en": "bangle",
+     "freq": 4
+    }
+   ]
+  },
+  {
+   "id": "ছ-1",
+   "type": "letter",
+   "key": "ছ",
+   "wheel": [
+    "ছ",
+    "বি",
+    "ড়ি",
+    "য়",
+    "ড়া",
+    "নো",
+    "ছো"
+   ],
+   "words": [
+    {
+     "w": "ছবি",
+     "split": [
+      "ছ",
+      "বি"
+     ],
+     "en": "picture",
+     "freq": 576
+    },
+    {
+     "w": "ছড়ি",
+     "split": [
+      "ছ",
+      "ড়ি"
+     ],
+     "en": "walking stick, cane",
+     "freq": 27
+    },
+    {
+     "w": "ছয়",
+     "split": [
+      "ছ",
+      "য়"
+     ],
+     "en": "six",
+     "freq": 193
+    },
+    {
+     "w": "ছড়ানো",
+     "split": [
+      "ছ",
+      "ড়া",
+      "নো"
+     ],
+     "en": "to scatter",
+     "freq": 11
+    },
+    {
+     "w": "ছোড়া",
+     "split": [
+      "ছো",
+      "ড়া"
+     ],
+     "en": "to throw",
+     "freq": 16
+    }
+   ]
+  },
+  {
+   "id": "ছ-2",
+   "type": "letter",
+   "key": "ছ",
+   "wheel": [
+    "ছা",
+    "গ",
+    "ল",
+    "না",
+    "ই",
+    "তা",
+    "দ"
+   ],
+   "words": [
+    {
+     "w": "ছাগল",
+     "split": [
+      "ছা",
+      "গ",
+      "ল"
+     ],
+     "en": "goat",
+     "freq": 60
+    },
+    {
+     "w": "ছাল",
+     "split": [
+      "ছা",
+      "ল"
+     ],
+     "en": "bark (of a tree), hide",
+     "freq": 11
+    },
+    {
+     "w": "ছানা",
+     "split": [
+      "ছা",
+      "না"
+     ],
+     "en": "baby animal (chick, kitten)",
+     "freq": 20
+    },
+    {
+     "w": "ছাই",
+     "split": [
+      "ছা",
+      "ই"
+     ],
+     "en": "ash",
+     "freq": 103
+    },
+    {
+     "w": "ছাতা",
+     "split": [
+      "ছা",
+      "তা"
+     ],
+     "en": "umbrella",
+     "freq": 24
+    },
+    {
+     "w": "ছাদ",
+     "split": [
+      "ছা",
+      "দ"
+     ],
+     "en": "roof",
+     "freq": 53
+    }
+   ]
+  },
+  {
+   "id": "জ-1",
+   "type": "letter",
+   "key": "জ",
+   "wheel": [
+    "জি",
+    "লা",
+    "পি",
+    "ভ",
+    "রা",
+    "ফ"
+   ],
+   "words": [
+    {
+     "w": "জিলাপি",
+     "split": [
+      "জি",
+      "লা",
+      "পি"
+     ],
+     "en": "jalebi, spiral sweet",
+     "freq": 0
+    },
+    {
+     "w": "জিভ",
+     "split": [
+      "জি",
+      "ভ"
+     ],
+     "en": "tongue",
+     "freq": 12
+    },
+    {
+     "w": "জিরা",
+     "split": [
+      "জি",
+      "রা"
+     ],
+     "en": "cumin",
+     "freq": 0
+    },
+    {
+     "w": "জিরাফ",
+     "split": [
+      "জি",
+      "রা",
+      "ফ"
+     ],
+     "en": "giraffe",
+     "freq": 7
+    }
+   ]
+  },
+  {
+   "id": "জ-2",
+   "type": "letter",
+   "key": "জ",
+   "wheel": [
+    "জা",
+    "ম",
+    "রু",
+    "ল",
+    "মা",
+    "জ",
+    "গ"
+   ],
+   "words": [
+    {
+     "w": "জামরুল",
+     "split": [
+      "জা",
+      "ম",
+      "রু",
+      "ল"
+     ],
+     "en": "rose apple",
+     "freq": 0
+    },
+    {
+     "w": "জাম",
+     "split": [
+      "জা",
+      "ম"
+     ],
+     "en": "black plum",
+     "freq": 5
+    },
+    {
+     "w": "জাল",
+     "split": [
+      "জা",
+      "ল"
+     ],
+     "en": "fishing net",
+     "freq": 58
+    },
+    {
+     "w": "জামা",
+     "split": [
+      "জা",
+      "মা"
+     ],
+     "en": "shirt",
+     "freq": 99
+    },
+    {
+     "w": "জগ",
+     "split": [
+      "জ",
+      "গ"
+     ],
+     "en": "jug",
+     "freq": 3
+    }
+   ]
+  },
+  {
+   "id": "জ-3",
+   "type": "letter",
+   "key": "জ",
+   "wheel": [
+    "জে",
+    "তা",
+    "লে",
+    "লি",
+    "ব্রা",
+    "জু"
+   ],
+   "words": [
+    {
+     "w": "জেতা",
+     "split": [
+      "জে",
+      "তা"
+     ],
+     "en": "to win",
+     "flag": "action; needs a two-frame race image",
+     "freq": 21
+    },
+    {
+     "w": "জেলে",
+     "split": [
+      "জে",
+      "লে"
+     ],
+     "en": "fisherman",
+     "flag": "homograph-of-locative-of-জেল",
+     "freq": 233
+    },
+    {
+     "w": "জেলি",
+     "split": [
+      "জে",
+      "লি"
+     ],
+     "en": "jelly",
+     "freq": 13
+    },
+    {
+     "w": "জেব্রা",
+     "split": [
+      "জে",
+      "ব্রা"
+     ],
+     "en": "zebra",
+     "freq": 18
+    },
+    {
+     "w": "জুতা",
+     "split": [
+      "জু",
+      "তা"
+     ],
+     "en": "shoe",
+     "flag": "regional-BD",
+     "freq": 155
+    }
+   ]
+  },
+  {
+   "id": "জ-4",
+   "type": "letter",
+   "key": "জ",
+   "wheel": [
+    "জ",
+    "ঙ্গ",
+    "ল",
+    "বা",
+    "জো",
+    "না",
+    "কি"
+   ],
+   "words": [
+    {
+     "w": "জঙ্গল",
+     "split": [
+      "জ",
+      "ঙ্গ",
+      "ল"
+     ],
+     "en": "jungle, forest",
+     "freq": 95
+    },
+    {
+     "w": "জবা",
+     "split": [
+      "জ",
+      "বা"
+     ],
+     "en": "hibiscus flower",
+     "freq": 0
+    },
+    {
+     "w": "জোনাকি",
+     "split": [
+      "জো",
+      "না",
+      "কি"
+     ],
+     "en": "firefly",
+     "freq": 2
+    }
+   ]
+  },
+  {
+   "id": "ড-1",
+   "type": "letter",
+   "key": "ড",
+   "wheel": [
+    "ডি",
+    "ম",
+    "ঙি",
+    "ডে",
+    "ক",
+    "চি",
+    "গ"
+   ],
+   "words": [
+    {
+     "w": "ডিম",
+     "split": [
+      "ডি",
+      "ম"
+     ],
+     "en": "egg",
+     "freq": 207
+    },
+    {
+     "w": "ডিঙি",
+     "split": [
+      "ডি",
+      "ঙি"
+     ],
+     "en": "small boat (dinghy)",
+     "freq": 2
+    },
+    {
+     "w": "ডেকচি",
+     "split": [
+      "ডে",
+      "ক",
+      "চি"
+     ],
+     "en": "cooking pot",
+     "freq": 9
+    },
+    {
+     "w": "ডেগ",
+     "split": [
+      "ডে",
+      "গ"
+     ],
+     "en": "big cauldron",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "ধ-1",
+   "type": "letter",
+   "key": "ধ",
+   "wheel": [
+    "ধা",
+    "ন",
+    "ও",
+    "য়া",
+    "ধু",
+    "লা"
+   ],
+   "words": [
+    {
+     "w": "ধান",
+     "split": [
+      "ধা",
+      "ন"
+     ],
+     "en": "paddy, unhusked rice",
+     "freq": 10
+    },
+    {
+     "w": "ধাওয়া",
+     "split": [
+      "ধা",
+      "ও",
+      "য়া"
+     ],
+     "en": "to chase",
+     "flag": "uncertain: two-frame image needed to separate from দৌড়",
+     "freq": 36
+    },
+    {
+     "w": "ধুলা",
+     "split": [
+      "ধু",
+      "লা"
+     ],
+     "en": "dust",
+     "flag": "regional-BD",
+     "freq": 17
+    }
+   ]
+  },
+  {
+   "id": "ন-1",
+   "type": "letter",
+   "key": "ন",
+   "wheel": [
+    "নি",
+    "ম",
+    "কি",
+    "নো",
+    "ঙ",
+    "র"
+   ],
+   "words": [
+    {
+     "w": "নিম",
+     "split": [
+      "নি",
+      "ম"
+     ],
+     "en": "neem tree",
+     "freq": 12
+    },
+    {
+     "w": "নিমকি",
+     "split": [
+      "নি",
+      "ম",
+      "কি"
+     ],
+     "en": "nimki, fried savoury snack",
+     "freq": 0
+    },
+    {
+     "w": "নোঙর",
+     "split": [
+      "নো",
+      "ঙ",
+      "র"
+     ],
+     "en": "anchor",
+     "freq": 7
+    }
+   ]
+  },
+  {
+   "id": "ন-2",
+   "type": "letter",
+   "key": "ন",
+   "wheel": [
+    "নো",
+    "ল",
+    "ক",
+    "নী",
+    "নৌ",
+    "কা"
+   ],
+   "words": [
+    {
+     "w": "নোলক",
+     "split": [
+      "নো",
+      "ল",
+      "ক"
+     ],
+     "en": "nose ring",
+     "freq": 0
+    },
+    {
+     "w": "নীল",
+     "split": [
+      "নী",
+      "ল"
+     ],
+     "en": "blue",
+     "freq": 233
+    },
+    {
+     "w": "নৌকা",
+     "split": [
+      "নৌ",
+      "কা"
+     ],
+     "en": "boat",
+     "freq": 148
+    }
+   ]
+  },
+  {
+   "id": "ফ-1",
+   "type": "letter",
+   "key": "ফ",
+   "wheel": [
+    "ফা",
+    "টা",
+    "লি",
+    "ফো",
+    "ন"
+   ],
+   "words": [
+    {
+     "w": "ফাটা",
+     "split": [
+      "ফা",
+      "টা"
+     ],
+     "en": "to crack, to burst",
+     "freq": 4
+    },
+    {
+     "w": "ফালি",
+     "split": [
+      "ফা",
+      "লি"
+     ],
+     "en": "slice, wedge",
+     "freq": 7
+    },
+    {
+     "w": "ফোন",
+     "split": [
+      "ফো",
+      "ন"
+     ],
+     "en": "phone",
+     "freq": 1557
+    },
+    {
+     "w": "ফোটা",
+     "split": [
+      "ফো",
+      "টা"
+     ],
+     "en": "to bloom",
+     "freq": 22
+    }
+   ]
+  },
+  {
+   "id": "ভ-1",
+   "type": "letter",
+   "key": "ভ",
+   "wheel": [
+    "ভ",
+    "রা",
+    "ভি",
+    "ড়",
+    "ভো",
+    "র"
+   ],
+   "words": [
+    {
+     "w": "ভরা",
+     "split": [
+      "ভ",
+      "রা"
+     ],
+     "en": "to fill",
+     "freq": 114
+    },
+    {
+     "w": "ভিড়",
+     "split": [
+      "ভি",
+      "ড়"
+     ],
+     "en": "crowd",
+     "freq": 20
+    },
+    {
+     "w": "ভোর",
+     "split": [
+      "ভো",
+      "র"
+     ],
+     "en": "dawn",
+     "freq": 33
+    }
+   ]
+  },
+  {
+   "id": "ভ-2",
+   "type": "letter",
+   "key": "ভ",
+   "wheel": [
+    "ভো",
+    "ম",
+    "রা",
+    "ভা",
+    "বি",
+    "ভাঁ",
+    "ড়"
+   ],
+   "words": [
+    {
+     "w": "ভোমরা",
+     "split": [
+      "ভো",
+      "ম",
+      "রা"
+     ],
+     "en": "bumblebee",
+     "freq": 0
+    },
+    {
+     "w": "ভাবি",
+     "split": [
+      "ভা",
+      "বি"
+     ],
+     "en": "elder brother's wife",
+     "flag": "regional-BD: needs a family-scene picture, not a portrait",
+     "freq": 148
+    },
+    {
+     "w": "ভাঁড়",
+     "split": [
+      "ভাঁ",
+      "ড়"
+     ],
+     "en": "clown, jester",
+     "freq": 12
+    }
+   ]
+  },
+  {
+   "id": "ম-1",
+   "type": "letter",
+   "key": "ম",
+   "wheel": [
+    "মি",
+    "ষ্টি",
+    "না",
+    "র",
+    "মা"
+   ],
+   "words": [
+    {
+     "w": "মিষ্টি",
+     "split": [
+      "মি",
+      "ষ্টি"
+     ],
+     "en": "sweets (the confection, not the taste)",
+     "freq": 210
+    },
+    {
+     "w": "মিনার",
+     "split": [
+      "মি",
+      "না",
+      "র"
+     ],
+     "en": "minaret, tower",
+     "flag": "regional-BD: familiar through শহীদ মিনার",
+     "freq": 27
+    },
+    {
+     "w": "মামা",
+     "split": [
+      "মা",
+      "মা"
+     ],
+     "en": "maternal uncle",
+     "freq": 209
+    }
+   ]
+  },
+  {
+   "id": "র-1",
+   "type": "letter",
+   "key": "র",
+   "wheel": [
+    "রা",
+    "ত",
+    "স্তা",
+    "নী",
+    "ন্না",
+    "জা"
+   ],
+   "words": [
+    {
+     "w": "রাত",
+     "split": [
+      "রা",
+      "ত"
+     ],
+     "en": "night",
+     "freq": 424
+    },
+    {
+     "w": "রাস্তা",
+     "split": [
+      "রা",
+      "স্তা"
+     ],
+     "en": "road",
+     "freq": 696
+    },
+    {
+     "w": "রানী",
+     "split": [
+      "রা",
+      "নী"
+     ],
+     "en": "queen",
+     "freq": 145
+    },
+    {
+     "w": "রান্না",
+     "split": [
+      "রা",
+      "ন্না"
+     ],
+     "en": "cooking",
+     "freq": 219
+    },
+    {
+     "w": "রাজা",
+     "split": [
+      "রা",
+      "জা"
+     ],
+     "en": "king",
+     "freq": 667
+    }
+   ]
+  },
+  {
+   "id": "র-2",
+   "type": "letter",
+   "key": "র",
+   "wheel": [
+    "রু",
+    "মা",
+    "ল",
+    "ই",
+    "টি",
+    "র",
+    "স"
+   ],
+   "words": [
+    {
+     "w": "রুমাল",
+     "split": [
+      "রু",
+      "মা",
+      "ল"
+     ],
+     "en": "handkerchief",
+     "freq": 23
+    },
+    {
+     "w": "রুই",
+     "split": [
+      "রু",
+      "ই"
+     ],
+     "en": "rui carp (fish)",
+     "freq": 0
+    },
+    {
+     "w": "রুটি",
+     "split": [
+      "রু",
+      "টি"
+     ],
+     "en": "flatbread",
+     "freq": 52
+    },
+    {
+     "w": "রস",
+     "split": [
+      "র",
+      "স"
+     ],
+     "en": "juice, sap",
+     "freq": 39
+    }
+   ]
+  },
+  {
+   "id": "র-3",
+   "type": "letter",
+   "key": "র",
+   "wheel": [
+    "রে",
+    "ল",
+    "গা",
+    "ড়ি",
+    "র",
+    "ঙ",
+    "শি"
+   ],
+   "words": [
+    {
+     "w": "রেলগাড়ি",
+     "split": [
+      "রে",
+      "ল",
+      "গা",
+      "ড়ি"
+     ],
+     "en": "train",
+     "freq": 1
+    },
+    {
+     "w": "রঙ",
+     "split": [
+      "র",
+      "ঙ"
+     ],
+     "en": "colour, paint",
+     "freq": 91
+    },
+    {
+     "w": "রশি",
+     "split": [
+      "র",
+      "শি"
+     ],
+     "en": "rope",
+     "freq": 33
+    }
+   ]
+  },
+  {
+   "id": "র-4",
+   "type": "letter",
+   "key": "র",
+   "wheel": [
+    "রো",
+    "ব",
+    "ট",
+    "দ",
+    "রি",
+    "ক",
+    "শা"
+   ],
+   "words": [
+    {
+     "w": "রোবট",
+     "split": [
+      "রো",
+      "ব",
+      "ট"
+     ],
+     "en": "robot",
+     "freq": 136
+    },
+    {
+     "w": "রোদ",
+     "split": [
+      "রো",
+      "দ"
+     ],
+     "en": "sunshine",
+     "freq": 26
+    },
+    {
+     "w": "রিকশা",
+     "split": [
+      "রি",
+      "ক",
+      "শা"
+     ],
+     "en": "rickshaw",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "শ-1",
+   "type": "letter",
+   "key": "শ",
+   "wheel": [
+    "শু",
+    "কা",
+    "নো",
+    "ক",
+    "না"
+   ],
+   "words": [
+    {
+     "w": "শুকানো",
+     "split": [
+      "শু",
+      "কা",
+      "নো"
+     ],
+     "en": "to dry",
+     "flag": "uncertain: freq 0",
+     "freq": 0
+    },
+    {
+     "w": "শুশুক",
+     "split": [
+      "শু",
+      "শু",
+      "ক"
+     ],
+     "en": "river dolphin (shushuk)",
+     "freq": 0
+    },
+    {
+     "w": "শুকনা",
+     "split": [
+      "শু",
+      "ক",
+      "না"
+     ],
+     "en": "dry",
+     "freq": 8
+    }
+   ]
+  },
+  {
+   "id": "স-1",
+   "type": "letter",
+   "key": "স",
+   "wheel": [
+    "সি",
+    "ন্দু",
+    "ক",
+    "ট",
+    "সো",
+    "না"
+   ],
+   "words": [
+    {
+     "w": "সিন্দুক",
+     "split": [
+      "সি",
+      "ন্দু",
+      "ক"
+     ],
+     "en": "chest, trunk",
+     "freq": 50
+    },
+    {
+     "w": "সিট",
+     "split": [
+      "সি",
+      "ট"
+     ],
+     "en": "seat",
+     "flag": "loanword",
+     "freq": 107
+    },
+    {
+     "w": "সোনা",
+     "split": [
+      "সো",
+      "না"
+     ],
+     "en": "gold",
+     "freq": 741
+    }
+   ]
+  },
+  {
+   "id": "হ-1",
+   "type": "letter",
+   "key": "হ",
+   "wheel": [
+    "হ",
+    "রি",
+    "ণ",
+    "লু",
+    "দ",
+    "হু",
+    "ক"
+   ],
+   "words": [
+    {
+     "w": "হরিণ",
+     "split": [
+      "হ",
+      "রি",
+      "ণ"
+     ],
+     "en": "deer",
+     "freq": 39
+    },
+    {
+     "w": "হলুদ",
+     "split": [
+      "হ",
+      "লু",
+      "দ"
+     ],
+     "en": "turmeric; yellow",
+     "freq": 61
+    },
+    {
+     "w": "হুক",
+     "split": [
+      "হু",
+      "ক"
+     ],
+     "en": "hook",
+     "freq": 24
+    }
+   ]
+  },
+  {
+   "id": "হ-2",
+   "type": "letter",
+   "key": "হ",
+   "wheel": [
+    "হি",
+    "জি",
+    "বি",
+    "ম",
+    "হো",
+    "টে",
+    "ল"
+   ],
+   "words": [
+    {
+     "w": "হিজিবিজি",
+     "split": [
+      "হি",
+      "জি",
+      "বি",
+      "জি"
+     ],
+     "en": "scribble",
+     "freq": 4
+    },
+    {
+     "w": "হিম",
+     "split": [
+      "হি",
+      "ম"
+     ],
+     "en": "frost, chill",
+     "flag": "uncertain: borderline on the picture test",
+     "freq": 9
+    },
+    {
+     "w": "হোটেল",
+     "split": [
+      "হো",
+      "টে",
+      "ল"
+     ],
+     "en": "eatery, hotel",
+     "freq": 124
+    }
+   ]
+  }
+ ]
+}

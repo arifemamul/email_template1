@@ -203,6 +203,81 @@ def layout(words):
     return None
 
 
+def cluster_layout(words, max_rows=8, max_cols=9):
+    """
+    Lay the words out allowing the board to be more than one island.
+
+    `layout` above insists on a single connected crossword, and that rules out most of the
+    curriculum. A level keyed on an akshara has every word starting with it - কাক কাঠ কান কাচ
+    কাপ - so the only cell any two of them can share is the key, and a cell takes at most two
+    words. Six such words cannot connect, and 73 of the 118 levels share exactly one akshara.
+
+    So words cross wherever they share a letter, and a word that can cross nothing starts a
+    new island two rows below, which leaves the blank row that keeps the two from reading as
+    one. Fewest islands wins, then the shallowest board, then the smallest - the board sits
+    above the wheel on a portrait screen, so height is what runs out.
+
+    Deterministic, and simple enough to be reimplemented exactly in the page: no randomness,
+    just each word taken as the starting one in turn and the best result kept. Returns
+    (occupied, placed, islands).
+    """
+    tokens = sorted(((w, split_aksharas(w)) for w in words),
+                    key=lambda t: (-len(t[1]), t[0]))
+    if not tokens:
+        return None
+
+    best = None
+    for seed in range(len(tokens)):
+        order = [tokens[seed]] + [t for i, t in enumerate(tokens) if i != seed]
+        occupied, placed = {}, []
+        islands = 1
+        first_word, first_aks = order[0]
+        for i, a in enumerate(first_aks):
+            occupied[(0, i)] = a
+        placed.append((first_word, cells_for((0, 0), True, len(first_aks))))
+
+        for word, aksharas in order[1:]:
+            spots = candidates(occupied, aksharas)
+            if spots:
+                start, horizontal = spots[0]
+            else:
+                # A new island goes below the board or beside it, whichever leaves it
+                # shallower - two rows or two columns clear, so the gap keeps the islands
+                # from reading as one word. Beside usually wins: the board sits above the
+                # wheel, so height is the scarce direction and width is not.
+                low = (max(p[0] for p in occupied) + 2, min(p[1] for p in occupied))
+                side = (min(p[0] for p in occupied), max(p[1] for p in occupied) + 2)
+                options = []
+                for at in (low, side):
+                    cells_ = cells_for(at, True, len(aksharas))
+                    rows_, area_ = _extent(occupied, cells_)
+                    cols_ = area_ // rows_ if rows_ else 0
+                    # Overflowing either cap is worse than any shape that stays inside it. A
+                    # cell that has to shrink past the width of a letter is the one thing the
+                    # board may not do, and columns are what force that on a narrow phone.
+                    over = (rows_ > max_rows) + (cols_ > max_cols)
+                    options.append(((over, rows_, area_, at[0], at[1]), at))
+                start, horizontal = min(options)[1], True
+                islands += 1
+            cells = cells_for(start, horizontal, len(aksharas))
+            for i, pos in enumerate(cells):
+                occupied[pos] = aksharas[i]
+            placed.append((word, cells))
+
+        rows, cols = grid_size(occupied)
+        rank = (islands, rows, rows * cols, seed)
+        if best is None or rank < best[0]:
+            best = (rank, occupied, placed, islands)
+
+    _, occupied, placed, islands = best
+    min_r = min(p[0] for p in occupied)
+    min_c = min(p[1] for p in occupied)
+    if (min_r, min_c) != (0, 0):
+        occupied = {(r - min_r, c - min_c): a for (r, c), a in occupied.items()}
+        placed = [(w, [(r - min_r, c - min_c) for r, c in cells]) for w, cells in placed]
+    return occupied, placed, islands
+
+
 def grid_size(occupied):
     rows = [p[0] for p in occupied]
     cols = [p[1] for p in occupied]
@@ -269,5 +344,31 @@ if __name__ == '__main__':
         bad.append(('layout', None))
     else:
         print(render(got[0]))
+
+    # An akshara-keyed level: every word starts with কা, so no three of them can connect and
+    # `layout` has nothing to return. `cluster_layout` places them all as crossing pairs.
+    keyed = ['কাক', 'কাঠ', 'কান', 'কাচ', 'কাপ', 'কাঠি']
+    if layout(keyed) is not None:
+        print('FAIL layout should not connect six words sharing only কা')
+        bad.append(('layout-keyed', None))
+    occupied, placed, islands = cluster_layout(keyed)
+    rows, cols = grid_size(occupied)
+    strays = stray_runs(occupied, keyed)
+    print()
+    print(render(occupied))
+    print(f'{islands} islands, {rows}x{cols}')
+    if len(placed) != len(keyed):
+        print(f'FAIL cluster_layout placed {len(placed)} of {len(keyed)} words')
+        bad.append(('cluster-count', None))
+    if strays:
+        print(f'FAIL cluster_layout left stray words: {strays}')
+        bad.append(('cluster-stray', None))
+    if min(p[0] for p in occupied) or min(p[1] for p in occupied):
+        print('FAIL cluster_layout did not shift the board to the origin')
+        bad.append(('cluster-origin', None))
+    if cluster_layout(keyed)[0] != occupied:
+        print('FAIL cluster_layout is not deterministic')
+        bad.append(('cluster-determinism', None))
+
     print('bangla.py self-test:', 'FAILED' if bad else 'ok')
     raise SystemExit(1 if bad else 0)
