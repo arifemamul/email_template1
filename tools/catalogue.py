@@ -112,10 +112,26 @@ ALPHABET_ORDER = list("অআইঈউঊঋএঐওঔকখগঘঙচছজ
 KAR_SERIES = ['', 'া', 'ি', 'ী', 'ু', 'ূ', 'ৃ', 'ে', 'ৈ', 'ো', 'ৌ']
 
 
+# ঐ and ঔ go to the very end rather than into the vowel run where the alphabet puts them.
+# Measured over all 156 levels, they are the two hardest in the game: ঐ is ঐক্য, ঐতিহ্য, ঐশী
+# and ঐচ্ছিক across three conjuncts, ঔ is ঔষধি, ঔদ্ধত্য and ঔজ্জ্বল্য across four. In alphabet
+# order they land at levels 11 and 13, which puts the hardest and most abstract material in the
+# game in front of a child who has met nine levels.
+#
+# That is not bad authoring, it is the language: word-initial ঐ and ঔ in Bengali are almost
+# entirely abstract Sanskritic nouns, and there is nothing concrete to put there instead. So
+# they become what they are - completeness levels, at the end, for a player who wants the whole
+# alphabet - and the vowel run reads অ আ ই ঈ উ ঊ ঋ এ ও, which is the standard order with the
+# two rarest left out.
+LAST = ('ঐ', 'ঔ')
+
+
 def teaching_order(level):
     """Where a level sits: base letter, then its own akshara series, then its mixed-sign ones."""
     key = level['id']
     base = key[0]
+    if key in LAST:
+        return (len(ALPHABET_ORDER) + 1, LAST.index(key), 0, 0, 0, key)
     letter = ALPHABET_ORDER.index(base) if base in ALPHABET_ORDER else len(ALPHABET_ORDER)
     if level['type'] == 'letter':
         return (letter, 2, int(key.split('-')[1]), 0, key)

@@ -32,6 +32,7 @@ from vocabulary import theme_of, words as pool_words                            
 REPO = pathlib.Path(__file__).resolve().parent.parent
 KOTLIN = REPO / 'bengali-word-game/app/src/main/java/com/bangla/shobdojot/data/Levels.kt'
 SOURCE = REPO / 'src/shobdojot.html'      # authored, with every comment
+WORKER = REPO / 'docs/sw.js'              # offline cache; its version is stamped below
 WEB = REPO / 'docs/index.html'            # built, comments stripped
 # The same page with the document wrapper taken off, for hosts that supply their own
 # <!doctype>/<html>/<head>/<body> - claude.ai artifacts among them. Generated, never edited:
@@ -219,6 +220,16 @@ def write_builds(levels):
     built = minify(SOURCE.read_text(encoding='utf-8'))
     WEB.write_text(built, encoding='utf-8')
 
+    # Stamp the offline cache with something that changes whenever the page does. Left to a
+    # human this gets forgotten, and a forgotten bump means every returning player keeps the
+    # copy they already have - the page updates for new visitors and for nobody else.
+    if WORKER.exists():
+        worker = WORKER.read_text(encoding='utf-8')
+        stamp = f"shobdojot-{len(levels)}-{len(built.encode('utf-8'))}"
+        fresh = re.sub(r"const VERSION = '[^']*';", f"const VERSION = '{stamp}';", worker, count=1)
+        if fresh != worker:
+            WORKER.write_text(fresh, encoding='utf-8')
+
     before_live = LIVE.read_text(encoding='utf-8') if LIVE.exists() else ''
     live_src = unwrap(built)
     LIVE.write_text(live_src, encoding='utf-8')
@@ -376,6 +387,26 @@ def report(levels, failures):
     if missing:
         print(f'  {len(missing)} letters have no level at all: {" ".join(missing)}')
         print('    (ঙ ঞ ণ ড় ঢ় য় are left out by design - no Bengali word begins with them)')
+
+    # Whether the game gets harder, which for 156 levels in alphabet order is not a given. The
+    # measures are crude on purpose - wheel size, words, conjunct tiles, cells to fill - but
+    # they are the four things that decide how long a level takes, and printing them in ten
+    # stretches makes a flat run obvious at a glance. It was flat when this was written: 6.6
+    # tiles in the first tenth against 6.2 in the last, and the two hardest levels in the game
+    # sat at 11 and 13 because ঐ and ঔ fall there in the alphabet. They were moved to the end.
+    import statistics
+    HASANTA = '\u09cd'
+    rows = []
+    for level in levels:
+        ws = level['words']
+        rows.append((len(level['tiles']), len(ws),
+                     sum(1 for w in ws for a in split_aksharas(w) if HASANTA in a),
+                     sum(len(split_aksharas(w)) for w in ws)))
+    tenths = [rows[i * len(rows) // 10:(i + 1) * len(rows) // 10] for i in range(10)]
+    print('\ndoes it get harder? the game in ten stretches, first to last')
+    for col, label in enumerate(('wheel size', 'words', 'conjunct tiles', 'cells to fill')):
+        line = '  '.join(f'{statistics.mean([r[col] for r in t]):4.1f}' for t in tenths)
+        print(f'  {label:<16}{line}')
 
     # The words that need art direction, from the curriculum's own notes. Every word is
     # supposed to be something a picture can show; the ones that are not carry a note saying
