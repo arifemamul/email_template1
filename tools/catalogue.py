@@ -99,7 +99,11 @@ from wordpool import zipf
 HERE = pathlib.Path(__file__).resolve().parent
 _DATA = json.loads((HERE / 'levels.json').read_text(encoding='utf-8'))
 _EXTRA = json.loads((HERE / 'levels-extra.json').read_text(encoding='utf-8'))
-ALL_LEVELS = _DATA['levels'] + _EXTRA['levels']
+# And levels built from the words vocabulary.py had left unused - 320 of its 541 were idle
+# once the akshara curriculum replaced the letter-per-level game. A '·2' id is a second level
+# for an akshara that already has one, and sits straight after it.
+_POOL = json.loads((HERE / 'levels-pool.json').read_text(encoding='utf-8'))
+ALL_LEVELS = _DATA['levels'] + _EXTRA['levels'] + _POOL['levels']
 
 ALPHABET_ORDER = list("অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ")
 KAR_SERIES = ['', 'া', 'ি', 'ী', 'ু', 'ূ', 'ৃ', 'ে', 'ৈ', 'ো', 'ৌ']
@@ -111,11 +115,15 @@ def teaching_order(level):
     base = key[0]
     letter = ALPHABET_ORDER.index(base) if base in ALPHABET_ORDER else len(ALPHABET_ORDER)
     if level['type'] == 'letter':
-        return (letter, 2, int(key.split('-')[1]), key)
-    rest = key[1:]
+        return (letter, 2, int(key.split('-')[1]), 0, key)
+    # A second level for the same akshara is marked '·2' and belongs immediately after the
+    # first: it is more practice on that step of the কার series, not a new step.
+    akshara, _, repeat = key.partition('·')
+    again = int(repeat) if repeat else 1
+    rest = akshara[1:]
     nasal = 1 if 'ঁ' in rest else 0
     kar = rest.replace('ঁ', '')
-    return (letter, 1, nasal, KAR_SERIES.index(kar) if kar in KAR_SERIES else 99, key)
+    return (letter, 1, nasal, KAR_SERIES.index(kar) if kar in KAR_SERIES else 99, again, key)
 
 
 SYLLABUS = [
@@ -214,9 +222,11 @@ def validate(words, block=None, key=None, kind=None):
     # same letter, any vowel sign.
     if key:
         if kind == 'akshara':
-            off = [w for w in words if split_aksharas(w)[0] != key]
+            akshara = key.split('·')[0]
+            off = [w for w in words if split_aksharas(w)[0] != akshara]
             if off:
-                problems.append(f'{key} level, but {" ".join(off)} do not start with {key}')
+                problems.append(f'{akshara} level, but {" ".join(off)} '
+                                f'do not start with {akshara}')
         else:
             base = key.split('-')[0]
             off = [w for w in words if split_aksharas(w)[0][0] != base]
