@@ -103,7 +103,10 @@ _EXTRA = json.loads((HERE / 'levels-extra.json').read_text(encoding='utf-8'))
 # once the akshara curriculum replaced the letter-per-level game. A '·2' id is a second level
 # for an akshara that already has one, and sits straight after it.
 _POOL = json.loads((HERE / 'levels-pool.json').read_text(encoding='utf-8'))
-ALL_LEVELS = _DATA['levels'] + _EXTRA['levels'] + _POOL['levels']
+# And ঈ ঊ ঐ ঔ, which nothing else could reach: between them the other three files held six
+# word-initial words for the four letters, where a level needs three each.
+_VOWELS = json.loads((HERE / 'levels-vowels.json').read_text(encoding='utf-8'))
+ALL_LEVELS = _DATA['levels'] + _EXTRA['levels'] + _POOL['levels'] + _VOWELS['levels']
 
 ALPHABET_ORDER = list("অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ")
 KAR_SERIES = ['', 'া', 'ি', 'ী', 'ু', 'ূ', 'ৃ', 'ে', 'ৈ', 'ো', 'ৌ']
