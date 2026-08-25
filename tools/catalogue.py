@@ -133,7 +133,6 @@ SYLLABUS = [
 
 GLOSS = {w['w']: w['en'] for lv in ALL_LEVELS for w in lv['words']}
 CAVEAT = {w['w']: w['flag'] for lv in ALL_LEVELS for w in lv['words'] if w.get('flag')}
-SPOKEN_FREQ = {w['w']: w.get('freq', 0) for lv in ALL_LEVELS for w in lv['words']}
 
 DECLARED = list(SYLLABUS)
 
@@ -164,7 +163,6 @@ SHARED = {}
 # without changing that. Set this to True when the levels are written to teach again.
 FULL_SYLLABUS = False
 
-MIN_ZIPF = 2.0          # below this, treat a "word" as invented rather than Bengali
 # What the placer aims for. These are the shape it tries to keep a board inside, and with both
 # orderings and cap-aware crossings every one of the 118 lands within 4 rows and 8 columns. The
 # numbers matter for more than fitting: a box is sized for the largest board in the game, so

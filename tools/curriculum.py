@@ -251,11 +251,6 @@ def block_for(words):
     return BLOCK_KARS
 
 
-def hardest_unit(words):
-    """The unit that decides a level's placement - the last one in teaching order."""
-    return max(units_in(words), key=teaching_rank)
-
-
 def new_units(words, known):
     """
     Units this level introduces, given what a learner already knows. Returned in teaching

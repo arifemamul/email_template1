@@ -21,14 +21,6 @@ BENGALI = frozenset(chr(c) for c in range(0x0980, 0x09FF + 1))
 CACHE = pathlib.Path(__file__).parent / '.wordpool-cache.pkl'
 
 
-def is_attested(word, floor=2.0):
-    """
-    Does this word occur in real Bengali text? `floor` is a Zipf frequency: 2.0 is roughly
-    "rare but real", 5.0 is everyday. Below 2.0 treat a word as invented.
-    """
-    return zipf_frequency(word, 'bn') >= floor
-
-
 def zipf(word):
     return zipf_frequency(word, 'bn')
 

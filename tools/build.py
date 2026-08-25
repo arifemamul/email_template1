@@ -23,15 +23,16 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
 from bangla import conjunct_tiles, render, split_aksharas            # noqa: E402
-from catalogue import (CATALOGUE, FULL_SYLLABUS, MAX_NEW_UNITS, SHARED,        # noqa: E402
-                       ordered_levels)
+from catalogue import (CATALOGUE, CAVEAT, FULL_SYLLABUS, GLOSS, MAX_NEW_UNITS,   # noqa: E402
+                       SHARED, ordered_levels)
 from curriculum import (BLOCKS, NOT_TAUGHT, alphabet,                  # noqa: E402
                         unit_label)
 from vocabulary import theme_of, words as pool_words                                       # noqa: E402
 
 REPO = pathlib.Path(__file__).resolve().parent.parent
 KOTLIN = REPO / 'bengali-word-game/app/src/main/java/com/bangla/shobdojot/data/Levels.kt'
-WEB = REPO / 'docs/index.html'
+SOURCE = REPO / 'src/shobdojot.html'      # authored, with every comment
+WEB = REPO / 'docs/index.html'            # built, comments stripped
 # The same page with the document wrapper taken off, for hosts that supply their own
 # <!doctype>/<html>/<head>/<body> - claude.ai artifacts among them. Generated, never edited:
 # a hand-maintained copy of a 2000-line file goes stale the first time the original changes.
@@ -153,6 +154,52 @@ def emit(levels):
     return '\n'.join(kt) + '\n', '\n'.join(js)
 
 
+def minify(html):
+    """
+    The page with its comments taken out. 260 lines of them, and they belong in the source
+    rather than in every download: this saves about 10 KB gzipped, 8% of what crosses the wire.
+
+    Deliberately timid. Only whole-line comments and whole-line block comments go, never a
+    trailing one - `//` and `/*` appear inside strings and regular expressions in this file,
+    and a minifier clever enough to tell the difference is a minifier clever enough to be
+    wrong. Indentation is stripped only from script and style lines, and only because no
+    template literal in the page spans a line, so no output string can change. Everything is
+    checked afterwards against the built file, not the source, so a mistake here fails the
+    tests rather than shipping.
+    """
+    out, in_block, in_script, in_style = [], False, False, False
+    for line in html.split('\n'):
+        bare = line.strip()
+        if bare == '<script>':
+            in_script = True
+        elif bare == '</script>':
+            in_script = False
+        elif bare == '<style>':
+            in_style = True
+        elif bare == '</style>':
+            in_style = False
+
+        if in_block:
+            if '*/' in bare:
+                in_block = False
+                if bare.split('*/', 1)[1].strip():      # code after the close: keep the line
+                    out.append(line.split('*/', 1)[1].rstrip())
+            continue
+        if (in_script or in_style) and bare.startswith('/*') and '*/' not in bare:
+            in_block = True
+            continue
+        if (in_script or in_style) and (bare.startswith('//')
+                                        or (bare.startswith('/*') and bare.endswith('*/'))):
+            continue
+        if not bare:
+            if out and not out[-1]:
+                continue                                 # never two blank lines running
+            out.append('')
+            continue
+        out.append(bare if (in_script or in_style) else line.rstrip())
+    return '\n'.join(out) + '\n'
+
+
 def write_builds(levels):
     # The web build is the product. The Android app is parked, and it can no longer be
     # generated into honestly: its CrosswordGenerator lays boards out as one connected
@@ -161,21 +208,22 @@ def write_builds(levels):
     # porting `cluster_layout` to Kotlin first; until then it keeps the levels it had.
     _, js_src = emit(levels)
 
-    html = WEB.read_text(encoding='utf-8')
+    html = SOURCE.read_text(encoding='utf-8')
     if html.count('const LEVELS = [') != 1:
-        raise SystemExit('docs/index.html: expected exactly one `const LEVELS = [` to replace')
+        raise SystemExit('src/shobdojot.html: expected exactly one `const LEVELS = [`')
     start = html.index('const LEVELS = [')
     end = html.index('];', start) + 2
-    before_web = html
-    WEB.write_text(html[:start] + js_src + html[end:], encoding='utf-8')
+    SOURCE.write_text(html[:start] + js_src + html[end:], encoding='utf-8')
+
+    before_web = WEB.read_text(encoding='utf-8') if WEB.exists() else ''
+    built = minify(SOURCE.read_text(encoding='utf-8'))
+    WEB.write_text(built, encoding='utf-8')
 
     before_live = LIVE.read_text(encoding='utf-8') if LIVE.exists() else ''
-    live_src = unwrap(WEB.read_text(encoding='utf-8'))
+    live_src = unwrap(built)
     LIVE.write_text(live_src, encoding='utf-8')
 
-    return (False,
-            before_web != WEB.read_text(encoding='utf-8'),
-            before_live != live_src)
+    return (False, before_web != built, before_live != live_src)
 
 
 def unwrap(html):
@@ -328,6 +376,17 @@ def report(levels, failures):
     if missing:
         print(f'  {len(missing)} letters have no level at all: {" ".join(missing)}')
         print('    (ঙ ঞ ণ ড় ঢ় য় are left out by design - no Bengali word begins with them)')
+
+    # The words that need art direction, from the curriculum's own notes. Every word is
+    # supposed to be something a picture can show; the ones that are not carry a note saying
+    # how to draw them, or saying plainly that they cannot be drawn. Printing them here is the
+    # only reason those notes are worth writing down - a note nobody reads is a note nobody
+    # acts on, and these are the words an illustrator will get stuck on.
+    noted = [(i, w) for i, level in enumerate(levels, 1)
+             for w in level['words'] if w in CAVEAT]
+    print(f'\nwords needing art direction: {len(noted)} of {sum(len(l["words"]) for l in levels)}')
+    for i, w in noted:
+        print(f'  level {i:<4} {w:<12} {GLOSS.get(w, "?"):<26} {CAVEAT[w]}')
 
     # No word set as a puzzle twice. `ordered_levels` rejects any level that breaks it outside
     # the documented list, so this is a count of what the documented list is actually covering
