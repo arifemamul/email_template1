@@ -1,0 +1,105 @@
+{
+ "name": "Levels for the letters the uploaded curriculum does not reach",
+ "WHY_THIS_FILE_EXISTS": [
+  "levels.json covers 31 base letters. Nine have no level in it: ঈ ঊ ঋ ঐ ঔ ঠ ঢ য ষ.",
+  "Four of those - ঠ ঢ য ষ - did have one in the 34 letter-per-level game this replaced,",
+  "so leaving them out is a regression in what the alphabet run actually teaches.",
+  "These levels fill five of the nine, built from words in tools/vocabulary.py that the",
+  "uploaded curriculum does not use. Same rules: every word starts with the level's akshara",
+  "(type=akshara) or its letter (type=letter), 3 or more words, a wheel of at most 8 tiles,",
+  "and a board inside 5 rows by 6 columns.",
+  "",
+  "Kept separate from levels.json so the uploaded file stays exactly as it arrived and it is",
+  "always clear which levels came from where. catalogue.py reads both and orders them together.",
+  "",
+  "ঈ ঊ ঐ ঔ still have no level and cannot get one under these rules. The whole of",
+  "word-initial ঈ is ঈগল and ঈদ; of ঊ, ঊনিশ and ঊষা; ঐ has only ঐক্য and ঔ only ঔষধ. A level",
+  "needs three words, and no word that starts with another letter may go on the board - which",
+  "is exactly how the old game filled these levels, with bridging words, and exactly what the",
+  "akshara-keyed rule forbids. They need three real words each, or nothing."
+ ],
+ "FLAG_NOTES": [
+  "The uploaded curriculum's test is that a picture could replace the gloss. Some words here",
+  "do not pass it, and are flagged rather than quietly included: they are the only way their",
+  "letter gets a level at all. ঠ has five word-initial words in the pool and ষ has three, so",
+  "there is no concrete alternative to choose instead."
+ ],
+ "levels": [
+  {
+   "id": "ঋ",
+   "type": "akshara",
+   "key": "ঋ",
+   "words": [
+    { "w": "ঋতু", "split": ["ঋ", "তু"], "en": "season", "freq": 0 },
+    { "w": "ঋষি", "split": ["ঋ", "ষি"], "en": "sage, holy man", "freq": 0 },
+    { "w": "ঋণ", "split": ["ঋ", "ণ"], "en": "a loan, debt",
+      "flag": "abstract: no picture shows it. The only third word for ঋ in the pool", "freq": 0 }
+   ]
+  },
+  {
+   "id": "ঠ-1",
+   "type": "letter",
+   "key": "ঠ",
+   "words": [
+    { "w": "ঠোঁট", "split": ["ঠোঁ", "ট"], "en": "lip", "freq": 0 },
+    { "w": "ঠিকানা", "split": ["ঠি", "কা", "না"], "en": "address", "freq": 0 },
+    { "w": "ঠেলা", "split": ["ঠে", "লা"], "en": "to push", "freq": 0 },
+    { "w": "ঠিক", "split": ["ঠি", "ক"], "en": "correct, right",
+      "flag": "abstract: draw a tick. ঠান্ডা is the only other ঠ word in the pool and its ন্ডা tile puts the wheel over eight", "freq": 0 }
+   ]
+  },
+  {
+   "id": "ঢা",
+   "type": "akshara",
+   "key": "ঢা",
+   "words": [
+    { "w": "ঢাকনা", "split": ["ঢা", "ক", "না"], "en": "lid", "freq": 0 },
+    { "w": "ঢাল", "split": ["ঢা", "ল"], "en": "shield", "freq": 0 },
+    { "w": "ঢালা", "split": ["ঢা", "লা"], "en": "to pour", "freq": 0 }
+   ]
+  },
+  {
+   "id": "ঢ-1",
+   "type": "letter",
+   "key": "ঢ",
+   "words": [
+    { "w": "ঢোল", "split": ["ঢো", "ল"], "en": "drum", "freq": 0 },
+    { "w": "ঢেউ", "split": ["ঢে", "উ"], "en": "wave (of water)", "freq": 0 },
+    { "w": "ঢোকা", "split": ["ঢো", "কা"], "en": "to go in, to enter", "freq": 0 }
+   ]
+  },
+  {
+   "id": "য",
+   "type": "akshara",
+   "key": "য",
+   "words": [
+    { "w": "যন্ত্র", "split": ["য", "ন্ত্র"], "en": "machine", "freq": 0 },
+    { "w": "যব", "split": ["য", "ব"], "en": "barley", "freq": 0 },
+    { "w": "যত", "split": ["য", "ত"], "en": "as much as",
+      "flag": "abstract: no picture shows it. The only third word for bare য in the pool", "freq": 0 }
+   ]
+  },
+  {
+   "id": "য-1",
+   "type": "letter",
+   "key": "য",
+   "words": [
+    { "w": "যাত্রা", "split": ["যা", "ত্রা"], "en": "a journey", "freq": 0 },
+    { "w": "যাওয়া", "split": ["যা", "ও", "য়া"], "en": "to go", "freq": 0 },
+    { "w": "যোগ", "split": ["যো", "গ"], "en": "addition, a sum",
+      "flag": "draw a plus sign, not the yoga sense", "freq": 0 }
+   ]
+  },
+  {
+   "id": "ষ-1",
+   "type": "letter",
+   "key": "ষ",
+   "words": [
+    { "w": "ষাঁড়", "split": ["ষাঁ", "ড়"], "en": "bull", "freq": 0 },
+    { "w": "ষোল", "split": ["ষো", "ল"], "en": "sixteen", "freq": 0 },
+    { "w": "ষষ্ঠ", "split": ["ষ", "ষ্ঠ"], "en": "sixth",
+      "flag": "an ordinal, drawable as six of something with the last marked. Word-initial ষ is almost nothing in Bengali - these three are the whole of it in the pool", "freq": 0 }
+   ]
+  }
+ ]
+}

@@ -92,8 +92,14 @@ from wordpool import zipf
 # them: base letters in alphabet order, and within a letter the bare akshara first, then the
 # kar series, then that letter's mixed-sign levels.
 
-LEVELS_FILE = pathlib.Path(__file__).resolve().parent / 'levels.json'
-_DATA = json.loads(LEVELS_FILE.read_text(encoding='utf-8'))
+# Two files, kept apart on purpose. `levels.json` is the uploaded curriculum, exactly as it
+# arrived. `levels-extra.json` fills five of the nine letters it does not reach - ঋ, ঠ, ঢ, য, ষ
+# - four of which had a level in the letter-per-level game this replaced. Keeping them separate
+# means it stays clear which levels came from where.
+HERE = pathlib.Path(__file__).resolve().parent
+_DATA = json.loads((HERE / 'levels.json').read_text(encoding='utf-8'))
+_EXTRA = json.loads((HERE / 'levels-extra.json').read_text(encoding='utf-8'))
+ALL_LEVELS = _DATA['levels'] + _EXTRA['levels']
 
 ALPHABET_ORDER = list("অআইঈউঊঋএঐওঔকখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ")
 KAR_SERIES = ['', 'া', 'ি', 'ী', 'ু', 'ূ', 'ৃ', 'ে', 'ৈ', 'ো', 'ৌ']
@@ -114,12 +120,12 @@ def teaching_order(level):
 
 SYLLABUS = [
     (lv['id'], lv['type'], [w['w'] for w in lv['words']])
-    for lv in sorted(_DATA['levels'], key=teaching_order)
+    for lv in sorted(ALL_LEVELS, key=teaching_order)
 ]
 
-GLOSS = {w['w']: w['en'] for lv in _DATA['levels'] for w in lv['words']}
-CAVEAT = {w['w']: w['flag'] for lv in _DATA['levels'] for w in lv['words'] if w.get('flag')}
-SPOKEN_FREQ = {w['w']: w.get('freq', 0) for lv in _DATA['levels'] for w in lv['words']}
+GLOSS = {w['w']: w['en'] for lv in ALL_LEVELS for w in lv['words']}
+CAVEAT = {w['w']: w['flag'] for lv in ALL_LEVELS for w in lv['words'] if w.get('flag')}
+SPOKEN_FREQ = {w['w']: w.get('freq', 0) for lv in ALL_LEVELS for w in lv['words']}
 
 DECLARED = list(SYLLABUS)
 
@@ -156,7 +162,7 @@ MIN_ZIPF = 2.0          # below this, treat a "word" as invented rather than Ben
 # numbers matter for more than fitting: a box is sized for the largest board in the game, so
 # the widest and tallest board decides how big a box can be on every level. Loosening either
 # one costs every level a smaller box.
-MAX_ROWS, MAX_COLS = 6, 6
+MAX_ROWS, MAX_COLS = 5, 6
 
 # The widest wheel worth drawing. A board grows by taking on words, and a word it has no tile
 # for brings its own - so this is what stops a level from ending up with a wheel too crowded to
@@ -264,6 +270,7 @@ def validate(words, block=None, key=None, kind=None):
         'tiles': tiles,
         'words': words,
         'occupied': occupied,
+        'placed': words_placed,
         'size': (rows, cols),
         'score': difficulty(tiles, words),
         'block': block if block is not None else actual,

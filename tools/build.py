@@ -124,10 +124,23 @@ def emit(levels):
         # empty list.
         kt_teaches = f', teaches = listOf({teaches})' if teaches else ''
         js_teaches = f', teaches: [{teaches}]' if teaches else ''
+        # The board, laid out here rather than in the page. It used to be generated at
+        # runtime, which meant the placer existed twice - once in Python for the checks and
+        # once in JavaScript for the game - and the two could drift silently. Emitting it
+        # leaves one implementation, lets the search be exhaustive (5040 orderings for a
+        # seven-word level, three seconds for all 118) instead of a heuristic cheap enough to
+        # run on page load, and costs the page nothing at startup.
+        rows, cols = level['size']
+        cells = level['placed']
+        board = ', '.join(
+            '{w:"%s",c:[%s]}' % (word, ','.join(f'[{r},{c}]' for r, c in cs))
+            for word, cs in cells)
         kt.append(f'        Level({i}, listOf({tiles}), listOf({words}), '
                   f'block = {level["block"]}{kt_teaches}),')
         js.append(f'  {{ id: {i}, letters: [{tiles}], words: [{words}], '
-                  f'block: {level["block"]}{js_teaches} }},')
+                  f'block: {level["block"]}{js_teaches}, '
+                  f'rows: {rows}, cols: {cols}, islands: {level["islands"]}, '
+                  f'board: [{board}] }},')
 
     kt[-1] = kt[-1].rstrip(',')
     js[-1] = js[-1].rstrip(',')
