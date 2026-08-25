@@ -255,48 +255,71 @@ def cluster_layout(words, max_rows=8, max_cols=9):
     if not tokens:
         return None
 
+    # Two orderings, longest word first and shortest first, each rotated so every word gets a
+    # turn at being the one the board starts from. Longest-first packs tightly; shortest-first
+    # is what finds the shallow arrangements, because it commits the small words before a long
+    # one has forced the board tall. One ordering left ক at six rows, which set the box size
+    # for all 118 levels on a phone.
+    orderings = [tokens, list(reversed(tokens))]
     best = None
-    for seed in range(len(tokens)):
-        order = [tokens[seed]] + [t for i, t in enumerate(tokens) if i != seed]
-        occupied, placed = {}, []
-        islands = 1
-        first_word, first_aks = order[0]
-        for i, a in enumerate(first_aks):
-            occupied[(0, i)] = a
-        placed.append((first_word, cells_for((0, 0), True, len(first_aks))))
+    for base in orderings:
+      for seed in range(len(base)):
+          order = [base[seed]] + [t for i, t in enumerate(base) if i != seed]
+          occupied, placed = {}, []
+          islands = 1
+          first_word, first_aks = order[0]
+          for i, a in enumerate(first_aks):
+              occupied[(0, i)] = a
+          placed.append((first_word, cells_for((0, 0), True, len(first_aks))))
 
-        for word, aksharas in order[1:]:
-            spots = candidates(occupied, aksharas)
-            if spots:
-                start, horizontal = spots[0]
-            else:
-                # A new island goes below the board or beside it, whichever leaves it
-                # shallower - two rows or two columns clear, so the gap keeps the islands
-                # from reading as one word. Beside usually wins: the board sits above the
-                # wheel, so height is the scarce direction and width is not.
-                low = (max(p[0] for p in occupied) + 2, min(p[1] for p in occupied))
-                side = (min(p[0] for p in occupied), max(p[1] for p in occupied) + 2)
-                options = []
-                for at in (low, side):
-                    cells_ = cells_for(at, True, len(aksharas))
-                    rows_, area_ = _extent(occupied, cells_)
-                    cols_ = area_ // rows_ if rows_ else 0
-                    # Overflowing either cap is worse than any shape that stays inside it. A
-                    # cell that has to shrink past the width of a letter is the one thing the
-                    # board may not do, and columns are what force that on a narrow phone.
-                    over = (rows_ > max_rows) + (cols_ > max_cols)
-                    options.append(((over, rows_, area_, at[0], at[1]), at))
-                start, horizontal = min(options)[1], True
-                islands += 1
-            cells = cells_for(start, horizontal, len(aksharas))
-            for i, pos in enumerate(cells):
-                occupied[pos] = aksharas[i]
-            placed.append((word, cells))
+          for word, aksharas in order[1:]:
+              spots = candidates(occupied, aksharas)
+              # Prefer a crossing that keeps the board inside its limits. `candidates` ranks
+              # by crossings first, which is right for a tight board and wrong for a sprawling
+              # one: it will happily run a board out to eleven columns, and the widest board in
+              # the game is what decides how big a box can be on a phone.
+              if spots:
+                  inside = []
+                  for at, horiz in spots:
+                      rows_, area_ = _extent(occupied, cells_for(at, horiz, len(aksharas)))
+                      cols_ = area_ // rows_ if rows_ else 0
+                      if rows_ <= max_rows and cols_ <= max_cols:
+                          inside.append((at, horiz))
+                  spots = inside or spots
+              if spots:
+                  start, horizontal = spots[0]
+              else:
+                  # A new island goes below the board or beside it, whichever leaves it
+                  # shallower - two rows or two columns clear, so the gap keeps the islands
+                  # from reading as one word. Beside usually wins: the board sits above the
+                  # wheel, so height is the scarce direction and width is not.
+                  low = (max(p[0] for p in occupied) + 2, min(p[1] for p in occupied))
+                  side = (min(p[0] for p in occupied), max(p[1] for p in occupied) + 2)
+                  options = []
+                  for at in (low, side):
+                      cells_ = cells_for(at, True, len(aksharas))
+                      rows_, area_ = _extent(occupied, cells_)
+                      cols_ = area_ // rows_ if rows_ else 0
+                      # Overflowing either cap is worse than any shape that stays inside it. A
+                      # cell that has to shrink past the width of a letter is the one thing the
+                      # board may not do, and columns are what force that on a narrow phone.
+                      over = (rows_ > max_rows) + (cols_ > max_cols)
+                      options.append(((over, rows_, area_, at[0], at[1]), at))
+                  start, horizontal = min(options)[1], True
+                  islands += 1
+              cells = cells_for(start, horizontal, len(aksharas))
+              for i, pos in enumerate(cells):
+                  occupied[pos] = aksharas[i]
+              placed.append((word, cells))
 
-        rows, cols = grid_size(occupied)
-        rank = (islands, rows, rows * cols, seed)
-        if best is None or rank < best[0]:
-            best = (rank, occupied, placed, islands)
+          rows, cols = grid_size(occupied)
+          # Staying inside the limits beats every other consideration. The largest board in
+          # the game sets the box size for all 118 levels, so one board sprawling to ten
+          # columns shrinks the boxes everywhere - it is not a local cost.
+          over = (max(0, rows - max_rows), max(0, cols - max_cols))
+          rank = (sum(over), rows, islands, rows * cols, seed)
+          if best is None or rank < best[0]:
+              best = (rank, occupied, placed, islands)
 
     _, occupied, placed, islands = best
     min_r = min(p[0] for p in occupied)

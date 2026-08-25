@@ -151,7 +151,12 @@ SHARED = {}
 FULL_SYLLABUS = False
 
 MIN_ZIPF = 2.0          # below this, treat a "word" as invented rather than Bengali
-MAX_ROWS, MAX_COLS = 8, 7
+# What the placer aims for. These are the shape it tries to keep a board inside, and with both
+# orderings and cap-aware crossings every one of the 118 lands within 4 rows and 8 columns. The
+# numbers matter for more than fitting: a box is sized for the largest board in the game, so
+# the widest and tallest board decides how big a box can be on every level. Loosening either
+# one costs every level a smaller box.
+MAX_ROWS, MAX_COLS = 6, 6
 
 # The widest wheel worth drawing. A board grows by taking on words, and a word it has no tile
 # for brings its own - so this is what stops a level from ending up with a wheel too crowded to

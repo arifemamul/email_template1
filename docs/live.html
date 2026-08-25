@@ -962,7 +962,10 @@ function candidates(occ, aks) {
  * randomness for that reason - each word is taken as the starting one in turn and the best
  * result kept.
  */
-const MAX_BOARD_ROWS = 8, MAX_BOARD_COLS = 7;
+/* The shape a board is kept inside. Not just a fitting rule: a box is sized for the largest
+   board in the game, so one level sprawling wide shrinks the boxes on all 118. Every level
+   lands inside 6x6. */
+const MAX_BOARD_ROWS = 6, MAX_BOARD_COLS = 6;
 
 /* Element-wise compare, the way Python orders tuples. `<` on two arrays stringifies them, so
    [10, 0] < [2, 0] would come out true - which silently picks the wrong board the moment a
@@ -990,42 +993,61 @@ function generate(words) {
     placed.push({ word: t.word, aks: t.aks, cells, horizontal });
   };
 
+  // Two orderings, longest word first and shortest first, each rotated so every word gets a
+  // turn at starting the board. Shortest-first is what finds the shallow arrangements.
+  const orderings = [tokens, [...tokens].reverse()];
   let best = null;
-  for (let seed = 0; seed < tokens.length; seed++) {
-    const order = [tokens[seed], ...tokens.filter((_, i) => i !== seed)];
-    const occ = new Map(), placed = [];
-    let islands = 1;
-    place(occ, placed, order[0], [0, 0], true);
+  for (const base of orderings) {
+    for (let seed = 0; seed < base.length; seed++) {
+      const order = [base[seed], ...base.filter((_, i) => i !== seed)];
+      const occ = new Map(), placed = [];
+      let islands = 1;
+      place(occ, placed, order[0], [0, 0], true);
 
-    for (const t of order.slice(1)) {
-      const spots = candidates(occ, t.aks);
-      let start, horizontal = true;
-      if (spots.length) {
-        start = spots[0].start;
-        horizontal = spots[0].horizontal;
-      } else {
-        const ks = [...occ.keys()].map(k => k.split(",").map(Number));
-        const low = [Math.max(...ks.map(p => p[0])) + 2, Math.min(...ks.map(p => p[1]))];
-        const side = [Math.min(...ks.map(p => p[0])), Math.max(...ks.map(p => p[1])) + 2];
-        let pick = null;
-        for (const at of [low, side]) {
-          const [rows, area] = boundsExtent(occ, cellsFor(at, true, t.aks.length));
-          const cols = rows ? Math.floor(area / rows) : 0;
-          const over = (rows > MAX_BOARD_ROWS ? 1 : 0) + (cols > MAX_BOARD_COLS ? 1 : 0);
-          const rank = [over, rows, area, at[0], at[1]];
-          if (!pick || ranks(rank, pick.rank)) pick = { rank, at };
+      for (const t of order.slice(1)) {
+        let spots = candidates(occ, t.aks);
+        // Prefer a crossing that keeps the board inside its limits: `candidates` ranks by
+        // crossings first, which will run a board out to eleven columns given the chance.
+        if (spots.length) {
+          const inside = spots.filter(sp => {
+            const [rows, area] = boundsExtent(occ, cellsFor(sp.start, sp.horizontal, t.aks.length));
+            const cols = rows ? Math.floor(area / rows) : 0;
+            return rows <= MAX_BOARD_ROWS && cols <= MAX_BOARD_COLS;
+          });
+          if (inside.length) spots = inside;
         }
-        start = pick.at;
-        islands += 1;
+        let start, horizontal = true;
+        if (spots.length) {
+          start = spots[0].start;
+          horizontal = spots[0].horizontal;
+        } else {
+          const ks = [...occ.keys()].map(k => k.split(",").map(Number));
+          const low = [Math.max(...ks.map(p => p[0])) + 2, Math.min(...ks.map(p => p[1]))];
+          const side = [Math.min(...ks.map(p => p[0])), Math.max(...ks.map(p => p[1])) + 2];
+          let pick = null;
+          for (const at of [low, side]) {
+            const [rows, area] = boundsExtent(occ, cellsFor(at, true, t.aks.length));
+            const cols = rows ? Math.floor(area / rows) : 0;
+            const over = (rows > MAX_BOARD_ROWS ? 1 : 0) + (cols > MAX_BOARD_COLS ? 1 : 0);
+            const rank = [over, rows, area, at[0], at[1]];
+            if (!pick || ranks(rank, pick.rank)) pick = { rank, at };
+          }
+          start = pick.at;
+          islands += 1;
+        }
+        place(occ, placed, t, start, horizontal);
       }
-      place(occ, placed, t, start, horizontal);
-    }
 
-    const ks = [...occ.keys()].map(k => k.split(",").map(Number));
-    const rows = Math.max(...ks.map(p => p[0])) - Math.min(...ks.map(p => p[0])) + 1;
-    const cols = Math.max(...ks.map(p => p[1])) - Math.min(...ks.map(p => p[1])) + 1;
-    const rank = [islands, rows, rows * cols, seed];
-    if (!best || ranks(rank, best.rank)) best = { rank, occ, placed, islands };
+      const ks = [...occ.keys()].map(k => k.split(",").map(Number));
+      const rows = Math.max(...ks.map(p => p[0])) - Math.min(...ks.map(p => p[0])) + 1;
+      const cols = Math.max(...ks.map(p => p[1])) - Math.min(...ks.map(p => p[1])) + 1;
+      // Staying inside the limits beats everything else, because the largest board sets the
+      // box size for every level. Then rows before islands: the board sits above the wheel,
+      // so height is the scarce direction and an extra island costs less than an extra row.
+      const over = Math.max(0, rows - MAX_BOARD_ROWS) + Math.max(0, cols - MAX_BOARD_COLS);
+      const rank = [over, rows, islands, rows * cols, seed];
+      if (!best || ranks(rank, best.rank)) best = { rank, occ, placed, islands };
+    }
   }
 
   const board = normalise(best.occ, best.placed);
@@ -1181,6 +1203,26 @@ const LEVELS = [
   { id: 118, letters: ["হি", "জি", "জি", "বি", "হো", "টে", "ল", "ম"], words: ["হিজিবিজি", "হিম", "হোটেল"], block: 3 }
 ];
 
+
+/*
+ * Every board, laid out once at startup, and the largest of them.
+ *
+ * A box is sized from these rather than from the level on screen, so that a box is the same
+ * size on every level of a given screen. It used to be sized from whichever board was open,
+ * which meant a level with a wide, half-empty grid got 30px cells while a small one got 46px
+ * on the same phone - the letter inside stayed 17px either way, so it read as cramped on one
+ * level and lost in space on the next. The board is what changes between levels; the size of
+ * a box should only change when the screen does.
+ *
+ * Laying every board out up front costs one pass of a greedy placer over 118 levels, and it
+ * is what makes the worst case knowable before anything is drawn.
+ */
+const BOARDS = LEVELS.map(lv => generate(lv.words));
+const BOARD_MAX = {
+  rows: Math.max(...BOARDS.map(b => b.rows)),
+  cols: Math.max(...BOARDS.map(b => b.cols))
+};
+const WHEEL_MAX = Math.max(...LEVELS.map(lv => lv.letters.length));
 
 /* ============================================================================
    4. Game state
@@ -1411,7 +1453,7 @@ function loadLevel(i) {
     delete game.hints[lv.id];
     persist();
   }
-  game.puzzle = generate(lv.words);
+  game.puzzle = BOARDS[game.index];
   game.wheel = scrambleWheel(lv);
   game.picked = [];
   game.verdict = null;
@@ -1464,12 +1506,14 @@ function allocateSpace() {
   // GLYPH that just draws a small letter in a large square, so cells stop at the comfortable
   // size and the leftover height goes to the wheel instead.
   const IDEAL_CELL = 46, MIN_CELL = GLYPH_BOX, MAX_CELL = 46;
-  const byWidth = Math.floor((width - gap * (p.cols - 1)) / p.cols);
-  const rowGaps = gap * (p.rows - 1);
-  const boardFor = c => p.rows * c + rowGaps;
+  // Sized for the largest board in the game, not the one on screen, so the answer is the same
+  // on every level. The board area then takes only the height this level's rows need.
+  const byWidth = Math.floor((width - gap * (BOARD_MAX.cols - 1)) / BOARD_MAX.cols);
+  const rowGaps = gap * (BOARD_MAX.rows - 1);
+  const boardFor = c => BOARD_MAX.rows * c + rowGaps;
 
   // What each part would like, before anyone gives anything up.
-  const wheelWant = Math.min(width, game.wheel.length <= 4 ? 210 : game.wheel.length <= 5 ? 230 : 250);
+  const wheelWant = Math.min(width, WHEEL_MAX <= 4 ? 210 : WHEEL_MAX <= 5 ? 230 : 250);
   const cellWant = Math.min(MAX_CELL, byWidth, IDEAL_CELL);
 
   // ...and the layout we refuse to go below: cells small but still readable, and a wheel with
@@ -1503,18 +1547,20 @@ function allocateSpace() {
   if (roomAfterBoard >= wheelWant) {
     // Everything fits with room over: spend it on bigger cells, up to the maximum.
     wheel = wheelWant;
-    cell = Math.min(MAX_CELL, byWidth, cell + Math.floor((roomAfterBoard - wheel) / p.rows));
+    cell = Math.min(MAX_CELL, byWidth, cell + Math.floor((roomAfterBoard - wheel) / BOARD_MAX.rows));
   } else if (roomAfterBoard >= WHEEL_FLOOR) {
     wheel = roomAfterBoard;
   } else {
     wheel = WHEEL_FLOOR;
-    cell = Math.max(floorCell, Math.floor((budget - wheel - rowGaps) / p.rows));
+    cell = Math.max(floorCell, Math.floor((budget - wheel - rowGaps) / BOARD_MAX.rows));
   }
 
   cell = Math.max(1, Math.min(cell, byWidth));
   wheel = Math.max(WHEEL_FLOOR, Math.min(wheel, width, budget - boardFor(cell)));
 
-  el.boardArea.style.height = Math.round(boardFor(cell)) + 'px';
+  // The height actually reserved is this level's, so a two-row board does not sit in the
+  // middle of space kept for a six-row one.
+  el.boardArea.style.height = Math.round(p.rows * cell + gap * (p.rows - 1)) + 'px';
   return { cell, wheel: Math.round(wheel), deficit: Math.ceil(deficit) };
 }
 
@@ -1609,10 +1655,16 @@ function drawWheel(alloc) {
   // `.screen`, which hides its overflow, ate the difference along with the letters in it.
   const size = alloc.wheel;
   const n = game.wheel.length;
-  // Never below GLYPH_BOX: the letter no longer shrinks with the tile, so the tile is what
-  // has to give way. Seven tiles at the wheel's floor sit 45px apart centre to centre, so
-  // holding them at 28px cannot make them touch.
-  const tile = Math.max(GLYPH_BOX, Math.round(size * (n <= 4 ? 0.30 : n <= 6 ? 0.26 : 0.21)));
+  // Sized for the fullest wheel in the game rather than this level's, for the same reason the
+  // cells are: a tile should be one size per screen. A level with fewer tiles gets the same
+  // tile, spaced further apart around the ring.
+  //
+  // Never below GLYPH_BOX either: the letter no longer shrinks with the tile, so the tile is
+  // what has to give way. Eight tiles at the wheel's floor sit 50px apart centre to centre,
+  // so holding them at 30px cannot make them touch.
+  const full = WHEEL_MAX;
+  const tile = Math.max(GLYPH_BOX,
+                        Math.round(size * (full <= 4 ? 0.30 : full <= 6 ? 0.26 : 0.21)));
   const radius = size / 2 - tile / 2;
 
   el.wheel.style.width = el.wheel.style.height = size + "px";
