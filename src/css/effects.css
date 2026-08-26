@@ -1,0 +1,63 @@
+  /* -- Animation layer: flying tiles and confetti ---------------------------- */
+  #fx {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 8;
+  }
+
+  .fly {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    font-family: var(--bn);
+    font-weight: 700;
+    border-radius: 22%;
+    background: var(--marigold);
+    color: var(--ink);
+    will-change: transform, opacity;
+  }
+
+  /* Confetti. A child reads colour as "well done", so the celebration throws paper in the
+     five block colours. */
+  .fly.confetti {
+    border-radius: 2px;
+    background: var(--conf, var(--marigold));
+  }
+  .fly.confetti.round { border-radius: 50%; }
+  .fly.confetti.tall { border-radius: 2px; }
+
+  .fly.word {
+    border-radius: 99px;
+    background: var(--leaf);
+    padding: 4px 14px;
+    white-space: nowrap;
+  }
+
+  /* revealed cells arrive with a flip rather than a fade */
+  .cell.on.arrive { animation: cell-arrive .42s cubic-bezier(.2,1.4,.4,1) backwards; }
+  @keyframes cell-arrive {
+    0%   { transform: scale(.5) rotateY(-70deg); }
+    60%  { transform: scale(1.08) rotateY(0deg); }
+    100% { transform: scale(1) rotateY(0); }
+  }
+
+  .cell.knock { animation: knock .4s ease; }
+  @keyframes knock {
+    0%,100% { transform: translateY(0); }
+    30%     { transform: translateY(-7px); }
+    60%     { transform: translateY(2px); }
+  }
+
+  .tile.reject { animation: tile-reject .36s ease; }
+  @keyframes tile-reject {
+    0%,100% { transform: translateX(0); }
+    25%     { transform: translateX(-4px) rotate(-3deg); }
+    75%     { transform: translateX(4px) rotate(3deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #fx { display: none; }
+  }
+

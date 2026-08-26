@@ -4,8 +4,15 @@
 
 **শব্দজট (Shobdojot)** - a Bengali word-cross puzzle game also lives in this repository:
 
-- **Edit [`src/shobdojot.html`](src/shobdojot.html).** That is the page, comments and all,
-  and the only file to change by hand. All design work happens here.
+- **Edit `src/`.** The page ships as one self-contained file - the service worker plays it
+  back offline and the artifact host allows no second request - but it is not authored as one.
+  [`src/index.html`](src/index.html) is the document and a list of its parts; the parts are in
+  [`src/css/`](src/css) and [`src/js/`](src/js), one file per concern, and `build.py` pastes
+  them together. An `/* include ... */` line is a comment in both CSS and JavaScript, so
+  `index.html` is still a page a browser will parse - just an unstyled, unplayable one. Every
+  part is hand-written and commented except `src/js/02-levels.js`, which `build.py` generates.
+  `check` fails if a file in `src/css` or `src/js` is not included anywhere, so a new part
+  cannot go quietly unwired.
 - **`docs/` is the whole site**, and it installs: `manifest.webmanifest`, `icon.svg`,
   `icon-maskable.svg` and `sw.js` make it a home-screen app that plays with no connection at
   all. `sw.js` caches the page on first visit and its `VERSION` is stamped by `build.py` from

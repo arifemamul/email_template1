@@ -1,0 +1,184 @@
+  /* -- Phone ---------------------------------------------------------------- */
+  .device {
+    position: relative;
+    width: 400px;
+    max-width: 100%;
+    height: min(760px, calc(100vh - 172px));
+    height: min(760px, calc(100dvh - 172px));
+    min-height: 540px;
+    margin: 0 auto;
+    padding: 12px;
+    border-radius: 42px;
+    background: linear-gradient(160deg, #3a2a5e, #1a1130 55%);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--marigold) 26%, transparent),
+      0 40px 90px -30px #000,
+      inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
+  }
+
+  .screen {
+    position: relative;
+    height: 100%;
+    border-radius: 32px;
+    background: var(--indigo-800);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 16px 16px 14px;
+    gap: 8px;
+  }
+
+  .notch {
+    position: absolute;
+    top: 8px; left: 50%;
+    transform: translateX(-50%);
+    width: 74px; height: 5px;
+    border-radius: 99px;
+    background: color-mix(in srgb, var(--parchment) 16%, transparent);
+    z-index: 5;
+  }
+
+  /* top bar */
+  /* Just the two arrows, pushed to the edges. A word counter used to sit between them -
+     "০ / ৪ শব্দ" - and it was cut: the board already says how much is left, cell by cell,
+     and a fraction ticking up turns finding a word into progress against a quota. */
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 6px; }
+
+  .icon-btn {
+    width: 38px; height: 38px;
+    flex: none;
+    border: 0;
+    border-radius: 50%;
+    background: var(--indigo-700);
+    color: var(--marigold);
+    font-size: 19px;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background-color .16s ease, transform .16s ease;
+  }
+  .icon-btn:hover { background: var(--violet-600); }
+  .icon-btn:active { transform: scale(.94); }
+
+  /* board - height is assigned in JS, since how much a board needs depends on its rows */
+  .board-area { flex: 0 0 auto; min-height: 0; display: grid; place-items: center; }
+
+  .board { display: grid; gap: var(--gap); }
+
+  .cell { border-radius: 22%; background: var(--violet-600); display: grid; place-items: center; }
+  .cell.blank { background: transparent; }
+
+  .cell span {
+    font-family: var(--bn);
+    font-weight: 700;
+    color: var(--ink);
+    opacity: 0;
+    transform: scale(.62);
+    transition: opacity .3s ease, transform .3s cubic-bezier(.2,1.5,.4,1);
+    user-select: none;
+  }
+
+  .cell.on { background: var(--marigold); }
+  .cell.on span { opacity: 1; transform: scale(1); }
+  .cell.hinted { background: color-mix(in srgb, var(--marigold) 74%, var(--violet-600)); }
+
+  /* traced word */
+  .preview { height: 50px; display: grid; place-items: center; flex: none; }
+
+  .preview .hint-text {
+    font-family: var(--bn);
+    font-size: 14.5px;
+    color: color-mix(in srgb, var(--parchment) 52%, var(--indigo-700));
+  }
+
+  .chip {
+    font-family: var(--bn);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--marigold);
+    border-radius: 99px;
+    padding: 5px 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+  }
+  .chip.good { background: var(--leaf); }
+  .chip.bad  { background: var(--coral); }
+  .chip.dup  { background: var(--marigold-d); }
+  .chip.shake { animation: shake .34s ease; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    18% { transform: translateX(13px); }
+    38% { transform: translateX(-11px); }
+    60% { transform: translateX(8px); }
+    82% { transform: translateX(-4px); }
+  }
+
+  .chip .go {
+    border: 0;
+    background: color-mix(in srgb, var(--ink) 16%, transparent);
+    color: var(--ink);
+    font-size: 15px;
+    border-radius: 99px;
+    width: 27px; height: 27px;
+    cursor: pointer;
+    display: grid; place-items: center;
+  }
+  .chip .go:hover { background: color-mix(in srgb, var(--ink) 28%, transparent); }
+
+  /* action row */
+  .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; flex: none; }
+
+  .action {
+    display: flex; align-items: center; gap: 7px;
+    background: var(--indigo-700);
+    border: 0;
+    border-radius: 99px;
+    padding: 9px 15px;
+    color: var(--parchment);
+    font-family: var(--bn);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color .16s ease, transform .16s ease;
+  }
+  .action:hover:not(:disabled) { background: var(--violet-600); }
+  .action:active:not(:disabled) { transform: scale(.96); }
+  .action:disabled { opacity: .45; cursor: not-allowed; }
+  .action .glyph { color: var(--marigold); font-size: 15px; }
+
+  /* wheel */
+  .wheel-area { flex: 1 1 auto; min-height: 0; display: grid; place-items: center; }
+
+  .wheel { position: relative; touch-action: none; }
+  .wheel svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+  .tile {
+    position: absolute;
+    border: 0;
+    border-radius: 50%;
+    background: var(--violet-600);
+    color: var(--marigold);
+    font-family: var(--bn);
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color .14s ease, color .14s ease,
+                transform .22s cubic-bezier(.2,1.7,.4,1), box-shadow .18s ease;
+    user-select: none;
+    touch-action: none;
+    will-change: transform;
+  }
+  .tile.sel {
+    background: var(--marigold);
+    color: var(--ink);
+    transform: scale(1.12);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--marigold) 26%, transparent);
+  }
+

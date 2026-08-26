@@ -1,0 +1,101 @@
+  /* -- Side panel ----------------------------------------------------------- */
+  .panel { display: flex; flex-direction: column; gap: 22px; }
+
+  .card {
+    background: color-mix(in srgb, var(--indigo-700) 62%, transparent);
+    border: 1px solid color-mix(in srgb, var(--parchment) 9%, transparent);
+    border-radius: 18px;
+    padding: 18px 18px 20px;
+  }
+
+  .card h3 {
+    margin: 0 0 12px;
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--marigold) 78%, var(--parchment));
+    font-weight: 700;
+  }
+
+  .levels { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 8px; }
+
+  .lv {
+    aspect-ratio: 1;
+    border: 0;
+    border-radius: 12px;
+    /* the block colour, dimmed until the level is finished */
+    background: color-mix(in srgb, var(--hue, var(--violet-600)) 26%, var(--indigo-800));
+    color: color-mix(in srgb, var(--hue, var(--marigold)) 72%, var(--parchment));
+    font-family: var(--bn);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-variant-numeric: tabular-nums;
+    position: relative;
+    transition: transform .18s cubic-bezier(.2,1.5,.4,1), background-color .18s ease,
+                color .18s ease;
+  }
+  .lv:hover { transform: translateY(-2px) scale(1.04); }
+  .lv:active { transform: scale(.94); }
+  .lv.done { background: var(--hue, var(--leaf)); color: var(--ink); }
+  /* a tick in the corner, so "finished" survives colour-blindness and a small screen */
+  .lv.done::after {
+    content: "";
+    position: absolute;
+    right: 16%; top: 40%;
+    width: 26%; height: 13%;
+    border-left: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+    transform: rotate(-45deg);
+    opacity: .5;
+  }
+  .lv.now { outline: 2px solid var(--parchment); outline-offset: 2px; }
+
+  .lv-1 { --hue: var(--block-1); }
+  .lv-2 { --hue: var(--block-2); }
+  .lv-3 { --hue: var(--block-3); }
+  .lv-4 { --hue: var(--block-4); }
+  .lv-5 { --hue: var(--block-5); }
+
+  .how { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 11px; }
+  .how li { display: flex; gap: 11px; font-size: 13.5px; line-height: 1.5; color: color-mix(in srgb, var(--parchment) 80%, var(--indigo-700)); }
+  .how .k {
+    flex: none;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--marigold);
+    background: color-mix(in srgb, var(--marigold) 14%, transparent);
+    border-radius: 6px;
+    padding: 3px 7px;
+    height: fit-content;
+  }
+  .how b { color: var(--parchment); font-weight: 600; }
+  .bn { font-family: var(--bn); }
+
+  .akshara-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .akshara-table td { padding: 7px 0; border-bottom: 1px solid color-mix(in srgb, var(--parchment) 8%, transparent); vertical-align: middle; }
+  .akshara-table tr:last-child td { border-bottom: 0; }
+  .akshara-table .w { font-family: var(--bn); font-size: 20px; color: var(--parchment); width: 4.5em; }
+  .akshara-table .a { font-family: var(--bn); font-size: 16px; color: var(--marigold); }
+  .akshara-table .n { color: color-mix(in srgb, var(--parchment) 55%, var(--indigo-700)); font-size: 11.5px; text-align: right; }
+
+  footer {
+    margin-top: 34px;
+    padding-top: 18px;
+    border-top: 1px solid color-mix(in srgb, var(--parchment) 10%, transparent);
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: color-mix(in srgb, var(--parchment) 55%, var(--indigo-700));
+    max-width: 74ch;
+  }
+  footer code { font-family: var(--mono); color: color-mix(in srgb, var(--marigold) 80%, var(--parchment)); font-size: 11.5px; }
+
+  :focus-visible { outline: 2px solid var(--marigold); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+
+

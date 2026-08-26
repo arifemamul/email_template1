@@ -1,0 +1,51 @@
+  /* -- One committed visual world: the game screen's night sky. Every colour is
+       explicit so the page holds on either host ground. ----------------------- */
+  :root {
+    --indigo-900: #150C29;
+    --indigo-800: #1B1035;
+    --indigo-700: #2C1A55;
+    --violet-600: #3D2670;
+    --marigold:   #FFB020;
+    --marigold-d: #E08A00;
+    --leaf:       #35C08A;
+    --coral:      #FF6B6B;
+
+    /* One colour per stage of the syllabus. The level picker is 83 identical chips otherwise,
+       which is both duller than it needs to be and less useful: the colour says at a glance
+       where plain letters end and vowel signs begin. They run cool-to-warm so the sequence
+       reads as a progression rather than a set of unrelated labels. */
+    --block-1:    #3FA9F5;
+    --block-2:    #35C08A;
+    --block-3:    #F5A623;
+    --block-4:    #FF6B6B;
+    --block-5:    #B478F0;
+    --parchment:  #FDF6E7;
+    --ink:        #2B1B0E;
+
+    --bn: "Noto Sans Bengali", "Hind Siliguri", "Baloo Da 2", "Kalpurush",
+          "Bangla Sangam MN", "Shonar Bangla", "Nirmala UI", "Vrinda", sans-serif;
+    --ui: ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+    --gap: 5px;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: clamp(16px, 3vw, 40px) clamp(12px, 3vw, 32px) 48px;
+    background:
+      radial-gradient(1100px 620px at 18% -8%, #241546 0%, transparent 60%),
+      radial-gradient(900px 520px at 100% 0%, #2a1a4e 0%, transparent 55%),
+      var(--indigo-900);
+    color: var(--parchment);
+    font-family: var(--ui);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  /* Sized so the masthead lines up with the phone's left edge and the pair stays centred. */
+  .wrap { max-width: 920px; margin: 0 auto; }
+

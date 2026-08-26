@@ -1,0 +1,48 @@
+  /* -- Standalone-page essentials (the hosted build has no wrapper stylesheet) -- */
+  html { -webkit-text-size-adjust: 100%; }
+  html, body { overscroll-behavior: none; }
+  body { -webkit-tap-highlight-color: transparent; }
+  h1, h2, h3, p, table { margin: 0; }
+  button { font: inherit; color: inherit; }
+
+  /* The board and wheel are dragged across, so text selection only gets in the way. */
+  .device, .levels { user-select: none; -webkit-user-select: none; }
+
+  /* -- Phones: drop the bezel, give the game the viewport ------------------- */
+  @media (max-width: 700px) {
+    body { padding: 14px 12px 24px; }
+    .device {
+      width: 100%;
+      /* The masthead is gone at this width and the touch bar is much shorter, so the frame
+         starts higher up the page. The 700px cap stays: past it the extra height lands as
+         empty space inside the frame rather than as a bigger board, since the cells are
+         already at their comfortable maximum. */
+      height: min(700px, calc(100vh - 104px));
+      height: min(700px, calc(100dvh - 104px));
+      min-height: 440px;
+      padding: 7px;
+      border-radius: 30px;
+    }
+    .screen { border-radius: 24px; padding: 12px 12px 10px; }
+    .notch { display: none; }
+    .screen .topbar { padding-top: 0; }
+    h1 { font-size: clamp(32px, 11vw, 44px); }
+    .deck { font-size: 14.5px; }
+  }
+
+  /* -- Short windows (laptops, landscape phones): let the phone shrink ------- */
+  @media (max-height: 700px) {
+    .device { min-height: 400px; }
+  }
+
+  /* A window this short cannot hold a portrait phone frame, so stop reserving height it
+     does not have. The layout budget shrinks the board and wheel to fit what is left, and
+     if even that is not enough it grows the frame back and the page scrolls - which beats
+     the alternative, since the screen clips its overflow and would simply hide the wheel. */
+  @media (max-height: 480px) {
+    .device { min-height: 0; }
+  }
+
+  @media (max-width: 380px) {
+    .levels { grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); }
+  }

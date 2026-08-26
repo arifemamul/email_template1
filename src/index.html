@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>শব্দজট Shobdojot - Bengali Word Puzzle</title>
+<meta name="description" content="শব্দজট - a Bengali word-cross puzzle. Drag across the letters to spell words and fill the crossword. Levels in a teaching order, free, works offline, no ads.">
+<meta name="theme-color" content="#1B1035">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231B1035'/%3E%3Cpath d='M32 36 L68 36 L50 68 Z' fill='none' stroke='%23FFB020' stroke-width='7' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='36' r='11' fill='%23FFB020'/%3E%3Ccircle cx='68' cy='36' r='11' fill='%23FFB020'/%3E%3Ccircle cx='50' cy='68' r='11' fill='%2335C08A'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231B1035'/%3E%3Cpath d='M32 36 L68 36 L50 68 Z' fill='none' stroke='%23FFB020' stroke-width='7' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='36' r='11' fill='%23FFB020'/%3E%3Ccircle cx='68' cy='36' r='11' fill='%23FFB020'/%3E%3Ccircle cx='50' cy='68' r='11' fill='%2335C08A'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="শব্দজট">
+<meta property="og:type" content="website">
+<meta property="og:title" content="শব্দজট Shobdojot - Bengali Word Puzzle">
+<meta property="og:description" content="শব্দজট - a Bengali word-cross puzzle. Drag across the letters to spell words and fill the crossword. Levels in a teaching order, free, works offline, no ads.">
+<meta property="og:locale" content="bn_BD">
+<meta name="twitter:card" content="summary">
+<style>
+/* include css/fonts.css      the Bengali face itself - 104 KB of base64, nothing to read */
+/* include css/theme.css      the colours, and the one wrapper the page hangs off */
+/* include css/layout.css     masthead, the two-up desktop grid, the phone/tablet stack */
+/* include css/game.css       the phone screen: board, wheel, tiles, buttons */
+/* include css/panel.css      the guide and the level picker beside the game */
+/* include css/effects.css    the layer flying tiles and confetti are drawn on */
+/* include css/host.css       what the page needs as a whole document, and the size overrides */
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">বাংলা শব্দ খেলা / <span id="eyebrowCount">levels</span> / plays in your browser</p>
+    <h1>শব্দজট</h1>
+  </header>
+
+  <!-- Stands in for the masthead on phones and tablets, where the game itself should own the
+       first screen. The notes move behind the button rather than below the fold. -->
+  <div class="touch-bar">
+    <span class="touch-title bn">শব্দজট</span>
+    <button class="touch-menu" id="guideOpen" aria-expanded="false" aria-controls="guide">
+      <span class="bars" aria-hidden="true"></span>
+      <span class="label">Guide</span>
+    </button>
+  </div>
+
+  <div class="stage">
+    <div class="device">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="topbar">
+          <button class="icon-btn" id="prev" title="আগের লেভেল" aria-label="Previous level">‹</button>
+          <button class="icon-btn" id="next" title="পরের লেভেল" aria-label="Next level">›</button>
+        </div>
+
+        <div class="board-area"><div class="board" id="board"></div></div>
+
+        <div class="preview" id="preview"></div>
+
+        <div class="actions">
+          <button class="action" id="hint"><span class="glyph">◈</span><span class="bn">সংকেত</span></button>
+          <button class="action" id="shuffle"><span class="glyph">⟳</span><span class="bn">এলোমেলো</span></button>
+        </div>
+
+        <div class="wheel-area"><div class="wheel" id="wheel"><svg id="trail"></svg></div></div>
+
+        <div id="fx"></div>
+
+      </div>
+    </div>
+
+    <div class="guide" id="guide" aria-label="Levels and how this game works">
+      <div class="guide-head">
+        <span class="guide-title">Levels &amp; guide</span>
+        <button class="guide-close" id="guideClose" aria-label="Close">Close</button>
+      </div>
+
+      <section class="card levels-card">
+        <h3>Levels - in teaching order</h3>
+        <div class="levels" id="levelGrid"></div>
+      </section>
+
+    <div class="panel">
+      <section class="card">
+        <h3>What this is</h3>
+        <p class="deck">
+          A Bengali word puzzle, one <b>akshara</b> at a time. Drag across the letters to
+          spell a word; each word you find writes itself into the grid above.
+          <b><span id="deckCount">Levels</span></b>, and each one is a single akshara: the
+          board for কা is কাক, কাঠ, কান, কাচ, কাপ, কাঠি - six words, every one of them
+          starting with কা.
+          <br><br>
+          That is the point of it. Bengali is taught as a letter and then the same letter
+          under each vowel sign - ক, কা, কি, কু, কে, কো, কাঁ - and a level per akshara is a
+          level per step of that series. A child who can read কাক can read কাঠ and কান
+          without being taught them twice, and the level is where that clicks.
+          <br><br>
+          Levels come in rounds. The first round is the বর্ণমালা itself: ক খ গ ঘ চ ছ জ ঝ ট ঠ ড
+          ঢ ত থ দ ধ ন প ফ ব ভ ম য র ল শ ষ স হ, one level each, in order, so every consonant is
+          met inside the first twenty-nine. Then the rounds come back to each letter with its
+          vowel signs, and the boards get bigger as they go. ঙ, ঞ and ণ are skipped - no Bengali
+          word begins with them - and neither do ড়, ঢ় or য়.
+          <br><br>
+          The vowels come last, all eleven of them - অ আ ই ঈ উ ঊ ঋ এ ঐ ও ঔ. Word-initial vowels
+          are rare in Bengali and the words carrying them are unusual - ঊরু, ঐচ্ছিক, ঔজ্জ্বল্য -
+          so in alphabet order they would put the hardest, most abstract material in the game in
+          front of a beginner.
+          <br><br>
+          ঐ and ঔ are the weakest levels in the game and it is worth knowing why. Word-initial
+          ঐ and ঔ in Bengali are almost entirely abstract nouns carrying heavy conjuncts -
+          ঐক্য, ঐতিহ্য, ঔদ্ধত্য, ঔজ্জ্বল্য - so those two levels teach the letter and nothing a
+          child can picture. There is no concrete alternative in the language to put there
+          instead, which is the other reason they sit at the end.
+          <br><br>
+          A board is not always one joined-up crossword. Words cross wherever they share a
+          letter, but on a level where every word starts with the same akshara the only cell
+          any two can share is that one - and a cell takes two words, not six. So a board is
+          one, two or three islands, and the words in each still cross.
+          <br><br>
+          Some aksharas come round twice - কা, then কা again later - which is more practice on
+          the same step rather than a new one. Every word is a concrete thing a picture could
+          show, or a number, a colour or an everyday action; the handful that are not carry a
+          note saying how to draw them.
+          <br><br>
+          Everything is Bangladeshi Bengali: পানি rather than জল, চাচা and ফুফু rather than
+          কাকা and পিসি. No word is ever set as a puzzle twice.
+          <br><br>
+          <b>It works with no connection.</b> Open it once and the whole game is on the device -
+          all 156 levels, the words, the font. Your browser will offer to add it to the home
+          screen, where it opens like an app and never asks for the network again. That is the
+          point rather than a nicety: a data connection is something you have sometimes. No
+          sign-up, no ads, nothing to pay - your progress is saved in this browser.
+        </p>
+      </section>
+
+      <section class="card">
+        <h3>How to play</h3>
+        <ul class="how">
+          <li><span class="k">drag</span><span>Press a letter and drag across the others. Sliding back onto the previous letter un-picks it.</span></li>
+          <li><span class="k">click</span><span>Prefer clicking? Tap letters one at a time, then hit <b>✓</b> on the word - or press <b>Enter</b>. <b>Esc</b> clears.</span></li>
+          <li><span class="k">finish</span><span>Clearing a level moves straight to the next one - no button, no waiting. The confetti plays across the change.</span></li>
+          <li><span class="k">&lsaquo; &rsaquo;</span><span>The arrows step to the previous or next level, and wrap around at either end. The level grid jumps straight to any level, and is coloured by stage of the syllabus. Any level you open starts blank, so an old one can always be played again.</span></li>
+          <li><span class="k">♪</span><span>Every word is spoken aloud as you find it, and there is no button for it - hearing the word is the point, not a setting. Bengali spelling hides the sound: ব and ভ, শ and ষ and স are each one sound but different letters. On a device with no Bengali voice the game stays silent rather than reading Bengali in an English voice.</span></li>
+          <li><span class="k">◈</span><span>A hint reveals one letter from a word you haven't solved. Free, and no limit - there is nothing to count and nothing to spend.</span></li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h3>One tile = one akshara</h3>
+        <table class="akshara-table">
+          <tbody>
+            <tr><td class="w">মাছ</td><td class="a">মা + ছ</td><td class="n">vowel sign</td></tr>
+            <tr><td class="w">বন্ধু</td><td class="a">ব + ন্ধু</td><td class="n">conjunct</td></tr>
+            <tr><td class="w">বাড়ি</td><td class="a">বা + ড়ি</td><td class="n">nukta + sign</td></tr>
+          </tbody>
+        </table>
+        <p style="margin:12px 0 0;font-size:12.5px;line-height:1.55;color:color-mix(in srgb, var(--parchment) 62%, var(--indigo-700))">
+          Bengali isn't one letter per character - মাছ is three code points but two letter units.
+          The game splits on those units, so a tile is always something a reader recognises.
+        </p>
+      </section>
+    </div>
+
+    <footer>
+      Every board is laid out when the game is built, not hand-drawn and not at runtime: every
+      ordering of a level's words is tried and the smallest grid wins, so no accidental word
+      ever appears on it. A wheel carries a letter twice when a word needs it twice, as ঘুঘু and
+      বাবা do, and the two are kept apart on the ring so a drag from one to the other does not
+      run over its twin. Every level is checked to be about its own akshara: a কা level is all
+      কা words, and the build fails if one is not.
+    </footer>
+    </div>
+  </div>
+</div>
+<script>
+"use strict";
+
+/* include js/01-bangla.js    splitting Bengali into aksharas - one tile, one akshara */
+/* include js/02-levels.js    GENERATED by tools/build.py - do not edit */
+/* include js/03-boards.js    reading a board back out of the level table */
+/* include js/04-state.js     what the player has done, and what is saved */
+/* include js/05-scramble.js  arranging a wheel so it does not give the board away */
+/* include js/06-render.js    drawing the screen and sizing it to the device */
+/* include js/07-speech.js    saying each word aloud as it lands */
+/* include js/08-animate.js   the movement that answers every action */
+/* include js/09-play.js      picking letters, judging a word, finishing a level */
+</script>
+</body>
+</html>

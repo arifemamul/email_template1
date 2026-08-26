@@ -1,0 +1,194 @@
+  /* -- Masthead ------------------------------------------------------------- */
+  header { margin-bottom: clamp(14px, 2.2vw, 22px); }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--marigold) 72%, var(--parchment));
+    margin: 0 0 10px;
+    font-weight: 600;
+  }
+
+  h1 {
+    font-family: var(--bn);
+    font-size: clamp(38px, 7vw, 64px);
+    line-height: .98;
+    margin: 0;
+    color: var(--marigold);
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .deck {
+    margin: 0;
+    color: color-mix(in srgb, var(--parchment) 74%, var(--indigo-700));
+    font-size: 15px;
+    line-height: 1.62;
+  }
+
+  .deck b { color: var(--parchment); font-weight: 600; }
+
+  /* Inside a card the deck is body copy under a heading; it only needs room below it when
+     something else follows. */
+  .card .deck:not(:last-child) { margin-bottom: 16px; }
+
+  /* -- Two-up: the game and its level picker on the left, notes on the right ---
+       The level grid belongs to the game rather than to the notes, so it sits in the
+       same column, directly under the phone - close enough to read as one thing.
+
+       `.guide` groups the reading material so a phone or tablet can put all of it behind
+       one button. On a wide screen it is display: contents, which dissolves the wrapper and
+       lets its children take their own places in this grid as if it were not there. */
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 400px) minmax(280px, 420px);
+    grid-template-areas: "game notes" "levels notes" "prose prose";
+    grid-template-rows: auto auto auto;
+    gap: clamp(20px, 3vw, 44px);
+    align-items: start;
+    justify-content: center;
+  }
+
+  .device { grid-area: game; }
+  .levels-card { grid-area: levels; }
+  .panel { grid-area: notes; }
+  footer { grid-area: prose; }
+
+  .guide { display: contents; }
+  .guide-head, .touch-bar { display: none; }
+
+  @media (max-width: 860px) {
+    .stage {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "game" "levels" "notes" "prose";
+      grid-template-rows: auto auto auto auto;
+    }
+  }
+
+  /* -- Phones and tablets: the game owns the first screen ----------------------
+       On a touch-sized screen the masthead and three cards of prose pushed the board
+       halfway down the page, so a player had to scroll before they could play. The game
+       now fills the viewport and everything written about it moves behind one button.
+       Width-gated rather than pointer-gated: a narrow desktop window gets the same
+       treatment, which is no loss, and it stays testable. */
+  @media (max-width: 1024px) {
+    header { display: none; }
+
+    .touch-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .touch-title {
+      font-family: var(--bn);
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--marigold);
+      line-height: 1;
+    }
+
+    .touch-menu {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      border: 1px solid color-mix(in srgb, var(--parchment) 14%, transparent);
+      background: var(--indigo-700);
+      color: var(--marigold);
+      border-radius: 99px;
+      padding: 9px 15px 9px 12px;
+      font: inherit;
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color .16s ease, transform .16s ease;
+    }
+    .touch-menu:hover { background: var(--violet-600); }
+    .touch-menu:active { transform: scale(.96); }
+
+    /* Three lines drawn rather than typed, so it never depends on a glyph being present. */
+    .touch-menu .bars {
+      width: 15px; height: 11px;
+      border-top: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      position: relative;
+    }
+    .touch-menu .bars::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; top: 50%;
+      border-top: 2px solid currentColor;
+      transform: translateY(-1px);
+    }
+
+    /* The stage is only the game now; the rest is a sheet over the top of it. */
+    .stage {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "game";
+      grid-template-rows: auto;
+      gap: 0;
+    }
+
+    .guide {
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      background: var(--indigo-900);
+      padding: 14px 14px calc(34px + env(safe-area-inset-bottom));
+      transform: translateY(100%);
+      visibility: hidden;
+      transition: transform .26s cubic-bezier(.22, 1, .36, 1), visibility .26s;
+    }
+    .guide.open { transform: translateY(0); visibility: visible; }
+    body.guide-open { overflow: hidden; }
+
+    .guide-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: -14px;
+      margin: -14px -14px 14px;
+      padding: 16px 14px 12px;
+      background: linear-gradient(var(--indigo-900) 78%, transparent);
+      z-index: 1;
+    }
+
+    .guide-title {
+      font-size: 11px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: color-mix(in srgb, var(--marigold) 78%, var(--parchment));
+    }
+
+    .guide-close {
+      border: 1px solid color-mix(in srgb, var(--parchment) 14%, transparent);
+      background: var(--indigo-700);
+      color: var(--marigold);
+      border-radius: 99px;
+      padding: 8px 16px;
+      font: inherit;
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .guide-close:active { transform: scale(.96); }
+
+    /* Inside the sheet the level grid and the notes are simply a stack. */
+    .guide .levels-card, .guide .panel, .guide footer { grid-area: auto; }
+    .guide .panel { margin-top: 16px; }
+    .guide footer { margin-top: 22px; }
+  }
+
