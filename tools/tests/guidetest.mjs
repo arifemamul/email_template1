@@ -104,11 +104,14 @@ for (const [viewport, name, touch] of sizes) {
       const dev = document.querySelector('.device').getBoundingClientRect();
       const menu = document.querySelector('.menu').getBoundingClientRect();
       const pages = document.querySelector('.pages').getBoundingClientRect();
-      const ft = document.querySelector('footer').getBoundingClientRect();
+      // The footer is build notes, so it lives inside the পরিচিতি section rather than under
+      // all six - it used to sit below every section, which read as a caption to whatever was
+      // on screen, including the alphabet chart.
+      const ft = document.querySelector('footer');
       return {
         sideBySide: menu.left > dev.right - 4 && pages.left > dev.right - 4,
         menuAbovePages: menu.bottom <= pages.top + 4,
-        footerLast: ft.top > pages.top,
+        footerInAbout: !!ft.closest('#page-about'),
         tabs: document.querySelectorAll('#menu .tab').length,
         onePageShowing: [...document.querySelectorAll('.pages .page')]
           .filter(x => getComputedStyle(x).display !== 'none').length
@@ -116,10 +119,16 @@ for (const [viewport, name, touch] of sizes) {
     });
     if (!cols.sideBySide) problems.push(`${name}: the menu is not beside the game`);
     if (!cols.menuAbovePages) problems.push(`${name}: the menu bar is not above its sections`);
-    if (!cols.footerLast) problems.push(`${name}: footer not last`);
+    if (!cols.footerInAbout) problems.push(`${name}: the footer is not inside the পরিচিতি section`);
     if (cols.tabs !== 6) problems.push(`${name}: ${cols.tabs} tabs, expected 6`);
     if (cols.onePageShowing !== 1)
       problems.push(`${name}: ${cols.onePageShowing} sections showing, expected exactly 1`);
+    // And it really is on screen when that section is open.
+    await p.click('#tab-about');
+    const footerShows = await p.evaluate(() =>
+      getComputedStyle(document.querySelector('footer')).display !== 'none'
+      && document.querySelector('footer').getBoundingClientRect().height > 0);
+    if (!footerShows) problems.push(`${name}: the footer does not show when পরিচিতি is open`);
     console.log(`${name}: two-up intact, no hamburger, ${cols.tabs} tabs, one section showing`);
   }
   if (state.overflow > 1) problems.push(`${name}: page scrolls sideways by ${state.overflow}px`);

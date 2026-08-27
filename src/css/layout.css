@@ -191,6 +191,16 @@
     }
     .guide-close:active { transform: scale(.96); }
 
+    /* Bengali chrome needs the opposite treatment to the small-caps English it replaced.
+       `text-transform: uppercase` does nothing to a script with no case, and the wide
+       letter-spacing that makes 11px English read as a label pulls Bengali matra clusters
+       apart - মে নু instead of মেনু. Both off, and a size the script can actually be read at. */
+    .guide-title.bn, .guide-close.bn, .touch-menu .label.bn {
+      letter-spacing: 0;
+      text-transform: none;
+      font-size: 15px;
+    }
+
     /* The footer is inside the About section now, so it needs no placement of its own. */
   }
 

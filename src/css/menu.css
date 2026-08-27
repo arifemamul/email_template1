@@ -34,14 +34,30 @@
   /* Two cards in one section (About holds the notes and the feedback card) need the gap the
      panel used to give them. */
   .page > .card + .card { margin-top: 22px; }
+  /* A heading is Bengali then English - স্বরবর্ণ / the vowels - and the two halves want
+     opposite typography. The English reads as a label at 11px with wide letter-spacing; that
+     same spacing pulls Bengali matra clusters apart, and 11px is unreadable in the script. So
+     the row is sized for the Bengali and the English half is shrunk back down inside it. */
   .page > h3 {
     margin: 0 0 12px;
-    font-size: 11px;
+    font-size: 15px;
+    font-family: var(--bn);
+    font-weight: 700;
+    color: color-mix(in srgb, var(--marigold) 82%, var(--parchment));
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .page > h3 .en {
+    font-size: 10.5px;
     letter-spacing: .16em;
     text-transform: uppercase;
-    color: color-mix(in srgb, var(--marigold) 78%, var(--parchment));
-    font-weight: 700;
+    color: color-mix(in srgb, var(--parchment) 60%, var(--indigo-700));
   }
+  /* The cards inside a section keep their own small-caps heading, which is English only. */
+  .page .card h3 { font-family: var(--bn); font-size: 14px; letter-spacing: 0; text-transform: none; }
+  .page .card h3 .en { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
 
   /* -- The alphabet charts --------------------------------------------------- */
   .chart {

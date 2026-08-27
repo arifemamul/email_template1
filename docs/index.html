@@ -248,6 +248,12 @@ cursor: pointer;
 }
 .guide-close:active { transform: scale(.96); }
 
+.guide-title.bn, .guide-close.bn, .touch-menu .label.bn {
+letter-spacing: 0;
+text-transform: none;
+font-size: 15px;
+}
+
 }
 .device {
 position: relative;
@@ -632,12 +638,23 @@ color: var(--ink);
 .page > .card + .card { margin-top: 22px; }
 .page > h3 {
 margin: 0 0 12px;
-font-size: 11px;
+font-size: 15px;
+font-family: var(--bn);
+font-weight: 700;
+color: color-mix(in srgb, var(--marigold) 82%, var(--parchment));
+display: flex;
+align-items: baseline;
+gap: 8px;
+flex-wrap: wrap;
+}
+.page > h3 .en {
+font-size: 10.5px;
 letter-spacing: .16em;
 text-transform: uppercase;
-color: color-mix(in srgb, var(--marigold) 78%, var(--parchment));
-font-weight: 700;
+color: color-mix(in srgb, var(--parchment) 60%, var(--indigo-700));
 }
+.page .card h3 { font-family: var(--bn); font-size: 14px; letter-spacing: 0; text-transform: none; }
+.page .card h3 .en { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
 
 .chart {
 display: grid;
@@ -820,7 +837,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
     <span class="touch-title bn">শব্দজট</span>
     <button class="touch-menu" id="guideOpen" aria-expanded="false" aria-controls="guide">
       <span class="bars" aria-hidden="true"></span>
-      <span class="label">Guide</span>
+      <span class="label bn">মেনু</span>
     </button>
   </div>
 
@@ -857,8 +874,8 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
 
     <div class="guide" id="guide" aria-label="Alphabet, levels and how this game works">
       <div class="guide-head">
-        <span class="guide-title">Menu</span>
-        <button class="guide-close" id="guideClose" aria-label="Close">Close</button>
+        <span class="guide-title bn">মেনু</span>
+        <button class="guide-close bn" id="guideClose" aria-label="মেনু বন্ধ করুন">বন্ধ</button>
       </div>
 
       <!-- The menu bar. One section is on screen at a time, which is the point: the guide used
@@ -866,17 +883,17 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
            chart had to know it was down there. Six named places instead. -->
       <nav class="menu" id="menu" role="tablist" aria-label="Sections">
         <button class="tab bn" type="button" role="tab" data-page="vowels"
-                aria-controls="page-vowels" title="the eleven vowels">স্বরবর্ণ</button>
+                aria-controls="page-vowels" title="এগারোটি স্বরবর্ণ">স্বরবর্ণ</button>
         <button class="tab bn" type="button" role="tab" data-page="consonants"
-                aria-controls="page-consonants" title="the thirty-two consonants, ক to হ">ব্যঞ্জনবর্ণ</button>
+                aria-controls="page-consonants" title="ক থেকে হ - বত্রিশটি ব্যঞ্জনবর্ণ">ব্যঞ্জনবর্ণ</button>
         <button class="tab bn" type="button" role="tab" data-page="marks"
-                aria-controls="page-marks" title="the signs that attach to a letter">কার ও চিহ্ন</button>
+                aria-controls="page-marks" title="বর্ণের সঙ্গে যে চিহ্নগুলো বসে">কার ও চিহ্ন</button>
         <button class="tab bn" type="button" role="tab" data-page="levels"
-                aria-controls="page-levels" title="every level, by letter">লেভেল</button>
+                aria-controls="page-levels" title="বর্ণ অনুসারে সব লেভেল">লেভেল</button>
         <button class="tab bn" type="button" role="tab" data-page="about"
-                aria-controls="page-about" title="what this is">About</button>
+                aria-controls="page-about" title="খেলাটি কী">পরিচিতি</button>
         <button class="tab bn" type="button" role="tab" data-page="play"
-                aria-controls="page-play" title="the controls">How to play</button>
+                aria-controls="page-play" title="কীভাবে খেলবে">খেলার নিয়ম</button>
       </nav>
 
       <div class="pages">
@@ -884,7 +901,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
              game: every letter that has levels is a button that opens its first one. Built in
              js/10-menu.js from LEVELS, so the chart cannot claim a letter the game has lost. -->
         <section class="page" id="page-vowels" role="tabpanel" aria-labelledby="tab-vowels">
-          <h3>স্বরবর্ণ - the vowels</h3>
+          <h3>স্বরবর্ণ <span class="en">the vowels</span></h3>
           <p class="deck">
             Eleven letters, and the order every Bengali child recites first. The game runs in
             this order, so these are levels 1 onward. Tap a letter to open its first level.
@@ -893,7 +910,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
         </section>
 
         <section class="page" id="page-consonants" role="tabpanel" aria-labelledby="tab-consonants">
-          <h3>ব্যঞ্জনবর্ণ - the consonants</h3>
+          <h3>ব্যঞ্জনবর্ণ <span class="en">the consonants</span></h3>
           <p class="deck">
             Thirty-two letters, ক to হ. The game plays them in this order after the vowels -
             tap one to open its first level. Twenty-nine have levels; ঙ, ঞ and ণ have none and
@@ -908,7 +925,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
         </section>
 
         <section class="page" id="page-marks" role="tabpanel" aria-labelledby="tab-marks">
-          <h3>কার ও চিহ্ন - the other parts of a letter</h3>
+          <h3>কার ও চিহ্ন <span class="en">the other parts of a letter</span></h3>
           <p class="deck">
             A Bengali letter is rarely alone. A vowel sign - a <b>কার</b> - rides on it and
             changes the sound without being a letter of its own: ক becomes কা, কি, কু, কে, কো.
@@ -923,14 +940,14 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
 
         <section class="page" id="page-levels" role="tabpanel" aria-labelledby="tab-levels">
 <section class="card levels-card">
-        <h3>Levels - in teaching order</h3>
+        <h3>লেভেল <span class="en">in alphabet order</span></h3>
         <div class="levels" id="levelGrid"></div>
       </section>
         </section>
 
         <section class="page" id="page-about" role="tabpanel" aria-labelledby="tab-about">
 <section class="card">
-        <h3>What this is</h3>
+        <h3>পরিচিতি <span class="en">what this is</span></h3>
         <p class="deck">
           A Bengali word puzzle, one <b>akshara</b> at a time. Drag across the letters to
           spell a word; each word you find writes itself into the grid above.
@@ -986,7 +1003,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
         </p>
       </section>
 <section class="card">
-        <h3>Found a problem?</h3>
+        <h3>ভুল পেয়েছেন? <span class="en">found a problem?</span></h3>
         <p class="deck">
           A word spelled wrong, a word that is not the Bengali you use at home, a level that
           will not finish - that is worth telling someone, and it is usually a child's parent
@@ -1006,19 +1023,18 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
           <span class="say-en">Copy</span>
         </button>
       </section>
-        </section>
-      <footer>
+          <footer>
           Every board is laid out when the game is built, not hand-drawn and not at runtime: every
           ordering of a level's words is tried and the smallest grid wins, so no accidental word
           ever appears on it. A wheel carries a letter twice when a word needs it twice, as ঘুঘু and
           বাবা do, and the two are kept apart on the ring so a drag from one to the other does not
           run over its twin. Every level is checked to be about its own akshara: a কা level is all
           কা words, and the build fails if one is not.
-        </footer>
-
+          </footer>
+        </section>
         <section class="page" id="page-play" role="tabpanel" aria-labelledby="tab-play">
 <section class="card">
-        <h3>How to play</h3>
+        <h3>খেলার নিয়ম <span class="en">how to play</span></h3>
         <ul class="how">
           <li><span class="k">drag</span><span>Press a letter and drag across the others. Sliding back onto the previous letter un-picks it.</span></li>
           <li><span class="k">click</span><span>Prefer clicking? Tap letters one at a time, then hit <b>✓</b> on the word - or press <b>Enter</b>. <b>Esc</b> clears.</span></li>
@@ -1029,7 +1045,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
         </ul>
       </section>
 <section class="card">
-        <h3>One tile = one akshara</h3>
+        <h3>এক ঘর, এক অক্ষর <span class="en">one tile is one akshara</span></h3>
         <table class="akshara-table">
           <tbody>
             <tr><td class="w">মাছ</td><td class="a">মা + ছ</td><td class="n">vowel sign</td></tr>
