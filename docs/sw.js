@@ -15,7 +15,7 @@
  * keep the copy they already have - `build.py` stamps it from the level count and the page's
  * own length, so it changes on its own whenever the built page does.
  */
-const VERSION = 'shobdojot-253-212946';
+const VERSION = 'shobdojot-256-214089';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-maskable.svg'];
 
 self.addEventListener('install', event => {

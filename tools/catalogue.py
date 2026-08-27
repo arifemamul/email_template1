@@ -106,7 +106,13 @@ _POOL = json.loads((HERE / 'levels-pool.json').read_text(encoding='utf-8'))
 # And ঈ ঊ ঐ ঔ, which nothing else could reach: between them the other three files held six
 # word-initial words for the four letters, where a level needs three each.
 _VOWELS = json.loads((HERE / 'levels-vowels.json').read_text(encoding='utf-8'))
-_AUTHORED = _DATA['levels'] + _EXTRA['levels'] + _POOL['levels'] + _VOWELS['levels']
+# And ৈ, which nothing else reached. Of the alphabet's 57 units the game taught 56; no word on
+# any board carried the sign that writes ঐ onto a consonant. The pool holds exactly four words
+# with it and these three levels place all four.
+_OI = json.loads((HERE / 'levels-oi.json').read_text(encoding='utf-8'))
+
+_AUTHORED = (_DATA['levels'] + _EXTRA['levels'] + _POOL['levels'] + _VOWELS['levels']
+             + _OI['levels'])
 
 # And what the 7-tile wheel forced. 22 levels were built when a wheel held 8; most of them
 # divide into two smaller levels rather than losing a word, and a letter may carry as many
