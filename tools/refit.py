@@ -1,28 +1,35 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Refit every level to a 7-tile wheel.
+Cut every level down to a five-letter wheel.
 
     python3 tools/refit.py            print what it would do, change nothing
     python3 tools/refit.py --write    write tools/levels-refit.json
 
-The wheel cap came down from 8 to 6 and 54 levels were over it. This works out what to do
-with each one, so the answer is a rule applied evenly rather than 22 hand-made decisions.
+The player is a child who has just learned the alphabet. Every extra letter on the ring is
+another thing to rule out before the first one can be picked, so the ring is the difficulty,
+not the words. Five is the cap.
 
-What it may do to an over-cap level, in order of preference:
+Getting there without throwing away the vocabulary rests on one change: a level may hold TWO
+words. It used to need three - a rule inherited from a version of this game that was a
+teaching syllabus rather than alphabet practice. Two words that cross at a shared letter is a
+whole puzzle, and for a beginner it is arguably the right size of one. It is also what makes
+five reachable:
 
-  1. SPLIT it into two levels within TARGET. Nothing is lost - the letter gets another level,
-     which is allowed: a letter already carries anywhere from one to nine.
-  2. SPLIT it with help, borrowing words for the same letter that are in the vocabulary pool
-     and on no board yet, when the level's own words will not divide.
-  3. SWAP a word out for a pool word, when the level cannot divide at all.
-  4. DROP a word, when nothing in the pool fits.
+    words per level    smallest wheel that fits every word
+    three or more      seven (a hard six costs 34 words and loses ঔ entirely)
+    two or more        five  (costs two words: কাঠবিড়ালি and রেলগাড়ি)
 
-Choosing between candidate fixes, in this order:
+So each level is partitioned - into as many small levels as its words need, not just two - and
+every part must come in at five letters or fewer. A letter may carry as many levels as it
+takes; ক already carries fifteen.
+
+Choosing between candidate partitions, in this order:
   - keep the most of the level's original words;
   - keep the most aksharas that appear on no other board, because losing the game's only
     হো word means হো is no longer taught anywhere - a curriculum hole, not just a lost word;
-  - prefer two levels over one, then the evener division, then the smaller wheels.
+  - then the fewest parts, so a level is not atomised when it did not need to be;
+  - then the smallest wheels.
 
 Every word must still start with the level's akshara (or its letter, for a `letter` level),
 so a fix can never quietly change what a level teaches.
@@ -35,25 +42,17 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
 from bangla import cluster_layout, split_aksharas, wheel_for        # noqa: E402
+from build import ring_can_hide                                     # noqa: E402
 from catalogue import _AUTHORED, GLOSS, MAX_ROWS, MAX_COLS          # noqa: E402
 import vocabulary                                                   # noqa: E402
 
-# Two numbers, not one. TARGET is the wheel this game wants - six letters to choose between,
-# so the words a child spells out of them stay short. CEILING is what a level may have when
-# getting to six would cost a word.
-#
-# A hard six was tried and measured first: 70 of the 156 authored levels are over it, 13 of
-# them cannot be divided or patched at all, and one of those is ঔ - so the alphabet run would
-# lose a vowel outright. It costs 34 words, among them কাঠবিড়ালি, মাকড়সা, রেলগাড়ি, চকলেট,
-# বাঁধাকপি, ভালুক, রান্নাঘর: the concrete, picturable half of the vocabulary, which is the half
-# worth having. And কৃ stops being taught anywhere.
-#
-# So six is preferred and seven is permitted, in that order, and no word is given up to reach
-# six. Most levels land on six or under; the ones that do not are the ones that could not.
-TARGET = 6
-CEILING = 7
-FLOOR = 3        # and the floor, which nothing was under already
-MIN_WORDS = 3
+CAP = 5          # letters on the ring, hard
+FLOOR = 3        # fewer than three and there is nothing to choose between
+
+# Two words that cross is a puzzle. Three was the old minimum and it is what forced big rings:
+# a third word on a level whose words share only their first letter brings all of its own
+# letters with it.
+MIN_WORDS = 2
 
 # A borrowed word may only come from the vetted list. The pool is a bare word list with no
 # glosses, and the curriculum's test is that a picture could replace the gloss - so letting the
@@ -77,10 +76,16 @@ def board_fits(words):
 
 
 def legal(words):
-    """A word list that could ship as a level, wheel and board both."""
+    """A word list that could ship as a level: wheel, board, and the ring not being the answer."""
     if len(words) < MIN_WORDS or len(set(words)) != len(words):
         return False
-    if not FLOOR <= len(wheel_for(words)) <= CEILING:
+    tiles = wheel_for(words)
+    if not FLOOR <= len(tiles) <= CAP:
+        return False
+    # A three-tile ring holding a three-letter word IS that word: three rotations either way
+    # covers all six orders, so no arrangement hides it. `check` rejects such a level, and a
+    # small ring is exactly where it starts happening, so the solver has to know about it too.
+    if not ring_can_hide(tiles, words):
         return False
     try:
         return board_fits(words)
@@ -105,12 +110,33 @@ def unique_aksharas(levels):
     return {a for a, n in seen.items() if n == 1}
 
 
+def partitions(items, min_size):
+    """Every way to split a list into groups of at least `min_size`, smallest count first."""
+    def walk(rest, groups):
+        if not rest:
+            yield groups
+            return
+        head, tail = rest[0], rest[1:]
+        for i, g in enumerate(groups):                       # put it with an existing group
+            yield from walk(tail, groups[:i] + [g + [head]] + groups[i + 1:])
+        yield from walk(tail, groups + [[head]])             # or start a new one
+    seen = set()
+    for groups in walk(list(items), []):
+        if any(len(g) < min_size for g in groups):
+            continue
+        fingerprint = tuple(sorted(tuple(sorted(g)) for g in groups))
+        if fingerprint in seen:
+            continue
+        seen.add(fingerprint)
+        yield [list(g) for g in groups]
+
+
 def solve(level, borrowable, precious):
     """
-    The best fix for one over-cap level, as (kind, [word lists], lost words).
+    The best way to cut one level into parts that each fit a five-letter ring.
 
-    `precious` is the set of aksharas carried by exactly one board, so dropping a word that
-    holds one is scored as the real loss it is.
+    Returns (score, groups, lost words, holed aksharas). Every group is a level in its own
+    right; a level that already fits comes back as a single group unchanged.
     """
     original = [w['w'] for w in level['words']]
     pool = [w for w in borrowable if belongs(w, level) and w in ALLOWED]
@@ -118,7 +144,6 @@ def solve(level, borrowable, precious):
     def loss(kept):
         gone = [w for w in original if w not in kept]
         holed = {a for w in gone for a in split_aksharas(w)} & precious
-        # Only a hole if no kept word puts the akshara back.
         holed -= {a for w in kept for a in split_aksharas(w)}
         return len(gone), len(holed), gone, holed
 
@@ -126,31 +151,24 @@ def solve(level, borrowable, precious):
     for borrow in range(0, min(MAX_BORROW, len(pool)) + 1):
         for extra in itertools.combinations(pool, borrow):
             words = original + list(extra)
-            # Two levels, every original word placed somewhere.
-            for size in range(MIN_WORDS, len(words) - MIN_WORDS + 1):
-                for a in itertools.combinations(words, size):
-                    b = [w for w in words if w not in a]
-                    if not (legal(list(a)) and legal(b)):
-                        continue
-                    kept = set(a) | set(b)
-                    gone, holed, lost, holes = loss(kept)
-                    fat = sum(len(wheel_for(g)) > TARGET for g in (list(a), b))
-                    score = (gone, holed, fat, 0, abs(len(a) - len(b)),
-                             len(wheel_for(list(a))) + len(wheel_for(b)), borrow)
-                    if best is None or score < best[0]:
-                        best = (score, 'split', [list(a), b], lost, holes)
-            # Or one level, which means giving something up.
-            for size in range(len(words), MIN_WORDS - 1, -1):
-                for a in itertools.combinations(words, size):
-                    if not legal(list(a)):
-                        continue
-                    gone, holed, lost, holes = loss(set(a))
-                    fat = int(len(wheel_for(list(a))) > TARGET)
-                    score = (gone, holed, fat, 1, 0, len(wheel_for(list(a))), borrow)
-                    if best is None or score < best[0]:
-                        best = (score, 'one', [list(a)], lost, holes)
-        if best and best[0][:3] == (0, 0, 0):
-            break        # nothing lost and every wheel within target; cannot be improved on
+            # Dropping is a last resort, so try to place every word first and give up one at a
+            # time only when the whole set will not go.
+            for keep_n in range(len(words), MIN_WORDS - 1, -1):
+                found = False
+                for keep in itertools.combinations(words, keep_n):
+                    for groups in partitions(keep, MIN_WORDS):
+                        if not all(legal(g) for g in groups):
+                            continue
+                        found = True
+                        gone, holed, lost, holes = loss(set(keep))
+                        score = (gone, holed, len(groups),
+                                 sum(len(wheel_for(g)) for g in groups), borrow)
+                        if best is None or score < best[0]:
+                            best = (score, groups, lost, holes)
+                if found:
+                    break        # no need to drop more words than this
+        if best and best[0][0] == 0 and best[0][1] == 0:
+            break                # nothing lost; borrowing more cannot improve on that
     return best
 
 
@@ -159,8 +177,8 @@ def main(write=False):
     on_board = {w['w'] for lv in _AUTHORED for w in lv['words']}
     borrowable = [w for w in vocabulary.words() if w not in on_board]
 
-    over = [lv for lv in _AUTHORED if len(wheel_for([w['w'] for w in lv['words']])) > TARGET]
-    print(f'{len(over)} of {len(_AUTHORED)} levels are over the {TARGET}-tile target\n')
+    over = [lv for lv in _AUTHORED if len(wheel_for([w['w'] for w in lv['words']])) > CAP]
+    print(f'{len(over)} of {len(_AUTHORED)} levels are over the {CAP}-letter cap\n')
 
     fixes, lost_words, holes, claimed = {}, [], set(), set()
     for lv in over:
@@ -170,19 +188,19 @@ def main(write=False):
         if result is None:
             print(f'  {lv["id"]:8s} NO LEGAL FIX')
             continue
-        _, kind, groups, lost, holed = result
+        _, groups, lost, holed = result
         for g in groups:
             for w in g:
                 if w not in original:
                     claimed.add(w)
-        fixes[lv['id']] = {'kind': kind, 'groups': groups, 'lost': lost}
+        fixes[lv['id']] = {'kind': 'split' if len(groups) > 1 else 'one',
+                           'groups': groups, 'lost': lost}
         lost_words += lost
         holes |= holed
-        tag = 'split' if kind == 'split' else 'one level'
         borrowed = [w for g in groups for w in g if w not in original]
-        print(f'  {lv["id"]:8s} {tag}')
+        print(f'  {lv["id"]:8s} into {len(groups)}')
         for g in groups:
-            print(f'{"":13s}{" ".join(g):46s} [{len(wheel_for(g))}t]')
+            print(f'{"":13s}{" ".join(g):40s} [{len(wheel_for(g))} letters]')
         if borrowed:
             print(f'{"":13s}borrowed from the pool: {" ".join(borrowed)}')
         if lost:

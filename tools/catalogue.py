@@ -308,16 +308,23 @@ FULL_SYLLABUS = False
 # one costs every level a smaller box.
 MAX_ROWS, MAX_COLS = 5, 7
 
-# The widest wheel worth drawing, and it came down from 8. Eight tiles on a 360px phone leaves
-# each one small enough that a drag catches its neighbour, and a ring of eight puts two tiles
-# adjacent for every word of three. A board grows by taking on words, and a word it has no tile
-# for brings its own - so this is what stops a level from ending up with a wheel too crowded to
-# drag across. tools/refit.py is what brought the 22 levels built for eight down to seven.
-MAX_TILES = 7
+# The widest ring, and it came down from 8 to 7 to 5. The player is a child who has just
+# learned the alphabet: every extra letter on the ring is one more thing to rule out before the
+# first one can be picked, so the ring is the difficulty rather than the words. Five is the cap
+# and it is hard - tools/refit.py cut all 156 authored levels to fit it.
+MAX_TILES = 5
 
 # And the narrowest. Three tiles is the least that makes a puzzle: two tiles spell one word and
 # there is nothing to choose between.
 MIN_TILES = 3
+
+# Two words that cross at a shared letter is a whole puzzle, and for a child who has just
+# learned the alphabet it is arguably the right size of one. Three was the minimum while this
+# was a teaching syllabus, and it is what forced wide rings: a third word on a level whose
+# words share only their first letter brings every one of its own letters with it. Dropping to
+# two is what let the ring come down to five without emptying the vocabulary - see
+# tools/refit.py, which measures both.
+MIN_WORDS = 2
 
 # How many pieces of the writing system one level may introduce. Two is a lesson; five is a
 # lecture. Levels that exceed it are reported by `check` rather than rejected, because the
@@ -341,8 +348,8 @@ def validate(words, block=None, key=None, kind=None):
 
     if len(words) != len(set(words)):
         problems.append('repeats a word')
-    if len(words) < 3:
-        problems.append(f'only {len(words)} words; a level needs at least 3')
+    if len(words) < MIN_WORDS:
+        problems.append(f'only {len(words)} words; a level needs at least {MIN_WORDS}')
     if not MIN_TILES <= len(tiles) <= MAX_TILES:
         problems.append(f'wheel of {len(tiles)} tiles, outside the '
                         f'{MIN_TILES} to {MAX_TILES} a wheel holds')

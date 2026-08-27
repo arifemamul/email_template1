@@ -1,5 +1,5 @@
 {
- "name": "Pool words the 7-tile cap let onto boards, vetted one by one",
+ "name": "Pool words the five-letter ring let onto boards, vetted one by one",
  "WHY_THIS_FILE_EXISTS": [
   "The wheel cap came down from 8 tiles to 7, which put 22 levels over. Most of them can be",
   "divided into two smaller levels instead of losing a word, but a level needs three words,",
@@ -17,90 +17,313 @@
   "level of বড় / সরু / নরম / কঠিন teaches the letter and gives a child nothing to picture."
  ],
  "allow": {
-  "আকাশ":       { "en": "the sky" },
-  "আগুন":       { "en": "fire" },
-  "আঙুর":       { "en": "grapes" },
-  "আঙুল":       { "en": "a finger" },
-  "আপেল":       { "en": "an apple" },
-  "আনারস":      { "en": "a pineapple" },
-  "আলমারি":     { "en": "a cupboard, almirah" },
-  "কালো":       { "en": "black" },
-  "কুঁড়ি":      { "en": "a flower bud" },
-  "কচ্ছপ":      { "en": "a turtle" },
-  "কড়াই":      { "en": "a frying pan, karai" },
-  "কবুতর":      { "en": "a pigeon" },
-  "কামার":      { "en": "a blacksmith" },
-  "কুমড়া":     { "en": "a pumpkin" },
-  "কুমার":      { "en": "a potter" },
-  "কোমর":       { "en": "the waist" },
-  "কলাগাছ":     { "en": "a banana tree" },
-  "গ্রাম":      { "en": "a village" },
-  "গ্রহ":       { "en": "a planet" },
-  "গামছা":      { "en": "a gamcha, thin cotton towel" },
-  "গায়ক":      { "en": "a singer" },
-  "চাঁদ":       { "en": "the moon" },
-  "নাশতা":      { "en": "breakfast" },
-  "পাহাড়":     { "en": "a hill" },
-  "পরিবার":     { "en": "a family" },
-  "বন্দর":      { "en": "a port, harbour" },
-  "বসা":        { "en": "to sit" },
-  "বালি":       { "en": "sand" },
-  "বালতি":      { "en": "a bucket" },
-  "বালিশ":      { "en": "a pillow" },
-  "বারান্দা":   { "en": "a verandah" },
-  "বিস্কুট":    { "en": "a biscuit" },
-  "বিদ্যালয়":  { "en": "a school" },
-  "মানুষ":      { "en": "a person" },
-  "মাছরাঙা":    { "en": "a kingfisher" },
-  "রাবার":      { "en": "an eraser" },
-  "সমুদ্র":     { "en": "the sea" },
-  "হাসি":       { "en": "a smile" },
-  "হাতঘড়ি":    { "en": "a wristwatch" },
-  "হেলিকপ্টার": { "en": "a helicopter" },
-  "ক্লাস":      { "en": "a class at school", "flag": "draw a classroom of children" },
-  "কবিতা":      { "en": "a poem", "flag": "draw an open book of verse" },
-  "ঠান্ডা":     { "en": "cold", "flag": "draw someone shivering, or ice" },
-  "বাতাস":      { "en": "wind", "flag": "draw leaves and hair blowing" },
-  "হরফ":        { "en": "a letter of the alphabet", "flag": "draw a single printed letter" },
-  "নগদ":        { "en": "cash", "flag": "draw banknotes and coins" }
+  "আকাশ": {
+   "en": "the sky"
+  },
+  "আগুন": {
+   "en": "fire"
+  },
+  "আঙুর": {
+   "en": "grapes"
+  },
+  "আঙুল": {
+   "en": "a finger"
+  },
+  "আপেল": {
+   "en": "an apple"
+  },
+  "আনারস": {
+   "en": "a pineapple"
+  },
+  "আলমারি": {
+   "en": "a cupboard, almirah"
+  },
+  "কালো": {
+   "en": "black"
+  },
+  "কুঁড়ি": {
+   "en": "a flower bud"
+  },
+  "কচ্ছপ": {
+   "en": "a turtle"
+  },
+  "কড়াই": {
+   "en": "a frying pan, karai"
+  },
+  "কবুতর": {
+   "en": "a pigeon"
+  },
+  "কামার": {
+   "en": "a blacksmith"
+  },
+  "কুমড়া": {
+   "en": "a pumpkin"
+  },
+  "কুমার": {
+   "en": "a potter"
+  },
+  "কোমর": {
+   "en": "the waist"
+  },
+  "কলাগাছ": {
+   "en": "a banana tree"
+  },
+  "গ্রাম": {
+   "en": "a village"
+  },
+  "গ্রহ": {
+   "en": "a planet"
+  },
+  "গামছা": {
+   "en": "a gamcha, thin cotton towel"
+  },
+  "গায়ক": {
+   "en": "a singer"
+  },
+  "চাঁদ": {
+   "en": "the moon"
+  },
+  "নাশতা": {
+   "en": "breakfast"
+  },
+  "পাহাড়": {
+   "en": "a hill"
+  },
+  "পরিবার": {
+   "en": "a family"
+  },
+  "বন্দর": {
+   "en": "a port, harbour"
+  },
+  "বসা": {
+   "en": "to sit"
+  },
+  "বালি": {
+   "en": "sand"
+  },
+  "বালতি": {
+   "en": "a bucket"
+  },
+  "বালিশ": {
+   "en": "a pillow"
+  },
+  "বারান্দা": {
+   "en": "a verandah"
+  },
+  "বিস্কুট": {
+   "en": "a biscuit"
+  },
+  "বিদ্যালয়": {
+   "en": "a school"
+  },
+  "মানুষ": {
+   "en": "a person"
+  },
+  "মাছরাঙা": {
+   "en": "a kingfisher"
+  },
+  "রাবার": {
+   "en": "an eraser"
+  },
+  "সমুদ্র": {
+   "en": "the sea"
+  },
+  "হাসি": {
+   "en": "a smile"
+  },
+  "হাতঘড়ি": {
+   "en": "a wristwatch"
+  },
+  "হেলিকপ্টার": {
+   "en": "a helicopter"
+  },
+  "ক্লাস": {
+   "en": "a class at school",
+   "flag": "draw a classroom of children"
+  },
+  "কবিতা": {
+   "en": "a poem",
+   "flag": "draw an open book of verse"
+  },
+  "ঠান্ডা": {
+   "en": "cold",
+   "flag": "draw someone shivering, or ice"
+  },
+  "বাতাস": {
+   "en": "wind",
+   "flag": "draw leaves and hair blowing"
+  },
+  "হরফ": {
+   "en": "a letter of the alphabet",
+   "flag": "draw a single printed letter"
+  },
+  "নগদ": {
+   "en": "cash",
+   "flag": "draw banknotes and coins"
+  },
+  "ছেলে": {
+   "en": "a boy"
+  },
+  "ধোঁয়া": {
+   "en": "smoke"
+  },
+  "ধোপা": {
+   "en": "a washerman"
+  },
+  "ভুরু": {
+   "en": "an eyebrow"
+  },
+  "মাংস": {
+   "en": "meat"
+  },
+  "মূলা": {
+   "en": "a radish"
+  },
+  "সিঁড়ি": {
+   "en": "stairs"
+  },
+  "সূর্য": {
+   "en": "the sun"
+  },
+  "স্কুল": {
+   "en": "a school"
+  },
+  "খাবার": {
+   "en": "food"
+  },
+  "জানালা": {
+   "en": "a window"
+  },
+  "জাহাজ": {
+   "en": "a ship"
+  },
+  "ডাক্তার": {
+   "en": "a doctor"
+  },
+  "ডালিম": {
+   "en": "a pomegranate"
+  },
+  "পেন্সিল": {
+   "en": "a pencil"
+  },
+  "বাঁদর": {
+   "en": "a monkey"
+  },
+  "ভবন": {
+   "en": "a building"
+  },
+  "মিছরি": {
+   "en": "sugar candy"
+  },
+  "মুরগি": {
+   "en": "a hen"
+  },
+  "সৈনিক": {
+   "en": "a soldier"
+  },
+  "স্টেশন": {
+   "en": "a station"
+  },
+  "তরকারি": {
+   "en": "curry"
+  },
+  "ফুলবাগান": {
+   "en": "a flower garden"
+  },
+  "সাঁতার": {
+   "en": "swimming",
+   "flag": "draw a child swimming"
+  },
+  "বেগুনি": {
+   "en": "purple",
+   "flag": "the colour, not the বেগুনি fritter"
+  },
+  "শীত": {
+   "en": "winter",
+   "flag": "draw a shawl and mist, not a thermometer"
+  }
  },
  "refuse": {
-  "মাসি":       "West Bengal form; this game says খালা. Already in vocabulary.py's rejects",
-  "বড়":        "adjective: nothing to draw that is not a comparison",
-  "সরু":        "adjective",
-  "চিকন":       "adjective",
-  "চওড়া":      "adjective",
-  "নরম":        "adjective",
-  "কঠিন":       "adjective",
-  "হালকা":      "adjective",
-  "সরল":        "adjective",
-  "সহজ":        "adjective",
-  "পরিষ্কার":   "adjective",
-  "কম":         "abstract quantity, and a fragment a child meets as a verb ending",
-  "কর":         "reads as the imperative of করা, which is already on a board",
-  "সব":         "abstract: all",
-  "সকল":        "abstract: all, and the more literary of the two",
-  "সফল":        "abstract: successful",
-  "সময়":       "abstract: time",
-  "সমতল":       "abstract: level ground, and a geography register",
-  "বছর":        "abstract: a year",
-  "আনন্দ":      "abstract: joy",
-  "আসল":        "abstract: real, genuine",
-  "রকম":        "abstract: kind, sort",
-  "হজম":        "abstract: digestion",
-  "হৃদয়":      "the heart as feeling, not the organ - abstract",
-  "চুপ":        "abstract: quiet",
-  "বস":         "reads as the imperative of বসা, which is allowed instead",
-  "পশ্চিম":     "abstract: west",
-  "পড়ালেখা":   "abstract: studying",
-  "গৃহ":        "Sanskritic and literary; বাড়ি is the word a child uses, and it is on a board",
-  "বসন্ত":      "a season, and also the word for smallpox - not for a child's board",
-  "বর্ষাকাল":   "the rainy season: বর্ষা already carries this and is on a board",
-  "আষাঢ়":      "a month of the Bengali calendar; no picture shows it",
-  "বানান":      "abstract: spelling",
-  "মাঝরাত":     "abstract: midnight",
-  "রাস্তাঘাট":  "a plural abstraction: streets in general",
-  "চিঠিপত্র":   "a plural abstraction: correspondence. চিঠি is the drawable one and is on a board",
-  "কমলা":       "already set as a puzzle on another level"
+  "মাসি": "West Bengal form; this game says খালা. Already in vocabulary.py's rejects",
+  "বড়": "adjective: nothing to draw that is not a comparison",
+  "সরু": "adjective",
+  "চিকন": "adjective",
+  "চওড়া": "adjective",
+  "নরম": "adjective",
+  "কঠিন": "adjective",
+  "হালকা": "adjective",
+  "সরল": "adjective",
+  "সহজ": "adjective",
+  "পরিষ্কার": "adjective",
+  "কম": "abstract quantity, and a fragment a child meets as a verb ending",
+  "কর": "reads as the imperative of করা, which is already on a board",
+  "সব": "abstract: all",
+  "সকল": "abstract: all, and the more literary of the two",
+  "সফল": "abstract: successful",
+  "সময়": "abstract: time",
+  "সমতল": "abstract: level ground, and a geography register",
+  "বছর": "abstract: a year",
+  "আনন্দ": "abstract: joy",
+  "আসল": "abstract: real, genuine",
+  "রকম": "abstract: kind, sort",
+  "হজম": "abstract: digestion",
+  "হৃদয়": "the heart as feeling, not the organ - abstract",
+  "চুপ": "abstract: quiet",
+  "বস": "reads as the imperative of বসা, which is allowed instead",
+  "পশ্চিম": "abstract: west",
+  "পড়ালেখা": "abstract: studying",
+  "গৃহ": "Sanskritic and literary; বাড়ি is the word a child uses, and it is on a board",
+  "বসন্ত": "a season, and also the word for smallpox - not for a child's board",
+  "বর্ষাকাল": "the rainy season: বর্ষা already carries this and is on a board",
+  "আষাঢ়": "a month of the Bengali calendar; no picture shows it",
+  "বানান": "abstract: spelling",
+  "মাঝরাত": "abstract: midnight",
+  "রাস্তাঘাট": "a plural abstraction: streets in general",
+  "চিঠিপত্র": "a plural abstraction: correspondence. চিঠি is the drawable one and is on a board",
+  "কমলা": "already set as a puzzle on another level",
+  "জল": "West Bengal form; this game says পানি",
+  "জুতো": "West Bengal form; Bangladesh says জুতা",
+  "সুতো": "West Bengal form, and সুতা is already on a board",
+  "ঔষধ": "the same word as ওষুধ, which is already on a board",
+  "নৃত্য": "Sanskritic; নাচ is the word a child uses and it is on a board",
+  "শীতকাল": "a season শীত already carries",
+  "খালি": "adjective",
+  "ঘন": "adjective",
+  "ছোট": "adjective",
+  "উষ্ণ": "adjective",
+  "ধীর": "adjective",
+  "নিচু": "adjective",
+  "ঝাল": "adjective",
+  "ভারী": "adjective",
+  "মৃদু": "adjective",
+  "মোটা": "adjective",
+  "শক্ত": "adjective",
+  "নোংরা": "adjective",
+  "ধনী": "adjective",
+  "পুরনো": "adjective",
+  "সুন্দর": "adjective",
+  "মেঘলা": "adjective",
+  "শীতল": "adjective",
+  "তরল": "adjective",
+  "অতল": "adjective",
+  "অলস": "adjective",
+  "ছুটি": "abstract: a holiday",
+  "ভাঁজ": "abstract: a fold",
+  "ভাষা": "abstract: a language",
+  "শব্দ": "abstract: a sound, a word",
+  "শেখা": "abstract: to learn",
+  "স্বপ্ন": "abstract: a dream",
+  "স্বাদ": "abstract: taste",
+  "ওজন": "abstract: weight",
+  "খবর": "abstract: news",
+  "তারিখ": "abstract: a date",
+  "মিনিট": "abstract: a minute",
+  "ভূগোল": "abstract: geography",
+  "ভ্রমণ": "abstract: travel",
+  "উত্তর": "abstract: north, and also an answer",
+  "অন্ধকার": "abstract: darkness",
+  "ইতিহাস": "abstract: history",
+  "ভালোবাসা": "abstract: love",
+  "মূল": "ambiguous: a root, but also an origin. মূলা the radish is allowed instead"
  }
 }
