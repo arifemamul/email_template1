@@ -1,5 +1,5 @@
 /*
- * The menu bar and the two alphabet charts.
+ * The menu bar, the two alphabet charts and the বারোখড়ি.
  *
  * The charts are built from LEVELS rather than written out, which is the whole reason they are
  * worth testing: a hand-written চার্ট of the বর্ণমালা goes quietly wrong the first time a refit
@@ -19,7 +19,18 @@ p.on('console', m => { if (m.type() === 'error') problems.push('console: ' + m.t
 await p.goto(PAGE);
 await p.waitForFunction(() => document.querySelector('.tile') && document.querySelector('#menu .tab'));
 
-const PAGES = ['vowels', 'consonants', 'marks', 'levels', 'about', 'play'];
+// Read off the page rather than written out here. A hardcoded list silently stops testing
+// whatever gets added next: two sections were added and this file kept passing, because it was
+// still checking the six it knew about. The tab bar and the sections also have to agree with
+// each other, and that agreement is itself worth asserting.
+const PAGES = await p.$$eval('#menu .tab', ts => ts.map(t => t.dataset.page));
+const SECTIONS = await p.$$eval('.pages .page', ss => ss.map(s => s.id.replace(/^page-/, '')));
+const EXPECTED = ['vowels', 'consonants', 'marks', 'gathon', 'phala', 'jukto',
+                  'levels', 'about', 'play'];
+if (PAGES.join() !== EXPECTED.join())
+  problems.push(`tabs are [${PAGES}], expected [${EXPECTED}]`);
+if (SECTIONS.join() !== PAGES.join())
+  problems.push(`tabs [${PAGES}] and sections [${SECTIONS}] do not match`);
 
 // ---- one section at a time, and the one you clicked ------------------------------------
 for (const key of PAGES) {
@@ -165,7 +176,7 @@ const cover = await p.evaluate(() => {
 });
 console.log(`বারোখড়ি coverage: ${cover.shown} of ${cover.total} forms show a word`);
 if (cover.shown < 270)
-  problems.push(`only ${cover.shown} of ${cover.total} forms show a word; was 274`);
+  problems.push(`only ${cover.shown} of ${cover.total} forms show a word; was 275`);
 console.log(`KAR_WORDS: ${kar.length} vetted words for forms no board reaches`);
 
 // A row's word or level opens something real.
@@ -204,4 +215,5 @@ if (!back.tiles) problems.push('no wheel after closing the menu');
 if (back.cell < 30) problems.push(`cells are ${back.cell}px after closing the menu, under the 30px floor`);
 
 await b.close();
-report(problems, 'MENU OK: six sections, charts and বারোখড়ি counted from the game, letters open their levels');
+report(problems, `MENU OK: ${PAGES.length} sections, charts and বারোখড়ি counted from `
+               + 'the game, letters open their levels');

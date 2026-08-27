@@ -85,7 +85,8 @@
 
       <!-- The menu bar. One section is on screen at a time, which is the point: the guide used
            to be one long scroll with the level grid on top, and a child looking for the letter
-           chart had to know it was down there. Six named places instead. -->
+           chart had to know it was down there. Eight named places instead, in teaching order:
+           the letters, then what the letters take, then how letters join into words. -->
       <nav class="menu" id="menu" role="tablist" aria-label="Sections">
         <button class="tab bn" type="button" role="tab" data-page="vowels"
                 aria-controls="page-vowels" title="এগারোটি স্বরবর্ণ">স্বরবর্ণ</button>
@@ -93,6 +94,12 @@
                 aria-controls="page-consonants" title="ক থেকে হ - বত্রিশটি ব্যঞ্জনবর্ণ">ব্যঞ্জনবর্ণ</button>
         <button class="tab bn" type="button" role="tab" data-page="marks"
                 aria-controls="page-marks" title="বর্ণের সঙ্গে যে চিহ্নগুলো বসে">কার ও চিহ্ন</button>
+        <button class="tab bn" type="button" role="tab" data-page="gathon"
+                aria-controls="page-gathon" title="বর্ণ জুড়ে শব্দ বানানো">শব্দ গঠন</button>
+        <button class="tab bn" type="button" role="tab" data-page="phala"
+                aria-controls="page-phala" title="ব্যঞ্জনবর্ণের সংক্ষিপ্ত রূপ">ফলা</button>
+        <button class="tab bn" type="button" role="tab" data-page="jukto"
+                aria-controls="page-jukto" title="দুই বর্ণ মিলে এক বর্ণ">যুক্তবর্ণ</button>
         <button class="tab bn" type="button" role="tab" data-page="levels"
                 aria-controls="page-levels" title="বর্ণ অনুসারে সব লেভেল">লেভেল</button>
         <button class="tab bn" type="button" role="tab" data-page="about"
@@ -156,6 +163,53 @@
           </p>
           <div class="baro-pick" id="baroPick"></div>
           <div class="baro" id="baroTable"></div>
+        </section>
+
+        <!-- শব্দ গঠন and ফলা: three tables out of a printed primer, transcribed in
+             tools/primer.json and drawn by js/11-primer.js. They are here because a chart of
+             the বর্ণমালা tells a child what the letters are and the বারোখড়ি tells them what
+             each letter becomes, but neither shows the step between - that two letters put
+             side by side make a word. A primer teaches that with equations, so this does. -->
+        <section class="page" id="page-gathon" role="tabpanel" aria-labelledby="tab-gathon">
+          <h3>কার চিহ্ন ছাড়া শব্দ গঠন</h3>
+          <p class="deck">
+            কোনো কার নেই, কোনো চিহ্ন নেই - শুধু বর্ণের পর বর্ণ। এভাবেই শিশু প্রথম শব্দ পড়ে:
+            ব আর ক পাশে বসলে বক, ক ল ম পাশে বসলে কলম। যে শব্দ এই খেলায় আছে, তাতে চাপ দিলে
+            তার লেভেল খুলে যায়।
+          </p>
+          <div class="eqs" id="eqTwo"></div>
+          <h4 class="eq-head bn">তিন বর্ণে</h4>
+          <div class="eqs" id="eqThree"></div>
+
+          <h3 class="kw-head">কার চিহ্ন যোগে বানান শেখা</h3>
+          <p class="deck">
+            এবার কার যোগ হলো। নিচের যেকোনো কারে চাপ দিলে সেই কার দিয়ে লেখা শব্দগুলো দেখা যাবে -
+            একটি কার, একগুচ্ছ শব্দ, আর প্রতিটিতেই সেই কারটি খুঁজে পাওয়া যাবে।
+          </p>
+          <div class="kw-pick" id="karPick"></div>
+          <div class="kw-list" id="karList"></div>
+        </section>
+
+        <section class="page" id="page-phala" role="tabpanel" aria-labelledby="tab-phala">
+          <h3>ফলা চিহ্নের পরিচয়</h3>
+          <p class="deck" id="phalaNote"></p>
+          <div class="phala" id="phalaTable"></div>
+        </section>
+
+        <!-- যুক্তবর্ণ. This is the section that explains the game's own rule: the wheel hands a
+             child ক্ষ as one tile because ক্ষ is one letter, and this is the table that says
+             so. Every row is checked by tools/build.py - the parts really do join into the
+             form, and the form really is a single akshara by the same splitter the board
+             uses. -->
+        <section class="page" id="page-jukto" role="tabpanel" aria-labelledby="tab-jukto">
+          <h3>যুক্তবর্ণ বা যুক্তাক্ষর</h3>
+          <p class="deck" id="juktoNote"></p>
+          <p class="deck">
+            নিচের ছকে তিনটি ঘর - যুক্তবর্ণ, তার বিভাজন, আর শব্দ। খেলায় আছে যে শব্দ, তাতে চাপ
+            দিলে লেভেল খুলে যায়। উপরের ঘরে চাপ দিয়ে খোঁজা যায়: কোন বর্ণ দিয়ে যুক্তবর্ণটি শুরু।
+          </p>
+          <div class="jk-pick" id="juktoPick"></div>
+          <div class="jk" id="juktoTable"></div>
         </section>
 
         <section class="page" id="page-levels" role="tabpanel" aria-labelledby="tab-levels">
@@ -299,7 +353,8 @@
 /* include js/08-animate.js   the movement that answers every action */
 /* include js/09-feedback.js  a note a player can copy and send on, no server behind it */
 /* include js/10-menu.js      the alphabet charts, the marks table, the menu bar */
-/* include js/11-play.js      picking letters, judging a word, finishing a level */
+/* include js/11-primer.js    a printed primer's tables - word building and ফলা */
+/* include js/12-play.js      picking letters, judging a word, finishing a level */
 </script>
 </body>
 </html>

@@ -10,6 +10,10 @@ Level pipeline CLI.
     python3 tools/build.py slots              recording and illustration work, in order
     python3 tools/build.py voice              the pronunciation manifest, as JS
     python3 tools/build.py discover প্রজাপতি   what else can this word's tiles spell?
+    python3 tools/build.py normalise-primer   compose ে + া into ো in tools/primer.json
+
+`check` and `build` both re-verify tools/primer.json - the primer's four tables, transcribed
+from photographs - and raise rather than warn if it has gone wrong. See `primer()`.
 
 `check` exits non-zero when anything is wrong, so it works in CI. After `build`, run the
 Kotlin tests (`cd bengali-word-game && ./gradlew test`) - they re-verify the same invariants
@@ -20,6 +24,7 @@ import json
 import pathlib
 import re
 import sys
+import unicodedata
 
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
@@ -39,6 +44,16 @@ LEVELS_JS = SRC / 'js/02-levels.js'       # the one generated part; written by `
 # A word for every বারোখড়ি form no board can illustrate - vetted by hand, because corpus
 # frequency alone offers proper nouns, misspellings and inflections. See the file's own note.
 KAR_WORDS = json.loads((REPO / 'tools/kar-words.json').read_text(encoding='utf-8'))
+
+# A Bengali primer's own tables, transcribed from its pages. Checked by `primer()` below
+# rather than trusted, because it was typed in by hand off photographs. See the file's note.
+# Normalised on the way in. ো is one code point, but it can also be typed as ে + া, which
+# renders identically and would defeat every check below - a ো word would pass as a ে word,
+# and split_aksharas would disagree with the equation it is checking. NFC composes the pair,
+# so the checks see one spelling. `primer()` then flags the file itself if it was not already
+# normalised, because the repo should hold the composed form, not be quietly fixed on load.
+PRIMER = json.loads(unicodedata.normalize(
+    'NFC', (REPO / 'tools/primer.json').read_text(encoding='utf-8')))
 
 # The বারোখড়ি's two axes, which the page draws and this file fills in for.
 BARO_CONSONANTS = 'কখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ'
@@ -121,6 +136,116 @@ def milestones(levels):
             info = BLOCKS[block]
             marks[i] = f'Block {block}, {info["name"]}: {info["goal"]}.'
     return marks
+
+
+# The ten কার, for checking that a word filed under one really carries it. Not BARO_SIGNS:
+# that list has a bare form and ং, neither of which is a কার.
+KAR_SIGNS = 'ািীুূৃেৈোৌ'
+
+# What binds two consonants into one যুক্তবর্ণ, and one tile.
+HASANTA = '\u09cd'
+
+
+def primer():
+    """
+    The primer's tables, checked against themselves before the page is allowed to show them.
+
+    tools/primer.json was transcribed by hand from photographs of a printed primer, which is
+    exactly the kind of source that goes wrong silently: a ু read as a ূ, a missing akshara in
+    an equation, a word filed under the wrong কার. Every one of those mistakes would be taught
+    to a child as fact. So the file is not trusted - it is verified on every build:
+
+      - each equation must compose its word akshara for akshara, so ক + ল + ম = কলম is checked
+        by splitting কলম and comparing, not by eye;
+      - the "কার চিহ্ন ছাড়া" words must carry no কার, which is the whole claim of that table;
+      - each word must contain the কার it is filed under, and a ে that is really the first half
+        of a ো or ৌ does not count;
+      - each ফলা form must contain its mark, and each ফলা word must contain one of the forms
+        listed for it - a word carrying the mark in some form the table never shows teaches
+        nothing.
+
+    A failure raises rather than warns. A quietly wrong primer is worse than no primer.
+    """
+    bad = []
+    raw = (REPO / 'tools/primer.json').read_text(encoding='utf-8')
+    if unicodedata.normalize('NFC', raw) != raw:
+        bad.append('the file is not NFC: some ো or ৌ is typed as ে + া. Run '
+                   '`python3 tools/build.py normalise-primer`.')
+
+    for group, count in (('two', 2), ('three', 3)):
+        for parts in PRIMER['no_kar'][group]:
+            word = ''.join(parts)
+            if split_aksharas(word) != parts:
+                bad.append(f'{"+".join(parts)} = {word}, which splits as '
+                           f'{"+".join(split_aksharas(word))}')
+            if len(parts) != count:
+                bad.append(f'no_kar/{group}: {word} has {len(parts)} parts, not {count}')
+            for ch in word:
+                if ch in KAR_SIGNS:
+                    bad.append(f'no_kar/{group}: {word} carries the কার {ch!r}')
+
+    for sign, words in PRIMER['by_kar'].items():
+        for word in words:
+            if sign not in word:
+                bad.append(f'by_kar[{sign}]: {word} does not carry the sign')
+            # ো and ৌ each contain a া or a ে once decomposed, and NFC has composed them, so
+            # the substring test above would still file মোট under া-কার without this.
+            elif sign in 'াে' and ('ো' in word or 'ৌ' in word):
+                bad.append(f'by_kar[{sign}]: {word} is a ো/ৌ word')
+        repeated = sorted({w for w in words if words.count(w) > 1})
+        if repeated:
+            bad.append(f'by_kar[{sign}]: repeated {repeated}')
+
+    for phala in PRIMER['phala']['list']:
+        mark = phala['mark']
+        for form in phala['forms']:
+            if mark not in form:
+                bad.append(f'{phala["name"]}: the form {form} does not carry {mark}')
+        for word in phala['words']:
+            if mark not in word:
+                bad.append(f'{phala["name"]}: {word} does not carry {mark}')
+            elif not any(form in word for form in phala['forms']):
+                bad.append(f'{phala["name"]}: {word} carries no form the table shows')
+        # `unused` says which of the book's forms no attested Bengali word carries - the page
+        # dims those and says so. It has to be a subset of the forms, or the page dims nothing.
+        for form in phala.get('unused', []):
+            if form not in phala['forms']:
+                bad.append(f'{phala["name"]}: {form} is marked unused but is not a form')
+            if any(form in word for word in phala['words']):
+                bad.append(f'{phala["name"]}: {form} is marked unused but a word here carries it')
+
+    # ---- যুক্তবর্ণ: the parts must really make the letter -----------------------------
+    # This is the strictest table in the file, and the one most worth checking: a যুক্তবর্ণ is
+    # exactly its parts joined by a hasanta, so the claim ক্ + ক = ক্ক is arithmetic and can be
+    # done rather than trusted. Two rows are exceptions the book itself creates - হৃ and ত্রু,
+    # where the printed বিভাজন is how the letter sounds rather than how it is written - and
+    # those carry `phonetic` and must explain themselves.
+    seen = set()
+    for row in PRIMER['jukto']['rows']:
+        form, parts = row['form'], row['parts']
+        if form in seen:
+            bad.append(f'jukto: {form} appears twice')
+        seen.add(form)
+        if row.get('phonetic'):
+            if not row.get('note'):
+                bad.append(f'jukto: {form} is marked phonetic but does not say why')
+        else:
+            joined = HASANTA.join(parts)
+            if joined != form:
+                bad.append(f'jukto: {"+".join(parts)} joins as {joined}, not {form}')
+        # One akshara, which is the whole reason this table belongs in this game: the wheel
+        # gives a child ক্ষ as a single tile, and here is why.
+        if len(split_aksharas(form)) != 1:
+            bad.append(f'jukto: {form} is {len(split_aksharas(form))} aksharas, not one')
+        if not row['words']:
+            bad.append(f'jukto: {form} has no example word')
+        for word in row['words']:
+            if form not in word:
+                bad.append(f'jukto: {word} does not contain {form}')
+
+    if bad:
+        raise SystemExit('tools/primer.json is wrong:\n  ' + '\n  '.join(bad))
+    return PRIMER
 
 
 def kar_examples(levels):
@@ -215,6 +340,47 @@ def emit(levels):
     for akshara, entry in kar_examples(levels).items():
         js.append(f'  "{akshara}": {{ w: "{entry["w"]}", en: "{entry["en"]}" }},')
     js[-1] = js[-1].rstrip(',')
+    js.append('};')
+
+    # And the primer's own three tables. Emitted rather than written into the page by hand for
+    # the same reason the level table is: they are checked by `primer()` on every build, and a
+    # hand copy in the page would be a second, unchecked one.
+    book = primer()
+    js.append('')
+    js.append('/* A printed primer\'s tables, transcribed and checked - see tools/primer.json. */')
+    js.append('const PRIMER = {')
+    for group in ('two', 'three'):
+        rows = ', '.join('[%s]' % ', '.join(f'"{part}"' for part in parts)
+                         for parts in book['no_kar'][group])
+        js.append(f'  {group}: [{rows}],')
+    js.append('  byKar: {')
+    for sign, words in book['by_kar'].items():
+        js.append('    "%s": [%s],' % (sign, ', '.join(f'"{w}"' for w in words)))
+    js[-1] = js[-1].rstrip(',')
+    js.append('  },')
+    js.append(f'  phalaNote: "{book["phala"]["note"]}",')
+    js.append('  phala: [')
+    for phala in book['phala']['list']:
+        forms = ', '.join(f'"{f}"' for f in phala['forms'])
+        words = ', '.join(f'"{w}"' for w in phala['words'])
+        unused = ', '.join(f'"{f}"' for f in phala['unused'])
+        js.append(f'    {{ name: "{phala["name"]}", mark: "{phala["mark"]}", '
+                  f'note: "{phala["note"]}", forms: [{forms}], unused: [{unused}], '
+                  f'words: [{words}] }},')
+    js[-1] = js[-1].rstrip(',')
+    js.append('  ],')
+    js.append(f'  juktoNote: "{book["jukto"]["note"]}",')
+    js.append('  jukto: [')
+    for row in book['jukto']['rows']:
+        parts = ', '.join(f'"{part}"' for part in row['parts'])
+        words = ', '.join(f'"{w}"' for w in row['words'])
+        extra = ''
+        if row.get('phonetic'):
+            extra = f', phonetic: true, note: "{row["note"]}"'
+        js.append(f'    {{ form: "{row["form"]}", parts: [{parts}], '
+                  f'words: [{words}]{extra} }},')
+    js[-1] = js[-1].rstrip(',')
+    js.append('  ]')
     js.append('};')
 
     kt[-1] = kt[-1].rstrip(',')
@@ -637,6 +803,19 @@ def voice(levels):
 def main(argv):
     command = argv[0] if argv else 'check'
 
+    if command == 'normalise-primer':
+        # ো typed as ে + া renders identically and is invisible in an editor, so the fix is a
+        # command rather than something to hunt for by hand.
+        path = REPO / 'tools/primer.json'
+        raw = path.read_text(encoding='utf-8')
+        fixed = unicodedata.normalize('NFC', raw)
+        if fixed == raw:
+            print('tools/primer.json is already NFC')
+            return 0
+        path.write_text(fixed, encoding='utf-8')
+        print(f'tools/primer.json normalised, {len(raw) - len(fixed)} code points composed')
+        return 0
+
     if command == 'discover':
         if len(argv) < 2:
             print('usage: build.py discover <bengali word>')
@@ -648,10 +827,19 @@ def main(argv):
     levels, failures = ordered_levels()
 
     if command == 'check':
+        # The primer's tables, before anything else prints. `build` verifies them too, by way
+        # of `emit`, but `check` is the gate that runs in CI, and a table a child reads to
+        # learn spelling is exactly the thing that should not reach a build unverified.
+        book = primer()
         report(levels, failures)
         if failures:
             print('\ncheck FAILED')
             return 1
+        sums = len(book['no_kar']['two']) + len(book['no_kar']['three'])
+        kar_words = sum(len(w) for w in book['by_kar'].values())
+        print(f'\nprimer ok: {sums} word sums, {kar_words} words across 10 কার, '
+              f'{len(book["phala"]["list"])} ফলা, {len(book["jukto"]["rows"])} যুক্তবর্ণ')
+
         gaps = [u for u in alphabet()
                 if u not in {t for level in levels for t in level['teaches']}]
         if gaps and FULL_SYLLABUS:

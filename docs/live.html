@@ -794,6 +794,236 @@ line-height: 1.35;
 .br:has(.br-gloss) { grid-template-columns: 54px 1fr auto; }
 .br-gloss { grid-column: 2 / -1; grid-row: 2; text-align: left; }
 }
+
+.eqs {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+gap: 6px;
+margin: 12px 0 4px;
+}
+.eq {
+display: flex;
+align-items: center;
+gap: 5px;
+padding: 7px 9px;
+border: 1px solid color-mix(in srgb, var(--parchment) 9%, transparent);
+border-radius: 10px;
+background: color-mix(in srgb, var(--indigo-700) 40%, transparent);
+}
+.eq-l {
+font-size: 17px;
+font-weight: 700;
+color: color-mix(in srgb, var(--parchment) 88%, var(--marigold));
+}
+.eq-op {
+font-family: var(--ui);
+font-size: 12px;
+color: color-mix(in srgb, var(--parchment) 34%, var(--indigo-700));
+}
+.eq-w {
+margin-left: auto;
+padding: 3px 8px;
+border: 1px solid color-mix(in srgb, var(--parchment) 14%, transparent);
+border-radius: 8px;
+font-size: 16px;
+font-weight: 700;
+color: color-mix(in srgb, var(--parchment) 74%, var(--indigo-700));
+background: none;
+cursor: default;
+}
+.eq-w.on {
+border-color: color-mix(in srgb, var(--marigold) 55%, transparent);
+color: var(--marigold);
+cursor: pointer;
+transition: background-color .14s ease, color .14s ease;
+}
+.eq-w.on:hover { background: var(--marigold); color: var(--ink); }
+.eq-head, .kw-head { margin: 18px 0 0; }
+.eq-head {
+font-size: 13px;
+font-weight: 700;
+color: color-mix(in srgb, var(--parchment) 52%, var(--indigo-700));
+}
+
+.kw-pick {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+gap: 5px;
+margin: 14px 0 16px;
+}
+.kp {
+display: grid;
+gap: 1px;
+padding: 7px 4px;
+border: 1px solid color-mix(in srgb, var(--parchment) 12%, transparent);
+border-radius: 10px;
+background: color-mix(in srgb, var(--indigo-700) 50%, transparent);
+cursor: pointer;
+transition: background-color .14s ease, transform .14s ease;
+}
+.kp:hover { background: var(--violet-600); }
+.kp:active { transform: scale(.94); }
+.kp-s {
+font-size: 18px;
+font-weight: 700;
+color: color-mix(in srgb, var(--marigold) 80%, var(--parchment));
+}
+.kp-n {
+font-size: 10px;
+color: color-mix(in srgb, var(--parchment) 44%, var(--indigo-700));
+}
+.kp.on { background: var(--marigold); border-color: var(--marigold); }
+.kp.on .kp-s, .kp.on .kp-n { color: var(--ink); }
+.kw-count {
+margin: 0 0 8px;
+font-size: 12px;
+color: color-mix(in srgb, var(--parchment) 50%, var(--indigo-700));
+}
+.kw-words, .ph-words, .ph-forms { display: flex; flex-wrap: wrap; gap: 5px; }
+.kw, .ph-w, .ph-f {
+padding: 4px 9px;
+border: 1px solid color-mix(in srgb, var(--parchment) 11%, transparent);
+border-radius: 8px;
+background: color-mix(in srgb, var(--indigo-700) 40%, transparent);
+font-size: 15px;
+color: color-mix(in srgb, var(--parchment) 74%, var(--indigo-700));
+cursor: default;
+}
+.kw.on, .ph-w.on {
+border-color: color-mix(in srgb, var(--marigold) 50%, transparent);
+color: var(--marigold);
+font-weight: 700;
+cursor: pointer;
+transition: background-color .14s ease, color .14s ease;
+}
+.kw.on:hover, .ph-w.on:hover { background: var(--marigold); color: var(--ink); }
+
+.phala { display: grid; gap: 10px; margin-top: 14px; }
+.ph {
+padding: 11px 12px 12px;
+border: 1px solid color-mix(in srgb, var(--parchment) 9%, transparent);
+border-radius: 12px;
+background: color-mix(in srgb, var(--indigo-700) 34%, transparent);
+}
+.ph-h {
+display: flex;
+align-items: center;
+gap: 8px;
+margin: 0 0 5px;
+font-size: 15px;
+color: color-mix(in srgb, var(--parchment) 88%, var(--marigold));
+}
+.ph-m {
+padding: 1px 8px;
+border-radius: 7px;
+background: color-mix(in srgb, var(--marigold) 20%, transparent);
+color: var(--marigold);
+font-size: 18px;
+font-weight: 700;
+}
+.ph-note {
+margin: 0 0 9px;
+font-size: 12.5px;
+line-height: 1.55;
+color: color-mix(in srgb, var(--parchment) 58%, var(--indigo-700));
+}
+.ph-f {
+font-size: 14px;
+font-weight: 700;
+color: color-mix(in srgb, var(--marigold) 62%, var(--parchment));
+background: none;
+}
+.ph-forms { margin-bottom: 9px; }
+
+.ph-f-none {
+color: color-mix(in srgb, var(--parchment) 26%, var(--indigo-700));
+text-decoration: line-through;
+text-decoration-thickness: 1px;
+}
+.ph-gap {
+margin: 0 0 9px;
+font-size: 11.5px;
+line-height: 1.5;
+color: color-mix(in srgb, var(--parchment) 40%, var(--indigo-700));
+}
+
+.jk-pick {
+display: flex;
+flex-wrap: wrap;
+gap: 4px;
+margin: 14px 0 14px;
+}
+.jp {
+min-width: 30px;
+padding: 5px 7px;
+border: 1px solid color-mix(in srgb, var(--parchment) 12%, transparent);
+border-radius: 9px;
+background: color-mix(in srgb, var(--indigo-700) 50%, transparent);
+color: color-mix(in srgb, var(--marigold) 80%, var(--parchment));
+font-size: 15px;
+font-weight: 700;
+cursor: pointer;
+transition: background-color .14s ease, transform .14s ease;
+}
+.jp:hover { background: var(--violet-600); }
+.jp:active { transform: scale(.94); }
+.jp.on { background: var(--marigold); border-color: var(--marigold); color: var(--ink); }
+.jp-all { font-size: 13px; }
+.jk-count {
+margin: 0 0 9px;
+font-size: 12px;
+color: color-mix(in srgb, var(--parchment) 50%, var(--indigo-700));
+}
+.jk { display: grid; gap: 5px; }
+.jr {
+display: grid;
+grid-template-columns: 46px 92px 1fr;
+align-items: center;
+gap: 8px;
+padding: 6px 9px;
+border: 1px solid color-mix(in srgb, var(--parchment) 8%, transparent);
+border-radius: 10px;
+background: color-mix(in srgb, var(--indigo-700) 36%, transparent);
+}
+.jr-f {
+font-size: 19px;
+font-weight: 700;
+color: color-mix(in srgb, var(--marigold) 78%, var(--parchment));
+}
+.jr-p {
+font-size: 13px;
+color: color-mix(in srgb, var(--parchment) 52%, var(--indigo-700));
+}
+.jr-words { display: flex; flex-wrap: wrap; gap: 4px; }
+.jr-w {
+padding: 3px 8px;
+border: 1px solid color-mix(in srgb, var(--parchment) 10%, transparent);
+border-radius: 7px;
+background: none;
+font-size: 14px;
+color: color-mix(in srgb, var(--parchment) 70%, var(--indigo-700));
+cursor: default;
+}
+.jr-w.on {
+border-color: color-mix(in srgb, var(--marigold) 50%, transparent);
+color: var(--marigold);
+font-weight: 700;
+cursor: pointer;
+transition: background-color .14s ease, color .14s ease;
+}
+.jr-w.on:hover { background: var(--marigold); color: var(--ink); }
+.jr-note {
+grid-column: 2 / -1;
+grid-row: 2;
+font-size: 11.5px;
+line-height: 1.45;
+color: color-mix(in srgb, var(--parchment) 42%, var(--indigo-700));
+}
+.jr:has(.jr-note) .jr-words { grid-column: 2 / -1; grid-row: 3; }
+@media (max-width: 460px) {
+.jr { grid-template-columns: 40px 1fr; }
+.jr-words { grid-column: 1 / -1; }
+}
 #fx {
 position: absolute;
 inset: 0;
@@ -944,7 +1174,8 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
 
       <!-- The menu bar. One section is on screen at a time, which is the point: the guide used
            to be one long scroll with the level grid on top, and a child looking for the letter
-           chart had to know it was down there. Six named places instead. -->
+           chart had to know it was down there. Eight named places instead, in teaching order:
+           the letters, then what the letters take, then how letters join into words. -->
       <nav class="menu" id="menu" role="tablist" aria-label="Sections">
         <button class="tab bn" type="button" role="tab" data-page="vowels"
                 aria-controls="page-vowels" title="এগারোটি স্বরবর্ণ">স্বরবর্ণ</button>
@@ -952,6 +1183,12 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
                 aria-controls="page-consonants" title="ক থেকে হ - বত্রিশটি ব্যঞ্জনবর্ণ">ব্যঞ্জনবর্ণ</button>
         <button class="tab bn" type="button" role="tab" data-page="marks"
                 aria-controls="page-marks" title="বর্ণের সঙ্গে যে চিহ্নগুলো বসে">কার ও চিহ্ন</button>
+        <button class="tab bn" type="button" role="tab" data-page="gathon"
+                aria-controls="page-gathon" title="বর্ণ জুড়ে শব্দ বানানো">শব্দ গঠন</button>
+        <button class="tab bn" type="button" role="tab" data-page="phala"
+                aria-controls="page-phala" title="ব্যঞ্জনবর্ণের সংক্ষিপ্ত রূপ">ফলা</button>
+        <button class="tab bn" type="button" role="tab" data-page="jukto"
+                aria-controls="page-jukto" title="দুই বর্ণ মিলে এক বর্ণ">যুক্তবর্ণ</button>
         <button class="tab bn" type="button" role="tab" data-page="levels"
                 aria-controls="page-levels" title="বর্ণ অনুসারে সব লেভেল">লেভেল</button>
         <button class="tab bn" type="button" role="tab" data-page="about"
@@ -1015,6 +1252,53 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
           </p>
           <div class="baro-pick" id="baroPick"></div>
           <div class="baro" id="baroTable"></div>
+        </section>
+
+        <!-- শব্দ গঠন and ফলা: three tables out of a printed primer, transcribed in
+             tools/primer.json and drawn by js/11-primer.js. They are here because a chart of
+             the বর্ণমালা tells a child what the letters are and the বারোখড়ি tells them what
+             each letter becomes, but neither shows the step between - that two letters put
+             side by side make a word. A primer teaches that with equations, so this does. -->
+        <section class="page" id="page-gathon" role="tabpanel" aria-labelledby="tab-gathon">
+          <h3>কার চিহ্ন ছাড়া শব্দ গঠন</h3>
+          <p class="deck">
+            কোনো কার নেই, কোনো চিহ্ন নেই - শুধু বর্ণের পর বর্ণ। এভাবেই শিশু প্রথম শব্দ পড়ে:
+            ব আর ক পাশে বসলে বক, ক ল ম পাশে বসলে কলম। যে শব্দ এই খেলায় আছে, তাতে চাপ দিলে
+            তার লেভেল খুলে যায়।
+          </p>
+          <div class="eqs" id="eqTwo"></div>
+          <h4 class="eq-head bn">তিন বর্ণে</h4>
+          <div class="eqs" id="eqThree"></div>
+
+          <h3 class="kw-head">কার চিহ্ন যোগে বানান শেখা</h3>
+          <p class="deck">
+            এবার কার যোগ হলো। নিচের যেকোনো কারে চাপ দিলে সেই কার দিয়ে লেখা শব্দগুলো দেখা যাবে -
+            একটি কার, একগুচ্ছ শব্দ, আর প্রতিটিতেই সেই কারটি খুঁজে পাওয়া যাবে।
+          </p>
+          <div class="kw-pick" id="karPick"></div>
+          <div class="kw-list" id="karList"></div>
+        </section>
+
+        <section class="page" id="page-phala" role="tabpanel" aria-labelledby="tab-phala">
+          <h3>ফলা চিহ্নের পরিচয়</h3>
+          <p class="deck" id="phalaNote"></p>
+          <div class="phala" id="phalaTable"></div>
+        </section>
+
+        <!-- যুক্তবর্ণ. This is the section that explains the game's own rule: the wheel hands a
+             child ক্ষ as one tile because ক্ষ is one letter, and this is the table that says
+             so. Every row is checked by tools/build.py - the parts really do join into the
+             form, and the form really is a single akshara by the same splitter the board
+             uses. -->
+        <section class="page" id="page-jukto" role="tabpanel" aria-labelledby="tab-jukto">
+          <h3>যুক্তবর্ণ বা যুক্তাক্ষর</h3>
+          <p class="deck" id="juktoNote"></p>
+          <p class="deck">
+            নিচের ছকে তিনটি ঘর - যুক্তবর্ণ, তার বিভাজন, আর শব্দ। খেলায় আছে যে শব্দ, তাতে চাপ
+            দিলে লেভেল খুলে যায়। উপরের ঘরে চাপ দিয়ে খোঁজা যায়: কোন বর্ণ দিয়ে যুক্তবর্ণটি শুরু।
+          </p>
+          <div class="jk-pick" id="juktoPick"></div>
+          <div class="jk" id="juktoTable"></div>
         </section>
 
         <section class="page" id="page-levels" role="tabpanel" aria-labelledby="tab-levels">
@@ -1448,6 +1732,7 @@ const KAR_WORDS = {
 "কৈ": { w: "কৈশোর", en: "বয়ঃসন্ধির বয়স" },
 "কৌ": { w: "কৌতুক", en: "মজার কথা" },
 "খী": { w: "সুখী", en: "সুখে আছে যে" },
+"খৈ": { w: "খৈ", en: "মুড়ির মতো ভাজা ধান" },
 "গী": { w: "সংগীত", en: "গান" },
 "গূ": { w: "নিগূঢ়", en: "গভীর, গোপন" },
 "গৃ": { w: "গৃহ", en: "বাড়ি" },
@@ -1546,6 +1831,139 @@ const KAR_WORDS = {
 "হৃ": { w: "হৃদয়", en: "মন, বুকের ভিতর" },
 "হে": { w: "সাহেব", en: "ভদ্রলোককে ডাকার শব্দ" },
 "হৈ": { w: "হৈচৈ", en: "চেঁচামেচি" }
+};
+
+const PRIMER = {
+two: [["ব", "ক"], ["চ", "ক"], ["ব", "ই"], ["দ", "ই"], ["ম", "ই"], ["খ", "ই"], ["ই", "ট"], ["উ", "ট"], ["ব", "ন"], ["ম", "ন"], ["এ", "ক"], ["ন", "য়"], ["ছ", "য়"], ["দ", "শ"], ["ঋ", "ণ"], ["প", "ণ"], ["ধ", "ন"], ["জ", "ন"], ["ন", "খ"], ["ব", "ল"], ["ক", "ল"], ["ফ", "ল"], ["হ", "ল"], ["ম", "ল"], ["চ", "ল"], ["ছ", "ল"], ["ও", "ল"], ["গ", "ম"], ["ঘ", "র"], ["ধ", "র"], ["খ", "ড়"], ["ঝ", "ড়"], ["ঈ", "দ"], ["ব", "উ"], ["ক", "ত"], ["ম", "গ"], ["জ", "গ"]],
+three: [["ক", "ল", "ম"], ["ঈ", "গ", "ল"], ["ল", "ব", "ণ"], ["গ", "র", "ম"], ["খ", "ব", "র"], ["ফ", "স", "ল"], ["ভ", "ব", "ন"], ["শ", "হ", "র"], ["অ", "ল", "স"], ["ক", "ল", "স"], ["ন", "য়", "ন"], ["শ", "য়", "ন"], ["ব", "চ", "ন"], ["প", "চ", "ন"], ["দ", "র", "দ"], ["ব", "ছ", "র"], ["ত", "র", "ল"], ["জ", "ম", "জ"], ["ঔ", "ষ", "ধ"]],
+byKar: {
+"া": ["বাবা", "চাচা", "মামা", "খালা", "নানা", "দাদা", "আদা", "সাদা", "ভাত", "মাছ", "গাছ", "লাল", "লাফ", "গান", "নাচ", "যাই", "খাই", "ঢাকা", "টাকা", "কলা", "ডাব", "তালা", "ছাতা", "জামা", "থালা", "জবা", "চাবি", "পাখা"],
+"ি": ["লিখি", "পড়ি", "বলি", "শুনি", "করি", "শিখি", "ডিম", "চিনি", "পানি", "দাদি", "দিদি", "দামি", "তিনি", "যিনি", "রবি", "নিশি", "তিন", "মণি", "তিমি", "শিশি", "পাখি", "দড়ি", "বাড়ি", "গাড়ি", "ছবি"],
+"ী": ["নদী", "বীজ", "গাভী", "ধনী", "শীত", "বীর", "তীর", "ভারী", "নীল", "নীতি", "দীর্ঘ", "শরীর", "জীবন", "জননী", "গভীর", "নীরস", "শীতল", "নীরব", "রজনী"],
+"ু": ["মুখ", "সুখ", "খুব", "খুশি", "ঘুম", "ছুটি", "শুরু", "শিশু", "দুই", "ফুল", "ঋতু", "সাধু", "ঝুড়ি", "মুড়ি", "ঘুড়ি", "থুতু", "মধু", "গরু", "ঢালু", "উঁচু", "হাঁটু", "সবুজ", "হলুদ", "যুবক", "তুলনা", "পুকুর", "পুতুল", "বকুল", "কুসুম", "দুপুর"],
+"ূ": ["সূর্য", "মূর্খ", "কূল", "মূল", "মূলা", "ভূমি", "পূজা", "সূত্র", "ভূগোল", "চূড়া", "কূপ", "ধূপ", "দূর", "বধূ", "সূচি", "রূপ", "রূপা", "ভূত", "দূষণ", "সূচনা", "ভূমিকা", "ময়ূর", "পূরণ", "ভূষণ", "ধূসর", "নূপুর", "ভূতল"],
+"ৃ": ["কৃষি", "তৃণ", "গৃহ", "কৃপা", "মৃত", "ধৃত", "ঘৃত", "বৃথা", "কৃশ", "ঘৃণা", "মৃদু", "দৃঢ়", "তৃষা", "পিতৃ", "কৃষক", "শৃগাল", "পৃথিবী", "সৃজন", "হৃদয়", "সদৃশ", "কৃপণ", "বৃহৎ", "পৃথক", "আবৃত", "তৃতীয়", "আকৃতি", "অমৃত"],
+"ে": ["খেলা", "দেখা", "মেঘ", "দেশ", "সেনা", "বেলা", "মেলা", "রেল", "তেল", "শেষ", "জেদ", "ডাকে", "ভাসে", "উড়ে", "দূরে", "ঠেলা", "দেনা", "পরে", "আসে", "হাসে", "পড়ে", "আগে", "ছেলে", "মেয়ে", "পেশা", "শেখা", "রেখা", "কেনা", "বেশ", "সেবা", "ট্রেন", "বেতন", "লেখক", "সেবক", "খেলনা", "আদেশ", "বেগুন", "বেলুন", "দেবর"],
+"ৈ": ["কৈ", "খৈ", "বৈঠা", "বৈধ", "দৈব", "চৈত্র", "জৈব", "জৈন", "হৈচৈ", "শৈল", "তৈরি", "দৈনিক", "বৈশাখ", "সৈকত", "শৈবাল", "সৈনিক", "শৈশব", "ভৈরব", "বৈকাল", "নৈতিক", "চৈতালি", "বৈরাগী", "বৈঠক"],
+"ো": ["ভোর", "হলো", "দোর", "খোল", "রোদ", "রোজা", "সোজা", "ঠোঁট", "আলো", "চোর", "দোষ", "ভোগ", "গোল", "ছোটো", "বড়ো", "তোতা", "বোকা", "কালো", "কোথা", "খোকন", "মোরগ", "কোমল", "দোকান", "কোদাল"],
+"ৌ": ["নৌকা", "সৌদি", "সৌর", "দৌড়", "চৌদ্দ", "পৌষ", "ধৌত", "লৌহ", "মৌন", "যৌথ", "ভৌত", "চৌকি", "পৌর", "কৌশল", "সৌরভ", "গৌরব", "মৌলভী", "চৌধুরী", "মৌমাছি", "মৌচাক", "মৌলিক", "যৌগিক", "মৌখিক"]
+},
+phalaNote: "ব্যঞ্জনবর্ণের সংক্ষিপ্ত রূপকে ফলা বলে। বাংলা বর্ণমালায় ফলা চিহ্ন মোট ৬টি। নিচে সাতটি সারি - কারণ শেষেরটি রেফ, ফলা নয়। র বর্ণটি পরের বর্ণের আগে বসলে তার মাথায় দাগ হয়ে ওঠে, আর সেই রূপের নাম রেফ। একই বর্ণের দুই চেহারা, তাই র-ফলার পাশেই রাখা হলো।",
+phala: [
+{ name: "য-ফলা", mark: "্য", note: "য বর্ণটি ছোট হয়ে আগের বর্ণের ডান পাশে বসে। ছয়টি ফলার মধ্যে এটিই সবচেয়ে বেশি ব্যবহৃত - বত্রিশটি ব্যঞ্জনের প্রায় সবগুলোর সঙ্গেই বসে।", forms: ["ক্য", "খ্য", "গ্য", "ঘ্য", "চ্য", "ছ্য", "জ্য", "ঝ্য", "ট্য", "ঠ্য", "ড্য", "ঢ্য", "ণ্য", "ত্য", "থ্য", "দ্য", "ধ্য", "ন্য", "প্য", "ফ্য", "ব্য", "ভ্য", "ম্য", "য্য", "র্য", "ল্য", "শ্য", "ষ্য", "স্য", "হ্য"], unused: [], words: ["বাক্য", "সত্য", "তথ্য", "কথ্য", "অন্য", "পণ্য", "বন্য", "মান্য", "জন্য", "রাজ্য", "ভাগ্য", "যোগ্য", "বাচ্য", "নাট্য", "সভ্য", "ব্যয়", "ঐক্য", "ব্যাঙ", "ব্যক্তি", "বিদ্যা", "সাহায্য", "সামান্য", "আরোগ্য", "বিভাজ্য", "ধন্যবাদ"] },
+{ name: "ব-ফলা", mark: "্ব", note: "ব বর্ণটি ছোট হয়ে আগের বর্ণের নিচে-ডানে বসে। উচ্চারণে প্রায়ই শোনা যায় না - বিশ্ব, স্বাদ।", forms: ["ক্ব", "খ্ব", "গ্ব", "ঘ্ব", "জ্ব", "ত্ব", "দ্ব", "ধ্ব", "ন্ব", "প্ব", "ব্ব", "ম্ব", "ল্ব", "শ্ব", "স্ব", "হ্ব"], unused: ["খ্ব", "ঘ্ব", "প্ব"], words: ["ত্বক", "পক্ব", "স্বর", "স্বচ্ছ", "অশ্ব", "বিশ্ব", "জ্বর", "জ্বালা", "লম্বা", "রাজত্ব", "দ্বীপ", "ধ্বনি", "ধ্বংস", "দ্বার", "দ্বিতীয়", "বিদ্বান", "বিশ্বাস", "নিশ্বাস", "স্বভাব", "স্বজন", "শ্বশুর", "স্বাক্ষর", "স্বাধীন", "গম্বুজ"] },
+{ name: "ম-ফলা", mark: "্ম", note: "ম বর্ণটি ছোট হয়ে আগের বর্ণের সঙ্গে জোড়া লাগে - আত্মা, পদ্ম।", forms: ["ক্ম", "খ্ম", "গ্ম", "ঘ্ম", "ঙ্ম", "ছ্ম", "জ্ম", "ট্ম", "ত্ম", "দ্ম", "ন্ম", "ম্ম", "ল্ম", "শ্ম", "ষ্ম", "স্ম", "হ্ম"], unused: ["খ্ম", "ঘ্ম", "ঙ্ম", "ছ্ম", "জ্ম"], words: ["পদ্ম", "আত্মা", "জন্ম", "রশ্মি", "গ্রীষ্ম", "বাগ্মী", "ভস্ম", "যুগ্ম", "ছদ্ম", "স্মৃতি", "সম্মান", "সম্মত", "গুল্ম", "কাশ্মীর", "দুরাত্মা", "স্মারক", "উন্মাদ", "বিস্ময়", "আত্মীয়", "সম্মুখ", "জীবাশ্ম", "ছদ্মবেশ", "স্মরণীয়"] },
+{ name: "ন-ফলা / ণ-ফলা", mark: "্ন", note: "ন বা ণ ছোট হয়ে আগের বর্ণের নিচে বসে - স্বপ্ন, যত্ন।", forms: ["ক্ন", "গ্ন", "ঘ্ন", "ট্ন", "ত্ন", "দ্ন", "ন্ন", "প্ন", "ম্ন", "র্ন", "শ্ন", "স্ন", "হ্ন"], unused: ["ক্ন", "ট্ন", "দ্ন"], words: ["প্রশ্ন", "যত্ন", "রত্ন", "স্নেহ", "ভগ্ন", "মগ্ন", "অগ্নি", "বিঘ্ন", "নিম্ন", "স্নান", "স্নিগ্ধ", "ভিন্ন", "চিহ্ন", "বহ্নি", "মধ্যাহ্ন", "আগ্নেয়", "আহ্নিক", "আসন্ন", "স্নাতক", "ভগ্নাংশ", "নবান্ন", "অবসন্ন"] },
+{ name: "র-ফলা", mark: "্র", note: "র বর্ণটি ছোট হয়ে আগের বর্ণের নিচে একটি বাঁকা দাগ হয়ে যায় - প্র, ক্র, ত্র।", forms: ["ক্র", "খ্র", "গ্র", "ঘ্র", "জ্র", "ট্র", "ঠ্র", "ড্র", "ঢ্র", "ত্র", "থ্র", "দ্র", "ধ্র", "ন্র", "প্র", "ফ্র", "ব্র", "ভ্র", "ম্র", "ল্র", "শ্র", "স্র", "হ্র"], unused: ["ঠ্র", "ঢ্র", "ন্র", "ল্র"], words: ["ক্রয়", "গ্রাম", "শ্রম", "নম্র", "ভদ্র", "ঘ্রাণ", "ত্রাণ", "প্রাণ", "ছাত্র", "মাত্র", "গ্রহ", "প্রথা", "পাত্র", "শুভ্র", "মাত্রা", "শ্রেণি", "শ্রেয়", "ট্রেন", "প্রথম", "সহস্র", "আগ্রহ", "সংগ্রহ", "প্রধান", "গ্রহণ", "প্রবীণ", "অগ্রজ", "বিদ্রোহ", "ভ্রমণ"] },
+{ name: "রেফ", mark: "র্", note: "র যখন আগে আসে, তখন সে পরের বর্ণের মাথায় একটি কাত দাগ হয়ে ওঠে। এটি ফলা নয়, রেফ - র-ফলা নিচে বসে, রেফ উপরে।", forms: ["র্ক", "র্খ", "র্গ", "র্ঘ", "র্চ", "র্ছ", "র্জ", "র্ঝ", "র্ট", "র্ঠ", "র্ড", "র্ঢ", "র্ণ", "র্ত", "র্থ", "র্দ", "র্ধ", "র্ন", "র্প", "র্ফ", "র্ব", "র্ভ", "র্ম", "র্য", "র্ল", "র্শ", "র্ষ", "র্স", "র্হ"], unused: ["র্ঠ", "র্ঢ"], words: ["বর্ণ", "কর্ণ", "মার্চ", "সূর্য", "পূর্ব", "তর্ক", "ধর্ম", "চর্ম", "শর্ত", "অর্ধ", "কার্য", "গর্ব", "পর্ব", "মূর্খ", "অর্থ", "দীর্ঘ", "চর্চা", "মূর্ছা", "বিসর্গ", "কর্কশ", "বর্ণনা", "নির্দেশ", "বার্ষিক", "মূর্ধন্য", "দুর্নাম", "দুর্লভ", "নির্ভয়", "নির্ঝর", "দুর্ভিক্ষ"] },
+{ name: "ল-ফলা", mark: "্ল", note: "ল বর্ণটি ছোট হয়ে আগের বর্ণের সঙ্গে জোড়া লাগে - ক্লাস, গ্লাস।", forms: ["ক্ল", "খ্ল", "গ্ল", "ঘ্ল", "প্ল", "ব্ল", "ম্ল", "ল্ল", "শ্ল", "স্ল", "হ্ল"], unused: ["খ্ল", "ঘ্ল"], words: ["গ্লাস", "ক্লান্ত", "ব্লেড", "অম্ল", "ক্লাস", "ক্লীব", "স্লেট", "ব্লক", "প্লেট", "পাল্লা", "গ্লানি", "শ্লোক", "পল্লব", "কল্লোল", "প্লাবন", "আল্লাহ", "অক্লান্ত", "উল্লাস", "বিপ্লব", "আহ্লাদ", "বিশ্লেষণ"] }
+],
+juktoNote: "দুই বা তার বেশি ব্যঞ্জনবর্ণ একসাথে যুক্ত হয়ে যে নতুন বর্ণ তৈরি করে, তাকে যুক্তবর্ণ বা যুক্তাক্ষর বলে। যেমন ক্ক (ক+ক), স্ক (স+ক), ক্ষ (ক+ষ), ন্দ (ন+দ), ম্ম (ম+ম), ঙ্গ (ঙ+গ)। এই খেলাটিও ঠিক এইভাবেই গোনে - একটি যুক্তবর্ণ একটি ঘর, দুটি নয়।",
+jukto: [
+{ form: "ক্ক", parts: ["ক", "ক"], words: ["মক্কা", "ধাক্কা", "ছক্কা"] },
+{ form: "চ্চ", parts: ["চ", "চ"], words: ["উচ্চ", "বাচ্চা", "উচ্চতা"] },
+{ form: "জ্জ", parts: ["জ", "জ"], words: ["সজ্জা", "বিপজ্জনক"] },
+{ form: "ট্ট", parts: ["ট", "ট"], words: ["ভুট্টা", "চট্টগ্রাম", "ছোট্ট"] },
+{ form: "ড্ড", parts: ["ড", "ড"], words: ["আড্ডা"] },
+{ form: "ণ্ণ", parts: ["ণ", "ণ"], words: ["বিষণ্ণ", "বিষণ্ণতা"] },
+{ form: "ত্ত", parts: ["ত", "ত"], words: ["উত্তর", "উত্তাল", "উত্তম"] },
+{ form: "দ্দ", parts: ["দ", "দ"], words: ["চৌদ্দ", "খদ্দর"] },
+{ form: "ন্ন", parts: ["ন", "ন"], words: ["কান্না", "রান্না", "পান্না"] },
+{ form: "প্প", parts: ["প", "প"], words: ["ধাপ্পা", "থাপ্পড়", "চপ্পল"] },
+{ form: "ব্ব", parts: ["ব", "ব"], words: ["আব্বা", "নব্বই"] },
+{ form: "ম্ম", parts: ["ম", "ম"], words: ["আম্মা", "সম্মান", "সম্মত"] },
+{ form: "ল্ল", parts: ["ল", "ল"], words: ["কেল্লা", "আল্লাহ", "মহল্লা"] },
+{ form: "ঙ্ক", parts: ["ঙ", "ক"], words: ["অঙ্ক", "কলঙ্ক", "পালঙ্ক"] },
+{ form: "ঙ্গ", parts: ["ঙ", "গ"], words: ["অঙ্গ", "সঙ্গ", "গঙ্গা", "তরঙ্গ"] },
+{ form: "ঙ্ঘ", parts: ["ঙ", "ঘ"], words: ["সঙ্ঘ", "লঙ্ঘন"] },
+{ form: "ঞ্চ", parts: ["ঞ", "চ"], words: ["পঞ্চম", "সঞ্চয়"] },
+{ form: "ঞ্ছ", parts: ["ঞ", "ছ"], words: ["লাঞ্ছনা", "বাঞ্ছিত"] },
+{ form: "ঞ্জ", parts: ["ঞ", "জ"], words: ["গঞ্জ", "কুঞ্জ", "রঞ্জন"] },
+{ form: "ঞ্ঝ", parts: ["ঞ", "ঝ"], words: ["ঝঞ্ঝা", "ঝঞ্ঝাট"] },
+{ form: "স্ক", parts: ["স", "ক"], words: ["স্কুল", "তুরস্ক", "স্কোর"] },
+{ form: "স্ট", parts: ["স", "ট"], words: ["স্টেশন", "আগস্ট"] },
+{ form: "স্ত", parts: ["স", "ত"], words: ["সস্তা", "ব্যস্ত", "রাস্তা"] },
+{ form: "স্থ", parts: ["স", "থ"], words: ["স্থান", "মুখস্থ", "অবস্থা"] },
+{ form: "স্প", parts: ["স", "প"], words: ["স্পষ্ট", "স্পন্দন"] },
+{ form: "স্ম", parts: ["স", "ম"], words: ["স্মৃতি", "স্মরণ", "বিস্ময়"] },
+{ form: "স্ন", parts: ["স", "ন"], words: ["স্নান", "স্নায়ু", "স্নাতক"] },
+{ form: "স্ব", parts: ["স", "ব"], words: ["স্বচ্ছ", "স্বর্গ", "স্বর্ণ"] },
+{ form: "ষ্ক", parts: ["ষ", "ক"], words: ["আবিষ্কার", "পরিষ্কার"] },
+{ form: "ষ্ট", parts: ["ষ", "ট"], words: ["কষ্ট", "অষ্টম", "বৃষ্টি"] },
+{ form: "ষ্ঠ", parts: ["ষ", "ঠ"], words: ["পৃষ্ঠা", "নিষ্ঠা"] },
+{ form: "ষ্প", parts: ["ষ", "প"], words: ["পুষ্প", "নিষ্পাপ"] },
+{ form: "ষ্ম", parts: ["ষ", "ম"], words: ["গ্রীষ্ম", "সূক্ষ্ম", "উষ্মা"] },
+{ form: "ষ্ণ", parts: ["ষ", "ণ"], words: ["উষ্ণ", "কৃষ্ণ", "তৃষ্ণা"] },
+{ form: "ত্থ", parts: ["ত", "থ"], words: ["উত্থান", "উত্থিত", "অশ্বত্থ"] },
+{ form: "ক্ট", parts: ["ক", "ট"], words: ["ডক্টর", "অক্টোবর"] },
+{ form: "ক্স", parts: ["ক", "স"], words: ["বাক্স", "ট্যাক্স"] },
+{ form: "ক্ষ", parts: ["ক", "ষ"], words: ["লক্ষ", "পক্ষ", "শিক্ষা"] },
+{ form: "ক্ষ্ম", parts: ["ক", "ষ", "ম"], words: ["সূক্ষ্ম", "যক্ষ্মা", "লক্ষ্মী"] },
+{ form: "ক্ত", parts: ["ক", "ত"], words: ["শক্ত", "রক্ত", "মুক্তি"] },
+{ form: "ক্ব", parts: ["ক", "ব"], words: ["পক্ব"] },
+{ form: "ক্ল", parts: ["ক", "ল"], words: ["ক্লাস", "ক্লান্তি", "ক্লিপ"] },
+{ form: "ক্র", parts: ["ক", "র"], words: ["চক্র", "বক্র", "বিক্রয়"] },
+{ form: "ক্য", parts: ["ক", "য"], words: ["বাক্য", "মাণিক্য"] },
+{ form: "খ্য", parts: ["খ", "য"], words: ["মুখ্য", "খ্যাতি"] },
+{ form: "গ্য", parts: ["গ", "য"], words: ["যোগ্য", "আরোগ্য"] },
+{ form: "ত্ম", parts: ["ত", "ম"], words: ["আত্মা", "আত্মীয়"] },
+{ form: "ন্ম", parts: ["ন", "ম"], words: ["জন্ম", "চিন্ময়"] },
+{ form: "দ্ম", parts: ["দ", "ম"], words: ["ছদ্ম", "পদ্ম", "পদ্মিনী"] },
+{ form: "হ্ম", parts: ["হ", "ম"], words: ["ব্রাহ্মণ", "ব্রহ্মপুত্র"] },
+{ form: "গ্র", parts: ["গ", "র"], words: ["গ্রাম", "অগ্রিম", "গ্রহ"] },
+{ form: "ট্র", parts: ["ট", "র"], words: ["ট্রেন", "ট্রাক্টর"] },
+{ form: "দ্র", parts: ["দ", "র"], words: ["নিদ্রা", "ভদ্র", "দ্রব্য"] },
+{ form: "ভ্র", parts: ["ভ", "র"], words: ["অভ্র", "শুভ্র", "ভ্রমণ"] },
+{ form: "ত্র", parts: ["ত", "র"], words: ["মিত্র", "পাত্র", "ত্রাণ"] },
+{ form: "ন্ত্র", parts: ["ন", "ত", "র"], words: ["অন্ত্র", "যন্ত্রণা", "মন্ত্রণা"] },
+{ form: "স্ত্র", parts: ["স", "ত", "র"], words: ["অস্ত্র", "স্ত্রী", "নিরস্ত্র"] },
+{ form: "র্ক", parts: ["র", "ক"], words: ["বিতর্ক", "কর্কশ"] },
+{ form: "র্খ", parts: ["র", "খ"], words: ["মূর্খ", "মূর্খতা"] },
+{ form: "র্গ", parts: ["র", "গ"], words: ["বিসর্গ", "দুর্গম"] },
+{ form: "প্ত", parts: ["প", "ত"], words: ["সপ্তম", "প্রাপ্ত"] },
+{ form: "চ্ছ", parts: ["চ", "ছ"], words: ["ইচ্ছা", "বিচ্ছিন্ন"] },
+{ form: "চ্ছ্ব", parts: ["চ", "ছ", "ব"], words: ["উচ্ছ্বাস", "জলোচ্ছ্বাস"] },
+{ form: "জ্জ্ব", parts: ["জ", "জ", "ব"], words: ["উজ্জ্বল", "উজ্জ্বলতা"] },
+{ form: "জ্ঝ", parts: ["জ", "ঝ"], words: ["কুজ্ঝটিকা"] },
+{ form: "জ্ঞ", parts: ["জ", "ঞ"], words: ["জ্ঞান", "অজ্ঞ", "বিজ্ঞান"] },
+{ form: "শ্ছ", parts: ["শ", "ছ"], words: ["শিরশ্ছেদ"] },
+{ form: "ন্দ", parts: ["ন", "দ"], words: ["আনন্দ", "সুন্দর"] },
+{ form: "ন্ধ", parts: ["ন", "ধ"], words: ["বন্ধ", "বন্ধু", "সন্ধ্যা"] },
+{ form: "ন্ট", parts: ["ন", "ট"], words: ["প্যান্ট", "ক্যান্টিন"] },
+{ form: "ন্ত", parts: ["ন", "ত"], words: ["অন্তর", "বসন্ত", "শান্ত"] },
+{ form: "ন্থ", parts: ["ন", "থ"], words: ["গ্রন্থ"] },
+{ form: "ন্ড", parts: ["ন", "ড"], words: ["পাউন্ড", "সাউন্ড"] },
+{ form: "ণ্ড", parts: ["ণ", "ড"], words: ["কাণ্ড", "গণ্ডার", "পণ্ডিত"] },
+{ form: "ণ্ট", parts: ["ণ", "ট"], words: ["ঘণ্টা", "বণ্টন", "কণ্টক"] },
+{ form: "ণ্ঠ", parts: ["ণ", "ঠ"], words: ["কণ্ঠ", "লুণ্ঠন"] },
+{ form: "ন্দ্ব", parts: ["ন", "দ", "ব"], words: ["দ্বন্দ্ব"] },
+{ form: "গ্ন", parts: ["গ", "ন"], words: ["ভগ্ন", "মগ্ন", "অগ্নি"] },
+{ form: "ঘ্ন", parts: ["ঘ", "ন"], words: ["বিঘ্ন", "নির্বিঘ্ন"] },
+{ form: "ত্ন", parts: ["ত", "ন"], words: ["যত্ন", "রত্ন", "প্রত্ন"] },
+{ form: "ম্ন", parts: ["ম", "ন"], words: ["নিম্ন"] },
+{ form: "হ্ন", parts: ["হ", "ন"], words: ["চিহ্ন", "বহ্নি", "মধ্যাহ্ন"] },
+{ form: "হ্ণ", parts: ["হ", "ণ"], words: ["পূর্বাহ্ণ", "অপরাহ্ণ"] },
+{ form: "ব্দ", parts: ["ব", "দ"], words: ["শব্দ", "জব্দ", "অব্দ"] },
+{ form: "দ্ব", parts: ["দ", "ব"], words: ["দ্বিতীয়", "বিদ্বান"] },
+{ form: "ব্ধ", parts: ["ব", "ধ"], words: ["লব্ধ", "স্তব্ধ", "প্রলুব্ধ"] },
+{ form: "ধ্ব", parts: ["ধ", "ব"], words: ["ধ্বনি", "ধ্বংস", "বিধ্বস্ত"] },
+{ form: "দ্ধ", parts: ["দ", "ধ"], words: ["যুদ্ধ", "শুদ্ধ", "বৃদ্ধ"] },
+{ form: "গ্ধ", parts: ["গ", "ধ"], words: ["মুগ্ধ", "দগ্ধ", "স্নিগ্ধ"] },
+{ form: "ত্ব", parts: ["ত", "ব"], words: ["দূরত্ব", "রাজত্ব"] },
+{ form: "ম্ব", parts: ["ম", "ব"], words: ["লম্ব", "চুম্বক", "গম্বুজ"] },
+{ form: "শ্ব", parts: ["শ", "ব"], words: ["বিশ্ব", "অশ্ব", "আশ্বিন"] },
+{ form: "ত্ত্ব", parts: ["ত", "ত", "ব"], words: ["সত্ত্ব"] },
+{ form: "দ্ভ", parts: ["দ", "ভ"], words: ["উদ্ভব", "উদ্ভাবন"] },
+{ form: "ম্ভ", parts: ["ম", "ভ"], words: ["গম্ভীর", "সম্ভব"] },
+{ form: "ম্প", parts: ["ম", "প"], words: ["সম্পর্ক", "কম্পিত"] },
+{ form: "ম্ফ", parts: ["ম", "ফ"], words: ["লম্ফ"] },
+{ form: "ল্ক", parts: ["ল", "ক"], words: ["শুল্ক", "উল্কা", "সিল্ক"] },
+{ form: "ল্গ", parts: ["ল", "গ"], words: ["বল্গা", "ফাল্গুন"] },
+{ form: "ল্ট", parts: ["ল", "ট"], words: ["বেল্ট", "ভোল্ট"] },
+{ form: "ল্প", parts: ["ল", "প"], words: ["অল্প", "গল্প", "সংকল্প"] },
+{ form: "হৃ", parts: ["হ", "ঋ"], words: ["হৃদয়", "হৃদযন্ত্র"], phonetic: true, note: "হ-এর সঙ্গে ঋ - লেখা হয় ৃ-কার দিয়ে, তাই হসন্ত দেখা যায় না।" },
+{ form: "ত্রু", parts: ["ত", "র", "উ"], words: ["শত্রু", "ত্রুটি"], phonetic: true, note: "ত-এ র-ফলা, তারপর উ - লেখা হয় ু-কার দিয়ে।" }
+]
 };
 const key = (r, c) => r + "," + c;
 
@@ -2457,6 +2875,197 @@ const saved = localStorage.getItem(MENU_KEY);
 if (saved && tabs.some(t => t.dataset.page === saved)) opening = saved;
 } catch { /* no stored preference; levels it is */ }
 showPage(opening, false);
+
+const LEVEL_WITH_WORD = (() => {
+const at = {};
+LEVELS.forEach((lv, i) => {
+for (const w of lv.words) if (at[w] === undefined) at[w] = i;
+});
+return at;
+})();
+
+function wordChip(word, cls) {
+const level = LEVEL_WITH_WORD[word];
+if (level === undefined) {
+const span = document.createElement("span");
+span.className = cls + " bn";
+span.textContent = word;
+return span;
+}
+const b = document.createElement("button");
+b.className = cls + " on bn";
+b.type = "button";
+b.textContent = word;
+b.title = `লেভেল ${bn(level + 1)} খুলুন`;
+b.addEventListener("click", () => { loadLevel(level); leaveMenu(); });
+return b;
+}
+
+function drawEquations() {
+for (const [group, id] of [["two", "eqTwo"], ["three", "eqThree"]]) {
+const box = document.getElementById(id);
+box.innerHTML = "";
+for (const parts of PRIMER[group]) {
+const eq = document.createElement("div");
+eq.className = "eq";
+parts.forEach((part, i) => {
+if (i) eq.appendChild(op("+"));
+const s = document.createElement("span");
+s.className = "eq-l bn";
+s.textContent = part;
+eq.appendChild(s);
+});
+eq.appendChild(op("="));
+eq.appendChild(wordChip(parts.join(""), "eq-w"));
+box.appendChild(eq);
+}
+}
+}
+
+function op(sign) {
+const s = document.createElement("span");
+s.className = "eq-op";
+s.textContent = sign;
+return s;
+}
+
+const KAR_PICK = ["া", "ি", "ী", "ু", "ূ", "ৃ", "ে", "ৈ", "ো", "ৌ"];
+let karShowing = "া";
+
+function drawKarWords() {
+const pick = document.getElementById("karPick");
+if (pick.childElementCount === 0) {
+for (const sign of KAR_PICK) {
+const b = document.createElement("button");
+b.className = "kp bn";
+b.type = "button";
+b.innerHTML = `<span class="kp-s bn">ক${sign}</span>`
++ `<span class="kp-n bn">${sign}-কার</span>`;
+b.addEventListener("click", () => { karShowing = sign; drawKarWords(); });
+pick.appendChild(b);
+}
+}
+for (let i = 0; i < pick.children.length; i++) {
+pick.children[i].classList.toggle("on", KAR_PICK[i] === karShowing);
+}
+
+const list = document.getElementById("karList");
+list.innerHTML = "";
+const words = PRIMER.byKar[karShowing] || [];
+const head = document.createElement("p");
+head.className = "kw-count bn";
+const playable = words.filter(w => LEVEL_WITH_WORD[w] !== undefined).length;
+head.textContent = `ক${karShowing} - ${bn(words.length)}টি শব্দ`
++ (playable ? `, তার ${bn(playable)}টি এই খেলায় আছে` : "");
+list.appendChild(head);
+const wrap = document.createElement("div");
+wrap.className = "kw-words";
+for (const w of words) wrap.appendChild(wordChip(w, "kw"));
+list.appendChild(wrap);
+}
+
+function drawPhala() {
+document.getElementById("phalaNote").textContent = PRIMER.phalaNote;
+const box = document.getElementById("phalaTable");
+box.innerHTML = "";
+for (const p of PRIMER.phala) {
+const card = document.createElement("section");
+card.className = "ph";
+card.innerHTML = `<h4 class="ph-h bn">${p.name}<span class="ph-m bn">${p.mark}</span></h4>`
++ `<p class="ph-note bn">${p.note}</p>`;
+
+const forms = document.createElement("div");
+forms.className = "ph-forms";
+for (const f of p.forms) {
+const s = document.createElement("span");
+const unused = p.unused.includes(f);
+s.className = "ph-f bn" + (unused ? " ph-f-none" : "");
+s.textContent = f;
+if (unused) s.title = "এই রূপে বাংলায় প্রচলিত কোনো শব্দ নেই";
+forms.appendChild(s);
+}
+card.appendChild(forms);
+if (p.unused.length) {
+const gap = document.createElement("p");
+gap.className = "ph-gap bn";
+gap.textContent = `ফিকে ${bn(p.unused.length)}টি রূপে বাংলায় প্রচলিত কোনো শব্দ নেই - `;
+const list = document.createElement("span");
+list.className = "ph-gap-list bn";
+list.textContent = p.unused.join(", ");
+gap.appendChild(list);
+gap.appendChild(document.createTextNode(
+"। বর্ণমালা এদের বানাতে দেয়, ভাষা ব্যবহার করে না।"));
+card.appendChild(gap);
+}
+
+const words = document.createElement("div");
+words.className = "ph-words";
+for (const w of p.words) words.appendChild(wordChip(w, "ph-w"));
+card.appendChild(words);
+box.appendChild(card);
+}
+}
+
+drawEquations();
+drawKarWords();
+drawPhala();
+
+const JUKTO_ALL = "সব";
+let juktoFirst = JUKTO_ALL;
+
+const JUKTO_HEADS = (() => {
+const heads = new Set(PRIMER.jukto.map(r => r.parts[0]));
+return [JUKTO_ALL, ...BYANJANBARNA.filter(c => heads.has(c))];
+})();
+
+function drawJukto() {
+document.getElementById("juktoNote").textContent = PRIMER.juktoNote;
+
+const pick = document.getElementById("juktoPick");
+if (pick.childElementCount === 0) {
+for (const head of JUKTO_HEADS) {
+const b = document.createElement("button");
+b.className = "jp bn" + (head === JUKTO_ALL ? " jp-all" : "");
+b.type = "button";
+b.textContent = head;
+b.addEventListener("click", () => { juktoFirst = head; drawJukto(); });
+pick.appendChild(b);
+}
+}
+for (const b of pick.children) b.classList.toggle("on", b.textContent === juktoFirst);
+
+const table = document.getElementById("juktoTable");
+table.innerHTML = "";
+const rows = juktoFirst === JUKTO_ALL
+? PRIMER.jukto : PRIMER.jukto.filter(r => r.parts[0] === juktoFirst);
+
+const count = document.createElement("p");
+count.className = "jk-count bn";
+count.textContent = juktoFirst === JUKTO_ALL
+? `${bn(PRIMER.jukto.length)}টি যুক্তবর্ণ`
+: `${juktoFirst} দিয়ে শুরু ${bn(rows.length)}টি যুক্তবর্ণ`;
+table.appendChild(count);
+
+for (const r of rows) {
+const row = document.createElement("div");
+row.className = "jr";
+row.innerHTML = `<span class="jr-f bn">${r.form}</span>`
++ `<span class="jr-p bn">${r.parts.join(" + ")}</span>`;
+if (r.phonetic) {
+const note = document.createElement("span");
+note.className = "jr-note bn";
+note.textContent = r.note;
+row.appendChild(note);
+}
+const words = document.createElement("span");
+words.className = "jr-words";
+for (const w of r.words) words.appendChild(wordChip(w, "jr-w"));
+row.appendChild(words);
+table.appendChild(row);
+}
+}
+
+drawJukto();
 let verdictTimer = null;
 
 function showVerdict(word, result) {

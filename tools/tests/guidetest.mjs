@@ -113,6 +113,7 @@ for (const [viewport, name, touch] of sizes) {
         menuAbovePages: menu.bottom <= pages.top + 4,
         footerInAbout: !!ft.closest('#page-about'),
         tabs: document.querySelectorAll('#menu .tab').length,
+        sections: document.querySelectorAll('.pages .page').length,
         onePageShowing: [...document.querySelectorAll('.pages .page')]
           .filter(x => getComputedStyle(x).display !== 'none').length
       };
@@ -120,7 +121,12 @@ for (const [viewport, name, touch] of sizes) {
     if (!cols.sideBySide) problems.push(`${name}: the menu is not beside the game`);
     if (!cols.menuAbovePages) problems.push(`${name}: the menu bar is not above its sections`);
     if (!cols.footerInAbout) problems.push(`${name}: the footer is not inside the পরিচিতি section`);
-    if (cols.tabs !== 6) problems.push(`${name}: ${cols.tabs} tabs, expected 6`);
+    // One tab per section, counted rather than written out - this file said 6 and kept saying
+    // it after two sections were added, so the literal was the bug. menutest owns which
+    // sections exist and in what order; here it only has to be a tab for each of them.
+    if (cols.tabs !== cols.sections)
+      problems.push(`${name}: ${cols.tabs} tabs for ${cols.sections} sections`);
+    if (cols.tabs < 6) problems.push(`${name}: only ${cols.tabs} tabs`);
     if (cols.onePageShowing !== 1)
       problems.push(`${name}: ${cols.onePageShowing} sections showing, expected exactly 1`);
     // And it really is on screen when that section is open.

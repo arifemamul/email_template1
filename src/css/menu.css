@@ -1,4 +1,4 @@
-  /* -- The menu bar and the six sections behind it --------------------------- */
+  /* -- The menu bar and the eight sections behind it ------------------------- */
   .menu {
     display: flex;
     flex-wrap: wrap;
@@ -223,4 +223,256 @@
   @media (max-width: 460px) {
     .br:has(.br-gloss) { grid-template-columns: 54px 1fr auto; }
     .br-gloss { grid-column: 2 / -1; grid-row: 2; text-align: left; }
+  }
+
+  /* ---- শব্দ গঠন: the equations -------------------------------------------------------- */
+
+  /* A grid of small sums rather than a list, because the whole point is that they are short
+     and alike: a child reads two or three before noticing they are all the same shape. */
+  .eqs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: 6px;
+    margin: 12px 0 4px;
+  }
+  .eq {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 9px;
+    border: 1px solid color-mix(in srgb, var(--parchment) 9%, transparent);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--indigo-700) 40%, transparent);
+  }
+  .eq-l {
+    font-size: 17px;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--parchment) 88%, var(--marigold));
+  }
+  /* The + and = are scaffolding, not letters. Kept small and grey so the eye lands on the
+     letters and then on the answer, which is the order the sum is meant to be read in. */
+  .eq-op {
+    font-family: var(--ui);
+    font-size: 12px;
+    color: color-mix(in srgb, var(--parchment) 34%, var(--indigo-700));
+  }
+  .eq-w {
+    margin-left: auto;
+    padding: 3px 8px;
+    border: 1px solid color-mix(in srgb, var(--parchment) 14%, transparent);
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--parchment) 74%, var(--indigo-700));
+    background: none;
+    cursor: default;
+  }
+  /* The answer is playable, so it looks like the thing it is: the same marigold the level
+     buttons use everywhere else in the menu. */
+  .eq-w.on {
+    border-color: color-mix(in srgb, var(--marigold) 55%, transparent);
+    color: var(--marigold);
+    cursor: pointer;
+    transition: background-color .14s ease, color .14s ease;
+  }
+  .eq-w.on:hover { background: var(--marigold); color: var(--ink); }
+  .eq-head, .kw-head { margin: 18px 0 0; }
+  .eq-head {
+    font-size: 13px;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--parchment) 52%, var(--indigo-700));
+  }
+
+  /* ---- শব্দ গঠন: a কার, and its words ------------------------------------------------ */
+
+  .kw-pick {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 5px;
+    margin: 14px 0 16px;
+  }
+  .kp {
+    display: grid;
+    gap: 1px;
+    padding: 7px 4px;
+    border: 1px solid color-mix(in srgb, var(--parchment) 12%, transparent);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--indigo-700) 50%, transparent);
+    cursor: pointer;
+    transition: background-color .14s ease, transform .14s ease;
+  }
+  .kp:hover { background: var(--violet-600); }
+  .kp:active { transform: scale(.94); }
+  .kp-s {
+    font-size: 18px;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--marigold) 80%, var(--parchment));
+  }
+  /* The sign's name, under the letter carrying it - see the comment in drawKarWords. */
+  .kp-n {
+    font-size: 10px;
+    color: color-mix(in srgb, var(--parchment) 44%, var(--indigo-700));
+  }
+  .kp.on { background: var(--marigold); border-color: var(--marigold); }
+  .kp.on .kp-s, .kp.on .kp-n { color: var(--ink); }
+  .kw-count {
+    margin: 0 0 8px;
+    font-size: 12px;
+    color: color-mix(in srgb, var(--parchment) 50%, var(--indigo-700));
+  }
+  .kw-words, .ph-words, .ph-forms { display: flex; flex-wrap: wrap; gap: 5px; }
+  .kw, .ph-w, .ph-f {
+    padding: 4px 9px;
+    border: 1px solid color-mix(in srgb, var(--parchment) 11%, transparent);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--indigo-700) 40%, transparent);
+    font-size: 15px;
+    color: color-mix(in srgb, var(--parchment) 74%, var(--indigo-700));
+    cursor: default;
+  }
+  .kw.on, .ph-w.on {
+    border-color: color-mix(in srgb, var(--marigold) 50%, transparent);
+    color: var(--marigold);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .14s ease, color .14s ease;
+  }
+  .kw.on:hover, .ph-w.on:hover { background: var(--marigold); color: var(--ink); }
+
+  /* ---- ফলা ---------------------------------------------------------------------------- */
+
+  .phala { display: grid; gap: 10px; margin-top: 14px; }
+  .ph {
+    padding: 11px 12px 12px;
+    border: 1px solid color-mix(in srgb, var(--parchment) 9%, transparent);
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--indigo-700) 34%, transparent);
+  }
+  .ph-h {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 5px;
+    font-size: 15px;
+    color: color-mix(in srgb, var(--parchment) 88%, var(--marigold));
+  }
+  /* The mark itself, large enough to see the shape of - which is the whole lesson. */
+  .ph-m {
+    padding: 1px 8px;
+    border-radius: 7px;
+    background: color-mix(in srgb, var(--marigold) 20%, transparent);
+    color: var(--marigold);
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .ph-note {
+    margin: 0 0 9px;
+    font-size: 12.5px;
+    line-height: 1.55;
+    color: color-mix(in srgb, var(--parchment) 58%, var(--indigo-700));
+  }
+  /* The forms are the mark on every letter it takes - a reference row, not words, so they are
+     set apart from the word list below by weight rather than by another box. */
+  .ph-f {
+    font-size: 14px;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--marigold) 62%, var(--parchment));
+    background: none;
+  }
+  .ph-forms { margin-bottom: 9px; }
+
+  /* A ফলা form the language does not use. Dimmed and struck, not hidden - see drawPhala. */
+  .ph-f-none {
+    color: color-mix(in srgb, var(--parchment) 26%, var(--indigo-700));
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+  .ph-gap {
+    margin: 0 0 9px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--parchment) 40%, var(--indigo-700));
+  }
+
+  /* ---- যুক্তবর্ণ ------------------------------------------------------------------------ */
+
+  .jk-pick {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 14px 0 14px;
+  }
+  .jp {
+    min-width: 30px;
+    padding: 5px 7px;
+    border: 1px solid color-mix(in srgb, var(--parchment) 12%, transparent);
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--indigo-700) 50%, transparent);
+    color: color-mix(in srgb, var(--marigold) 80%, var(--parchment));
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .14s ease, transform .14s ease;
+  }
+  .jp:hover { background: var(--violet-600); }
+  .jp:active { transform: scale(.94); }
+  .jp.on { background: var(--marigold); border-color: var(--marigold); color: var(--ink); }
+  .jp-all { font-size: 13px; }
+  .jk-count {
+    margin: 0 0 9px;
+    font-size: 12px;
+    color: color-mix(in srgb, var(--parchment) 50%, var(--indigo-700));
+  }
+  .jk { display: grid; gap: 5px; }
+  /* The letter, its parts, then the words - the three columns the book prints. The words get
+     whatever is left, because that is the column that varies in length. */
+  .jr {
+    display: grid;
+    grid-template-columns: 46px 92px 1fr;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 9px;
+    border: 1px solid color-mix(in srgb, var(--parchment) 8%, transparent);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--indigo-700) 36%, transparent);
+  }
+  .jr-f {
+    font-size: 19px;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--marigold) 78%, var(--parchment));
+  }
+  .jr-p {
+    font-size: 13px;
+    color: color-mix(in srgb, var(--parchment) 52%, var(--indigo-700));
+  }
+  .jr-words { display: flex; flex-wrap: wrap; gap: 4px; }
+  .jr-w {
+    padding: 3px 8px;
+    border: 1px solid color-mix(in srgb, var(--parchment) 10%, transparent);
+    border-radius: 7px;
+    background: none;
+    font-size: 14px;
+    color: color-mix(in srgb, var(--parchment) 70%, var(--indigo-700));
+    cursor: default;
+  }
+  .jr-w.on {
+    border-color: color-mix(in srgb, var(--marigold) 50%, transparent);
+    color: var(--marigold);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .14s ease, color .14s ease;
+  }
+  .jr-w.on:hover { background: var(--marigold); color: var(--ink); }
+  /* হৃ and ত্রু, whose printed বিভাজন is phonetic. The note takes the whole width under them. */
+  .jr-note {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: color-mix(in srgb, var(--parchment) 42%, var(--indigo-700));
+  }
+  .jr:has(.jr-note) .jr-words { grid-column: 2 / -1; grid-row: 3; }
+  @media (max-width: 460px) {
+    .jr { grid-template-columns: 40px 1fr; }
+    .jr-words { grid-column: 1 / -1; }
   }

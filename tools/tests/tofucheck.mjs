@@ -14,6 +14,25 @@ const out = await page.evaluate(async () => {
     lv.letters.forEach(a => aksharas.add(a));
     lv.words.forEach(w => splitAksharas(w).forEach(a => aksharas.add(a)));
   }
+  // And everything the primer's three tables show. These reach further into the script than the
+  // boards do: 103 যুক্তবর্ণ, and ফলা forms like ঙ্ম and ঠ্র that no word in the game contains.
+  // Added as whole aksharas, not loose code points, because a conjunct is one glyph to ask the
+  // font for and asking for ঙ, ্ and ম separately does not test whether ঙ্ম exists.
+  for (const group of [PRIMER.two, PRIMER.three]) {
+    for (const parts of group) parts.forEach(a => aksharas.add(a));
+  }
+  for (const words of Object.values(PRIMER.byKar)) {
+    for (const w of words) splitAksharas(w).forEach(a => aksharas.add(a));
+  }
+  for (const p of PRIMER.phala) {
+    p.forms.forEach(f => aksharas.add(f));
+    p.words.forEach(w => splitAksharas(w).forEach(a => aksharas.add(a)));
+  }
+  for (const r of PRIMER.jukto) {
+    aksharas.add(r.form);
+    r.words.forEach(w => splitAksharas(w).forEach(a => aksharas.add(a)));
+  }
+
   const uiStrings = [...document.querySelectorAll('.bn, h1, .name, .sub, .hint-text, .action span, .primary, .ghost, .clear-card h2, .akshara-table .w, .akshara-table .a, .eyebrow')]
     .map(e => e.textContent.trim()).filter(Boolean);
   for (const s of uiStrings) for (const ch of s) if (ch >= 'ঀ' && ch <= '৿') aksharas.add(ch);
