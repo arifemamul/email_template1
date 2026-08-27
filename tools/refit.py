@@ -6,12 +6,12 @@ Refit every level to a 7-tile wheel.
     python3 tools/refit.py            print what it would do, change nothing
     python3 tools/refit.py --write    write tools/levels-refit.json
 
-The wheel cap came down from 8 to 7 and 22 levels were over it. This works out what to do
+The wheel cap came down from 8 to 6 and 54 levels were over it. This works out what to do
 with each one, so the answer is a rule applied evenly rather than 22 hand-made decisions.
 
 What it may do to an over-cap level, in order of preference:
 
-  1. SPLIT it into two legal levels. Nothing is lost - the letter simply gets another level,
+  1. SPLIT it into two levels within TARGET. Nothing is lost - the letter gets another level,
      which is allowed: a letter already carries anywhere from one to nine.
   2. SPLIT it with help, borrowing words for the same letter that are in the vocabulary pool
      and on no board yet, when the level's own words will not divide.
@@ -35,10 +35,23 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 
 from bangla import cluster_layout, split_aksharas, wheel_for        # noqa: E402
-from catalogue import ALL_LEVELS, GLOSS, MAX_ROWS, MAX_COLS         # noqa: E402
+from catalogue import _AUTHORED, GLOSS, MAX_ROWS, MAX_COLS          # noqa: E402
 import vocabulary                                                   # noqa: E402
 
-CAP = 7          # the new ceiling
+# Two numbers, not one. TARGET is the wheel this game wants - six letters to choose between,
+# so the words a child spells out of them stay short. CEILING is what a level may have when
+# getting to six would cost a word.
+#
+# A hard six was tried and measured first: 70 of the 156 authored levels are over it, 13 of
+# them cannot be divided or patched at all, and one of those is ঔ - so the alphabet run would
+# lose a vowel outright. It costs 34 words, among them কাঠবিড়ালি, মাকড়সা, রেলগাড়ি, চকলেট,
+# বাঁধাকপি, ভালুক, রান্নাঘর: the concrete, picturable half of the vocabulary, which is the half
+# worth having. And কৃ stops being taught anywhere.
+#
+# So six is preferred and seven is permitted, in that order, and no word is given up to reach
+# six. Most levels land on six or under; the ones that do not are the ones that could not.
+TARGET = 6
+CEILING = 7
 FLOOR = 3        # and the floor, which nothing was under already
 MIN_WORDS = 3
 
@@ -67,7 +80,7 @@ def legal(words):
     """A word list that could ship as a level, wheel and board both."""
     if len(words) < MIN_WORDS or len(set(words)) != len(words):
         return False
-    if not FLOOR <= len(wheel_for(words)) <= CAP:
+    if not FLOOR <= len(wheel_for(words)) <= CEILING:
         return False
     try:
         return board_fits(words)
@@ -121,7 +134,8 @@ def solve(level, borrowable, precious):
                         continue
                     kept = set(a) | set(b)
                     gone, holed, lost, holes = loss(kept)
-                    score = (gone, holed, 0, abs(len(a) - len(b)),
+                    fat = sum(len(wheel_for(g)) > TARGET for g in (list(a), b))
+                    score = (gone, holed, fat, 0, abs(len(a) - len(b)),
                              len(wheel_for(list(a))) + len(wheel_for(b)), borrow)
                     if best is None or score < best[0]:
                         best = (score, 'split', [list(a), b], lost, holes)
@@ -131,21 +145,22 @@ def solve(level, borrowable, precious):
                     if not legal(list(a)):
                         continue
                     gone, holed, lost, holes = loss(set(a))
-                    score = (gone, holed, 1, 0, len(wheel_for(list(a))), borrow)
+                    fat = int(len(wheel_for(list(a))) > TARGET)
+                    score = (gone, holed, fat, 1, 0, len(wheel_for(list(a))), borrow)
                     if best is None or score < best[0]:
                         best = (score, 'one', [list(a)], lost, holes)
-        if best and best[0][0] == 0 and best[0][1] == 0:
-            break        # nothing lost; borrowing more cannot improve on that
+        if best and best[0][:3] == (0, 0, 0):
+            break        # nothing lost and every wheel within target; cannot be improved on
     return best
 
 
 def main(write=False):
-    precious = unique_aksharas(ALL_LEVELS)
-    on_board = {w['w'] for lv in ALL_LEVELS for w in lv['words']}
+    precious = unique_aksharas(_AUTHORED)
+    on_board = {w['w'] for lv in _AUTHORED for w in lv['words']}
     borrowable = [w for w in vocabulary.words() if w not in on_board]
 
-    over = [lv for lv in ALL_LEVELS if len(wheel_for([w['w'] for w in lv['words']])) > CAP]
-    print(f'{len(over)} of {len(ALL_LEVELS)} levels are over the {CAP}-tile cap\n')
+    over = [lv for lv in _AUTHORED if len(wheel_for([w['w'] for w in lv['words']])) > TARGET]
+    print(f'{len(over)} of {len(_AUTHORED)} levels are over the {TARGET}-tile target\n')
 
     fixes, lost_words, holes, claimed = {}, [], set(), set()
     for lv in over:

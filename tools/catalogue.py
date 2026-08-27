@@ -520,6 +520,10 @@ def ordered_levels():
             continue
         level['letters'] = key
         level['kind'] = kind
+        # The name the player sees. An akshara level is named for its akshara - কা - and a
+        # letter level, whose words share only the consonant, for that consonant. The `·N`
+        # suffix is bookkeeping for a level that was divided, not something to show.
+        level['name'] = key.split('·')[0].split('-')[0]
         levels.append(level)
 
     # Board words are verified vocabulary too, so a level can grow into a word another level was
@@ -542,6 +546,18 @@ def ordered_levels():
     else:
         out, known = order_block(levels, known, keep_order=True)
     levels = out
+
+    # Number the levels that share a name, so ক ১ / ক ২ / ক ৩ read as three goes at ক rather
+    # than three levels with the same title. A name carried by one level alone gets no number:
+    # "ঋ ১" would be answering a question nobody asked.
+    shared = {}
+    for level in levels:
+        shared[level['name']] = shared.get(level['name'], 0) + 1
+    seen = {}
+    for level in levels:
+        name = level['name']
+        seen[name] = seen.get(name, 0) + 1
+        level['pass'] = seen[name] if shared[name] > 1 else 0
 
     # No word is a puzzle twice. That rule is what decides the rest: a board grows only into
     # words no other level has claimed, so no level can help itself to the same handful of

@@ -27,14 +27,21 @@
     background: color-mix(in srgb, var(--hue, var(--violet-600)) 26%, var(--indigo-800));
     color: color-mix(in srgb, var(--hue, var(--marigold)) 72%, var(--parchment));
     font-family: var(--bn);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     cursor: pointer;
     font-variant-numeric: tabular-nums;
+    padding: 0 1px;
+    overflow: hidden;
+    text-overflow: clip;
+    white-space: nowrap;
     position: relative;
     transition: transform .18s cubic-bezier(.2,1.5,.4,1), background-color .18s ease,
                 color .18s ease;
   }
+  /* The chip holds an akshara now, which can be two glyphs wide - কাঁ - where a numeral was
+     always one or two digits. Shrink to fit rather than overflow the square. */
+  .lv sup { font-size: 8px; font-weight: 700; opacity: .72; margin-left: 1px; vertical-align: super; }
   .lv:hover { transform: translateY(-2px) scale(1.04); }
   .lv:active { transform: scale(.94); }
   .lv.done { background: var(--hue, var(--leaf)); color: var(--ink); }

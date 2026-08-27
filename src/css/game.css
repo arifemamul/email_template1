@@ -44,6 +44,37 @@
      and a fraction ticking up turns finding a word into progress against a quota. */
   .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 6px; }
 
+  /* The level's letter, centred between the arrows. Sized to the 38px arrows so adding it
+     cannot change the height of the row - the board and wheel are allocated what is left, and
+     a taller topbar would take it from them on every level. */
+  .now-letter {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    height: 38px;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px;
+    overflow: hidden;
+  }
+  .now-letter .glyph {
+    font-size: 26px;
+    line-height: 38px;
+    font-weight: 700;
+    color: var(--marigold);
+    white-space: nowrap;
+  }
+  /* Which go at this letter it is - shown only when the letter has more than one. */
+  .now-letter .pass {
+    font-size: 13px;
+    line-height: 38px;          /* match the glyph, or baseline alignment drops it low */
+    font-weight: 700;
+    color: color-mix(in srgb, var(--parchment) 52%, var(--indigo-700));
+    font-variant-numeric: tabular-nums;
+  }
+  .now-letter .pass:empty { display: none; }
+
   .icon-btn {
     width: 38px; height: 38px;
     flex: none;

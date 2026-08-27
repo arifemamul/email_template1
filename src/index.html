@@ -51,6 +51,12 @@
       <div class="screen">
         <div class="topbar">
           <button class="icon-btn" id="prev" title="আগের লেভেল" aria-label="Previous level">‹</button>
+          <!-- The letter this level is about. A player arriving mid-alphabet should be able to
+               see which one they are on without opening the guide, and a number cannot tell
+               them: level ২১ says nothing, কা says everything. -->
+          <h2 class="now-letter" id="levelName" aria-live="polite">
+            <span class="bn glyph" id="levelGlyph"></span><span class="pass" id="levelPass"></span>
+          </h2>
           <button class="icon-btn" id="next" title="পরের লেভেল" aria-label="Next level">›</button>
         </div>
 
@@ -98,7 +104,7 @@
           <br><br>
           The levels run in the order of the বর্ণমালা, straight through. স্বরবর্ণ first -
           অ আ ই ঈ উ ঊ ঋ এ ঐ ও ঔ - then ব্যঞ্জনবর্ণ, ক to হ. A letter carries as many levels as
-          it has aksharas with words behind them: ক has twelve, ঋ has one. Inside a letter the
+          it has aksharas with words behind them: ক has fifteen, ঋ has one. Inside a letter the
           bare form leads and the rest follow the বারোখড়ি - ক কা কি কী কু কূ কৃ কে কৈ কো কৌ -
           so a child looking for ম finds it where ম belongs. ঙ, ঞ and ণ are skipped, because no
           Bengali word begins with them, and neither do ড়, ঢ় or য়.
@@ -125,7 +131,7 @@
           কাকা and পিসি. No word is ever set as a puzzle twice.
           <br><br>
           <b>It works with no connection.</b> Open it once and the whole game is on the device -
-          all 169 levels, the words, the font. Your browser will offer to add it to the home
+          all 184 levels, the words, the font. Your browser will offer to add it to the home
           screen, where it opens like an app and never asks for the network again. That is the
           point rather than a nicety: a data connection is something you have sometimes. No
           sign-up, no ads, nothing to pay - your progress is saved in this browser.

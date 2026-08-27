@@ -150,7 +150,12 @@ def emit(levels):
         # through `boardOf` and never read by anything. `teaches` likewise: 58 levels carried
         # it and no line of the page ever looked at it. The Kotlin build still gets the full
         # record; the parked app has no board placer to derive from.
-        js.append(f'  {{ id: {i}, letters: [{tiles}], '
+        # The level's name, which is the akshara it teaches - so a player reads "কা" at the
+        # top of the screen and in the level grid rather than "২১", and knows where in the
+        # alphabet they are. `pass` numbers the levels that share an akshara, and is 0 when
+        # the akshara has only one, so a lone level is not labelled "ক ১".
+        js.append(f'  {{ id: {i}, name: "{level["name"]}", pass: {level["pass"]}, '
+                  f'letters: [{tiles}], '
                   f'block: {level["block"]}, board: [{board}] }},')
 
     kt[-1] = kt[-1].rstrip(',')

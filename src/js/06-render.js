@@ -16,6 +16,8 @@ const el = {
   guide: document.getElementById("guide"),
   guideOpen: document.getElementById("guideOpen"),
   guideClose: document.getElementById("guideClose"),
+  levelGlyph: document.getElementById("levelGlyph"),
+  levelPass: document.getElementById("levelPass"),
   device: document.querySelector(".device")
 };
 
@@ -50,6 +52,10 @@ function loadLevel(i) {
 
 function drawHud() {
   el.hint.disabled = isClear();
+  // The letter, and which go at it. `pass` is 0 when the letter has only one level.
+  const lv = level();
+  el.levelGlyph.textContent = lv.name;
+  el.levelPass.textContent = lv.pass ? bn(lv.pass) : "";
 }
 
 /**
@@ -314,13 +320,34 @@ function drawPreview() {
   if (go) go.addEventListener("click", () => submitWord());
 }
 
+/*
+ * A colour per letter, so the grid reads as bands: every ক level one colour, every খ the next.
+ * It used to be coloured by block - the five stages of the teaching syllabus this game
+ * replaced - which in alphabet order lands ক in one colour and গ in another for no reason a
+ * player could see. Five colours cycling means neighbours always differ.
+ */
+const HUE = (() => {
+  const of = {};
+  let n = 0;
+  for (const lv of LEVELS) if (!(lv.name in of)) of[lv.name] = (n++ % 5) + 1;
+  return of;
+})();
+
 function drawLevelGrid() {
   el.levelGrid.innerHTML = "";
   LEVELS.forEach((lv, i) => {
     const b = document.createElement("button");
-    b.className = `lv lv-${lv.block || 1}`;
+    b.className = `lv lv-${HUE[lv.name]}`;
     b.type = "button";
-    b.textContent = bn(lv.id);
+    // The letter, not the level number - the grid is how a player finds a letter again, and
+    // they remember ম, not ১২৭. The go number rides along as a superscript where there is one.
+    b.textContent = lv.name;
+    if (lv.pass) {
+      const n = document.createElement("sup");
+      n.textContent = bn(lv.pass);
+      b.appendChild(n);
+    }
+    b.title = lv.pass ? `${lv.name} ${bn(lv.pass)}` : lv.name;
     const done = !!game.completed[lv.id];
     if (done) b.classList.add("done");
     if (i === game.index) b.classList.add("now");
