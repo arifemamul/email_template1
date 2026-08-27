@@ -1,0 +1,12 @@
+{
+  "name": "shobdojot",
+  "private": true,
+  "description": "শব্দজট - a Bengali akshara word game. The game itself is docs/index.html and needs nothing installed; this file exists only for the browser test suite.",
+  "scripts": {
+    "test": "node tools/tests/run.mjs",
+    "test:all": "node tools/tests/run.mjs --sweep"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}

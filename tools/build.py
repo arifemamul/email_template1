@@ -668,6 +668,33 @@ def main(argv):
         print('check ok')
         return 0
 
+    if command == 'stale':
+        # Is the built page the one the source would produce right now?
+        #
+        # This is here because of a real failure: the browser tests spent five commits passing
+        # against a stale copy of the page, reporting 156 levels while the game shipped 169.
+        # The tests can no longer read a copy, but they could still read a `docs/index.html`
+        # that a forgotten `build` had left behind. `tools/tests/run.mjs` calls this first and
+        # refuses to run when it says stale, so tests can never again describe a page nobody
+        # is shipping.
+        if failures:
+            print('catalogue has rejected levels; run check')
+            return 1
+        _, js_src = emit(levels)
+        stale_levels = js_src != LEVELS_JS.read_text(encoding='utf-8')
+        want = minify(assemble())
+        have = WEB.read_text(encoding='utf-8') if WEB.exists() else ''
+        if stale_levels or want != have:
+            print('STALE: docs/index.html is not what src/ would build right now')
+            if stale_levels:
+                print('  the level table the catalogue produces is not the one in src/js')
+            if want != have:
+                print(f'  built page differs: {len(want)} chars from source, {len(have)} on disk')
+            print('\n  run: python3 tools/build.py build')
+            return 1
+        print('current: docs/index.html matches src/')
+        return 0
+
     if command == 'build':
         if failures:
             report(levels, failures)

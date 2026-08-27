@@ -28,6 +28,11 @@
   `<!doctype>`/`<head>`/`<body>` wrapper removed, for hosts that supply their own. Neither is
   edited directly: `build.py` overwrites both, and the tests run against the built file rather
   than the source, so a mistake in the stripping fails a test instead of shipping.
+- **Test it: `npm test`.** Sixteen browser checks against the built page, about four minutes;
+  `npm run test:all` adds the solve sweep, which opens all 256 levels and wins each one. The
+  runner refuses to start if `docs/index.html` is not what `src/` would build right now - see
+  [`tools/tests/README.md`](tools/tests/README.md) for why that guard is there, and what the
+  suite cost before it existed.
 - **Android app (Kotlin + Compose): parked.** [`bengali-word-game/`](bengali-word-game/) is a
   working skeleton whose screens are deliberately behind the web version, and it stays that way
   until the design settles. Porting a design twice while it is still moving is wasted work.
