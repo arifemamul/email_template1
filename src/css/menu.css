@@ -204,3 +204,23 @@
     font-size: 12px;
     cursor: default;
   }
+
+  /* A word that shows the form but is not in the game - no level to open, so not a button. */
+  .br-out {
+    border-style: dashed;
+    border-color: color-mix(in srgb, var(--parchment) 16%, transparent);
+    color: color-mix(in srgb, var(--parchment) 70%, var(--indigo-700));
+    cursor: default;
+  }
+  .br-gloss {
+    font-size: 11px;
+    text-align: right;
+    color: color-mix(in srgb, var(--parchment) 42%, var(--indigo-700));
+    line-height: 1.35;
+  }
+  /* The row grows a column for that meaning; on a narrow sheet it drops under the name. */
+  .br:has(.br-gloss) { grid-template-columns: 62px 1fr auto auto; }
+  @media (max-width: 460px) {
+    .br:has(.br-gloss) { grid-template-columns: 54px 1fr auto; }
+    .br-gloss { grid-column: 2 / -1; grid-row: 2; text-align: left; }
+  }

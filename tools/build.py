@@ -16,6 +16,7 @@ Kotlin tests (`cd bengali-word-game && ./gradlew test`) - they re-verify the sam
 against the app's own generator rather than this Python mirror of it.
 """
 import itertools
+import json
 import pathlib
 import re
 import sys
@@ -34,6 +35,14 @@ KOTLIN = REPO / 'bengali-word-game/app/src/main/java/com/bangla/shobdojot/data/L
 SRC = REPO / 'src'                        # authored, with every comment
 SOURCE = SRC / 'index.html'               # the document, and the list of parts it is built from
 LEVELS_JS = SRC / 'js/02-levels.js'       # the one generated part; written by `write_builds`
+
+# A word for every বারোখড়ি form no board can illustrate - vetted by hand, because corpus
+# frequency alone offers proper nouns, misspellings and inflections. See the file's own note.
+KAR_WORDS = json.loads((REPO / 'tools/kar-words.json').read_text(encoding='utf-8'))
+
+# The বারোখড়ি's two axes, which the page draws and this file fills in for.
+BARO_CONSONANTS = 'কখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ'
+BARO_SIGNS = ['', 'া', 'ি', 'ী', 'ু', 'ূ', 'ৃ', 'ে', 'ৈ', 'ো', 'ৌ', 'ং']
 WORKER = REPO / 'docs/sw.js'              # offline cache; its version is stamped below
 WEB = REPO / 'docs/index.html'            # built, comments stripped
 # The same page with the document wrapper taken off, for hosts that supply their own
@@ -114,6 +123,45 @@ def milestones(levels):
     return marks
 
 
+def kar_examples(levels):
+    """
+    A word for every বারোখড়ি form no board can illustrate.
+
+    The table in the page shows 32 consonants under 12 signs. `boardOf` can find a word for a
+    form only if some board carries it, which covers 170 of the 384. This fills what it can of
+    the rest, from two sources in order of trust:
+
+      - tools/vocabulary.py, the hand-curated pool this game was built from;
+      - tools/kar-words.json, read out of wordfreq and then read by a human, because corpus
+        frequency alone offers proper nouns, misspellings and inflections - see that file.
+
+    Only forms with nothing on a board are emitted, so the page never carries a word it could
+    have found in its own level table.
+    """
+    from bangla import split_aksharas as split
+
+    # Only the forms the table shows: 32 consonants under 12 signs. Without this the pool
+    # contributes conjunct aksharas too - ষ্ঠ, ব্যা, প্র - which the বারোখড়ি never asks about,
+    # and which arrive from vocabulary.py with no gloss to show beside them.
+    wanted = {c + k for c in ''.join(BARO_CONSONANTS) for k in BARO_SIGNS}
+
+    on_board = set()
+    for level in levels:
+        for word in level['words']:
+            on_board |= set(split(word))
+
+    out = {}
+    for word in pool_words():
+        for akshara in split(word):
+            if akshara in wanted and akshara not in on_board and akshara not in out:
+                out[akshara] = {'w': word, 'en': GLOSS.get(word, '')}
+    # The hand-vetted list wins over a pool word: it was chosen for this job and glossed for it.
+    for akshara, entry in KAR_WORDS['words'].items():
+        if akshara in wanted and akshara not in on_board:
+            out[akshara] = {'w': entry['w'], 'en': entry['en']}
+    return {a: out[a] for a in sorted(out) if out[a]['en']}
+
+
 def emit(levels):
     marks = milestones(levels)
     kt, js = [KOTLIN_HEADER], ['const LEVELS = [']
@@ -158,10 +206,19 @@ def emit(levels):
                   f'letters: [{tiles}], '
                   f'block: {level["block"]}, board: [{board}] }},')
 
-    kt[-1] = kt[-1].rstrip(',')
-    js[-1] = js[-1].rstrip(',')
-    kt.append(KOTLIN_FOOTER % ('true' if FULL_SYLLABUS else 'false'))
+    # And the words that illustrate a বারোখড়ি form no board reaches. Emitted beside the level
+    # table because the page cannot work them out: they are not in the game.
     js.append('];')
+    js.append('')
+    js.append('/* A word for each বারোখড়ি form no board carries - see tools/kar-words.json. */')
+    js.append('const KAR_WORDS = {')
+    for akshara, entry in kar_examples(levels).items():
+        js.append(f'  "{akshara}": {{ w: "{entry["w"]}", en: "{entry["en"]}" }},')
+    js[-1] = js[-1].rstrip(',')
+    js.append('};')
+
+    kt[-1] = kt[-1].rstrip(',')
+    kt.append(KOTLIN_FOOTER % ('true' if FULL_SYLLABUS else 'false'))
     return '\n'.join(kt) + '\n', JS_HEADER + '\n'.join(js) + '\n'
 
 

@@ -178,8 +178,15 @@ const LEVEL_FOR_AKSHARA = (() => {
   return of;
 })();
 
-/** A word from the game beginning with this akshara, shortest first - or one containing it. */
-function wordStarting(akshara) {
+/**
+ * A word showing this akshara, and where it came from.
+ *
+ * A board word first, because that one can be played: tapping it opens the level it sits on.
+ * Failing that, KAR_WORDS - a word from the vocabulary pool or from wordfreq, vetted by hand
+ * and glossed, which exists to fill a form no board reaches. Those are not in the game, so
+ * they are shown and not offered as somewhere to go.
+ */
+function wordShowing(akshara) {
   let best = null;
   LEVELS.forEach((lv, i) => {
     for (const w of lv.words) {
@@ -189,11 +196,13 @@ function wordStarting(akshara) {
       const cost = [rank, parts.length];
       if (!best || cost[0] < best.cost[0]
           || (cost[0] === best.cost[0] && cost[1] < best.cost[1])) {
-        best = { word: w, level: i, cost };
+        best = { word: w, level: i, cost, inGame: true };
       }
     }
   });
-  return best;
+  if (best) return best;
+  const outside = KAR_WORDS[akshara];
+  return outside ? { word: outside.w, gloss: outside.en, inGame: false } : null;
 }
 
 let baroLetter = "ক";
@@ -221,24 +230,36 @@ function drawBaro() {
     row.innerHTML = `<span class="br-f bn">${akshara}</span><span class="br-n bn">${name}</span>`;
 
     const lvl = LEVEL_FOR_AKSHARA[akshara];
-    const eg = wordStarting(akshara);
-    const open = lvl !== undefined ? lvl : (eg ? eg.level : undefined);
-    const label = lvl !== undefined ? `${akshara} লেভেল` : (eg ? eg.word : "");
+    const eg = wordShowing(akshara);
 
-    if (open !== undefined) {
+    if (lvl !== undefined || (eg && eg.inGame)) {
+      // Playable: the form's own level, or the level of a word carrying it.
+      const open = lvl !== undefined ? lvl : eg.level;
       const go = document.createElement("button");
       go.className = "br-go bn" + (lvl !== undefined ? " br-lvl" : "");
       go.type = "button";
-      go.textContent = label;
+      go.textContent = lvl !== undefined ? `${akshara} লেভেল` : eg.word;
       go.title = `লেভেল ${bn(open + 1)} খুলুন`;
       go.addEventListener("click", () => { loadLevel(open); leaveMenu(); });
       row.appendChild(go);
+    } else if (eg) {
+      // A real Bengali word, but not one this game sets as a puzzle - so it is shown with its
+      // meaning and is not a button, because there is no level behind it to open.
+      const out = document.createElement("span");
+      out.className = "br-go br-out bn";
+      out.textContent = eg.word;
+      out.title = eg.gloss;
+      row.appendChild(out);
+      const note = document.createElement("span");
+      note.className = "br-gloss bn";
+      note.textContent = eg.gloss;
+      row.insertBefore(note, out);
     } else {
-      // Honest blank: Bengali has no everyday word for many of these forms, which is exactly
-      // why the game has no level for them either.
+      // Not a gap: this consonant and this sign do not meet in everyday Bengali at all - no
+      // word in 120,000 attested ones carries it. Said rather than left blank.
       const none = document.createElement("span");
       none.className = "br-go br-none bn";
-      none.textContent = "খেলায় নেই";
+      none.textContent = "বাংলায় নেই";
       row.appendChild(none);
     }
     table.appendChild(row);

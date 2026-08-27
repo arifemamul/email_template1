@@ -136,6 +136,38 @@ for (const letter of ['ক', 'ম', 'ঙ', 'হ']) {
     problems.push(`${letter}: picker highlights [${lit}]`);
 }
 
+// ---- every KAR_WORDS entry really contains its form, and is glossed --------------------
+const kar = await p.evaluate(() => {
+  const split = w => splitAksharas(w);
+  return Object.entries(KAR_WORDS).map(([form, e]) => ({
+    form, w: e.w, en: e.en, parts: split(e.w), onBoard: LEVELS.some(l => l.words.includes(e.w))
+  }));
+});
+for (const k of kar) {
+  if (!k.parts.includes(k.form))
+    problems.push(`KAR_WORDS["${k.form}"] = "${k.w}", which splits as ${k.parts.join('+')}`);
+  if (!k.en) problems.push(`KAR_WORDS["${k.form}"] has no gloss`);
+  // These exist to cover forms the boards cannot. One that is on a board is dead weight and a
+  // sign the emit filter has drifted.
+  if (k.onBoard) problems.push(`KAR_WORDS["${k.form}"] = "${k.w}" is on a board already`);
+}
+// Coverage, so a drop is visible rather than silent.
+const cover = await p.evaluate(() => {
+  const CONS = [...'কখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ'];
+  const KARS = ['', 'া', 'ি', 'ী', 'ু', 'ূ', 'ৃ', 'ে', 'ৈ', 'ো', 'ৌ', 'ং'];
+  let shown = 0;
+  for (const c of CONS) for (const k of KARS) {
+    const a = c + k;
+    if (LEVELS.some(l => l.name === a) || LEVELS.some(l => l.words.some(w => splitAksharas(w).includes(a)))
+        || KAR_WORDS[a]) shown++;
+  }
+  return { shown, total: CONS.length * KARS.length };
+});
+console.log(`বারোখড়ি coverage: ${cover.shown} of ${cover.total} forms show a word`);
+if (cover.shown < 270)
+  problems.push(`only ${cover.shown} of ${cover.total} forms show a word; was 274`);
+console.log(`KAR_WORDS: ${kar.length} vetted words for forms no board reaches`);
+
 // A row's word or level opens something real.
 await p.evaluate(() => [...document.querySelectorAll('.bp')].find(x => x.textContent === 'ক').click());
 const opened = await p.evaluate(async () => {

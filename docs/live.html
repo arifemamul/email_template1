@@ -776,6 +776,24 @@ color: color-mix(in srgb, var(--parchment) 34%, var(--indigo-700));
 font-size: 12px;
 cursor: default;
 }
+
+.br-out {
+border-style: dashed;
+border-color: color-mix(in srgb, var(--parchment) 16%, transparent);
+color: color-mix(in srgb, var(--parchment) 70%, var(--indigo-700));
+cursor: default;
+}
+.br-gloss {
+font-size: 11px;
+text-align: right;
+color: color-mix(in srgb, var(--parchment) 42%, var(--indigo-700));
+line-height: 1.35;
+}
+.br:has(.br-gloss) { grid-template-columns: 62px 1fr auto auto; }
+@media (max-width: 460px) {
+.br:has(.br-gloss) { grid-template-columns: 54px 1fr auto; }
+.br-gloss { grid-column: 2 / -1; grid-row: 2; text-align: left; }
+}
 #fx {
 position: absolute;
 inset: 0;
@@ -1420,8 +1438,115 @@ const LEVELS = [
 { id: 253, name: "হ", pass: 3, letters: ["হু", "ক", "হা", "সি"], block: 3, board: [{w:"হাসি",c:[[0,0],[0,1]]}, {w:"হুক",c:[[0,3],[0,4]]}] },
 { id: 254, name: "হা", pass: 0, letters: ["হা", "ত", "তি", "ড়", "ট"], block: 3, board: [{w:"হাট",c:[[0,0],[0,1]]}, {w:"হাড়",c:[[0,0],[1,0]]}, {w:"হাত",c:[[0,3],[0,4]]}, {w:"হাতি",c:[[0,3],[1,3]]}] },
 { id: 255, name: "হাঁ", pass: 1, letters: ["হাঁ", "স", "টু", "টা"], block: 3, board: [{w:"হাঁটা",c:[[0,0],[0,1]]}, {w:"হাঁটু",c:[[0,0],[1,0]]}, {w:"হাঁস",c:[[0,3],[0,4]]}] },
-{ id: 256, name: "হাঁ", pass: 2, letters: ["হাঁ", "চি", "ড়ি"], block: 3, board: [{w:"হাঁচি",c:[[0,0],[0,1]]}, {w:"হাঁড়ি",c:[[0,0],[1,0]]}] }
+{ id: 256, name: "হাঁ", pass: 2, letters: ["হাঁ", "চি", "ড়ি"], block: 3, board: [{w:"হাঁচি",c:[[0,0],[0,1]]}, {w:"হাঁড়ি",c:[[0,0],[1,0]]}] },
 ];
+
+const KAR_WORDS = {
+"কং": { w: "কংক্রিট", en: "ঢালাই, কনক্রিট" },
+"কী": { w: "কীট", en: "পোকা" },
+"কূ": { w: "কূপ", en: "কুয়ো" },
+"কৈ": { w: "কৈশোর", en: "বয়ঃসন্ধির বয়স" },
+"কৌ": { w: "কৌতুক", en: "মজার কথা" },
+"খী": { w: "সুখী", en: "সুখে আছে যে" },
+"গী": { w: "সংগীত", en: "গান" },
+"গূ": { w: "নিগূঢ়", en: "গভীর, গোপন" },
+"গৃ": { w: "গৃহ", en: "বাড়ি" },
+"গৌ": { w: "গৌরব", en: "গর্ব" },
+"ঘি": { w: "দীঘি", en: "বড় পুকুর" },
+"ঘূ": { w: "ঘূর্ণি", en: "পাক, ঘোরা জল" },
+"ঘৃ": { w: "ঘৃণা", en: "অপছন্দ" },
+"ঘে": { w: "ঘেউ", en: "কুকুরের ডাক" },
+"চী": { w: "প্রাচীন", en: "অনেক পুরোনো" },
+"চূ": { w: "চূড়া", en: "উঁচু মাথা, শৃঙ্গ" },
+"চৈ": { w: "চৈত্র", en: "বাংলা বছরের শেষ মাস" },
+"ছে": { w: "কাছে", en: "পাশে, নিকটে" },
+"জং": { w: "জংশন", en: "রেললাইন মেশে যেখানে" },
+"জী": { w: "জীবন", en: "বেঁচে থাকা" },
+"জৈ": { w: "জৈব", en: "জীব থেকে আসা" },
+"ঝং": { w: "ঝংকার", en: "গয়নার ঝনঝন শব্দ" },
+"ঝি": { w: "মাঝি", en: "নৌকা চালায় যে" },
+"ঝু": { w: "ঝুড়ি", en: "বাঁশের পাত্র" },
+"ঝো": { w: "ঝোল", en: "তরকারির রস" },
+"টী": { w: "টীকা", en: "ব্যাখ্যা, নোট" },
+"টূ": { w: "কটূক্তি", en: "কড়া কথা" },
+"ঠী": { w: "সহপাঠী", en: "একই ক্লাসের বন্ধু" },
+"ঠু": { w: "ঠুনকো", en: "সহজে ভাঙে যা" },
+"ঠো": { w: "মুঠো", en: "মুঠি ভরা" },
+"ড": { w: "ডলার", en: "বিদেশি টাকা" },
+"ডো": { w: "ডোর", en: "দোরা, বাঁধার সুতো" },
+"ঢ": { w: "ঢল", en: "পাহাড়ি ঢল, হঠাৎ পানি" },
+"ঢি": { w: "ঢিল", en: "ছোট পাথর" },
+"ণা": { w: "ধারণা", en: "ভাবনা" },
+"ণী": { w: "প্রাণী", en: "জীব, জন্তু" },
+"ণু": { w: "অণু", en: "খুব ছোট কণা" },
+"তী": { w: "তীব্র", en: "খুব জোরালো" },
+"তূ": { w: "কৌতূহল", en: "জানার আগ্রহ" },
+"তৃ": { w: "তৃষ্ণা", en: "পিপাসা" },
+"থী": { w: "সাথী", en: "সঙ্গী" },
+"থু": { w: "থুথু", en: "মুখের লালা" },
+"থে": { w: "যথেষ্ট", en: "যতটা দরকার" },
+"থৈ": { w: "অথৈ", en: "তল পাওয়া যায় না যেখানে" },
+"দং": { w: "দংশন", en: "কাটা, ছোবল" },
+"দূ": { w: "দূর", en: "অনেক তফাতে" },
+"দৃ": { w: "দৃশ্য", en: "চোখে যা দেখা যায়" },
+"দৈ": { w: "দৈনিক", en: "প্রতিদিনের" },
+"দৌ": { w: "দৌড়", en: "ছুটে চলা" },
+"ধি": { w: "বিধি", en: "নিয়ম" },
+"ধী": { w: "ধীরে", en: "আস্তে" },
+"ধূ": { w: "ধূসর", en: "ছাই রং" },
+"ধৃ": { w: "ধৃত", en: "ধরা হয়েছে যা" },
+"ধৈ": { w: "ধৈর্য", en: "সহ্য করার ক্ষমতা" },
+"ধো": { w: "ধোয়া", en: "পরিষ্কার করা" },
+"ধৌ": { w: "ধৌত", en: "ধোয়া হয়েছে যা" },
+"নূ": { w: "নূপুর", en: "পায়ের গয়না" },
+"নৃ": { w: "নৃত্য", en: "নাচ" },
+"নৈ": { w: "নৈতিক", en: "ন্যায়-অন্যায় নিয়ে" },
+"পী": { w: "পীর", en: "ধর্মগুরু" },
+"পূ": { w: "পূজা", en: "উপাসনা" },
+"পৃ": { w: "পৃথিবী", en: "আমরা যে গ্রহে থাকি" },
+"পৈ": { w: "পৈতৃক", en: "বাবার দিক থেকে পাওয়া" },
+"পৌ": { w: "পৌর", en: "শহরের, নগরের" },
+"ফূ": { w: "ফূর্তি", en: "আনন্দ" },
+"ফৌ": { w: "ফৌজ", en: "সৈন্যদল" },
+"বং": { w: "বংশ", en: "পরিবারের ধারা" },
+"বী": { w: "বীর", en: "সাহসী" },
+"বৃ": { w: "বৃষ্টি", en: "আকাশ থেকে পড়া পানি" },
+"বৌ": { w: "বৌদ্ধ", en: "বুদ্ধের ধর্মের" },
+"ভী": { w: "ভীষণ", en: "খুব, ভয়ানক" },
+"ভূ": { w: "ভূমি", en: "জমি" },
+"ভৃ": { w: "ভৃত্য", en: "কাজের লোক" },
+"ভৌ": { w: "ভৌত", en: "বস্তু নিয়ে, পদার্থের" },
+"মী": { w: "স্বামী", en: "বর" },
+"মৃ": { w: "মৃত", en: "মরে গেছে যা" },
+"মৈ": { w: "মৈত্রী", en: "বন্ধুত্ব" },
+"যি": { w: "যিনি", en: "যে (সম্মানে)" },
+"যু": { w: "যুদ্ধ", en: "লড়াই" },
+"যে": { w: "যেমন", en: "যেভাবে, উদাহরণ দিতে" },
+"যৌ": { w: "যৌথ", en: "মিলিত, একসঙ্গে" },
+"রং": { w: "রংধনু", en: "আকাশের সাত রঙের ধনু" },
+"রূ": { w: "রূপ", en: "চেহারা, আকার" },
+"রৌ": { w: "রৌদ্র", en: "কড়া রোদ" },
+"লং": { w: "অলংকার", en: "গয়না" },
+"লী": { w: "লীলা", en: "খেলা, কর্ম" },
+"লৌ": { w: "লৌহ", en: "লোহা" },
+"শং": { w: "প্রশংসা", en: "বাহবা, ভালো বলা" },
+"শূ": { w: "শূন্য", en: "০, কিছুই নেই" },
+"শৃ": { w: "শৃঙ্গ", en: "পাহাড়ের চূড়া, শিং" },
+"শে": { w: "শেষ", en: "সমাপ্তি" },
+"শৈ": { w: "শৈশব", en: "ছোটবেলা" },
+"শৌ": { w: "শৌখিন", en: "সাজগোজ পছন্দ করে যে" },
+"ষী": { w: "চাষী", en: "চাষ করে যে" },
+"ষে": { w: "নিষেধ", en: "বারণ" },
+"সং": { w: "সংখ্যা", en: "গোনার মান" },
+"সৃ": { w: "মসৃণ", en: "মোলায়েম, চকচকে" },
+"সৌ": { w: "সৌরভ", en: "সুগন্ধ" },
+"হং": { w: "অহং", en: "অহংকার, আমিত্ব" },
+"হী": { w: "আগ্রহী", en: "আগ্রহ আছে যার" },
+"হূ": { w: "মুহূর্ত", en: "খুব অল্প সময়" },
+"হৃ": { w: "হৃদয়", en: "মন, বুকের ভিতর" },
+"হে": { w: "সাহেব", en: "ভদ্রলোককে ডাকার শব্দ" },
+"হৈ": { w: "হৈচৈ", en: "চেঁচামেচি" }
+};
 const key = (r, c) => r + "," + c;
 
 function boardOf(lv) {
@@ -2228,7 +2353,7 @@ LEVELS.forEach((lv, i) => { if (!(lv.name in of)) of[lv.name] = i; });
 return of;
 })();
 
-function wordStarting(akshara) {
+function wordShowing(akshara) {
 let best = null;
 LEVELS.forEach((lv, i) => {
 for (const w of lv.words) {
@@ -2238,11 +2363,13 @@ if (rank === 2) continue;
 const cost = [rank, parts.length];
 if (!best || cost[0] < best.cost[0]
 || (cost[0] === best.cost[0] && cost[1] < best.cost[1])) {
-best = { word: w, level: i, cost };
+best = { word: w, level: i, cost, inGame: true };
 }
 }
 });
-return best;
+if (best) return best;
+const outside = KAR_WORDS[akshara];
+return outside ? { word: outside.w, gloss: outside.en, inGame: false } : null;
 }
 
 let baroLetter = "ক";
@@ -2270,22 +2397,31 @@ row.className = "br";
 row.innerHTML = `<span class="br-f bn">${akshara}</span><span class="br-n bn">${name}</span>`;
 
 const lvl = LEVEL_FOR_AKSHARA[akshara];
-const eg = wordStarting(akshara);
-const open = lvl !== undefined ? lvl : (eg ? eg.level : undefined);
-const label = lvl !== undefined ? `${akshara} লেভেল` : (eg ? eg.word : "");
+const eg = wordShowing(akshara);
 
-if (open !== undefined) {
+if (lvl !== undefined || (eg && eg.inGame)) {
+const open = lvl !== undefined ? lvl : eg.level;
 const go = document.createElement("button");
 go.className = "br-go bn" + (lvl !== undefined ? " br-lvl" : "");
 go.type = "button";
-go.textContent = label;
+go.textContent = lvl !== undefined ? `${akshara} লেভেল` : eg.word;
 go.title = `লেভেল ${bn(open + 1)} খুলুন`;
 go.addEventListener("click", () => { loadLevel(open); leaveMenu(); });
 row.appendChild(go);
+} else if (eg) {
+const out = document.createElement("span");
+out.className = "br-go br-out bn";
+out.textContent = eg.word;
+out.title = eg.gloss;
+row.appendChild(out);
+const note = document.createElement("span");
+note.className = "br-gloss bn";
+note.textContent = eg.gloss;
+row.insertBefore(note, out);
 } else {
 const none = document.createElement("span");
 none.className = "br-go br-none bn";
-none.textContent = "খেলায় নেই";
+none.textContent = "বাংলায় নেই";
 row.appendChild(none);
 }
 table.appendChild(row);
