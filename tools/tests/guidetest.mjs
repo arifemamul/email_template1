@@ -60,7 +60,9 @@ for (const [viewport, name, touch] of sizes) {
     if (open.visible !== 'visible') problems.push(`${name}: guide did not open`);
     if (open.expanded !== 'true') problems.push(`${name}: aria-expanded not set`);
     if (open.bodyLocked !== 'hidden') problems.push(`${name}: body not scroll-locked`);
-    // Levels, what-this-is, how-to-play, one-tile-one-akshara, and the feedback card.
+    // Five cards spread across six sections - levels, what-this-is, how-to-play,
+    // one-tile-one-akshara and the feedback card. They exist in the DOM whichever section is
+    // open, so this counts the markup rather than what is on screen.
     if (open.cards !== 5) problems.push(`${name}: guide has ${open.cards} cards, expected 5`);
     if (!open.hasFooter) problems.push(`${name}: footer missing from guide`);
     // Not a hardcoded count: the picker must hold every level there is.
@@ -96,18 +98,29 @@ for (const [viewport, name, touch] of sizes) {
     if (!state.masthead) problems.push(`${name}: masthead hidden on desktop`);
     if (!state.guideVisible) problems.push(`${name}: notes hidden on desktop`);
     if (state.menuButton) problems.push(`${name}: menu button showing on desktop`);
+    // The level picker used to have a column of its own under the phone; it is a section of
+    // the menu now, so the desktop layout is game on the left, menu on the right, footer last.
     const cols = await p.evaluate(() => {
       const dev = document.querySelector('.device').getBoundingClientRect();
-      const pan = document.querySelector('.panel').getBoundingClientRect();
-      const lv = document.querySelector('.levels-card').getBoundingClientRect();
+      const menu = document.querySelector('.menu').getBoundingClientRect();
+      const pages = document.querySelector('.pages').getBoundingClientRect();
       const ft = document.querySelector('footer').getBoundingClientRect();
-      return { sideBySide: pan.left > dev.right - 4, levelsUnderGame: lv.top > dev.top && Math.abs(lv.left - dev.left) < 4,
-               footerLast: ft.top > lv.top };
+      return {
+        sideBySide: menu.left > dev.right - 4 && pages.left > dev.right - 4,
+        menuAbovePages: menu.bottom <= pages.top + 4,
+        footerLast: ft.top > pages.top,
+        tabs: document.querySelectorAll('#menu .tab').length,
+        onePageShowing: [...document.querySelectorAll('.pages .page')]
+          .filter(x => getComputedStyle(x).display !== 'none').length
+      };
     });
-    if (!cols.sideBySide) problems.push(`${name}: notes not beside the game`);
-    if (!cols.levelsUnderGame) problems.push(`${name}: levels not under the game`);
+    if (!cols.sideBySide) problems.push(`${name}: the menu is not beside the game`);
+    if (!cols.menuAbovePages) problems.push(`${name}: the menu bar is not above its sections`);
     if (!cols.footerLast) problems.push(`${name}: footer not last`);
-    console.log(`${name}: two-up intact, no menu, levels under the game`);
+    if (cols.tabs !== 6) problems.push(`${name}: ${cols.tabs} tabs, expected 6`);
+    if (cols.onePageShowing !== 1)
+      problems.push(`${name}: ${cols.onePageShowing} sections showing, expected exactly 1`);
+    console.log(`${name}: two-up intact, no hamburger, ${cols.tabs} tabs, one section showing`);
   }
   if (state.overflow > 1) problems.push(`${name}: page scrolls sideways by ${state.overflow}px`);
   await p.close();

@@ -114,27 +114,24 @@ line-height: 1.62;
 
 .stage {
 display: grid;
-grid-template-columns: minmax(0, 400px) minmax(280px, 420px);
-grid-template-areas: "game notes" "levels notes" "prose prose";
-grid-template-rows: auto auto auto;
+grid-template-columns: minmax(0, 400px) minmax(300px, 460px);
+grid-template-areas: "game notes";
+grid-template-rows: auto;
 gap: clamp(20px, 3vw, 44px);
 align-items: start;
 justify-content: center;
 }
 
 .device { grid-area: game; }
-.levels-card { grid-area: levels; }
-.panel { grid-area: notes; }
-footer { grid-area: prose; }
 
-.guide { display: contents; }
+.guide { grid-area: notes; min-width: 0; }
 .guide-head, .touch-bar { display: none; }
 
 @media (max-width: 860px) {
 .stage {
 grid-template-columns: minmax(0, 1fr);
-grid-template-areas: "game" "levels" "notes" "prose";
-grid-template-rows: auto auto auto auto;
+grid-template-areas: "game" "notes";
+grid-template-rows: auto auto;
 }
 }
 
@@ -199,6 +196,7 @@ gap: 0;
 }
 
 .guide {
+grid-area: auto;
 display: block;
 position: fixed;
 inset: 0;
@@ -250,9 +248,6 @@ cursor: pointer;
 }
 .guide-close:active { transform: scale(.96); }
 
-.guide .levels-card, .guide .panel, .guide footer { grid-area: auto; }
-.guide .panel { margin-top: 16px; }
-.guide footer { margin-top: 22px; }
 }
 .device {
 position: relative;
@@ -604,6 +599,118 @@ footer code { font-family: var(--mono); color: color-mix(in srgb, var(--marigold
 @media (prefers-reduced-motion: reduce) {
 * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
+.menu {
+display: flex;
+flex-wrap: wrap;
+gap: 6px;
+margin-bottom: 16px;
+padding-bottom: 14px;
+border-bottom: 1px solid color-mix(in srgb, var(--parchment) 10%, transparent);
+}
+
+.tab {
+border: 1px solid color-mix(in srgb, var(--parchment) 12%, transparent);
+border-radius: 999px;
+padding: 7px 13px;
+background: transparent;
+color: color-mix(in srgb, var(--parchment) 62%, var(--indigo-700));
+font-size: 13px;
+font-weight: 600;
+cursor: pointer;
+white-space: nowrap;
+transition: background-color .16s ease, color .16s ease, border-color .16s ease;
+}
+.tab:hover { color: var(--parchment); border-color: color-mix(in srgb, var(--parchment) 26%, transparent); }
+.tab.on {
+background: var(--marigold);
+border-color: var(--marigold);
+color: var(--ink);
+}
+
+.page { display: none; }
+.page.on { display: block; }
+.page > .card + .card { margin-top: 22px; }
+.page > h3 {
+margin: 0 0 12px;
+font-size: 11px;
+letter-spacing: .16em;
+text-transform: uppercase;
+color: color-mix(in srgb, var(--marigold) 78%, var(--parchment));
+font-weight: 700;
+}
+
+.chart {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+gap: 8px;
+margin-top: 16px;
+}
+
+.ch {
+aspect-ratio: 1;
+border: 1px solid color-mix(in srgb, var(--parchment) 12%, transparent);
+border-radius: 13px;
+background: color-mix(in srgb, var(--indigo-700) 55%, transparent);
+display: grid;
+place-content: center;
+gap: 1px;
+cursor: pointer;
+transition: transform .18s cubic-bezier(.2,1.5,.4,1), background-color .18s ease;
+}
+.ch:hover { transform: translateY(-2px); background: var(--violet-600); }
+.ch:active { transform: scale(.95); }
+.ch-l { font-size: 23px; font-weight: 700; color: var(--marigold); line-height: 1.1; }
+.ch-n {
+font-size: 10.5px;
+font-variant-numeric: tabular-nums;
+color: color-mix(in srgb, var(--parchment) 50%, var(--indigo-700));
+}
+.ch-none {
+cursor: default;
+border-style: dashed;
+background: transparent;
+}
+.ch-none .ch-l { color: color-mix(in srgb, var(--parchment) 30%, var(--indigo-700)); }
+
+.marks { margin-top: 16px; display: flex; flex-direction: column; gap: 2px; }
+
+.mk {
+display: grid;
+grid-template-columns: 46px minmax(88px, auto) 1fr auto;
+align-items: center;
+gap: 10px;
+padding: 9px 4px;
+border-bottom: 1px solid color-mix(in srgb, var(--parchment) 8%, transparent);
+font-size: 12.5px;
+}
+.mk:last-child { border-bottom: 0; }
+.mk-g { font-size: 21px; color: var(--marigold); line-height: 1.2; }
+.mk-n { color: var(--parchment); font-size: 13px; }
+.mk-w { color: color-mix(in srgb, var(--parchment) 58%, var(--indigo-700)); line-height: 1.45; }
+
+.mk-eg {
+border: 1px solid color-mix(in srgb, var(--marigold) 30%, transparent);
+border-radius: 9px;
+padding: 4px 9px;
+background: color-mix(in srgb, var(--marigold) 10%, transparent);
+color: var(--marigold);
+font-size: 15px;
+cursor: pointer;
+white-space: nowrap;
+}
+.mk-eg:hover { background: var(--marigold); color: var(--ink); }
+.mk-gone {
+border-style: dashed;
+background: transparent;
+color: color-mix(in srgb, var(--parchment) 40%, var(--indigo-700));
+font-size: 11.5px;
+cursor: default;
+}
+
+@media (max-width: 460px) {
+.mk { grid-template-columns: 40px 1fr auto; }
+.mk-w { grid-column: 2 / -1; grid-row: 2; }
+}
 #fx {
 position: absolute;
 inset: 0;
@@ -748,19 +855,81 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
       </div>
     </div>
 
-    <div class="guide" id="guide" aria-label="Levels and how this game works">
+    <div class="guide" id="guide" aria-label="Alphabet, levels and how this game works">
       <div class="guide-head">
-        <span class="guide-title">Levels &amp; guide</span>
+        <span class="guide-title">Menu</span>
         <button class="guide-close" id="guideClose" aria-label="Close">Close</button>
       </div>
 
-      <section class="card levels-card">
+      <!-- The menu bar. One section is on screen at a time, which is the point: the guide used
+           to be one long scroll with the level grid on top, and a child looking for the letter
+           chart had to know it was down there. Six named places instead. -->
+      <nav class="menu" id="menu" role="tablist" aria-label="Sections">
+        <button class="tab bn" type="button" role="tab" data-page="vowels"
+                aria-controls="page-vowels" title="the eleven vowels">স্বরবর্ণ</button>
+        <button class="tab bn" type="button" role="tab" data-page="consonants"
+                aria-controls="page-consonants" title="the thirty-two consonants, ক to হ">ব্যঞ্জনবর্ণ</button>
+        <button class="tab bn" type="button" role="tab" data-page="marks"
+                aria-controls="page-marks" title="the signs that attach to a letter">কার ও চিহ্ন</button>
+        <button class="tab bn" type="button" role="tab" data-page="levels"
+                aria-controls="page-levels" title="every level, by letter">লেভেল</button>
+        <button class="tab bn" type="button" role="tab" data-page="about"
+                aria-controls="page-about" title="what this is">About</button>
+        <button class="tab bn" type="button" role="tab" data-page="play"
+                aria-controls="page-play" title="the controls">How to play</button>
+      </nav>
+
+      <div class="pages">
+        <!-- The two halves of the বর্ণমালা, as a chart a child can read AND as the way into the
+             game: every letter that has levels is a button that opens its first one. Built in
+             js/10-menu.js from LEVELS, so the chart cannot claim a letter the game has lost. -->
+        <section class="page" id="page-vowels" role="tabpanel" aria-labelledby="tab-vowels">
+          <h3>স্বরবর্ণ - the vowels</h3>
+          <p class="deck">
+            Eleven letters, and the order every Bengali child recites first. The game runs in
+            this order, so these are levels 1 onward. Tap a letter to open its first level.
+          </p>
+          <div class="chart" id="chartVowels"></div>
+        </section>
+
+        <section class="page" id="page-consonants" role="tabpanel" aria-labelledby="tab-consonants">
+          <h3>ব্যঞ্জনবর্ণ - the consonants</h3>
+          <p class="deck">
+            Thirty-two letters, ক to হ. The game plays them in this order after the vowels -
+            tap one to open its first level. Twenty-nine have levels; ঙ, ঞ and ণ have none and
+            cannot, because no Bengali word begins with them. They still turn up inside words,
+            so a child meets them - just never at the front, which is where a level's name
+            comes from.
+            <br><br>
+            ড়, ঢ় and য় are usually counted here too, and the same is true of them: no word
+            starts with one, and all three are on boards - বাড়ি, গাঢ়, নয়.
+          </p>
+          <div class="chart" id="chartConsonants"></div>
+        </section>
+
+        <section class="page" id="page-marks" role="tabpanel" aria-labelledby="tab-marks">
+          <h3>কার ও চিহ্ন - the other parts of a letter</h3>
+          <p class="deck">
+            A Bengali letter is rarely alone. A vowel sign - a <b>কার</b> - rides on it and
+            changes the sound without being a letter of its own: ক becomes কা, কি, কু, কে, কো.
+            That is why this game counts in aksharas rather than characters, and why কা is one
+            tile and not two.
+            <br><br>
+            Each row below is a sign, the vowel it writes, and a word from the game that uses
+            it. Tap the word to open the level it is on.
+          </p>
+          <div class="marks" id="markTable"></div>
+        </section>
+
+        <section class="page" id="page-levels" role="tabpanel" aria-labelledby="tab-levels">
+<section class="card levels-card">
         <h3>Levels - in teaching order</h3>
         <div class="levels" id="levelGrid"></div>
       </section>
+        </section>
 
-    <div class="panel">
-      <section class="card">
+        <section class="page" id="page-about" role="tabpanel" aria-labelledby="tab-about">
+<section class="card">
         <h3>What this is</h3>
         <p class="deck">
           A Bengali word puzzle, one <b>akshara</b> at a time. Drag across the letters to
@@ -784,7 +953,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
           comes from.
           <br><br>
           <b>Every sign of the alphabet is taught somewhere.</b> Fifty-seven units - the eleven
-          vowels, the thirty-three consonants, the vowel signs and the conjunct families - and
+          vowels, the thirty-two consonants ক to হ, the vowel signs and the conjunct families - and
           the last to arrive was ৈ, which writes ঐ onto a consonant. Bengali offers only four
           words carrying it, so three small levels hold all four: তৈরি, বৈশাখ, বৈঠক and সৈনিক.
           <br><br>
@@ -816,35 +985,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
           sign-up, no ads, nothing to pay - your progress is saved in this browser.
         </p>
       </section>
-
-      <section class="card">
-        <h3>How to play</h3>
-        <ul class="how">
-          <li><span class="k">drag</span><span>Press a letter and drag across the others. Sliding back onto the previous letter un-picks it.</span></li>
-          <li><span class="k">click</span><span>Prefer clicking? Tap letters one at a time, then hit <b>✓</b> on the word - or press <b>Enter</b>. <b>Esc</b> clears.</span></li>
-          <li><span class="k">finish</span><span>Clearing a level moves straight to the next one - no button, no waiting. The confetti plays across the change.</span></li>
-          <li><span class="k">&lsaquo; &rsaquo;</span><span>The arrows step to the previous or next level, and wrap around at either end. The level grid jumps straight to any level, and runs in alphabet order like the game. Any level you open starts blank, so an old one can always be played again.</span></li>
-          <li><span class="k">♪</span><span>Every word is spoken aloud as you find it, and there is no button for it - hearing the word is the point, not a setting. Bengali spelling hides the sound: ব and ভ, শ and ষ and স are each one sound but different letters. On a device with no Bengali voice the game stays silent rather than reading Bengali in an English voice.</span></li>
-          <li><span class="k">◈</span><span>A hint reveals one letter from a word you haven't solved. Free, and no limit - there is nothing to count and nothing to spend.</span></li>
-        </ul>
-      </section>
-
-      <section class="card">
-        <h3>One tile = one akshara</h3>
-        <table class="akshara-table">
-          <tbody>
-            <tr><td class="w">মাছ</td><td class="a">মা + ছ</td><td class="n">vowel sign</td></tr>
-            <tr><td class="w">বন্ধু</td><td class="a">ব + ন্ধু</td><td class="n">conjunct</td></tr>
-            <tr><td class="w">বাড়ি</td><td class="a">বা + ড়ি</td><td class="n">nukta + sign</td></tr>
-          </tbody>
-        </table>
-        <p style="margin:12px 0 0;font-size:12.5px;line-height:1.55;color:color-mix(in srgb, var(--parchment) 62%, var(--indigo-700))">
-          Bengali isn't one letter per character - মাছ is three code points but two letter units.
-          The game splits on those units, so a tile is always something a reader recognises.
-        </p>
-      </section>
-
-      <section class="card">
+<section class="card">
         <h3>Found a problem?</h3>
         <p class="deck">
           A word spelled wrong, a word that is not the Bengali you use at home, a level that
@@ -865,16 +1006,46 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
           <span class="say-en">Copy</span>
         </button>
       </section>
-    </div>
+        </section>
+      <footer>
+          Every board is laid out when the game is built, not hand-drawn and not at runtime: every
+          ordering of a level's words is tried and the smallest grid wins, so no accidental word
+          ever appears on it. A wheel carries a letter twice when a word needs it twice, as ঘুঘু and
+          বাবা do, and the two are kept apart on the ring so a drag from one to the other does not
+          run over its twin. Every level is checked to be about its own akshara: a কা level is all
+          কা words, and the build fails if one is not.
+        </footer>
 
-    <footer>
-      Every board is laid out when the game is built, not hand-drawn and not at runtime: every
-      ordering of a level's words is tried and the smallest grid wins, so no accidental word
-      ever appears on it. A wheel carries a letter twice when a word needs it twice, as ঘুঘু and
-      বাবা do, and the two are kept apart on the ring so a drag from one to the other does not
-      run over its twin. Every level is checked to be about its own akshara: a কা level is all
-      কা words, and the build fails if one is not.
-    </footer>
+        <section class="page" id="page-play" role="tabpanel" aria-labelledby="tab-play">
+<section class="card">
+        <h3>How to play</h3>
+        <ul class="how">
+          <li><span class="k">drag</span><span>Press a letter and drag across the others. Sliding back onto the previous letter un-picks it.</span></li>
+          <li><span class="k">click</span><span>Prefer clicking? Tap letters one at a time, then hit <b>✓</b> on the word - or press <b>Enter</b>. <b>Esc</b> clears.</span></li>
+          <li><span class="k">finish</span><span>Clearing a level moves straight to the next one - no button, no waiting. The confetti plays across the change.</span></li>
+          <li><span class="k">&lsaquo; &rsaquo;</span><span>The arrows step to the previous or next level, and wrap around at either end. The level grid jumps straight to any level, and runs in alphabet order like the game. Any level you open starts blank, so an old one can always be played again.</span></li>
+          <li><span class="k">♪</span><span>Every word is spoken aloud as you find it, and there is no button for it - hearing the word is the point, not a setting. Bengali spelling hides the sound: ব and ভ, শ and ষ and স are each one sound but different letters. On a device with no Bengali voice the game stays silent rather than reading Bengali in an English voice.</span></li>
+          <li><span class="k">◈</span><span>A hint reveals one letter from a word you haven't solved. Free, and no limit - there is nothing to count and nothing to spend.</span></li>
+        </ul>
+      </section>
+<section class="card">
+        <h3>One tile = one akshara</h3>
+        <table class="akshara-table">
+          <tbody>
+            <tr><td class="w">মাছ</td><td class="a">মা + ছ</td><td class="n">vowel sign</td></tr>
+            <tr><td class="w">বন্ধু</td><td class="a">ব + ন্ধু</td><td class="n">conjunct</td></tr>
+            <tr><td class="w">বাড়ি</td><td class="a">বা + ড়ি</td><td class="n">nukta + sign</td></tr>
+          </tbody>
+        </table>
+        <p style="margin:12px 0 0;font-size:12.5px;line-height:1.55;color:color-mix(in srgb, var(--parchment) 62%, var(--indigo-700))">
+          Bengali isn't one letter per character - মাছ is three code points but two letter units.
+          The game splits on those units, so a tile is always something a reader recognises.
+        </p>
+      </section>
+        </section>
+      </div>
+
+    </div>
     </div>
   </div>
 </div>
@@ -1860,6 +2031,141 @@ say.adds.textContent =
 say.copy.addEventListener("click", sayCopy);
 addEventListener("resize", drawSayAdds);
 drawSayAdds();
+
+const SWARABARNA = [...'অআইঈউঊঋএঐওঔ'];
+const BYANJANBARNA = [...'কখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ'];
+
+const KARS = [
+["া", "আ-কার", "আ"], ["ি", "ই-কার", "ই"], ["ী", "ঈ-কার", "ঈ"],
+["ু", "উ-কার", "উ"], ["ূ", "ঊ-কার", "ঊ"], ["ৃ", "ঋ-কার", "ঋ"],
+["ে", "এ-কার", "এ"], ["ৈ", "ঐ-কার", "ঐ"], ["ো", "ও-কার", "ও"],
+["ৌ", "ঔ-কার", "ঔ"]
+];
+
+const SIGNS = [
+["ঁ", "চন্দ্রবিন্দু", "makes the vowel nasal - চাঁদ, হাঁস"],
+["ং", "অনুস্বার", "a nasal ending - রঙ, ফড়িং"],
+["্", "হসন্ত", "joins two consonants into one letter - ন + ্ + ধ makes ন্ধ, as in বন্ধু"]
+];
+
+function leaveMenu() {
+if (el.guide.classList.contains("open")) closeGuide();
+}
+
+const LEVELS_BY_LETTER = (() => {
+const of = {};
+LEVELS.forEach((lv, i) => {
+const letter = lv.name[0];
+(of[letter] = of[letter] || []).push(i);
+});
+return of;
+})();
+
+function exampleWord(mark) {
+let best = null;
+LEVELS.forEach((lv, i) => {
+for (const w of lv.words) {
+for (const akshara of splitAksharas(w)) {
+if (!akshara.includes(mark)) continue;
+const cost = [akshara.length, splitAksharas(w).length];
+if (!best || cost[0] < best.cost[0]
+|| (cost[0] === best.cost[0] && cost[1] < best.cost[1])) {
+best = { word: w, level: i, akshara, cost };
+}
+}
+}
+});
+return best;
+}
+
+function letterTile(letter) {
+const levels = LEVELS_BY_LETTER[letter] || [];
+const tile = document.createElement(levels.length ? "button" : "div");
+tile.className = "ch" + (levels.length ? "" : " ch-none");
+tile.innerHTML = `<span class="ch-l bn">${letter}</span>`
++ `<span class="ch-n">${levels.length ? bn(levels.length) : "\u2014"}</span>`;
+if (levels.length) {
+tile.type = "button";
+tile.title = `${letter} - ${levels.length} level${levels.length > 1 ? "s" : ""}, `
++ `from ${bn(levels[0] + 1)}`;
+tile.addEventListener("click", () => { loadLevel(levels[0]); leaveMenu(); });
+} else {
+tile.title = `${letter} - no level, because no Bengali word begins with it`;
+}
+return tile;
+}
+
+function drawCharts() {
+for (const [id, letters] of [["chartVowels", SWARABARNA],
+["chartConsonants", BYANJANBARNA]]) {
+const box = document.getElementById(id);
+box.innerHTML = "";
+letters.forEach(l => box.appendChild(letterTile(l)));
+}
+
+const table = document.getElementById("markTable");
+table.innerHTML = "";
+const row = (glyph, name, note, example) => {
+const r = document.createElement("div");
+r.className = "mk";
+r.innerHTML = `<span class="mk-g bn">${glyph}</span>`
++ `<span class="mk-n bn">${name}</span>`
++ `<span class="mk-w">${note}</span>`;
+if (example) {
+const b = document.createElement("button");
+b.className = "mk-eg bn";
+b.type = "button";
+b.textContent = example.word;
+b.title = `open level ${bn(example.level + 1)}`;
+b.addEventListener("click", () => { loadLevel(example.level); leaveMenu(); });
+r.appendChild(b);
+} else {
+const s = document.createElement("span");
+s.className = "mk-eg mk-gone";
+s.textContent = "no word";
+r.appendChild(s);
+}
+table.appendChild(r);
+};
+
+for (const [sign, name, vowel] of KARS) {
+row(`ক${sign}`, name, `writes ${vowel} onto a letter`, exampleWord(sign));
+}
+for (const [sign, name, note] of SIGNS) {
+const eg = exampleWord(sign);
+const glyph = sign === "\u09cd" ? (eg ? eg.akshara : "\u0995\u09cd\u09a4") : `ক${sign}`;
+row(glyph, name, note, eg);
+}
+}
+
+const MENU_KEY = "shobdojot.page";
+const tabs = [...document.querySelectorAll("#menu .tab")];
+
+function showPage(key, remember = true) {
+for (const tab of tabs) {
+const on = tab.dataset.page === key;
+tab.classList.toggle("on", on);
+tab.setAttribute("aria-selected", on ? "true" : "false");
+}
+for (const page of document.querySelectorAll(".pages .page")) {
+page.classList.toggle("on", page.id === `page-${key}`);
+}
+if (remember) { try { localStorage.setItem(MENU_KEY, key); } catch {} }
+}
+
+for (const tab of tabs) {
+tab.id = `tab-${tab.dataset.page}`;
+tab.addEventListener("click", () => showPage(tab.dataset.page));
+}
+
+drawCharts();
+
+let opening = "levels";
+try {
+const saved = localStorage.getItem(MENU_KEY);
+if (saved && tabs.some(t => t.dataset.page === saved)) opening = saved;
+} catch { /* no stored preference; levels it is */ }
+showPage(opening, false);
 let verdictTimer = null;
 
 function showVerdict(word, result) {

@@ -1,0 +1,125 @@
+  /* -- The menu bar and the six sections behind it --------------------------- */
+  .menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid color-mix(in srgb, var(--parchment) 10%, transparent);
+  }
+
+  .tab {
+    border: 1px solid color-mix(in srgb, var(--parchment) 12%, transparent);
+    border-radius: 999px;
+    padding: 7px 13px;
+    background: transparent;
+    color: color-mix(in srgb, var(--parchment) 62%, var(--indigo-700));
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color .16s ease, color .16s ease, border-color .16s ease;
+  }
+  .tab:hover { color: var(--parchment); border-color: color-mix(in srgb, var(--parchment) 26%, transparent); }
+  /* The section you are on, in the game's own accent rather than a grey - a child should be
+     able to see where they are without reading. */
+  .tab.on {
+    background: var(--marigold);
+    border-color: var(--marigold);
+    color: var(--ink);
+  }
+
+  .page { display: none; }
+  .page.on { display: block; }
+  /* Two cards in one section (About holds the notes and the feedback card) need the gap the
+     panel used to give them. */
+  .page > .card + .card { margin-top: 22px; }
+  .page > h3 {
+    margin: 0 0 12px;
+    font-size: 11px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--marigold) 78%, var(--parchment));
+    font-weight: 700;
+  }
+
+  /* -- The alphabet charts --------------------------------------------------- */
+  .chart {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .ch {
+    aspect-ratio: 1;
+    border: 1px solid color-mix(in srgb, var(--parchment) 12%, transparent);
+    border-radius: 13px;
+    background: color-mix(in srgb, var(--indigo-700) 55%, transparent);
+    display: grid;
+    place-content: center;
+    gap: 1px;
+    cursor: pointer;
+    transition: transform .18s cubic-bezier(.2,1.5,.4,1), background-color .18s ease;
+  }
+  .ch:hover { transform: translateY(-2px); background: var(--violet-600); }
+  .ch:active { transform: scale(.95); }
+  .ch-l { font-size: 23px; font-weight: 700; color: var(--marigold); line-height: 1.1; }
+  /* How many levels this letter has. Counted from the game, never typed in. */
+  .ch-n {
+    font-size: 10.5px;
+    font-variant-numeric: tabular-nums;
+    color: color-mix(in srgb, var(--parchment) 50%, var(--indigo-700));
+  }
+  /* ঙ, ঞ and ণ. Dimmed and not a button, because there is nothing to open - no Bengali word
+     begins with them. Shown rather than omitted: a gap in a chart of the alphabet reads as a
+     mistake, and this is not one. */
+  .ch-none {
+    cursor: default;
+    border-style: dashed;
+    background: transparent;
+  }
+  .ch-none .ch-l { color: color-mix(in srgb, var(--parchment) 30%, var(--indigo-700)); }
+
+  /* -- The কার and চিহ্ন table ----------------------------------------------- */
+  .marks { margin-top: 16px; display: flex; flex-direction: column; gap: 2px; }
+
+  .mk {
+    display: grid;
+    grid-template-columns: 46px minmax(88px, auto) 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 4px;
+    border-bottom: 1px solid color-mix(in srgb, var(--parchment) 8%, transparent);
+    font-size: 12.5px;
+  }
+  .mk:last-child { border-bottom: 0; }
+  .mk-g { font-size: 21px; color: var(--marigold); line-height: 1.2; }
+  .mk-n { color: var(--parchment); font-size: 13px; }
+  .mk-w { color: color-mix(in srgb, var(--parchment) 58%, var(--indigo-700)); line-height: 1.45; }
+
+  /* The example word, which opens the level it sits on. */
+  .mk-eg {
+    border: 1px solid color-mix(in srgb, var(--marigold) 30%, transparent);
+    border-radius: 9px;
+    padding: 4px 9px;
+    background: color-mix(in srgb, var(--marigold) 10%, transparent);
+    color: var(--marigold);
+    font-size: 15px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .mk-eg:hover { background: var(--marigold); color: var(--ink); }
+  .mk-gone {
+    border-style: dashed;
+    background: transparent;
+    color: color-mix(in srgb, var(--parchment) 40%, var(--indigo-700));
+    font-size: 11.5px;
+    cursor: default;
+  }
+
+  /* On a narrow sheet the note has nowhere to go, so it drops under the name. */
+  @media (max-width: 460px) {
+    .mk { grid-template-columns: 40px 1fr auto; }
+    .mk-w { grid-column: 2 / -1; grid-row: 2; }
+  }

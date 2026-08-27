@@ -24,6 +24,7 @@
 /* include css/layout.css   masthead, the two-up desktop grid, the phone/tablet stack */
 /* include css/game.css     the phone screen: board, wheel, tiles, buttons */
 /* include css/panel.css    the guide and the level picker beside the game */
+/* include css/menu.css     the menu bar, the alphabet charts, the marks table */
 /* include css/effects.css  the layer flying tiles and confetti are drawn on */
 /* include css/host.css     what the page needs as a whole document, and the size overrides */
 </style>
@@ -76,19 +77,81 @@
       </div>
     </div>
 
-    <div class="guide" id="guide" aria-label="Levels and how this game works">
+    <div class="guide" id="guide" aria-label="Alphabet, levels and how this game works">
       <div class="guide-head">
-        <span class="guide-title">Levels &amp; guide</span>
+        <span class="guide-title">Menu</span>
         <button class="guide-close" id="guideClose" aria-label="Close">Close</button>
       </div>
 
-      <section class="card levels-card">
+      <!-- The menu bar. One section is on screen at a time, which is the point: the guide used
+           to be one long scroll with the level grid on top, and a child looking for the letter
+           chart had to know it was down there. Six named places instead. -->
+      <nav class="menu" id="menu" role="tablist" aria-label="Sections">
+        <button class="tab bn" type="button" role="tab" data-page="vowels"
+                aria-controls="page-vowels" title="the eleven vowels">স্বরবর্ণ</button>
+        <button class="tab bn" type="button" role="tab" data-page="consonants"
+                aria-controls="page-consonants" title="the thirty-two consonants, ক to হ">ব্যঞ্জনবর্ণ</button>
+        <button class="tab bn" type="button" role="tab" data-page="marks"
+                aria-controls="page-marks" title="the signs that attach to a letter">কার ও চিহ্ন</button>
+        <button class="tab bn" type="button" role="tab" data-page="levels"
+                aria-controls="page-levels" title="every level, by letter">লেভেল</button>
+        <button class="tab bn" type="button" role="tab" data-page="about"
+                aria-controls="page-about" title="what this is">About</button>
+        <button class="tab bn" type="button" role="tab" data-page="play"
+                aria-controls="page-play" title="the controls">How to play</button>
+      </nav>
+
+      <div class="pages">
+        <!-- The two halves of the বর্ণমালা, as a chart a child can read AND as the way into the
+             game: every letter that has levels is a button that opens its first one. Built in
+             js/10-menu.js from LEVELS, so the chart cannot claim a letter the game has lost. -->
+        <section class="page" id="page-vowels" role="tabpanel" aria-labelledby="tab-vowels">
+          <h3>স্বরবর্ণ - the vowels</h3>
+          <p class="deck">
+            Eleven letters, and the order every Bengali child recites first. The game runs in
+            this order, so these are levels 1 onward. Tap a letter to open its first level.
+          </p>
+          <div class="chart" id="chartVowels"></div>
+        </section>
+
+        <section class="page" id="page-consonants" role="tabpanel" aria-labelledby="tab-consonants">
+          <h3>ব্যঞ্জনবর্ণ - the consonants</h3>
+          <p class="deck">
+            Thirty-two letters, ক to হ. The game plays them in this order after the vowels -
+            tap one to open its first level. Twenty-nine have levels; ঙ, ঞ and ণ have none and
+            cannot, because no Bengali word begins with them. They still turn up inside words,
+            so a child meets them - just never at the front, which is where a level's name
+            comes from.
+            <br><br>
+            ড়, ঢ় and য় are usually counted here too, and the same is true of them: no word
+            starts with one, and all three are on boards - বাড়ি, গাঢ়, নয়.
+          </p>
+          <div class="chart" id="chartConsonants"></div>
+        </section>
+
+        <section class="page" id="page-marks" role="tabpanel" aria-labelledby="tab-marks">
+          <h3>কার ও চিহ্ন - the other parts of a letter</h3>
+          <p class="deck">
+            A Bengali letter is rarely alone. A vowel sign - a <b>কার</b> - rides on it and
+            changes the sound without being a letter of its own: ক becomes কা, কি, কু, কে, কো.
+            That is why this game counts in aksharas rather than characters, and why কা is one
+            tile and not two.
+            <br><br>
+            Each row below is a sign, the vowel it writes, and a word from the game that uses
+            it. Tap the word to open the level it is on.
+          </p>
+          <div class="marks" id="markTable"></div>
+        </section>
+
+        <section class="page" id="page-levels" role="tabpanel" aria-labelledby="tab-levels">
+<section class="card levels-card">
         <h3>Levels - in teaching order</h3>
         <div class="levels" id="levelGrid"></div>
       </section>
+        </section>
 
-    <div class="panel">
-      <section class="card">
+        <section class="page" id="page-about" role="tabpanel" aria-labelledby="tab-about">
+<section class="card">
         <h3>What this is</h3>
         <p class="deck">
           A Bengali word puzzle, one <b>akshara</b> at a time. Drag across the letters to
@@ -112,7 +175,7 @@
           comes from.
           <br><br>
           <b>Every sign of the alphabet is taught somewhere.</b> Fifty-seven units - the eleven
-          vowels, the thirty-three consonants, the vowel signs and the conjunct families - and
+          vowels, the thirty-two consonants ক to হ, the vowel signs and the conjunct families - and
           the last to arrive was ৈ, which writes ঐ onto a consonant. Bengali offers only four
           words carrying it, so three small levels hold all four: তৈরি, বৈশাখ, বৈঠক and সৈনিক.
           <br><br>
@@ -144,35 +207,7 @@
           sign-up, no ads, nothing to pay - your progress is saved in this browser.
         </p>
       </section>
-
-      <section class="card">
-        <h3>How to play</h3>
-        <ul class="how">
-          <li><span class="k">drag</span><span>Press a letter and drag across the others. Sliding back onto the previous letter un-picks it.</span></li>
-          <li><span class="k">click</span><span>Prefer clicking? Tap letters one at a time, then hit <b>✓</b> on the word - or press <b>Enter</b>. <b>Esc</b> clears.</span></li>
-          <li><span class="k">finish</span><span>Clearing a level moves straight to the next one - no button, no waiting. The confetti plays across the change.</span></li>
-          <li><span class="k">&lsaquo; &rsaquo;</span><span>The arrows step to the previous or next level, and wrap around at either end. The level grid jumps straight to any level, and runs in alphabet order like the game. Any level you open starts blank, so an old one can always be played again.</span></li>
-          <li><span class="k">♪</span><span>Every word is spoken aloud as you find it, and there is no button for it - hearing the word is the point, not a setting. Bengali spelling hides the sound: ব and ভ, শ and ষ and স are each one sound but different letters. On a device with no Bengali voice the game stays silent rather than reading Bengali in an English voice.</span></li>
-          <li><span class="k">◈</span><span>A hint reveals one letter from a word you haven't solved. Free, and no limit - there is nothing to count and nothing to spend.</span></li>
-        </ul>
-      </section>
-
-      <section class="card">
-        <h3>One tile = one akshara</h3>
-        <table class="akshara-table">
-          <tbody>
-            <tr><td class="w">মাছ</td><td class="a">মা + ছ</td><td class="n">vowel sign</td></tr>
-            <tr><td class="w">বন্ধু</td><td class="a">ব + ন্ধু</td><td class="n">conjunct</td></tr>
-            <tr><td class="w">বাড়ি</td><td class="a">বা + ড়ি</td><td class="n">nukta + sign</td></tr>
-          </tbody>
-        </table>
-        <p style="margin:12px 0 0;font-size:12.5px;line-height:1.55;color:color-mix(in srgb, var(--parchment) 62%, var(--indigo-700))">
-          Bengali isn't one letter per character - মাছ is three code points but two letter units.
-          The game splits on those units, so a tile is always something a reader recognises.
-        </p>
-      </section>
-
-      <section class="card">
+<section class="card">
         <h3>Found a problem?</h3>
         <p class="deck">
           A word spelled wrong, a word that is not the Bengali you use at home, a level that
@@ -193,16 +228,46 @@
           <span class="say-en">Copy</span>
         </button>
       </section>
-    </div>
+        </section>
+      <footer>
+          Every board is laid out when the game is built, not hand-drawn and not at runtime: every
+          ordering of a level's words is tried and the smallest grid wins, so no accidental word
+          ever appears on it. A wheel carries a letter twice when a word needs it twice, as ঘুঘু and
+          বাবা do, and the two are kept apart on the ring so a drag from one to the other does not
+          run over its twin. Every level is checked to be about its own akshara: a কা level is all
+          কা words, and the build fails if one is not.
+        </footer>
 
-    <footer>
-      Every board is laid out when the game is built, not hand-drawn and not at runtime: every
-      ordering of a level's words is tried and the smallest grid wins, so no accidental word
-      ever appears on it. A wheel carries a letter twice when a word needs it twice, as ঘুঘু and
-      বাবা do, and the two are kept apart on the ring so a drag from one to the other does not
-      run over its twin. Every level is checked to be about its own akshara: a কা level is all
-      কা words, and the build fails if one is not.
-    </footer>
+        <section class="page" id="page-play" role="tabpanel" aria-labelledby="tab-play">
+<section class="card">
+        <h3>How to play</h3>
+        <ul class="how">
+          <li><span class="k">drag</span><span>Press a letter and drag across the others. Sliding back onto the previous letter un-picks it.</span></li>
+          <li><span class="k">click</span><span>Prefer clicking? Tap letters one at a time, then hit <b>✓</b> on the word - or press <b>Enter</b>. <b>Esc</b> clears.</span></li>
+          <li><span class="k">finish</span><span>Clearing a level moves straight to the next one - no button, no waiting. The confetti plays across the change.</span></li>
+          <li><span class="k">&lsaquo; &rsaquo;</span><span>The arrows step to the previous or next level, and wrap around at either end. The level grid jumps straight to any level, and runs in alphabet order like the game. Any level you open starts blank, so an old one can always be played again.</span></li>
+          <li><span class="k">♪</span><span>Every word is spoken aloud as you find it, and there is no button for it - hearing the word is the point, not a setting. Bengali spelling hides the sound: ব and ভ, শ and ষ and স are each one sound but different letters. On a device with no Bengali voice the game stays silent rather than reading Bengali in an English voice.</span></li>
+          <li><span class="k">◈</span><span>A hint reveals one letter from a word you haven't solved. Free, and no limit - there is nothing to count and nothing to spend.</span></li>
+        </ul>
+      </section>
+<section class="card">
+        <h3>One tile = one akshara</h3>
+        <table class="akshara-table">
+          <tbody>
+            <tr><td class="w">মাছ</td><td class="a">মা + ছ</td><td class="n">vowel sign</td></tr>
+            <tr><td class="w">বন্ধু</td><td class="a">ব + ন্ধু</td><td class="n">conjunct</td></tr>
+            <tr><td class="w">বাড়ি</td><td class="a">বা + ড়ি</td><td class="n">nukta + sign</td></tr>
+          </tbody>
+        </table>
+        <p style="margin:12px 0 0;font-size:12.5px;line-height:1.55;color:color-mix(in srgb, var(--parchment) 62%, var(--indigo-700))">
+          Bengali isn't one letter per character - মাছ is three code points but two letter units.
+          The game splits on those units, so a tile is always something a reader recognises.
+        </p>
+      </section>
+        </section>
+      </div>
+
+    </div>
     </div>
   </div>
 </div>
@@ -218,7 +283,8 @@
 /* include js/07-speech.js    saying each word aloud as it lands */
 /* include js/08-animate.js   the movement that answers every action */
 /* include js/09-feedback.js  a note a player can copy and send on, no server behind it */
-/* include js/10-play.js      picking letters, judging a word, finishing a level */
+/* include js/10-menu.js      the alphabet charts, the marks table, the menu bar */
+/* include js/11-play.js      picking letters, judging a word, finishing a level */
 </script>
 </body>
 </html>

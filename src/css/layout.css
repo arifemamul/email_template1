@@ -33,36 +33,37 @@
      something else follows. */
   .card .deck:not(:last-child) { margin-bottom: 16px; }
 
-  /* -- Two-up: the game and its level picker on the left, notes on the right ---
-       The level grid belongs to the game rather than to the notes, so it sits in the
-       same column, directly under the phone - close enough to read as one thing.
+  /* -- Two-up: the game on the left, the menu on the right --------------------
+       The level picker used to have a column of its own under the phone. It is one section of
+       the menu now - six named places behind a menu bar - so there is nothing to put there and
+       the menu takes the whole right-hand side.
 
-       `.guide` groups the reading material so a phone or tablet can put all of it behind
-       one button. On a wide screen it is display: contents, which dissolves the wrapper and
-       lets its children take their own places in this grid as if it were not there. */
+       `.guide` groups the menu so a phone or tablet can put all of it behind one button. On a
+       wide screen it is display: contents, which dissolves the wrapper and lets its children
+       take their own places in this grid as if it were not there. */
   .stage {
     display: grid;
-    grid-template-columns: minmax(0, 400px) minmax(280px, 420px);
-    grid-template-areas: "game notes" "levels notes" "prose prose";
-    grid-template-rows: auto auto auto;
+    grid-template-columns: minmax(0, 400px) minmax(300px, 460px);
+    grid-template-areas: "game notes";
+    grid-template-rows: auto;
     gap: clamp(20px, 3vw, 44px);
     align-items: start;
     justify-content: center;
   }
 
   .device { grid-area: game; }
-  .levels-card { grid-area: levels; }
-  .panel { grid-area: notes; }
-  footer { grid-area: prose; }
 
-  .guide { display: contents; }
+  /* The menu is one column now, so it can be the grid item itself. It used to be
+     `display: contents` - the wrapper dissolving so the level picker and the notes could take
+     two different areas - which there is no longer anything to do. */
+  .guide { grid-area: notes; min-width: 0; }
   .guide-head, .touch-bar { display: none; }
 
   @media (max-width: 860px) {
     .stage {
       grid-template-columns: minmax(0, 1fr);
-      grid-template-areas: "game" "levels" "notes" "prose";
-      grid-template-rows: auto auto auto auto;
+      grid-template-areas: "game" "notes";
+      grid-template-rows: auto auto;
     }
   }
 
@@ -135,6 +136,10 @@
     }
 
     .guide {
+      /* Not a grid item here - it is a sheet over the whole screen. Leaving the desktop's
+         `grid-area: notes` on it made the grid invent a column for a name it no longer had,
+         which crushed the game column to 1px cells. */
+      grid-area: auto;
       display: block;
       position: fixed;
       inset: 0;
@@ -186,9 +191,6 @@
     }
     .guide-close:active { transform: scale(.96); }
 
-    /* Inside the sheet the level grid and the notes are simply a stack. */
-    .guide .levels-card, .guide .panel, .guide footer { grid-area: auto; }
-    .guide .panel { margin-top: 16px; }
-    .guide footer { margin-top: 22px; }
+    /* The footer is inside the About section now, so it needs no placement of its own. */
   }
 

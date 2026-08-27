@@ -15,6 +15,13 @@ const ctx = await b.newContext({ viewport: { width: 1280, height: 1000 }, permis
 const p = await ctx.newPage();
 await p.goto(site.url + '/index.html');
 await p.waitForFunction(() => typeof LEVELS !== 'undefined' && document.getElementById('sayCopy'));
+// The feedback card lives in the About section of the menu now, and only the open section is on
+// screen. Open it the way a player would rather than reaching past the menu.
+const openAbout = async pg => {
+  await pg.click('#tab-about');
+  await pg.waitForSelector('#sayNote', { state: 'visible', timeout: 5000 });
+};
+await openAbout(p);
 
 // 1. An empty note is refused rather than copying a bare context block.
 await p.click('#sayCopy');
@@ -56,8 +63,9 @@ await p2.waitForFunction(() => document.getElementById('sayCopy'));
 // rather than reading the moment the click lands.
 if (!await p2.isVisible('#sayNote')) {
   await p2.click('#guideOpen');
-  await p2.waitForSelector('#sayNote', { state: 'visible', timeout: 5000 })
-          .catch(() => fail('the feedback card is unreachable on a phone'));
+  await p2.waitForSelector('#menu', { state: 'visible', timeout: 5000 })
+          .catch(() => fail('the menu is unreachable on a phone'));
+  await openAbout(p2).catch(() => fail('the feedback card is unreachable on a phone'));
 }
 await p2.fill('#sayNote', 'no clipboard here');
 await p2.click('#sayCopy');

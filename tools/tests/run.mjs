@@ -2,7 +2,7 @@
 /*
  * The browser test suite.
  *
- *     node tools/tests/run.mjs              the sixteen checks, about four minutes
+ *     node tools/tests/run.mjs              the seventeen checks, about four minutes
  *     node tools/tests/run.mjs --sweep      and the full solve sweep, about twelve more
  *     node tools/tests/run.mjs playtest     one check, or several, by name
  *     node tools/tests/run.mjs --list       what there is
@@ -38,6 +38,7 @@ const CHECKS = [
   ['fittest',     'board, wheel and buttons fit at every screen size'],
   ['rowcheck',    'the actions row fits everywhere'],
   ['guidetest',   'the guide opens, closes and holds what it should'],
+  ['menutest',    'six sections, charts counted from the game, letters open their levels'],
   ['quiettest',   'no sound button, no word counter, no pause - and words are spoken'],
   ['wheeltest',   'the wheel is scrambled, stable between visits, and drawn as scrambled'],
   ['playtest',    'a level can be played through, by drag and by tap'],

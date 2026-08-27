@@ -1,7 +1,7 @@
 # The browser test suite
 
 ```
-npm test                              the sixteen checks, about four minutes
+npm test                              the seventeen checks, about four minutes
 npm run test:all                      and the full solve sweep, about twelve more
 node tools/tests/run.mjs playtest     one check, or several, by name
 node tools/tests/run.mjs --list       what there is
@@ -48,6 +48,7 @@ If you find yourself typing a number from the game into a test, read it from the
 | `fittest` | board, wheel and buttons fit at every screen size |
 | `rowcheck` | the actions row fits everywhere |
 | `guidetest` | the guide opens, closes, and holds the cards it should |
+| `menutest` | six menu sections, the alphabet charts counted from the game, letters open their levels |
 | `quiettest` | no sound button, no word counter, no pause — and every word is spoken |
 | `wheeltest` | the wheel is scrambled, stable between visits, and drawn as scrambled |
 | `playtest` | a level plays through, by drag and by tap |
