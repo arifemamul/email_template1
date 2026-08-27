@@ -81,6 +81,57 @@
   .akshara-table .a { font-family: var(--bn); font-size: 16px; color: var(--marigold); }
   .akshara-table .n { color: color-mix(in srgb, var(--parchment) 55%, var(--indigo-700)); font-size: 11.5px; text-align: right; }
 
+  /* -- The feedback card: a note the player copies out and sends on themselves --- */
+  .say {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 14px 0 0;
+    padding: 11px 12px;
+    background: color-mix(in srgb, var(--indigo-900) 70%, transparent);
+    border: 1px solid color-mix(in srgb, var(--parchment) 14%, transparent);
+    border-radius: 12px;
+    color: var(--parchment);
+    font: inherit;
+    font-size: 13.5px;
+    line-height: 1.5;
+    /* Bengali and English both go in here, and a parent will type either. */
+    font-family: var(--bn);
+    resize: vertical;
+    min-height: 72px;
+  }
+  .say::placeholder { color: color-mix(in srgb, var(--parchment) 38%, var(--indigo-700)); }
+  .say:focus { border-color: color-mix(in srgb, var(--marigold) 55%, transparent); outline: none; }
+
+  .say-adds {
+    margin: 9px 0 13px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: color-mix(in srgb, var(--parchment) 52%, var(--indigo-700));
+  }
+  .say-adds span { color: color-mix(in srgb, var(--marigold) 70%, var(--parchment)); }
+
+  .say-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    border: 0;
+    border-radius: 12px;
+    padding: 10px 15px;
+    background: var(--violet-600);
+    color: var(--parchment);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .18s ease, transform .18s cubic-bezier(.2,1.5,.4,1);
+  }
+  .say-copy:hover { background: color-mix(in srgb, var(--violet-600) 78%, var(--parchment)); }
+  .say-copy:active { transform: scale(.96); }
+  /* Green on success, because "did that work?" should not need reading. */
+  .say-copy.ok { background: var(--leaf); color: var(--ink); }
+  .say-copy .glyph { font-size: 15px; opacity: .85; }
+  .say-copy .bn { font-family: var(--bn); font-size: 14px; }
+  .say-copy .say-en { font-weight: 600; opacity: .8; }
+
   footer {
     margin-top: 34px;
     padding-top: 18px;

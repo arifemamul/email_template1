@@ -45,6 +45,7 @@ function loadLevel(i) {
   drawHud();
   drawPreview();
   drawLevelGrid();
+  drawSayAdds();
 }
 
 function drawHud() {

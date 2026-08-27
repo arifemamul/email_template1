@@ -19,13 +19,13 @@
 <meta property="og:locale" content="bn_BD">
 <meta name="twitter:card" content="summary">
 <style>
-/* include css/fonts.css      the Bengali face itself - 104 KB of base64, nothing to read */
-/* include css/theme.css      the colours, and the one wrapper the page hangs off */
-/* include css/layout.css     masthead, the two-up desktop grid, the phone/tablet stack */
-/* include css/game.css       the phone screen: board, wheel, tiles, buttons */
-/* include css/panel.css      the guide and the level picker beside the game */
-/* include css/effects.css    the layer flying tiles and confetti are drawn on */
-/* include css/host.css       what the page needs as a whole document, and the size overrides */
+/* include css/fonts.css    the Bengali face itself - 104 KB of base64, nothing to read */
+/* include css/theme.css    the colours, and the one wrapper the page hangs off */
+/* include css/layout.css   masthead, the two-up desktop grid, the phone/tablet stack */
+/* include css/game.css     the phone screen: board, wheel, tiles, buttons */
+/* include css/panel.css    the guide and the level picker beside the game */
+/* include css/effects.css  the layer flying tiles and confetti are drawn on */
+/* include css/host.css     what the page needs as a whole document, and the size overrides */
 </style>
 </head>
 <body>
@@ -160,6 +160,28 @@
           The game splits on those units, so a tile is always something a reader recognises.
         </p>
       </section>
+
+      <section class="card">
+        <h3>Found a problem?</h3>
+        <p class="deck">
+          A word spelled wrong, a word that is not the Bengali you use at home, a level that
+          will not finish - that is worth telling someone, and it is usually a child's parent
+          who notices.
+          <br><br>
+          There is no server behind this game and no account to sign into, which is deliberate
+          and also means this button cannot send anything by itself. It copies your note
+          instead, with the level you were on attached, and you paste it wherever suits you -
+          WhatsApp, Messenger, email. Nothing leaves the device until you send it.
+        </p>
+        <textarea class="say" id="sayNote" rows="3" maxlength="1200"
+                  placeholder="What is wrong, or what would make it better?"></textarea>
+        <p class="say-adds">Copied with your note: <span id="sayAdds"></span></p>
+        <button class="say-copy" id="sayCopy">
+          <span class="glyph" aria-hidden="true">&#10697;</span>
+          <span class="bn">কপি করুন</span>
+          <span class="say-en">Copy</span>
+        </button>
+      </section>
     </div>
 
     <footer>
@@ -184,7 +206,8 @@
 /* include js/06-render.js    drawing the screen and sizing it to the device */
 /* include js/07-speech.js    saying each word aloud as it lands */
 /* include js/08-animate.js   the movement that answers every action */
-/* include js/09-play.js      picking letters, judging a word, finishing a level */
+/* include js/09-feedback.js  a note a player can copy and send on, no server behind it */
+/* include js/10-play.js      picking letters, judging a word, finishing a level */
 </script>
 </body>
 </html>

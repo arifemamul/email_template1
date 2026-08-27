@@ -508,6 +508,54 @@ height: fit-content;
 .akshara-table .a { font-family: var(--bn); font-size: 16px; color: var(--marigold); }
 .akshara-table .n { color: color-mix(in srgb, var(--parchment) 55%, var(--indigo-700)); font-size: 11.5px; text-align: right; }
 
+.say {
+width: 100%;
+box-sizing: border-box;
+margin: 14px 0 0;
+padding: 11px 12px;
+background: color-mix(in srgb, var(--indigo-900) 70%, transparent);
+border: 1px solid color-mix(in srgb, var(--parchment) 14%, transparent);
+border-radius: 12px;
+color: var(--parchment);
+font: inherit;
+font-size: 13.5px;
+line-height: 1.5;
+font-family: var(--bn);
+resize: vertical;
+min-height: 72px;
+}
+.say::placeholder { color: color-mix(in srgb, var(--parchment) 38%, var(--indigo-700)); }
+.say:focus { border-color: color-mix(in srgb, var(--marigold) 55%, transparent); outline: none; }
+
+.say-adds {
+margin: 9px 0 13px;
+font-size: 11.5px;
+line-height: 1.5;
+color: color-mix(in srgb, var(--parchment) 52%, var(--indigo-700));
+}
+.say-adds span { color: color-mix(in srgb, var(--marigold) 70%, var(--parchment)); }
+
+.say-copy {
+display: inline-flex;
+align-items: center;
+gap: 9px;
+border: 0;
+border-radius: 12px;
+padding: 10px 15px;
+background: var(--violet-600);
+color: var(--parchment);
+font-size: 13px;
+font-weight: 700;
+cursor: pointer;
+transition: background-color .18s ease, transform .18s cubic-bezier(.2,1.5,.4,1);
+}
+.say-copy:hover { background: color-mix(in srgb, var(--violet-600) 78%, var(--parchment)); }
+.say-copy:active { transform: scale(.96); }
+.say-copy.ok { background: var(--leaf); color: var(--ink); }
+.say-copy .glyph { font-size: 15px; opacity: .85; }
+.say-copy .bn { font-family: var(--bn); font-size: 14px; }
+.say-copy .say-en { font-weight: 600; opacity: .8; }
+
 footer {
 margin-top: 34px;
 padding-top: 18px;
@@ -751,6 +799,28 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
           Bengali isn't one letter per character - মাছ is three code points but two letter units.
           The game splits on those units, so a tile is always something a reader recognises.
         </p>
+      </section>
+
+      <section class="card">
+        <h3>Found a problem?</h3>
+        <p class="deck">
+          A word spelled wrong, a word that is not the Bengali you use at home, a level that
+          will not finish - that is worth telling someone, and it is usually a child's parent
+          who notices.
+          <br><br>
+          There is no server behind this game and no account to sign into, which is deliberate
+          and also means this button cannot send anything by itself. It copies your note
+          instead, with the level you were on attached, and you paste it wherever suits you -
+          WhatsApp, Messenger, email. Nothing leaves the device until you send it.
+        </p>
+        <textarea class="say" id="sayNote" rows="3" maxlength="1200"
+                  placeholder="What is wrong, or what would make it better?"></textarea>
+        <p class="say-adds">Copied with your note: <span id="sayAdds"></span></p>
+        <button class="say-copy" id="sayCopy">
+          <span class="glyph" aria-hidden="true">&#10697;</span>
+          <span class="bn">কপি করুন</span>
+          <span class="say-en">Copy</span>
+        </button>
       </section>
     </div>
 
@@ -1158,6 +1228,7 @@ drawScreen();
 drawHud();
 drawPreview();
 drawLevelGrid();
+drawSayAdds();
 }
 
 function drawHud() {
@@ -1560,6 +1631,74 @@ tile.animate(
 { duration: 420, easing: 'cubic-bezier(.3,1.2,.4,1)' });
 });
 }
+const say = {
+note: document.getElementById("sayNote"),
+adds: document.getElementById("sayAdds"),
+copy: document.getElementById("sayCopy")
+};
+
+function sayText() {
+const lv = level();
+const cleared = Object.keys(game.completed).length;
+return [
+say.note.value.trim(),
+"",
+`-- শব্দজট, level ${lv.id} of ${LEVELS.length}: ${lv.words.join(", ")}`,
+`   ${cleared} of ${LEVELS.length} levels cleared`,
+`   screen ${innerWidth}x${innerHeight}`,
+`   ${navigator.userAgent}`
+].join("\n");
+}
+
+async function sayCopy() {
+if (!say.note.value.trim()) {
+say.note.focus();
+return sayDone("Write a note first", false);
+}
+const text = sayText();
+try {
+await navigator.clipboard.writeText(text);
+return sayDone("Copied - now paste it wherever you like", true);
+} catch { /* no clipboard API, or permission refused; fall through */ }
+
+const box = document.createElement("textarea");
+box.value = text;
+box.setAttribute("aria-hidden", "true");
+box.style.cssText = "position:fixed;top:-1000px;opacity:0";
+document.body.appendChild(box);
+box.select();
+const copied = document.execCommand && document.execCommand("copy");
+box.remove();
+if (copied) return sayDone("Copied - now paste it wherever you like", true);
+
+say.note.value = text;
+say.note.select();
+sayDone("Copy the selected text by hand", false);
+}
+
+let sayTimer = null;
+
+function sayDone(message, ok) {
+const label = say.copy.querySelector(".say-en");
+label.textContent = message;
+say.copy.classList.toggle("ok", ok);
+clearTimeout(sayTimer);
+sayTimer = setTimeout(() => {
+label.textContent = "Copy";
+say.copy.classList.remove("ok");
+}, 3200);
+}
+
+function drawSayAdds() {
+const cleared = Object.keys(game.completed).length;
+say.adds.textContent =
+`level ${level().id}, ${cleared} cleared, screen ${innerWidth}×${innerHeight}, `
++ "and which browser you are using";
+}
+
+say.copy.addEventListener("click", sayCopy);
+addEventListener("resize", drawSayAdds);
+drawSayAdds();
 let verdictTimer = null;
 
 function showVerdict(word, result) {
