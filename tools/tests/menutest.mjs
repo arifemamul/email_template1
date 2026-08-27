@@ -100,6 +100,54 @@ for (const m of marks) {
 console.log(`charts: ${charts.vowels.length} vowels, ${charts.consonants.length} consonants, `
           + `${marks.length} marks; ${dead.length} letters without levels (${dead.join(' ')})`);
 
+// ---- বারোখড়ি: a picker of 32 letters, and twelve forms for whichever is chosen ---------
+const KARS_IN_ORDER = ['', 'া', 'ি', 'ী', 'ু', 'ূ', 'ৃ', 'ে', 'ৈ', 'ো', 'ৌ', 'ং'];
+const pickers = await p.$$eval('.bp', bs => bs.map(x => x.textContent));
+if (pickers.length !== 32) problems.push(`${pickers.length} letters in the বারোখড়ি picker, expected 32`);
+if (pickers.join('') !== 'কখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ')
+  problems.push('the বারোখড়ি picker is not the consonants in alphabet order');
+
+for (const letter of ['ক', 'ম', 'ঙ', 'হ']) {
+  await p.evaluate(l => [...document.querySelectorAll('.bp')].find(x => x.textContent === l).click(), letter);
+  const rows = await p.$$eval('.br', rs => rs.map(r => ({
+    form: r.querySelector('.br-f').textContent,
+    isLevel: r.querySelector('.br-go').classList.contains('br-lvl'),
+    label: r.querySelector('.br-go').textContent,
+    dead: r.querySelector('.br-go').classList.contains('br-none')
+  })));
+  if (rows.length !== 12) { problems.push(`${letter}: ${rows.length} forms, expected 12`); continue; }
+  // Every row is that letter under the kar for its position, in order.
+  rows.forEach((r, i) => {
+    const want = letter + KARS_IN_ORDER[i];
+    if (r.form !== want) problems.push(`${letter} row ${i + 1}: shows ${r.form}, expected ${want}`);
+  });
+  // A row marked as a level must really be a level whose whole subject is that akshara.
+  const claims = await p.evaluate(ls => ls.map(f => LEVELS.findIndex(lv => lv.name === f)),
+                                  rows.map(r => r.form));
+  rows.forEach((r, i) => {
+    if (r.isLevel && claims[i] < 0)
+      problems.push(`${r.form}: offered as a level, but no level is named ${r.form}`);
+    if (!r.isLevel && !r.dead && claims[i] >= 0)
+      problems.push(`${r.form}: has a level of its own but is shown as a mere example`);
+  });
+  // The picker marks which letter you are looking at.
+  const lit = await p.$$eval('.bp.on', bs => bs.map(x => x.textContent));
+  if (lit.length !== 1 || lit[0] !== letter)
+    problems.push(`${letter}: picker highlights [${lit}]`);
+}
+
+// A row's word or level opens something real.
+await p.evaluate(() => [...document.querySelectorAll('.bp')].find(x => x.textContent === 'ক').click());
+const opened = await p.evaluate(async () => {
+  const go = [...document.querySelectorAll('.br .br-go')].find(b => b.tagName === 'BUTTON');
+  const before = game.index;
+  go.click();
+  await new Promise(r => requestAnimationFrame(r));
+  return { before, after: game.index, label: go.textContent };
+});
+if (opened.after === undefined) problems.push('a বারোখড়ি row opened nothing');
+console.log(`বারোখড়ি: ${pickers.length} letters, 12 forms each, "${opened.label}" opened level ${opened.after + 1}`);
+
 // ---- phone: the whole menu is behind the one button ------------------------------------
 const phone = await (await b.newContext({ viewport: { width: 360, height: 640 } })).newPage();
 await phone.goto(PAGE);
@@ -124,4 +172,4 @@ if (!back.tiles) problems.push('no wheel after closing the menu');
 if (back.cell < 30) problems.push(`cells are ${back.cell}px after closing the menu, under the 30px floor`);
 
 await b.close();
-report(problems, 'MENU OK: six sections, charts counted from the game, letters open their levels');
+report(problems, 'MENU OK: six sections, charts and বারোখড়ি counted from the game, letters open their levels');

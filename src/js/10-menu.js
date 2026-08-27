@@ -37,9 +37,9 @@ const KARS = [
 
 /* The marks that are not কার. A child meets all three on the boards. */
 const SIGNS = [
-  ["ঁ", "চন্দ্রবিন্দু", "makes the vowel nasal - চাঁদ, হাঁস"],
-  ["ং", "অনুস্বার", "a nasal ending - রঙ, ফড়িং"],
-  ["্", "হসন্ত", "joins two consonants into one letter - ন + ্ + ধ makes ন্ধ, as in বন্ধু"]
+  ["ঁ", "চন্দ্রবিন্দু", "স্বরকে নাকিসুরে উচ্চারণ করায় - চাঁদ, হাঁস"],
+  ["ং", "অনুস্বার", "শব্দের শেষে নাকের সুর - রঙ, ফড়িং"],
+  ["্", "হসন্ত", "দুই ব্যঞ্জনবর্ণকে জুড়ে একটি করে - ন + ্ + ধ মিলে ন্ধ, যেমন বন্ধু"]
 ];
 
 /*
@@ -130,14 +130,14 @@ function drawCharts() {
       // Only ever true if a refit dropped the last word carrying a sign, which is worth seeing.
       const s = document.createElement("span");
       s.className = "mk-eg mk-gone";
-      s.textContent = "no word";
+      s.textContent = "খেলায় নেই";
       r.appendChild(s);
     }
     table.appendChild(r);
   };
 
   for (const [sign, name, vowel] of KARS) {
-    row(`ক${sign}`, name, `writes ${vowel} onto a letter`, exampleWord(sign));
+    row(`ক${sign}`, name, `বর্ণের উপর ${vowel} লেখে`, exampleWord(sign));
   }
   for (const [sign, name, note] of SIGNS) {
     const eg = exampleWord(sign);
@@ -145,6 +145,103 @@ function drawCharts() {
     // real word - which is the thing being explained anyway.
     const glyph = sign === "\u09cd" ? (eg ? eg.akshara : "\u0995\u09cd\u09a4") : `ক${sign}`;
     row(glyph, name, note, eg);
+  }
+}
+
+/* ============================================================================
+   বারোখড়ি - every consonant under every কার
+   ============================================================================ */
+/*
+ * The table a Bengali child is actually set to learn: one consonant, then that consonant under
+ * each vowel sign in turn - ক কা কি কী কু কূ কৃ কে কৈ কো কৌ কং. Twelve forms, which is what
+ * বারোখড়ি counts.
+ *
+ * The game teaches these one at a time, a level per akshara, and only 91 of the 384 possible
+ * consonant-and-কার forms have a level - because a level needs real words behind it and Bengali
+ * simply has no কৈ words for most letters. So this is a reference rather than an index: all
+ * twelve forms for any letter, with a level to open where one exists and a word from the game
+ * where one does not.
+ *
+ * One letter's table at a time. Thirty-two letters by twelve forms is 384 rows, which is a wall
+ * rather than a lesson; a picker and one table is how a primer does it too - one page per letter.
+ */
+const BARO_FORMS = [
+  ["", "বর্ণ নিজেই"], ["া", "আ-কার"], ["ি", "ই-কার"], ["ী", "ঈ-কার"],
+  ["ু", "উ-কার"], ["ূ", "ঊ-কার"], ["ৃ", "ঋ-কার"], ["ে", "এ-কার"],
+  ["ৈ", "ঐ-কার"], ["ো", "ও-কার"], ["ৌ", "ঔ-কার"], ["ং", "অনুস্বার"]
+];
+
+/* The level whose whole subject is this akshara, if the game has one. */
+const LEVEL_FOR_AKSHARA = (() => {
+  const of = {};
+  LEVELS.forEach((lv, i) => { if (!(lv.name in of)) of[lv.name] = i; });
+  return of;
+})();
+
+/** A word from the game beginning with this akshara, shortest first - or one containing it. */
+function wordStarting(akshara) {
+  let best = null;
+  LEVELS.forEach((lv, i) => {
+    for (const w of lv.words) {
+      const parts = splitAksharas(w);
+      const rank = parts[0] === akshara ? 0 : (parts.includes(akshara) ? 1 : 2);
+      if (rank === 2) continue;
+      const cost = [rank, parts.length];
+      if (!best || cost[0] < best.cost[0]
+          || (cost[0] === best.cost[0] && cost[1] < best.cost[1])) {
+        best = { word: w, level: i, cost };
+      }
+    }
+  });
+  return best;
+}
+
+let baroLetter = "ক";
+
+function drawBaro() {
+  const pick = document.getElementById("baroPick");
+  if (pick.childElementCount === 0) {
+    for (const letter of BYANJANBARNA) {
+      const b = document.createElement("button");
+      b.className = "bp bn";
+      b.type = "button";
+      b.textContent = letter;
+      b.addEventListener("click", () => { baroLetter = letter; drawBaro(); });
+      pick.appendChild(b);
+    }
+  }
+  for (const b of pick.children) b.classList.toggle("on", b.textContent === baroLetter);
+
+  const table = document.getElementById("baroTable");
+  table.innerHTML = "";
+  for (const [sign, name] of BARO_FORMS) {
+    const akshara = baroLetter + sign;
+    const row = document.createElement("div");
+    row.className = "br";
+    row.innerHTML = `<span class="br-f bn">${akshara}</span><span class="br-n bn">${name}</span>`;
+
+    const lvl = LEVEL_FOR_AKSHARA[akshara];
+    const eg = wordStarting(akshara);
+    const open = lvl !== undefined ? lvl : (eg ? eg.level : undefined);
+    const label = lvl !== undefined ? `${akshara} লেভেল` : (eg ? eg.word : "");
+
+    if (open !== undefined) {
+      const go = document.createElement("button");
+      go.className = "br-go bn" + (lvl !== undefined ? " br-lvl" : "");
+      go.type = "button";
+      go.textContent = label;
+      go.title = `লেভেল ${bn(open + 1)} খুলুন`;
+      go.addEventListener("click", () => { loadLevel(open); leaveMenu(); });
+      row.appendChild(go);
+    } else {
+      // Honest blank: Bengali has no everyday word for many of these forms, which is exactly
+      // why the game has no level for them either.
+      const none = document.createElement("span");
+      none.className = "br-go br-none bn";
+      none.textContent = "খেলায় নেই";
+      row.appendChild(none);
+    }
+    table.appendChild(row);
   }
 }
 
@@ -173,6 +270,7 @@ for (const tab of tabs) {
 }
 
 drawCharts();
+drawBaro();
 
 let opening = "levels";
 try {

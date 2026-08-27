@@ -138,3 +138,69 @@
     .mk { grid-template-columns: 40px 1fr auto; }
     .mk-w { grid-column: 2 / -1; grid-row: 2; }
   }
+
+  /* -- বারোখড়ি: the letter picker and one letter's twelve forms ---------------- */
+  .baro-head { margin-top: 30px !important; padding-top: 22px;
+               border-top: 1px solid color-mix(in srgb, var(--parchment) 10%, transparent); }
+
+  /* Thirty-two letters, tight enough to sit above the table without scrolling past it. */
+  .baro-pick {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+    gap: 5px;
+    margin: 14px 0 18px;
+  }
+  .bp {
+    aspect-ratio: 1;
+    border: 1px solid color-mix(in srgb, var(--parchment) 12%, transparent);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--indigo-700) 50%, transparent);
+    color: color-mix(in srgb, var(--marigold) 80%, var(--parchment));
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .14s ease, transform .14s ease;
+  }
+  .bp:hover { background: var(--violet-600); }
+  .bp:active { transform: scale(.94); }
+  .bp.on { background: var(--marigold); border-color: var(--marigold); color: var(--ink); }
+
+  .baro { display: flex; flex-direction: column; gap: 2px; }
+  .br {
+    display: grid;
+    grid-template-columns: 62px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 4px;
+    border-bottom: 1px solid color-mix(in srgb, var(--parchment) 8%, transparent);
+  }
+  .br:last-child { border-bottom: 0; }
+  /* The form itself, big - this is the thing being learned, not a label about it. */
+  .br-f { font-size: 26px; font-weight: 700; color: var(--marigold); line-height: 1.25; }
+  .br-n { font-size: 12.5px; color: color-mix(in srgb, var(--parchment) 60%, var(--indigo-700)); }
+
+  .br-go {
+    border: 1px solid color-mix(in srgb, var(--parchment) 18%, transparent);
+    border-radius: 9px;
+    padding: 4px 10px;
+    background: transparent;
+    color: color-mix(in srgb, var(--parchment) 75%, var(--indigo-700));
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .br-go:hover { background: var(--violet-600); color: var(--parchment); }
+  /* A form with a level of its own reads differently from one that only has a word. */
+  .br-lvl {
+    border-color: color-mix(in srgb, var(--marigold) 34%, transparent);
+    background: color-mix(in srgb, var(--marigold) 10%, transparent);
+    color: var(--marigold);
+    font-weight: 700;
+  }
+  .br-lvl:hover { background: var(--marigold); color: var(--ink); }
+  .br-none {
+    border-style: dashed;
+    color: color-mix(in srgb, var(--parchment) 34%, var(--indigo-700));
+    font-size: 12px;
+    cursor: default;
+  }

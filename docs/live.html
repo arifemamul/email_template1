@@ -714,6 +714,68 @@ cursor: default;
 .mk { grid-template-columns: 40px 1fr auto; }
 .mk-w { grid-column: 2 / -1; grid-row: 2; }
 }
+
+.baro-head { margin-top: 30px !important; padding-top: 22px;
+border-top: 1px solid color-mix(in srgb, var(--parchment) 10%, transparent); }
+
+.baro-pick {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+gap: 5px;
+margin: 14px 0 18px;
+}
+.bp {
+aspect-ratio: 1;
+border: 1px solid color-mix(in srgb, var(--parchment) 12%, transparent);
+border-radius: 10px;
+background: color-mix(in srgb, var(--indigo-700) 50%, transparent);
+color: color-mix(in srgb, var(--marigold) 80%, var(--parchment));
+font-size: 17px;
+font-weight: 700;
+cursor: pointer;
+transition: background-color .14s ease, transform .14s ease;
+}
+.bp:hover { background: var(--violet-600); }
+.bp:active { transform: scale(.94); }
+.bp.on { background: var(--marigold); border-color: var(--marigold); color: var(--ink); }
+
+.baro { display: flex; flex-direction: column; gap: 2px; }
+.br {
+display: grid;
+grid-template-columns: 62px 1fr auto;
+align-items: center;
+gap: 10px;
+padding: 8px 4px;
+border-bottom: 1px solid color-mix(in srgb, var(--parchment) 8%, transparent);
+}
+.br:last-child { border-bottom: 0; }
+.br-f { font-size: 26px; font-weight: 700; color: var(--marigold); line-height: 1.25; }
+.br-n { font-size: 12.5px; color: color-mix(in srgb, var(--parchment) 60%, var(--indigo-700)); }
+
+.br-go {
+border: 1px solid color-mix(in srgb, var(--parchment) 18%, transparent);
+border-radius: 9px;
+padding: 4px 10px;
+background: transparent;
+color: color-mix(in srgb, var(--parchment) 75%, var(--indigo-700));
+font-size: 14px;
+cursor: pointer;
+white-space: nowrap;
+}
+.br-go:hover { background: var(--violet-600); color: var(--parchment); }
+.br-lvl {
+border-color: color-mix(in srgb, var(--marigold) 34%, transparent);
+background: color-mix(in srgb, var(--marigold) 10%, transparent);
+color: var(--marigold);
+font-weight: 700;
+}
+.br-lvl:hover { background: var(--marigold); color: var(--ink); }
+.br-none {
+border-style: dashed;
+color: color-mix(in srgb, var(--parchment) 34%, var(--indigo-700));
+font-size: 12px;
+cursor: default;
+}
 #fx {
 position: absolute;
 inset: 0;
@@ -920,6 +982,21 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
             সেটি ব্যবহার হয়েছে। শব্দে চাপ দিলে তার লেভেল খুলে যায়।
           </p>
           <div class="marks" id="markTable"></div>
+
+          <!-- The বারোখড়ি: one consonant under every কার. Built in js/10-menu.js, one letter
+               at a time - thirty-two letters by twelve forms is 384 rows, and a primer does it
+               one page per letter for the same reason. -->
+          <h3 class="baro-head">বারোখড়ি - প্রতিটি বর্ণের সব রূপ</h3>
+          <p class="deck">
+            একটি বর্ণ, তারপর সেই বর্ণই এক এক করে প্রতিটি কার নিয়ে - ক কা কি কী কু কূ কৃ কে কৈ
+            কো কৌ কং। বারোটি রূপ, আর এই বারো থেকেই নাম বারোখড়ি।
+            <br><br>
+            নিচে যে বর্ণে চাপ দেবেন, তার পুরো তালিকা দেখা যাবে। যে রূপের নিজের লেভেল আছে, সেটির
+            পাশে লেভেলের নাম - চাপ দিলে সোজা সেখানে যাওয়া যায়। যার নেই, তার পাশে খেলার একটি শব্দ
+            যেখানে সেই রূপটি আছে। ৩৮৪টি রূপের মধ্যে ৯১টির নিজের লেভেল আছে; বাকিগুলোর জন্য এই খেলায় শিশুর উপযোগী শব্দ নেই - যেমন বেশির ভাগ বর্ণের কৈ রূপ।
+          </p>
+          <div class="baro-pick" id="baroPick"></div>
+          <div class="baro" id="baroTable"></div>
         </section>
 
         <section class="page" id="page-levels" role="tabpanel" aria-labelledby="tab-levels">
@@ -2044,9 +2121,9 @@ const KARS = [
 ];
 
 const SIGNS = [
-["ঁ", "চন্দ্রবিন্দু", "makes the vowel nasal - চাঁদ, হাঁস"],
-["ং", "অনুস্বার", "a nasal ending - রঙ, ফড়িং"],
-["্", "হসন্ত", "joins two consonants into one letter - ন + ্ + ধ makes ন্ধ, as in বন্ধু"]
+["ঁ", "চন্দ্রবিন্দু", "স্বরকে নাকিসুরে উচ্চারণ করায় - চাঁদ, হাঁস"],
+["ং", "অনুস্বার", "শব্দের শেষে নাকের সুর - রঙ, ফড়িং"],
+["্", "হসন্ত", "দুই ব্যঞ্জনবর্ণকে জুড়ে একটি করে - ন + ্ + ধ মিলে ন্ধ, যেমন বন্ধু"]
 ];
 
 function leaveMenu() {
@@ -2123,19 +2200,95 @@ r.appendChild(b);
 } else {
 const s = document.createElement("span");
 s.className = "mk-eg mk-gone";
-s.textContent = "no word";
+s.textContent = "খেলায় নেই";
 r.appendChild(s);
 }
 table.appendChild(r);
 };
 
 for (const [sign, name, vowel] of KARS) {
-row(`ক${sign}`, name, `writes ${vowel} onto a letter`, exampleWord(sign));
+row(`ক${sign}`, name, `বর্ণের উপর ${vowel} লেখে`, exampleWord(sign));
 }
 for (const [sign, name, note] of SIGNS) {
 const eg = exampleWord(sign);
 const glyph = sign === "\u09cd" ? (eg ? eg.akshara : "\u0995\u09cd\u09a4") : `ক${sign}`;
 row(glyph, name, note, eg);
+}
+}
+
+const BARO_FORMS = [
+["", "বর্ণ নিজেই"], ["া", "আ-কার"], ["ি", "ই-কার"], ["ী", "ঈ-কার"],
+["ু", "উ-কার"], ["ূ", "ঊ-কার"], ["ৃ", "ঋ-কার"], ["ে", "এ-কার"],
+["ৈ", "ঐ-কার"], ["ো", "ও-কার"], ["ৌ", "ঔ-কার"], ["ং", "অনুস্বার"]
+];
+
+const LEVEL_FOR_AKSHARA = (() => {
+const of = {};
+LEVELS.forEach((lv, i) => { if (!(lv.name in of)) of[lv.name] = i; });
+return of;
+})();
+
+function wordStarting(akshara) {
+let best = null;
+LEVELS.forEach((lv, i) => {
+for (const w of lv.words) {
+const parts = splitAksharas(w);
+const rank = parts[0] === akshara ? 0 : (parts.includes(akshara) ? 1 : 2);
+if (rank === 2) continue;
+const cost = [rank, parts.length];
+if (!best || cost[0] < best.cost[0]
+|| (cost[0] === best.cost[0] && cost[1] < best.cost[1])) {
+best = { word: w, level: i, cost };
+}
+}
+});
+return best;
+}
+
+let baroLetter = "ক";
+
+function drawBaro() {
+const pick = document.getElementById("baroPick");
+if (pick.childElementCount === 0) {
+for (const letter of BYANJANBARNA) {
+const b = document.createElement("button");
+b.className = "bp bn";
+b.type = "button";
+b.textContent = letter;
+b.addEventListener("click", () => { baroLetter = letter; drawBaro(); });
+pick.appendChild(b);
+}
+}
+for (const b of pick.children) b.classList.toggle("on", b.textContent === baroLetter);
+
+const table = document.getElementById("baroTable");
+table.innerHTML = "";
+for (const [sign, name] of BARO_FORMS) {
+const akshara = baroLetter + sign;
+const row = document.createElement("div");
+row.className = "br";
+row.innerHTML = `<span class="br-f bn">${akshara}</span><span class="br-n bn">${name}</span>`;
+
+const lvl = LEVEL_FOR_AKSHARA[akshara];
+const eg = wordStarting(akshara);
+const open = lvl !== undefined ? lvl : (eg ? eg.level : undefined);
+const label = lvl !== undefined ? `${akshara} লেভেল` : (eg ? eg.word : "");
+
+if (open !== undefined) {
+const go = document.createElement("button");
+go.className = "br-go bn" + (lvl !== undefined ? " br-lvl" : "");
+go.type = "button";
+go.textContent = label;
+go.title = `লেভেল ${bn(open + 1)} খুলুন`;
+go.addEventListener("click", () => { loadLevel(open); leaveMenu(); });
+row.appendChild(go);
+} else {
+const none = document.createElement("span");
+none.className = "br-go br-none bn";
+none.textContent = "খেলায় নেই";
+row.appendChild(none);
+}
+table.appendChild(row);
 }
 }
 
@@ -2160,6 +2313,7 @@ tab.addEventListener("click", () => showPage(tab.dataset.page));
 }
 
 drawCharts();
+drawBaro();
 
 let opening = "levels";
 try {
