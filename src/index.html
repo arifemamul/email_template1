@@ -290,19 +290,50 @@
           বানান ভুল, ঘরে যে বাংলা বলা হয় সেটি নয় এমন কোনো শব্দ, বা কোনো লেভেল শেষ হচ্ছে না -
           এসব কাউকে জানানো দরকার, আর সাধারণত শিশুর অভিভাবকের চোখেই আগে পড়ে।
           <br><br>
-          এই খেলার পেছনে কোনো সার্ভার নেই, লগইনও নেই - এটি ইচ্ছে করেই, আর তার মানে এই বোতাম
-          নিজে থেকে কিছু পাঠাতে পারে না। বদলে এটি আপনার লেখা কপি করে দেয়, সঙ্গে আপনি কোন লেভেলে
-          ছিলেন তা জুড়ে দিয়ে - তারপর যেখানে সুবিধা সেখানে পেস্ট করে পাঠান: হোয়াটসঅ্যাপ,
-          মেসেঞ্জার, ইমেইল। আপনি না পাঠানো পর্যন্ত কিছুই ডিভাইস ছেড়ে যায় না।
+          এই খেলার পেছনে কোনো সার্ভার নেই, লগইনও নেই - এটি ইচ্ছে করেই, আর তার মানে এই পাতা
+          নিজে থেকে কিছু পাঠাতে পারে না। তাই দুটি পথ, আর দুটোতেই লেখাটি আপনার হাতেই থাকে।
+          <br><br>
+          <b>রেখে দিন</b> - লেখাটি এই ডিভাইসেই জমা থাকে, সঙ্গে আপনি কোন লেভেলে ছিলেন তা জুড়ে
+          দিয়ে। পরে যখন সময় হয়, নিচের তালিকা থেকে কপি করে পাঠাবেন। রাতে চোখে পড়া ভুলটা সকালে
+          মনে না-ও থাকতে পারে; এটি তার জন্য।
+          <br><br>
+          <b>কপি করুন</b> - এখনই পাঠাবেন হলে সোজা কপি হয়ে যায়, তারপর যেখানে সুবিধা সেখানে
+          পেস্ট করুন: হোয়াটসঅ্যাপ, মেসেঞ্জার, ইমেইল। আপনি না পাঠানো পর্যন্ত কিছুই ডিভাইস ছেড়ে
+          যায় না।
         </p>
         <textarea class="say" id="sayNote" rows="3" maxlength="1200"
                   placeholder="কী ভুল আছে, বা কী হলে আরও ভালো হতো?"></textarea>
         <p class="say-adds bn">আপনার লেখার সঙ্গে যা যাবে: <span id="sayAdds"></span></p>
-        <button class="say-copy" id="sayCopy">
-          <span class="glyph" aria-hidden="true">&#10697;</span>
-          <span class="bn">কপি করুন</span>
-          <span class="say-en bn">কপি</span>
-        </button>
+        <div class="say-row">
+          <!-- Keep it here, or take it away now. Two different intentions, so two buttons:
+               folding them into one leaves a player unsure which just happened. -->
+          <button class="say-copy" id="saySave">
+            <span class="glyph" aria-hidden="true">&#128190;</span>
+            <span class="bn">রেখে দিন</span>
+          </button>
+          <button class="say-copy say-ghost" id="sayCopy">
+            <span class="glyph" aria-hidden="true">&#10697;</span>
+            <span class="bn">কপি করুন</span>
+          </button>
+        </div>
+        <!-- What just happened, beside the buttons rather than inside them: these messages are
+             sentences, and a button that grows to hold one moves everything under it. -->
+        <p class="say-said bn" id="saySaid" role="status" aria-live="polite"></p>
+
+        <!-- What was kept. Lives in the same card as the box that writes it, rather than
+             behind a tenth tab: a person is already here when they have something to say, and
+             this is where they will look for it again. -->
+        <div class="rp-head">
+          <h4 class="rp-title bn">রাখা রিপোর্ট <span class="rp-count bn" id="sayCount"></span></h4>
+          <button class="say-copy say-ghost rp-all" id="sayAll" hidden>
+            <span class="bn">সব কপি করুন</span>
+          </button>
+        </div>
+        <p class="say-adds bn">
+          এগুলো শুধু এই ডিভাইসেই থাকে - নিজে না পাঠানো পর্যন্ত কোথাও যায় না। অন্য ফোনে
+          দেখা যাবে না।
+        </p>
+        <div class="rp-list" id="sayList"></div>
       </section>
           <footer>
           প্রতিটি ছক খেলা তৈরি হওয়ার সময়েই সাজানো হয় - হাতে আঁকা নয়, খেলার সময়েও নয়: একটি

@@ -736,6 +736,80 @@ footer code { font-family: var(--mono); color: var(--accent-lo); font-size: 12px
 @media (prefers-reduced-motion: reduce) {
 * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
+
+.say-row { display: flex; flex-wrap: wrap; gap: 9px; }
+
+.say-ghost {
+background: linear-gradient(180deg, #fff, var(--surface-2));
+color: var(--ink);
+box-shadow: var(--lip) var(--surface-3), 0 0 0 1px rgba(var(--shade), .07);
+}
+
+.rp-head {
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 10px;
+margin: 24px 0 4px;
+padding-top: 18px;
+border-top: 1px solid var(--surface-3);
+}
+.rp-title { margin: 0; font-size: 16px; font-weight: 800; color: var(--ink); }
+.rp-count { font-weight: 700; color: var(--ink-faint); font-size: 13px; }
+.rp-all { padding: 7px 13px 9px; font-size: 12.5px; }
+
+.rp-list { display: flex; flex-direction: column; gap: 9px; margin-top: 12px; }
+.rp-none { margin: 0; font-size: 13px; color: var(--ink-faint); }
+
+.rp {
+background: var(--surface-2);
+border-radius: var(--r-sm);
+padding: 11px 13px 12px;
+box-shadow: 0 0 0 1px rgba(var(--shade), .06);
+}
+.rp-when {
+margin: 0 0 6px;
+font-size: 11.5px;
+font-weight: 700;
+color: var(--ink-faint);
+}
+.rp-text {
+margin: 0 0 9px;
+font-size: 14px;
+line-height: 1.55;
+color: var(--ink);
+white-space: pre-wrap;
+overflow-wrap: anywhere;
+}
+.rp-tools { display: flex; gap: 7px; }
+.rp-btn {
+border: 0;
+border-radius: 9px;
+padding: 5px 11px 7px;
+background: #fff;
+color: var(--ink-soft);
+font-size: 12.5px;
+font-weight: 700;
+cursor: pointer;
+box-shadow: var(--lip) var(--surface-3);
+transition: transform .12s ease, box-shadow .12s ease, color .16s ease;
+}
+.rp-btn:hover { color: var(--ink); }
+.rp-btn:active { transform: translateY(4px); box-shadow: none; }
+.rp-btn.armed {
+background: linear-gradient(180deg, var(--bad-hi), var(--bad));
+color: var(--bad-ink);
+box-shadow: var(--lip) var(--bad-lo);
+}
+
+.say-said {
+margin: 9px 0 0;
+min-height: 1.4em;
+font-size: 13px;
+font-weight: 700;
+color: var(--ink-soft);
+}
+.say-said.ok { color: var(--good-lo); }
 .menu {
 display: flex;
 flex-wrap: wrap;
@@ -1675,19 +1749,50 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
           বানান ভুল, ঘরে যে বাংলা বলা হয় সেটি নয় এমন কোনো শব্দ, বা কোনো লেভেল শেষ হচ্ছে না -
           এসব কাউকে জানানো দরকার, আর সাধারণত শিশুর অভিভাবকের চোখেই আগে পড়ে।
           <br><br>
-          এই খেলার পেছনে কোনো সার্ভার নেই, লগইনও নেই - এটি ইচ্ছে করেই, আর তার মানে এই বোতাম
-          নিজে থেকে কিছু পাঠাতে পারে না। বদলে এটি আপনার লেখা কপি করে দেয়, সঙ্গে আপনি কোন লেভেলে
-          ছিলেন তা জুড়ে দিয়ে - তারপর যেখানে সুবিধা সেখানে পেস্ট করে পাঠান: হোয়াটসঅ্যাপ,
-          মেসেঞ্জার, ইমেইল। আপনি না পাঠানো পর্যন্ত কিছুই ডিভাইস ছেড়ে যায় না।
+          এই খেলার পেছনে কোনো সার্ভার নেই, লগইনও নেই - এটি ইচ্ছে করেই, আর তার মানে এই পাতা
+          নিজে থেকে কিছু পাঠাতে পারে না। তাই দুটি পথ, আর দুটোতেই লেখাটি আপনার হাতেই থাকে।
+          <br><br>
+          <b>রেখে দিন</b> - লেখাটি এই ডিভাইসেই জমা থাকে, সঙ্গে আপনি কোন লেভেলে ছিলেন তা জুড়ে
+          দিয়ে। পরে যখন সময় হয়, নিচের তালিকা থেকে কপি করে পাঠাবেন। রাতে চোখে পড়া ভুলটা সকালে
+          মনে না-ও থাকতে পারে; এটি তার জন্য।
+          <br><br>
+          <b>কপি করুন</b> - এখনই পাঠাবেন হলে সোজা কপি হয়ে যায়, তারপর যেখানে সুবিধা সেখানে
+          পেস্ট করুন: হোয়াটসঅ্যাপ, মেসেঞ্জার, ইমেইল। আপনি না পাঠানো পর্যন্ত কিছুই ডিভাইস ছেড়ে
+          যায় না।
         </p>
         <textarea class="say" id="sayNote" rows="3" maxlength="1200"
                   placeholder="কী ভুল আছে, বা কী হলে আরও ভালো হতো?"></textarea>
         <p class="say-adds bn">আপনার লেখার সঙ্গে যা যাবে: <span id="sayAdds"></span></p>
-        <button class="say-copy" id="sayCopy">
-          <span class="glyph" aria-hidden="true">&#10697;</span>
-          <span class="bn">কপি করুন</span>
-          <span class="say-en bn">কপি</span>
-        </button>
+        <div class="say-row">
+          <!-- Keep it here, or take it away now. Two different intentions, so two buttons:
+               folding them into one leaves a player unsure which just happened. -->
+          <button class="say-copy" id="saySave">
+            <span class="glyph" aria-hidden="true">&#128190;</span>
+            <span class="bn">রেখে দিন</span>
+          </button>
+          <button class="say-copy say-ghost" id="sayCopy">
+            <span class="glyph" aria-hidden="true">&#10697;</span>
+            <span class="bn">কপি করুন</span>
+          </button>
+        </div>
+        <!-- What just happened, beside the buttons rather than inside them: these messages are
+             sentences, and a button that grows to hold one moves everything under it. -->
+        <p class="say-said bn" id="saySaid" role="status" aria-live="polite"></p>
+
+        <!-- What was kept. Lives in the same card as the box that writes it, rather than
+             behind a tenth tab: a person is already here when they have something to say, and
+             this is where they will look for it again. -->
+        <div class="rp-head">
+          <h4 class="rp-title bn">রাখা রিপোর্ট <span class="rp-count bn" id="sayCount"></span></h4>
+          <button class="say-copy say-ghost rp-all" id="sayAll" hidden>
+            <span class="bn">সব কপি করুন</span>
+          </button>
+        </div>
+        <p class="say-adds bn">
+          এগুলো শুধু এই ডিভাইসেই থাকে - নিজে না পাঠানো পর্যন্ত কোথাও যায় না। অন্য ফোনে
+          দেখা যাবে না।
+        </p>
+        <div class="rp-list" id="sayList"></div>
       </section>
           <footer>
           প্রতিটি ছক খেলা তৈরি হওয়ার সময়েই সাজানো হয় - হাতে আঁকা নয়, খেলার সময়েও নয়: একটি
@@ -3110,8 +3215,52 @@ Bird.mount();
 const say = {
 note: document.getElementById("sayNote"),
 adds: document.getElementById("sayAdds"),
-copy: document.getElementById("sayCopy")
+copy: document.getElementById("sayCopy"),
+save: document.getElementById("saySave"),
+said: document.getElementById("saySaid"),
+list: document.getElementById("sayList"),
+count: document.getElementById("sayCount"),
+all: document.getElementById("sayAll")
 };
+
+const REPORTS = {
+KEY: "shobdojot.reports",
+MAX: 60,
+MAX_CHARS: 1400,
+
+read() {
+try {
+const raw = JSON.parse(localStorage.getItem(this.KEY) || "[]");
+return Array.isArray(raw) ? raw.filter(r => r && typeof r.text === "string") : [];
+} catch { return []; }
+},
+
+write(list) {
+try {
+localStorage.setItem(this.KEY, JSON.stringify(list.slice(0, this.MAX)));
+return true;
+} catch {
+return false;
+}
+},
+
+add(entry) {
+const list = this.read();
+list.unshift(entry);
+return this.write(list);
+},
+
+remove(at) {
+return this.write(this.read().filter(r => r.at !== at));
+},
+};
+
+function reportDate(ms) {
+const d = new Date(ms);
+const two = n => bn(String(n).padStart(2, "0"));
+return `${two(d.getDate())}/${two(d.getMonth() + 1)}/${bn(d.getFullYear())}, `
++ `${two(d.getHours())}:${two(d.getMinutes())}`;
+}
 
 function sayText() {
 const lv = level();
@@ -3132,20 +3281,7 @@ say.note.focus();
 return sayDone("আগে কিছু লিখুন", false);
 }
 const text = sayText();
-try {
-await navigator.clipboard.writeText(text);
-return sayDone("কপি হয়েছে - এখন যেখানে খুশি পেস্ট করুন", true);
-} catch { /* no clipboard API, or permission refused; fall through */ }
-
-const box = document.createElement("textarea");
-box.value = text;
-box.setAttribute("aria-hidden", "true");
-box.style.cssText = "position:fixed;top:-1000px;opacity:0";
-document.body.appendChild(box);
-box.select();
-const copied = document.execCommand && document.execCommand("copy");
-box.remove();
-if (copied) return sayDone("কপি হয়েছে - এখন যেখানে খুশি পেস্ট করুন", true);
+if (await copyText(text)) return sayDone("কপি হয়েছে - এখন যেখানে খুশি পেস্ট করুন", true);
 
 say.note.value = text;
 say.note.select();
@@ -3155,14 +3291,13 @@ sayDone("বেছে নেওয়া লেখাটি হাতে কপ�
 let sayTimer = null;
 
 function sayDone(message, ok) {
-const label = say.copy.querySelector(".say-en");
-label.textContent = message;
-say.copy.classList.toggle("ok", ok);
+say.said.textContent = message;
+say.said.classList.toggle("ok", ok);
 clearTimeout(sayTimer);
 sayTimer = setTimeout(() => {
-label.textContent = "কপি";
-say.copy.classList.remove("ok");
-}, 3200);
+say.said.textContent = "";
+say.said.classList.remove("ok");
+}, 3600);
 }
 
 function drawSayAdds() {
@@ -3172,9 +3307,133 @@ say.adds.textContent =
 + "আর আপনি কোন ব্রাউজার ব্যবহার করছেন";
 }
 
+function saySave() {
+const text = say.note.value.trim();
+if (!text) {
+say.note.focus();
+return sayDone("আগে কিছু লিখুন", false);
+}
+const lv = level();
+const kept = REPORTS.add({
+at: Date.now(),
+text: text.slice(0, REPORTS.MAX_CHARS),
+level: lv.id,
+name: lv.name,
+words: lv.words.join(", "),
+cleared: Object.keys(game.completed).length,
+screen: `${innerWidth}x${innerHeight}`,
+ua: navigator.userAgent,
+});
+if (!kept) return sayDone("রাখা গেল না - ব্রাউজারের জায়গা নেই", false);
+say.note.value = "";
+drawReports();
+sayDone("রাখা হলো - নিচের তালিকায় আছে", true);
+}
+
+function reportText(r) {
+return [
+r.text,
+"",
+`-- শব্দজট, ${reportDate(r.at)}`,
+`   লেভেল ${bn(r.level)}${r.name ? ` (${r.name})` : ""}: ${r.words || ""}`,
+`   ${bn(r.cleared || 0)}টি শেষ, পর্দা ${r.screen || ""}`,
+`   ${r.ua || ""}`,
+].join("\n");
+}
+
+function drawReports() {
+const list = REPORTS.read();
+say.count.textContent = list.length ? `${bn(list.length)}টি` : "";
+say.all.hidden = list.length < 2;
+say.list.innerHTML = "";
+if (!list.length) {
+const none = document.createElement("p");
+none.className = "rp-none bn";
+none.textContent = "এখনো কিছু রাখা হয়নি।";
+say.list.appendChild(none);
+return;
+}
+for (const r of list) {
+const row = document.createElement("article");
+row.className = "rp";
+
+const when = document.createElement("p");
+when.className = "rp-when bn";
+when.textContent = `${reportDate(r.at)} · লেভেল ${bn(r.level)}${r.name ? ` (${r.name})` : ""}`;
+
+const body = document.createElement("p");
+body.className = "rp-text bn";
+body.textContent = r.text;
+
+const tools = document.createElement("div");
+tools.className = "rp-tools";
+
+const copy = document.createElement("button");
+copy.className = "rp-btn bn";
+copy.type = "button";
+copy.textContent = "কপি";
+copy.addEventListener("click", async () => {
+await copyText(reportText(r));
+copy.textContent = "কপি হয়েছে";
+setTimeout(() => { copy.textContent = "কপি"; }, 2000);
+});
+
+const drop = document.createElement("button");
+drop.className = "rp-btn rp-drop bn";
+drop.type = "button";
+drop.textContent = "মুছুন";
+let armed = false;
+drop.addEventListener("click", () => {
+if (!armed) {
+armed = true;
+drop.textContent = "সত্যি মুছবেন?";
+drop.classList.add("armed");
+setTimeout(() => {
+if (!armed) return;
+armed = false;
+drop.textContent = "মুছুন";
+drop.classList.remove("armed");
+}, 3000);
+return;
+}
+REPORTS.remove(r.at);
+drawReports();
+});
+
+tools.append(copy, drop);
+row.append(when, body, tools);
+say.list.appendChild(row);
+}
+}
+
+async function copyText(text) {
+try {
+await navigator.clipboard.writeText(text);
+return true;
+} catch { /* no clipboard API, or permission refused; fall through */ }
+const box = document.createElement("textarea");
+box.value = text;
+box.setAttribute("aria-hidden", "true");
+box.style.cssText = "position:fixed;top:-1000px;opacity:0";
+document.body.appendChild(box);
+box.select();
+const copied = document.execCommand && document.execCommand("copy");
+box.remove();
+return !!copied;
+}
+
 say.copy.addEventListener("click", sayCopy);
+say.save.addEventListener("click", saySave);
+say.all.addEventListener("click", async () => {
+const list = REPORTS.read();
+if (!list.length) return;
+const text = [...list].reverse().map(reportText).join("\n\n———\n\n");
+const ok = await copyText(text);
+sayDone(ok ? `${bn(list.length)}টি কপি হয়েছে` : "কপি করা গেল না", ok);
+});
 addEventListener("resize", drawSayAdds);
 drawSayAdds();
+drawReports();
 
 const SWARABARNA = [...'অআইঈউঊঋএঐওঔ'];
 const BYANJANBARNA = [...'কখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ'];

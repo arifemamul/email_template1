@@ -48,7 +48,7 @@ const CHECKS = [
   ['advancetest', 'clearing advances, the next board is blank, the grid is coloured by letter'],
   ['replaytest',  'a cleared level can be played again'],
   ['oldsavetest', 'progress saved by an older build still loads'],
-  ['saytest',     'the feedback card copies a note with the level attached'],
+  ['saytest',     'the feedback card copies a note, and keeps one on the device'],
   ['pwatest',     'installs, and plays with the network cut'],
 ];
 
