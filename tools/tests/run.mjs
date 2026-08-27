@@ -51,7 +51,7 @@ const CHECKS = [
   ['pwatest',     'installs, and plays with the network cut'],
 ];
 
-/** The slow one: opens all 256 levels and solves each. Opt in with --sweep. */
+/** The slow one: opens every level and solves each. Opt in with --sweep. */
 const SLOW = [['sweep', 'every level solves, fills its board, and marks itself cleared']];
 
 const args = process.argv.slice(2);

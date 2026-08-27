@@ -3,7 +3,7 @@
  *
  * Every board is placed at build time by `tools/bangla.py` and emitted into the page as bare
  * coordinates, which the page rebuilds into a grid in `boardOf`. Two pieces of code therefore
- * have to agree about the same 256 boards: the Python that searched for them and the JavaScript
+ * have to agree about the same boards: the Python that searched for them and the JavaScript
  * that reads them back. This is the check that they do.
  *
  * It earns its place because the page derives more than it is given. Rows, columns and the word

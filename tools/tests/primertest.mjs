@@ -7,7 +7,7 @@
  * different question: does the page show what the JSON holds, and is every word offered as
  * playable really playable?
  *
- * The second half matters more than it sounds. 389 words are on these pages and 626 are in the
+ * The second half matters more than it sounds. 389 words are on these pages and ~600 are in the
  * game, so most of the primer's words have no level behind them. A word wrongly drawn as a
  * button sends a child to whatever level happens to sit at index undefined - which is how the
  * rule "playable words are buttons, the rest are text" ends up being worth a test.

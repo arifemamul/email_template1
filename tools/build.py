@@ -56,6 +56,10 @@ PRIMER = json.loads(unicodedata.normalize(
     'NFC', (REPO / 'tools/primer.json').read_text(encoding='utf-8')))
 
 # The বারোখড়ি's two axes, which the page draws and this file fills in for.
+# The longest word a level may set, matching tools/refit.py. Two tiles or three; four was
+# never a puzzle a five-year-old could hold in their head.
+MAX_AKSHARAS = 3
+
 BARO_CONSONANTS = 'কখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ'
 BARO_SIGNS = ['', 'া', 'ি', 'ী', 'ু', 'ূ', 'ৃ', 'ে', 'ৈ', 'ো', 'ৌ', 'ং']
 WORKER = REPO / 'docs/sw.js'              # offline cache; its version is stamped below
@@ -873,6 +877,17 @@ def main(argv):
                              f'{others[loud]} - it is a {loud} level')
         if wrong and not FULL_SYLLABUS:
             print('\ncheck FAILED: ' + '; '.join(wrong))
+            return 1
+
+        # No word longer than three aksharas. The refit enforces this while it builds, but a
+        # word can also arrive by hand in levels.json, and this is the gate that would catch
+        # it: three tiles to place is three chances to be wrong, and চকলেট on a four-letter
+        # ring was a queue rather than a puzzle.
+        long_words = sorted({w for level in levels for w in level['words']
+                             if len(split_aksharas(w)) > MAX_AKSHARAS})
+        if long_words:
+            print(f'\ncheck FAILED: {len(long_words)} words are over {MAX_AKSHARAS} aksharas: '
+                  + ', '.join(f'{w} ({"+".join(split_aksharas(w))})' for w in long_words[:8]))
             return 1
 
         needed = set()

@@ -15,7 +15,7 @@
  *
  * The charts also navigate. Every letter that has a level is a button that opens the first of
  * them, so the chart is both the reference and the index - which is what a child scanning for
- * ম actually wants, rather than counting through a grid of 256.
+ * ম actually wants, rather than counting through a grid of every level in the game.
  */
 
 // The two halves of the alphabet, in recitation order. These are facts about the script rather
