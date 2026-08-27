@@ -93,7 +93,7 @@ The list is candidates, not vocabulary. Every word still has to pass what is alr
    list cannot see on its own: no word on two boards, every level actually about its declared
    letter, and no level stealing a word that a later letter's level needs.
 
-What is genuinely scarce is worth knowing before you ask: the pool has 541 words and only 181
+What is genuinely scarce is worth knowing before you ask: the pool has 541 words and only 345
 are on boards, so words in general are not the bottleneck. The bottleneck is words for the
 rare vowels, and words that share aksharas with each other. A hundred more animal names would
 not add a single level; four more ঐ words would add one.
