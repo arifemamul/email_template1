@@ -34,9 +34,9 @@ function sayText() {
   return [
     say.note.value.trim(),
     "",
-    `-- শব্দজট, level ${lv.id} of ${LEVELS.length}: ${lv.words.join(", ")}`,
-    `   ${cleared} of ${LEVELS.length} levels cleared`,
-    `   screen ${innerWidth}x${innerHeight}`,
+    `-- শব্দজট, লেভেল ${bn(lv.id)} / ${bn(LEVELS.length)}: ${lv.words.join(", ")}`,
+    `   ${bn(LEVELS.length)}টির মধ্যে ${bn(cleared)}টি শেষ`,
+    `   পর্দা ${innerWidth}x${innerHeight}`,
     `   ${navigator.userAgent}`
   ].join("\n");
 }
@@ -53,12 +53,12 @@ function sayText() {
 async function sayCopy() {
   if (!say.note.value.trim()) {
     say.note.focus();
-    return sayDone("Write a note first", false);
+    return sayDone("আগে কিছু লিখুন", false);
   }
   const text = sayText();
   try {
     await navigator.clipboard.writeText(text);
-    return sayDone("Copied - now paste it wherever you like", true);
+    return sayDone("কপি হয়েছে - এখন যেখানে খুশি পেস্ট করুন", true);
   } catch { /* no clipboard API, or permission refused; fall through */ }
 
   const box = document.createElement("textarea");
@@ -69,11 +69,11 @@ async function sayCopy() {
   box.select();
   const copied = document.execCommand && document.execCommand("copy");
   box.remove();
-  if (copied) return sayDone("Copied - now paste it wherever you like", true);
+  if (copied) return sayDone("কপি হয়েছে - এখন যেখানে খুশি পেস্ট করুন", true);
 
   say.note.value = text;
   say.note.select();
-  sayDone("Copy the selected text by hand", false);
+  sayDone("বেছে নেওয়া লেখাটি হাতে কপি করুন", false);
 }
 
 let sayTimer = null;
@@ -85,7 +85,7 @@ function sayDone(message, ok) {
   say.copy.classList.toggle("ok", ok);
   clearTimeout(sayTimer);
   sayTimer = setTimeout(() => {
-    label.textContent = "Copy";
+    label.textContent = "কপি";
     say.copy.classList.remove("ok");
   }, 3200);
 }
@@ -94,8 +94,8 @@ function sayDone(message, ok) {
 function drawSayAdds() {
   const cleared = Object.keys(game.completed).length;
   say.adds.textContent =
-    `level ${level().id}, ${cleared} cleared, screen ${innerWidth}×${innerHeight}, `
-    + "and which browser you are using";
+    `লেভেল ${bn(level().id)}, ${bn(cleared)}টি শেষ, পর্দা ${innerWidth}×${innerHeight}, `
+    + "আর আপনি কোন ব্রাউজার ব্যবহার করছেন";
 }
 
 say.copy.addEventListener("click", sayCopy);

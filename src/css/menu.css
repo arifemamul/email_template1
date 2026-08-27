@@ -49,15 +49,14 @@
     gap: 8px;
     flex-wrap: wrap;
   }
-  .page > h3 .en {
-    font-size: 10.5px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, var(--parchment) 60%, var(--indigo-700));
+  /* Cards inside a section carry a Bengali heading too, so the small-caps English treatment
+     they inherited from `.card h3` has to come off there as well. */
+  .page .card h3 {
+    font-family: var(--bn);
+    font-size: 14px;
+    letter-spacing: 0;
+    text-transform: none;
   }
-  /* The cards inside a section keep their own small-caps heading, which is English only. */
-  .page .card h3 { font-family: var(--bn); font-size: 14px; letter-spacing: 0; text-transform: none; }
-  .page .card h3 .en { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
 
   /* -- The alphabet charts --------------------------------------------------- */
   .chart {

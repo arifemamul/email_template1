@@ -32,7 +32,7 @@
 <body>
 <div class="wrap">
   <header>
-    <p class="eyebrow">বাংলা শব্দ খেলা / <span id="eyebrowCount">levels</span> / plays in your browser</p>
+    <p class="eyebrow bn">বাংলা শব্দ খেলা / <span id="eyebrowCount">লেভেল</span> / ব্রাউজারেই চলে</p>
     <h1>শব্দজট</h1>
   </header>
 
@@ -106,161 +106,162 @@
              game: every letter that has levels is a button that opens its first one. Built in
              js/10-menu.js from LEVELS, so the chart cannot claim a letter the game has lost. -->
         <section class="page" id="page-vowels" role="tabpanel" aria-labelledby="tab-vowels">
-          <h3>স্বরবর্ণ <span class="en">the vowels</span></h3>
+          <h3>স্বরবর্ণ</h3>
           <p class="deck">
-            Eleven letters, and the order every Bengali child recites first. The game runs in
-            this order, so these are levels 1 onward. Tap a letter to open its first level.
+            এগারোটি বর্ণ, আর প্রতিটি বাঙালি শিশু সবার আগে এই ক্রমেই মুখস্থ করে। খেলাটিও এই
+            ক্রমেই চলে, তাই এগুলোই ১ থেকে শুরুর লেভেল। যেকোনো বর্ণে চাপ দিলে তার প্রথম লেভেল
+            খুলে যায়। নিচের ছোট সংখ্যাটি বলে সেই বর্ণের কতটি লেভেল আছে।
           </p>
           <div class="chart" id="chartVowels"></div>
         </section>
 
         <section class="page" id="page-consonants" role="tabpanel" aria-labelledby="tab-consonants">
-          <h3>ব্যঞ্জনবর্ণ <span class="en">the consonants</span></h3>
+          <h3>ব্যঞ্জনবর্ণ</h3>
           <p class="deck">
-            Thirty-two letters, ক to হ. The game plays them in this order after the vowels -
-            tap one to open its first level. Twenty-nine have levels; ঙ, ঞ and ণ have none and
-            cannot, because no Bengali word begins with them. They still turn up inside words,
-            so a child meets them - just never at the front, which is where a level's name
-            comes from.
+            বত্রিশটি বর্ণ, ক থেকে হ। স্বরবর্ণের পরে খেলাটি এই ক্রমেই চলে - যেকোনো বর্ণে চাপ
+            দিলে তার প্রথম লেভেল খুলে যায়। উনত্রিশটির লেভেল আছে; ঙ, ঞ আর ণ-এর নেই, আর থাকতেও
+            পারে না - বাংলায় কোনো শব্দ এই তিনটি দিয়ে শুরু হয় না। তবু শব্দের ভিতরে এরা আসে, তাই
+            শিশু এদের দেখে - শুধু শব্দের শুরুতে নয়, আর লেভেলের নাম আসে শব্দের শুরু থেকেই। এই
+            তিনটি তাই কাটা-দাগের ঘরে, সংখ্যার বদলে একটি দাগ নিয়ে।
             <br><br>
-            ড়, ঢ় and য় are usually counted here too, and the same is true of them: no word
-            starts with one, and all three are on boards - বাড়ি, গাঢ়, নয়.
+            ড়, ঢ় আর য়-কেও সাধারণত এই তালিকায় গোনা হয়, আর এদের বেলায়ও একই কথা: কোনো শব্দ এদের
+            দিয়ে শুরু হয় না, কিন্তু তিনটিই ছকে আছে - বাড়ি, গাঢ়, নয়।
           </p>
           <div class="chart" id="chartConsonants"></div>
         </section>
 
         <section class="page" id="page-marks" role="tabpanel" aria-labelledby="tab-marks">
-          <h3>কার ও চিহ্ন <span class="en">the other parts of a letter</span></h3>
+          <h3>কার ও চিহ্ন</h3>
           <p class="deck">
-            A Bengali letter is rarely alone. A vowel sign - a <b>কার</b> - rides on it and
-            changes the sound without being a letter of its own: ক becomes কা, কি, কু, কে, কো.
-            That is why this game counts in aksharas rather than characters, and why কা is one
-            tile and not two.
+            বাংলা বর্ণ খুব কম সময়েই একা থাকে। একটি <b>কার</b> বর্ণের সঙ্গে বসে উচ্চারণ বদলে
+            দেয়, কিন্তু নিজে আলাদা বর্ণ নয়: ক থেকে হয় কা, কি, কু, কে, কো। এই কারণেই খেলাটি
+            সংকেত ধরে নয়, অক্ষর ধরে গোনে - আর কা একটি ঘর, দুটি নয়।
             <br><br>
-            Each row below is a sign, the vowel it writes, and a word from the game that uses
-            it. Tap the word to open the level it is on.
+            নিচের প্রতিটি সারিতে আছে একটি চিহ্ন, সেটি কোন স্বর লেখে, আর খেলার একটি শব্দ যেখানে
+            সেটি ব্যবহার হয়েছে। শব্দে চাপ দিলে তার লেভেল খুলে যায়।
           </p>
           <div class="marks" id="markTable"></div>
         </section>
 
         <section class="page" id="page-levels" role="tabpanel" aria-labelledby="tab-levels">
 <section class="card levels-card">
-        <h3>লেভেল <span class="en">in alphabet order</span></h3>
+        <h3>লেভেল</h3>
         <div class="levels" id="levelGrid"></div>
       </section>
         </section>
 
         <section class="page" id="page-about" role="tabpanel" aria-labelledby="tab-about">
 <section class="card">
-        <h3>পরিচিতি <span class="en">what this is</span></h3>
+        <h3>পরিচিতি</h3>
         <p class="deck">
-          A Bengali word puzzle, one <b>akshara</b> at a time. Drag across the letters to
-          spell a word; each word you find writes itself into the grid above.
-          <b><span id="deckCount">Levels</span></b>, and each one is a single akshara: the
-          board for কা is কাক, কাঠ, কান, কাচ, কাপ, কাঠি - six words, every one of them
-          starting with কা.
-          <br><br>
-          That is the point of it. Bengali is taught as a letter and then the same letter
-          under each vowel sign - ক, কা, কি, কু, কে, কো, কাঁ - and a level per akshara is a
-          level per step of that series. A child who can read কাক can read কাঠ and কান
-          without being taught them twice, and the level is where that clicks.
-          <br><br>
-          The levels run in the order of the বর্ণমালা, straight through. স্বরবর্ণ first -
-          অ আ ই ঈ উ ঊ ঋ এ ঐ ও ঔ - then ব্যঞ্জনবর্ণ, ক to হ. A letter carries as many levels as
-          it has aksharas with words behind them: ক has sixteen, ঋ has one. Inside a letter the
-          bare form leads and the rest follow the বারোখড়ি - ক কা কি কী কু কূ কৃ কে কৈ কো কৌ -
-          so a child looking for ম finds it where ম belongs. ঙ, ঞ and ণ head no
-          level, because no Bengali word begins with them, and neither do ড়, ঢ় or য় - all six
-          still turn up inside words, just never at the front, which is where a level's name
-          comes from.
-          <br><br>
-          <b>Every sign of the alphabet is taught somewhere.</b> Fifty-seven units - the eleven
-          vowels, the thirty-two consonants ক to হ, the vowel signs and the conjunct families - and
-          the last to arrive was ৈ, which writes ঐ onto a consonant. Bengali offers only four
-          words carrying it, so three small levels hold all four: তৈরি, বৈশাখ, বৈঠক and সৈনিক.
-          <br><br>
-          Alphabet order has one honest cost, and it lands in the first quarter hour. Levels 12
-          and 14 are ঐ and ঔ, and word-initial ঐ and ঔ in Bengali are almost entirely abstract
-          nouns under heavy conjuncts - ঐক্য, ঐতিহ্য, ঔদ্ধত্য, ঔজ্জ্বল্য. Those two levels teach
-          the letter and nothing a child can picture, and there is no concrete alternative in the
-          language to put there instead. The game is at its hardest early and then levels off
-          rather than climbing. That is the price of being in alphabet order, and it is the order
-          the game is for.
-          <br><br>
-          A board is not always one joined-up crossword. Words cross wherever they share a
-          letter, but on a level where every word starts with the same akshara the only cell
-          any two can share is that one - and a cell takes two words, not four. So a board is
-          one island or two, and the words in each still cross.
-          <br><br>
-          Some aksharas come round twice - কা, then কা again straight after - which is more
-          practice on the same step rather than a new one. Every word is a concrete thing a
-          picture could show, or a number, a colour or an everyday action; the handful that are
-          not carry a note saying how to draw them.
-          <br><br>
-          Everything is Bangladeshi Bengali: পানি rather than জল, চাচা and ফুফু rather than
-          কাকা and পিসি. No word is ever set as a puzzle twice.
-          <br><br>
-          <b>It works with no connection.</b> Open it once and the whole game is on the device -
-          all 256 levels, the words, the font. Your browser will offer to add it to the home
-          screen, where it opens like an app and never asks for the network again. That is the
-          point rather than a nicety: a data connection is something you have sometimes. No
-          sign-up, no ads, nothing to pay - your progress is saved in this browser.
-        </p>
+            বাংলা শব্দের খেলা, একবারে একটি অক্ষর। অক্ষরের উপর আঙুল টেনে শব্দ বানাও; যে শব্দ
+            পাওয়া যায়, সেটি নিজেই উপরের ছকে বসে যায়। <b><span id="deckCount">লেভেল</span></b>,
+            আর প্রতিটি লেভেল একটি অক্ষর নিয়ে: কা লেভেলের প্রথম ছকে থাকে কাক, কাঠ, কান, কাচ -
+            চারটি শব্দ, সবগুলোই কা দিয়ে শুরু, আর পাঁচটি অক্ষরের চাকা থেকে বানানো।
+            <br><br>
+            <b>চাকায় থাকে তিন থেকে পাঁচটি অক্ষর, বেশি নয়।</b> এটাই খেলার কঠিনতা ঠিক করে। যে
+            শিশু সদ্য বর্ণমালা শিখেছে, তার জন্য চাকার প্রতিটি বাড়তি অক্ষর মানে প্রথম অক্ষরটি
+            বেছে নেওয়ার আগে আরও একটি বাদ দেওয়ার কাজ - আটটি অক্ষর খোঁজাখুঁজি, পাঁচটি বেছে নেওয়া।
+            বেশির ভাগ লেভেলে দুটি শব্দ, আর সেটিও পুরো একটি ছোট শব্দছক: দুটি শব্দ তাদের ভাগ করা
+            অক্ষরে গিয়ে মেলে।
+            <br><br>
+            এটাই খেলার আসল কথা। বাংলা শেখানো হয় একটি বর্ণ দিয়ে, তারপর সেই বর্ণকেই এক এক করে
+            কার-সহ - ক, কা, কি, কু, কে, কো, কাঁ - আর প্রতি অক্ষরে একটি লেভেল মানে সেই সারির
+            প্রতি ধাপে একটি লেভেল। যে শিশু কাক পড়তে পারে, সে কাঠ আর কান-ও পড়তে পারে, আলাদা করে
+            শেখানো ছাড়াই - লেভেলেই সেটি ধরা পড়ে।
+            <br><br>
+            লেভেলগুলো চলে বর্ণমালার ক্রমে, সোজা শুরু থেকে শেষ। আগে স্বরবর্ণ - অ আ ই ঈ উ ঊ ঋ এ ঐ
+            ও ঔ - তারপর ব্যঞ্জনবর্ণ, ক থেকে হ। কোনো বর্ণের যত অক্ষরের পেছনে শব্দ আছে, তার তত
+            লেভেল: ক-এর ষোলোটি, ঋ-এর একটি। এক বর্ণের ভিতরে আগে খালি রূপ, তারপর বারোখড়ি -
+            ক কা কি কী কু কূ কৃ কে কৈ কো কৌ - তাই ম খুঁজতে গেলে ম যেখানে থাকার কথা, সেখানেই
+            পাওয়া যায়। ঙ, ঞ আর ণ কোনো লেভেলের নাম নয়, কারণ বাংলায় কোনো শব্দ এদের দিয়ে শুরু হয়
+            না; ড়, ঢ় আর য়-ও নয়। ছয়টিই শব্দের ভিতরে আসে, শুধু শুরুতে নয় - আর লেভেলের নাম আসে
+            শব্দের শুরু থেকেই।
+            <br><br>
+            <b>বর্ণমালার প্রতিটি চিহ্নই কোথাও শেখানো হয়।</b> সাতান্নটি অংশ - এগারোটি স্বরবর্ণ,
+            ক থেকে হ বত্রিশটি ব্যঞ্জনবর্ণ, কারগুলো আর যুক্তবর্ণের দলগুলো। সবার শেষে যোগ হলো ৈ,
+            যেটি ব্যঞ্জনবর্ণের উপর ঐ লেখে। বাংলায় এই চিহ্ন নিয়ে শব্দ আছে মাত্র চারটি, তাই তিনটি
+            ছোট লেভেলে চারটিই ধরানো হয়েছে: তৈরি, বৈশাখ, বৈঠক আর সৈনিক।
+            <br><br>
+            বর্ণমালার ক্রমে চলার একটি খরচ আছে, আর সেটি পড়ে প্রথম পনেরো মিনিটেই। ১২ আর ১৪ নম্বর
+            লেভেল ঐ আর ঔ, আর বাংলায় ঐ বা ঔ দিয়ে শুরু হওয়া শব্দ প্রায় সবই ভারী যুক্তবর্ণের ভাবগত
+            শব্দ - ঐক্য, ঐতিহ্য, ঔদ্ধত্য, ঔজ্জ্বল্য। এই দুটি লেভেল বর্ণ শেখায়, কিন্তু শিশুর ছবিতে
+            আনার কিছু দেয় না - আর ভাষায় এদের বদলে বসানোর মতো সহজ কোনো শব্দ নেই। খেলাটি শুরুতেই
+            সবচেয়ে কঠিন, তারপর সমান চলে, চড়াই হয় না। এটাই বর্ণমালার ক্রমে থাকার দাম, আর খেলাটি
+            সেই ক্রমের জন্যই।
+            <br><br>
+            ছক সব সময় একটিই জোড়া শব্দছক নয়। শব্দ সেখানেই মেলে যেখানে তারা একটি অক্ষর ভাগ করে,
+            কিন্তু যে লেভেলের সব শব্দ একই অক্ষর দিয়ে শুরু, সেখানে দুটি শব্দ কেবল সেই একটি ঘরই
+            ভাগ করতে পারে - আর একটি ঘরে দুটি শব্দ বসে, চারটি নয়। তাই ছক এক টুকরো বা দুই টুকরো
+            হয়, আর প্রতি টুকরোর শব্দগুলো তবুও মেলে।
+            <br><br>
+            কিছু অক্ষর দুবার আসে - কা, তারপর একটু পরেই আবার কা - সেটি নতুন ধাপ নয়, একই ধাপে আরও
+            অভ্যাস। প্রতিটি শব্দই এমন কিছু যা ছবিতে দেখানো যায়, নয়তো একটি সংখ্যা, একটি রং বা
+            রোজকার কোনো কাজ; যে অল্প কয়েকটি নয়, সেগুলোর সঙ্গে কীভাবে আঁকতে হবে তার নোট আছে।
+            <br><br>
+            পুরোটাই বাংলাদেশের বাংলা: জল নয়, পানি; কাকা আর পিসি নয়, চাচা আর ফুফু। কোনো শব্দ
+            দুবার ধাঁধা হিসেবে আসে না।
+            <br><br>
+            <b>ইন্টারনেট ছাড়াই চলে।</b> একবার খুললেই পুরো খেলা ডিভাইসে থেকে যায় - ২৫৬টি লেভেল,
+            শব্দ, বর্ণের ফন্ট, সব। ব্রাউজার হোম স্ক্রিনে যোগ করার কথা বলবে; সেখান থেকে এটি
+            অ্যাপের মতো খোলে আর নেটওয়ার্ক আর কখনো চায় না। এটি বাড়তি সুবিধা নয়, এটাই মূল কথা:
+            ইন্টারনেট এমন জিনিস যা মাঝে মাঝে থাকে। কোনো সাইন-আপ নেই, বিজ্ঞাপন নেই, দাম নেই -
+            আপনার অগ্রগতি এই ব্রাউজারেই জমা থাকে।
+          </p>
       </section>
 <section class="card">
-        <h3>ভুল পেয়েছেন? <span class="en">found a problem?</span></h3>
+        <h3>ভুল পেয়েছেন?</h3>
         <p class="deck">
-          A word spelled wrong, a word that is not the Bengali you use at home, a level that
-          will not finish - that is worth telling someone, and it is usually a child's parent
-          who notices.
+          বানান ভুল, ঘরে যে বাংলা বলা হয় সেটি নয় এমন কোনো শব্দ, বা কোনো লেভেল শেষ হচ্ছে না -
+          এসব কাউকে জানানো দরকার, আর সাধারণত শিশুর অভিভাবকের চোখেই আগে পড়ে।
           <br><br>
-          There is no server behind this game and no account to sign into, which is deliberate
-          and also means this button cannot send anything by itself. It copies your note
-          instead, with the level you were on attached, and you paste it wherever suits you -
-          WhatsApp, Messenger, email. Nothing leaves the device until you send it.
+          এই খেলার পেছনে কোনো সার্ভার নেই, লগইনও নেই - এটি ইচ্ছে করেই, আর তার মানে এই বোতাম
+          নিজে থেকে কিছু পাঠাতে পারে না। বদলে এটি আপনার লেখা কপি করে দেয়, সঙ্গে আপনি কোন লেভেলে
+          ছিলেন তা জুড়ে দিয়ে - তারপর যেখানে সুবিধা সেখানে পেস্ট করে পাঠান: হোয়াটসঅ্যাপ,
+          মেসেঞ্জার, ইমেইল। আপনি না পাঠানো পর্যন্ত কিছুই ডিভাইস ছেড়ে যায় না।
         </p>
         <textarea class="say" id="sayNote" rows="3" maxlength="1200"
-                  placeholder="What is wrong, or what would make it better?"></textarea>
-        <p class="say-adds">Copied with your note: <span id="sayAdds"></span></p>
+                  placeholder="কী ভুল আছে, বা কী হলে আরও ভালো হতো?"></textarea>
+        <p class="say-adds bn">আপনার লেখার সঙ্গে যা যাবে: <span id="sayAdds"></span></p>
         <button class="say-copy" id="sayCopy">
           <span class="glyph" aria-hidden="true">&#10697;</span>
           <span class="bn">কপি করুন</span>
-          <span class="say-en">Copy</span>
+          <span class="say-en bn">কপি</span>
         </button>
       </section>
           <footer>
-          Every board is laid out when the game is built, not hand-drawn and not at runtime: every
-          ordering of a level's words is tried and the smallest grid wins, so no accidental word
-          ever appears on it. A wheel carries a letter twice when a word needs it twice, as ঘুঘু and
-          বাবা do, and the two are kept apart on the ring so a drag from one to the other does not
-          run over its twin. Every level is checked to be about its own akshara: a কা level is all
-          কা words, and the build fails if one is not.
+          প্রতিটি ছক খেলা তৈরি হওয়ার সময়েই সাজানো হয় - হাতে আঁকা নয়, খেলার সময়েও নয়: একটি
+          লেভেলের শব্দগুলোর সব সাজানো ক্রম পরীক্ষা করে সবচেয়ে ছোট ছকটি বেছে নেওয়া হয়, তাই ছকে
+          কখনো নিজে থেকে অন্য কোনো শব্দ তৈরি হয় না। কোনো শব্দে একই অক্ষর দুবার লাগলে চাকায় সেটি
+          দুবার থাকে - যেমন ঘুঘু আর বাবা - আর দুটিকে চাকার দুই দিকে রাখা হয়, যাতে একটি থেকে
+          অন্যটিতে টানতে গিয়ে জোড়ার উপর দিয়ে না যায়। প্রতিটি লেভেল যাচাই করা হয় সেটি নিজের
+          অক্ষর নিয়েই কিনা: কা লেভেলের সব শব্দ কা দিয়ে শুরু, না হলে বিল্ড ব্যর্থ হয়।
           </footer>
         </section>
         <section class="page" id="page-play" role="tabpanel" aria-labelledby="tab-play">
 <section class="card">
-        <h3>খেলার নিয়ম <span class="en">how to play</span></h3>
+        <h3>খেলার নিয়ম</h3>
         <ul class="how">
-          <li><span class="k">drag</span><span>Press a letter and drag across the others. Sliding back onto the previous letter un-picks it.</span></li>
-          <li><span class="k">click</span><span>Prefer clicking? Tap letters one at a time, then hit <b>✓</b> on the word - or press <b>Enter</b>. <b>Esc</b> clears.</span></li>
-          <li><span class="k">finish</span><span>Clearing a level moves straight to the next one - no button, no waiting. The confetti plays across the change.</span></li>
-          <li><span class="k">&lsaquo; &rsaquo;</span><span>The arrows step to the previous or next level, and wrap around at either end. The level grid jumps straight to any level, and runs in alphabet order like the game. Any level you open starts blank, so an old one can always be played again.</span></li>
-          <li><span class="k">♪</span><span>Every word is spoken aloud as you find it, and there is no button for it - hearing the word is the point, not a setting. Bengali spelling hides the sound: ব and ভ, শ and ষ and স are each one sound but different letters. On a device with no Bengali voice the game stays silent rather than reading Bengali in an English voice.</span></li>
-          <li><span class="k">◈</span><span>A hint reveals one letter from a word you haven't solved. Free, and no limit - there is nothing to count and nothing to spend.</span></li>
+          <li><span class="k bn">টানা</span><span>একটি অক্ষরে চাপ দিয়ে বাকিগুলোর উপর আঙুল টেনে নাও। আগের অক্ষরে ফিরে গেলে সেটি বাদ পড়ে যায়।</span></li>
+          <li><span class="k bn">ছোঁয়া</span><span>টানার বদলে ছুঁয়ে খেলতে চাও? এক এক করে অক্ষর ছোঁও, তারপর শব্দের পাশে <b>✓</b> চাপো - বা কীবোর্ডে <b>Enter</b>। <b>Esc</b> দিলে সব মুছে যায়।</span></li>
+          <li><span class="k bn">শেষ</span><span>লেভেল শেষ হলে সোজা পরেরটিতে চলে যায় - কোনো বোতাম নেই, অপেক্ষাও নেই। বদলের সঙ্গেই কনফেটি ঝরে।</span></li>
+          <li><span class="k">&lsaquo; &rsaquo;</span><span>তীর দুটি আগের বা পরের লেভেলে নিয়ে যায়, আর দুই প্রান্তে গিয়ে ঘুরে আবার শুরুতে ফেরে। তীরের মাঝের অক্ষরটিই লেভেলের নাম: কা, আর সেই বর্ণের একের বেশি লেভেল থাকলে পাশে একটি সংখ্যা। মেনুর লেভেল তালিকা থেকে যেকোনো লেভেলে সোজা যাওয়া যায়; সেটিও খেলার মতো বর্ণমালার ক্রমে চলে, আর প্রতিটি বর্ণ আলাদা রঙ পায়। যে লেভেলই খোলা হয়, সেটি খালি ছক থেকেই শুরু হয় - তাই পুরোনো লেভেল আবার খেলা যায়।</span></li>
+          <li><span class="k">♪</span><span>প্রতিটি শব্দ পাওয়ার সঙ্গে সঙ্গেই তার উচ্চারণ শোনা যায়, আর এর কোনো বোতাম নেই - শব্দটি শোনাই আসল কথা, এটি কোনো সেটিং নয়। বাংলা বানানে উচ্চারণ লুকিয়ে থাকে: ব আর ভ, কিংবা শ, ষ আর স - উচ্চারণ এক, বর্ণ আলাদা। যে ডিভাইসে বাংলা কণ্ঠ নেই, সেখানে খেলাটি চুপ থাকে - ইংরেজি কণ্ঠে বাংলা পড়ে শোনায় না।</span></li>
+          <li><span class="k">◈</span><span>সংকেত না-মেলানো কোনো শব্দের একটি অক্ষর দেখিয়ে দেয়। বিনামূল্যে, যত খুশি - গোনার কিছু নেই, খরচেরও কিছু নেই।</span></li>
         </ul>
       </section>
 <section class="card">
-        <h3>এক ঘর, এক অক্ষর <span class="en">one tile is one akshara</span></h3>
+        <h3>এক ঘর, এক অক্ষর</h3>
         <table class="akshara-table">
           <tbody>
-            <tr><td class="w">মাছ</td><td class="a">মা + ছ</td><td class="n">vowel sign</td></tr>
-            <tr><td class="w">বন্ধু</td><td class="a">ব + ন্ধু</td><td class="n">conjunct</td></tr>
-            <tr><td class="w">বাড়ি</td><td class="a">বা + ড়ি</td><td class="n">nukta + sign</td></tr>
+            <tr><td class="w">মাছ</td><td class="a">মা + ছ</td><td class="n bn">কার</td></tr>
+            <tr><td class="w">বন্ধু</td><td class="a">ব + ন্ধু</td><td class="n bn">যুক্তবর্ণ</td></tr>
+            <tr><td class="w">বাড়ি</td><td class="a">বা + ড়ি</td><td class="n bn">নুক্তা + কার</td></tr>
           </tbody>
         </table>
         <p style="margin:12px 0 0;font-size:12.5px;line-height:1.55;color:color-mix(in srgb, var(--parchment) 62%, var(--indigo-700))">
-          Bengali isn't one letter per character - মাছ is three code points but two letter units.
-          The game splits on those units, so a tile is always something a reader recognises.
+          বাংলায় এক সংকেত মানে এক অক্ষর নয় - মাছ লেখা হয় তিনটি সংকেতে, কিন্তু পড়ার সময় চোখে
+          পড়ে দুটি অক্ষর। খেলাটি এই অক্ষর ধরেই ভাগ করে, তাই প্রতিটি ঘরে যা বসে তা পাঠক চিনতে পারে।
         </p>
       </section>
         </section>

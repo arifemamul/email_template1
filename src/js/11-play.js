@@ -211,14 +211,14 @@ function closeGuide() {
    number typed into the copy, because the catalogue ships a slice of itself while the game is
    being reworked and a hardcoded count would be wrong the moment that slice changes. */
 function drawLevelCount() {
+  // Bengali, and in Bengali digits, because the sentence around it is Bengali. There is no
+  // plural to agree with - বাংলায় একটি আর অনেকগুলো লেভেল একই শব্দ - which removes the
+  // spelled-out-number table this used to carry for the English.
   const n = LEVELS.length;
-  const plural = n === 1 ? "level" : "levels";
-  const words = ["zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight",
-                 "Nine", "Ten", "Eleven", "Twelve"][n];
   const eyebrow = document.getElementById("eyebrowCount");
   const deck = document.getElementById("deckCount");
-  if (eyebrow) eyebrow.textContent = `${n} ${plural}`;
-  if (deck) deck.textContent = `${words || n} ${plural}`;
+  if (eyebrow) eyebrow.textContent = `${bn(n)}টি লেভেল`;
+  if (deck) deck.textContent = `${bn(n)}টি লেভেল`;
 }
 drawLevelCount();
 

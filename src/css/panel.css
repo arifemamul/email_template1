@@ -78,6 +78,15 @@
     padding: 3px 7px;
     height: fit-content;
   }
+  /* The key pills are Bengali words now - টানা, ছোঁয়া, শেষ - and 10.5px monospace with
+     letter-spacing was sized for lower-case English labels. The symbol pills (♪ ◈ ‹ ›) keep it. */
+  .how .k.bn {
+    font-family: var(--bn);
+    font-size: 12.5px;
+    letter-spacing: 0;
+    text-transform: none;
+    padding: 3px 8px;
+  }
   .how b { color: var(--parchment); font-weight: 600; }
   .bn { font-family: var(--bn); }
 
