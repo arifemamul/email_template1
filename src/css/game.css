@@ -1,126 +1,164 @@
-  /* -- Phone ---------------------------------------------------------------- */
+  /* -- The toy ---------------------------------------------------------------- */
+
+  /*
+   * A thing on a table, not a window into an app. The frame is thick and soft-cornered like
+   * moulded plastic, the screen inside it is warm paper, and everything a child can press has
+   * a hard bottom edge that vanishes when pressed - which is the whole trick behind making a
+   * flat screen feel like it has buttons on it.
+   */
   .device {
     position: relative;
-    width: 400px;
+    width: 410px;
     max-width: 100%;
-    height: min(760px, calc(100vh - 172px));
-    height: min(760px, calc(100dvh - 172px));
+    height: min(770px, calc(100vh - 176px));
+    height: min(770px, calc(100dvh - 176px));
     min-height: 540px;
     margin: 0 auto;
-    padding: 12px;
-    border-radius: 42px;
-    background: linear-gradient(160deg, #3a2a5e, #1a1130 55%);
+    padding: 14px;
+    border-radius: var(--r-xl);
+    background: linear-gradient(168deg, #FFFFFF 0%, var(--surface-2) 42%, var(--surface-3) 100%);
     box-shadow:
-      0 0 0 1px color-mix(in srgb, var(--marigold) 26%, transparent),
-      0 40px 90px -30px #000,
-      inset 0 1px 0 color-mix(in srgb, #fff 12%, transparent);
+      inset 0 2px 0 #fff,                       /* the light along the top edge of the shell */
+      inset 0 -3px 0 rgba(var(--shade), .10),     /* and the shadow under its bottom lip */
+      0 0 0 1px rgba(var(--shade), .07),
+      var(--lift-lg);
   }
 
   .screen {
     position: relative;
     height: 100%;
-    border-radius: 32px;
-    background: var(--indigo-800);
+    border-radius: 30px;
+    background:
+      radial-gradient(120% 60% at 50% -10%, #FFFFFF 0%, transparent 62%),
+      var(--surface);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    padding: 16px 16px 14px;
+    padding: 15px 15px 13px;
     gap: 8px;
+    box-shadow: inset 0 0 0 1px rgba(var(--shade), .06);
   }
 
+  /* The speaker grille of the toy. Decoration, and the only thing on screen that is. */
   .notch {
     position: absolute;
-    top: 8px; left: 50%;
+    top: 9px; left: 50%;
     transform: translateX(-50%);
-    width: 74px; height: 5px;
+    width: 66px; height: 5px;
     border-radius: 99px;
-    background: color-mix(in srgb, var(--parchment) 16%, transparent);
+    background: var(--surface-3);
     z-index: 5;
   }
 
-  /* top bar */
-  /* Just the two arrows, pushed to the edges. A word counter used to sit between them -
-     "০ / ৪ শব্দ" - and it was cut: the board already says how much is left, cell by cell,
-     and a fraction ticking up turns finding a word into progress against a quota. */
-  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 6px; }
+  /* -- top bar: two arrows and the letter between them ------------------------ */
+  /* A word counter used to sit between them - "০ / ৪ শব্দ" - and it was cut: the board already
+     says how much is left, cell by cell, and a fraction ticking up turns finding a word into
+     progress against a quota. */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; padding-top: 5px; flex: none;
+  }
 
-  /* The level's letter, centred between the arrows. Sized to the 38px arrows so adding it
-     cannot change the height of the row - the board and wheel are allocated what is left, and
-     a taller topbar would take it from them on every level. */
+  /* The level's letter. Sized to the arrows so adding it cannot change the height of the row -
+     the board and wheel are allocated what is left, and a taller topbar would take it from
+     them on every level. */
   .now-letter {
     flex: 1 1 auto;
     min-width: 0;
     margin: 0;
-    height: 38px;
+    height: 44px;
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 5px;
     overflow: hidden;
   }
+  /* The letter sits in its own gold badge. A child arriving mid-alphabet reads কা here and
+     knows where they are; a number could not tell them that. */
   .now-letter .glyph {
-    font-size: 26px;
-    line-height: 38px;
+    font-size: 25px;
     font-weight: 700;
-    color: var(--marigold);
+    color: var(--ink);
     white-space: nowrap;
+    background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+    border-radius: 99px;
+    padding: 2px 18px 4px;
+    box-shadow: var(--lip) var(--accent-lo), 0 6px 14px -8px var(--accent-lo);
   }
-  /* Which go at this letter it is - shown only when the letter has more than one. */
   .now-letter .pass {
     font-size: 13px;
-    line-height: 38px;          /* match the glyph, or baseline alignment drops it low */
-    font-weight: 700;
-    color: color-mix(in srgb, var(--parchment) 52%, var(--indigo-700));
+    font-weight: 800;
+    color: var(--ink-soft);
     font-variant-numeric: tabular-nums;
   }
   .now-letter .pass:empty { display: none; }
 
   .icon-btn {
-    width: 38px; height: 38px;
+    width: 42px; height: 42px;
     flex: none;
     border: 0;
     border-radius: 50%;
-    background: var(--indigo-700);
-    color: var(--marigold);
-    font-size: 19px;
+    background: linear-gradient(180deg, #fff, var(--surface-2));
+    color: var(--tile);
+    font-size: 22px;
     line-height: 1;
     cursor: pointer;
     display: grid;
     place-items: center;
-    transition: background-color .16s ease, transform .16s ease;
+    box-shadow: var(--lip) var(--surface-3), 0 0 0 1px rgba(var(--shade), .07);
+    transition: transform .12s ease, box-shadow .12s ease, background-color .16s ease;
   }
-  .icon-btn:hover { background: var(--violet-600); }
-  .icon-btn:active { transform: scale(.94); }
+  .icon-btn:hover { background: linear-gradient(180deg, #fff, var(--accent-hi)); }
+  /* Pressed: the button travels down by exactly the height of its own lip, so the lip
+     disappears rather than the button shrinking. That is what reads as a real key. */
+  .icon-btn:active { transform: translateY(4px); box-shadow: 0 0 0 1px rgba(var(--shade), .07); }
 
-  /* board - height is assigned in JS, since how much a board needs depends on its rows */
+  /* -- board ------------------------------------------------------------------ */
+  /* Height is assigned in JS, since how much a board needs depends on its rows. */
   .board-area { flex: 0 0 auto; min-height: 0; display: grid; place-items: center; }
-
   .board { display: grid; gap: var(--gap); }
 
-  .cell { border-radius: 22%; background: var(--violet-600); display: grid; place-items: center; }
-  .cell.blank { background: transparent; }
+  /* An empty cell is a hole in the paper: recessed, cool, obviously waiting for something. */
+  .cell {
+    border-radius: 28%;
+    background: var(--well);
+    display: grid;
+    place-items: center;
+    box-shadow: inset 0 2px 5px rgba(var(--glow-well), .28), inset 0 -1px 0 #fff;
+    transition: background-color .2s ease, box-shadow .2s ease;
+  }
+  .cell.blank { background: transparent; box-shadow: none; }
 
   .cell span {
     font-family: var(--bn);
     font-weight: 700;
     color: var(--ink);
     opacity: 0;
-    transform: scale(.62);
-    transition: opacity .3s ease, transform .3s cubic-bezier(.2,1.5,.4,1);
+    transform: scale(.55);
+    transition: opacity .26s ease, transform .34s cubic-bezier(.2,1.6,.4,1);
     user-select: none;
   }
 
-  .cell.on { background: var(--marigold); }
+  /* A found cell is the opposite of a hole: raised, gold, lit from above. */
+  .cell.on {
+    background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.6), var(--lip) var(--accent-lo);
+  }
   .cell.on span { opacity: 1; transform: scale(1); }
-  .cell.hinted { background: color-mix(in srgb, var(--marigold) 74%, var(--violet-600)); }
 
-  /* traced word */
-  .preview { height: 50px; display: grid; place-items: center; flex: none; }
+  /* A hint gives the letter away, so it is deliberately not the gold of a letter you found. */
+  .cell.hinted {
+    background: linear-gradient(180deg, var(--hint-hi), var(--hint));
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.7), var(--lip) var(--hint-lo);
+  }
+
+  /* -- the word being traced -------------------------------------------------- */
+  .preview { height: 52px; display: grid; place-items: center; flex: none; }
 
   .preview .hint-text {
     font-family: var(--bn);
     font-size: 14.5px;
-    color: color-mix(in srgb, var(--parchment) 52%, var(--indigo-700));
+    color: var(--ink-faint);
   }
 
   .chip {
@@ -128,17 +166,29 @@
     font-size: 26px;
     font-weight: 700;
     color: var(--ink);
-    background: var(--marigold);
+    background: linear-gradient(180deg, var(--accent-hi), var(--accent));
     border-radius: 99px;
-    padding: 5px 22px;
+    padding: 4px 22px 6px;
     display: flex;
     align-items: center;
     gap: 10px;
     white-space: nowrap;
+    box-shadow: var(--lip) var(--accent-lo), var(--lift);
   }
-  .chip.good { background: var(--leaf); }
-  .chip.bad  { background: var(--coral); }
-  .chip.dup  { background: var(--marigold-d); }
+  .chip.good {
+    background: linear-gradient(180deg, var(--good-hi), var(--good));
+    box-shadow: var(--lip) var(--good-lo), var(--lift);
+    color: var(--good-ink);
+  }
+  .chip.bad {
+    background: linear-gradient(180deg, var(--bad-hi), var(--bad));
+    box-shadow: var(--lip) var(--bad-lo), var(--lift);
+    color: var(--bad-ink);
+  }
+  .chip.dup {
+    background: linear-gradient(180deg, var(--hint-hi), var(--accent-lo));
+    box-shadow: var(--lip) var(--accent-deep), var(--lift);
+  }
   .chip.shake { animation: shake .34s ease; }
 
   @keyframes shake {
@@ -151,65 +201,101 @@
 
   .chip .go {
     border: 0;
-    background: color-mix(in srgb, var(--ink) 16%, transparent);
-    color: var(--ink);
+    background: rgba(var(--shade), .16);
+    color: inherit;
     font-size: 15px;
     border-radius: 99px;
-    width: 27px; height: 27px;
+    width: 28px; height: 28px;
     cursor: pointer;
     display: grid; place-items: center;
   }
-  .chip .go:hover { background: color-mix(in srgb, var(--ink) 28%, transparent); }
+  .chip .go:hover { background: rgba(var(--shade), .3); }
 
-  /* action row */
-  .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; flex: none; }
+  /* -- action row -------------------------------------------------------------- */
+  .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; flex: none; }
 
   .action {
     display: flex; align-items: center; gap: 7px;
-    background: var(--indigo-700);
+    background: linear-gradient(180deg, #fff, var(--surface-2));
     border: 0;
     border-radius: 99px;
-    padding: 9px 15px;
-    color: var(--parchment);
+    padding: 9px 17px 11px;
+    color: var(--ink);
     font-family: var(--bn);
-    font-size: 13.5px;
-    font-weight: 600;
+    font-size: 14px;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color .16s ease, transform .16s ease;
+    box-shadow: var(--lip) var(--surface-3), 0 0 0 1px rgba(var(--shade), .07);
+    transition: transform .12s ease, box-shadow .12s ease, background-color .16s ease;
   }
-  .action:hover:not(:disabled) { background: var(--violet-600); }
-  .action:active:not(:disabled) { transform: scale(.96); }
-  .action:disabled { opacity: .45; cursor: not-allowed; }
-  .action .glyph { color: var(--marigold); font-size: 15px; }
+  .action:hover:not(:disabled) { background: linear-gradient(180deg, #fff, var(--accent-hi)); }
+  .action:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 1px rgba(var(--shade), .07);
+  }
+  .action:disabled { opacity: .42; cursor: not-allowed; box-shadow: none; }
+  .action .glyph { color: var(--accent-lo); font-size: 16px; }
 
-  /* wheel */
+  /* -- wheel ------------------------------------------------------------------- */
   .wheel-area { flex: 1 1 auto; min-height: 0; display: grid; place-items: center; }
 
   .wheel { position: relative; touch-action: none; }
   .wheel svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 
+  /* The tiles. Berry rather than gold: gold already means "you found this", and a tile must
+     not look found before it has been used. */
   .tile {
     position: absolute;
     border: 0;
     border-radius: 50%;
-    background: var(--violet-600);
-    color: var(--marigold);
+    background: radial-gradient(120% 120% at 30% 22%, var(--tile-hi), var(--tile) 62%);
+    color: #fff;
     font-family: var(--bn);
     font-weight: 700;
     display: grid;
     place-items: center;
     cursor: pointer;
     padding: 0;
+    box-shadow: var(--lip) var(--tile-lo), 0 10px 20px -10px var(--tile-lo);
     transition: background-color .14s ease, color .14s ease,
                 transform .22s cubic-bezier(.2,1.7,.4,1), box-shadow .18s ease;
     user-select: none;
     touch-action: none;
     will-change: transform;
   }
+  .tile:active { transform: translateY(3px) scale(.97); }
+
+  /* Chosen: gold, bigger, and haloed - the same gold it will become on the board, so a child
+     can see where the letter is going before it goes. */
   .tile.sel {
-    background: var(--marigold);
+    background: radial-gradient(120% 120% at 30% 22%, var(--hint-hi), var(--accent) 62%);
     color: var(--ink);
-    transform: scale(1.12);
-    box-shadow: 0 0 0 6px color-mix(in srgb, var(--marigold) 26%, transparent);
+    transform: scale(1.14);
+    box-shadow: var(--lip) var(--accent-lo), 0 0 0 8px rgba(var(--glow-accent), .26);
   }
 
+  /* -- the mute switch --------------------------------------------------------- */
+  /* Not in the top bar and not in the action row: both of those are exactly what a child
+     needs and nothing else, and a test holds them to it. This lives in the screen's corner,
+     small and out of the way, because it is a thing a parent reaches for once.  */
+  .mute {
+    position: absolute;
+    right: 12px; bottom: 10px;
+    width: 34px; height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    opacity: .72;
+    z-index: 9;
+    box-shadow: 0 0 0 1px rgba(var(--shade), .07);
+    transition: opacity .16s ease, transform .12s ease, background-color .16s ease;
+  }
+  .mute:hover { opacity: 1; background: var(--accent-hi); }
+  .mute:active { transform: scale(.92); }
+  .mute[aria-pressed="true"] { opacity: .85; color: var(--bad); }

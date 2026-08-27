@@ -1,33 +1,37 @@
-  /* -- Side panel ----------------------------------------------------------- */
+  /* -- Side panel ------------------------------------------------------------ */
   .panel { display: flex; flex-direction: column; gap: 22px; }
 
+  /* Cards are paper on paper: raised a little, never outlined. A border around a light card on
+     a light ground is a box; a soft shadow is an object. */
   .card {
-    background: color-mix(in srgb, var(--indigo-700) 62%, transparent);
-    border: 1px solid color-mix(in srgb, var(--parchment) 9%, transparent);
-    border-radius: 18px;
-    padding: 18px 18px 20px;
+    background: var(--surface);
+    border-radius: var(--r-lg);
+    padding: 20px 20px 22px;
+    box-shadow: 0 0 0 1px rgba(var(--shade), .05), var(--lift);
   }
 
+  /* No letter-spacing and no uppercase: these headings are Bengali, uppercase is a no-op on a
+     caseless script, and tracking pulls matra clusters apart. */
   .card h3 {
-    margin: 0 0 12px;
-    font-size: 11px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
-    color: color-mix(in srgb, var(--marigold) 78%, var(--parchment));
-    font-weight: 700;
+    margin: 0 0 14px;
+    font-size: 21px;
+    color: var(--ink);
+    font-weight: 800;
   }
 
-  .levels { display: grid; grid-template-columns: repeat(auto-fill, minmax(46px, 1fr)); gap: 8px; }
+  /* -- the level picker ------------------------------------------------------- */
+  .levels { display: grid; grid-template-columns: repeat(auto-fill, minmax(48px, 1fr)); gap: 9px; }
 
+  /* Each level is a button you can feel: its block colour, pale until finished, with the same
+     bottom lip every pressable thing in the game has. */
   .lv {
     aspect-ratio: 1;
     border: 0;
-    border-radius: 12px;
-    /* the block colour, dimmed until the level is finished */
-    background: color-mix(in srgb, var(--hue, var(--violet-600)) 26%, var(--indigo-800));
-    color: color-mix(in srgb, var(--hue, var(--marigold)) 72%, var(--parchment));
+    border-radius: var(--r-sm);
+    background: color-mix(in srgb, var(--hue, var(--tile)) 15%, #fff);
+    color: color-mix(in srgb, var(--hue, var(--tile)) 76%, var(--ink));
     font-family: var(--bn);
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
     cursor: pointer;
     font-variant-numeric: tabular-nums;
@@ -36,27 +40,37 @@
     text-overflow: clip;
     white-space: nowrap;
     position: relative;
-    transition: transform .18s cubic-bezier(.2,1.5,.4,1), background-color .18s ease,
-                color .18s ease;
+    box-shadow: var(--lip) color-mix(in srgb, var(--hue, var(--tile)) 26%, #fff);
+    transition: transform .16s cubic-bezier(.2,1.5,.4,1), background-color .18s ease,
+                color .18s ease, box-shadow .16s ease;
   }
-  /* The chip holds an akshara now, which can be two glyphs wide - কাঁ - where a numeral was
-     always one or two digits. Shrink to fit rather than overflow the square. */
+  /* The chip holds an akshara, which can be two glyphs wide - কাঁ - where a numeral was always
+     one or two digits. Shrink to fit rather than overflow the square. */
   .lv sup { font-size: 8px; font-weight: 700; opacity: .72; margin-left: 1px; vertical-align: super; }
-  .lv:hover { transform: translateY(-2px) scale(1.04); }
-  .lv:active { transform: scale(.94); }
-  .lv.done { background: var(--hue, var(--leaf)); color: var(--ink); }
-  /* a tick in the corner, so "finished" survives colour-blindness and a small screen */
+  .lv:hover { transform: translateY(-2px); }
+  .lv:active { transform: translateY(4px); box-shadow: none; }
+
+  /* Finished: the block colour at full strength. */
+  .lv.done {
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--hue, var(--good)) 76%, #fff),
+      var(--hue, var(--good)));
+    color: #fff;
+    box-shadow: var(--lip) color-mix(in srgb, var(--hue, var(--good)) 62%, var(--ink));
+  }
+  /* A tick in the corner, so "finished" survives colour-blindness and a small screen. */
   .lv.done::after {
     content: "";
     position: absolute;
     right: 16%; top: 40%;
     width: 26%; height: 13%;
-    border-left: 2px solid var(--ink);
-    border-bottom: 2px solid var(--ink);
+    border-left: 2.5px solid #fff;
+    border-bottom: 2.5px solid #fff;
     transform: rotate(-45deg);
-    opacity: .5;
+    opacity: .85;
   }
-  .lv.now { outline: 2px solid var(--parchment); outline-offset: 2px; }
+  /* Where you are now. A gold ring, the same gold as the letter badge on the game screen. */
+  .lv.now { outline: 3px solid var(--accent); outline-offset: 2px; }
 
   .lv-1 { --hue: var(--block-1); }
   .lv-2 { --hue: var(--block-2); }
@@ -64,105 +78,110 @@
   .lv-4 { --hue: var(--block-4); }
   .lv-5 { --hue: var(--block-5); }
 
-  .how { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 11px; }
-  .how li { display: flex; gap: 11px; font-size: 13.5px; line-height: 1.5; color: color-mix(in srgb, var(--parchment) 80%, var(--indigo-700)); }
+  /* -- how to play ------------------------------------------------------------ */
+  .how { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .how li { display: flex; gap: 11px; font-size: 14px; line-height: 1.6; color: var(--ink-soft); }
   .how .k {
     flex: none;
     font-family: var(--mono);
-    font-size: 10.5px;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: var(--marigold);
-    background: color-mix(in srgb, var(--marigold) 14%, transparent);
-    border-radius: 6px;
-    padding: 3px 7px;
+    font-size: 11px;
+    color: var(--accent-lo);
+    background: color-mix(in srgb, var(--accent) 20%, #fff);
+    border-radius: 8px;
+    padding: 3px 8px;
     height: fit-content;
+    font-weight: 700;
   }
-  /* The key pills are Bengali words now - টানা, ছোঁয়া, শেষ - and 10.5px monospace with
-     letter-spacing was sized for lower-case English labels. The symbol pills (♪ ◈ ‹ ›) keep it. */
+  /* The key pills are Bengali words - টানা, ছোঁয়া, শেষ - so they get the Bengali face and no
+     tracking. The symbol pills (♪ ◈ ‹ ›) keep the monospace. */
   .how .k.bn {
     font-family: var(--bn);
-    font-size: 12.5px;
-    letter-spacing: 0;
-    text-transform: none;
-    padding: 3px 8px;
+    font-size: 13px;
+    padding: 3px 9px;
   }
-  .how b { color: var(--parchment); font-weight: 600; }
+  .how b { color: var(--ink); font-weight: 700; }
   .bn { font-family: var(--bn); }
 
   .akshara-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .akshara-table td { padding: 7px 0; border-bottom: 1px solid color-mix(in srgb, var(--parchment) 8%, transparent); vertical-align: middle; }
+  .akshara-table td {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--surface-3);
+    vertical-align: middle;
+  }
   .akshara-table tr:last-child td { border-bottom: 0; }
-  .akshara-table .w { font-family: var(--bn); font-size: 20px; color: var(--parchment); width: 4.5em; }
-  .akshara-table .a { font-family: var(--bn); font-size: 16px; color: var(--marigold); }
-  .akshara-table .n { color: color-mix(in srgb, var(--parchment) 55%, var(--indigo-700)); font-size: 11.5px; text-align: right; }
+  .akshara-table .w { font-family: var(--bn); font-size: 21px; color: var(--ink); width: 4.5em; }
+  .akshara-table .a { font-family: var(--bn); font-size: 16px; color: var(--accent-lo); font-weight: 700; }
+  .akshara-table .n { color: var(--ink-faint); font-size: 12px; text-align: right; }
 
   /* -- The feedback card: a note the player copies out and sends on themselves --- */
   .say {
     width: 100%;
     box-sizing: border-box;
     margin: 14px 0 0;
-    padding: 11px 12px;
-    background: color-mix(in srgb, var(--indigo-900) 70%, transparent);
-    border: 1px solid color-mix(in srgb, var(--parchment) 14%, transparent);
-    border-radius: 12px;
-    color: var(--parchment);
+    padding: 12px 13px;
+    background: var(--surface-2);
+    border: 2px solid var(--surface-3);
+    border-radius: var(--r-sm);
+    color: var(--ink);
     font: inherit;
-    font-size: 13.5px;
+    font-size: 14px;
     line-height: 1.5;
     /* Bengali and English both go in here, and a parent will type either. */
     font-family: var(--bn);
     resize: vertical;
-    min-height: 72px;
+    min-height: 76px;
   }
-  .say::placeholder { color: color-mix(in srgb, var(--parchment) 38%, var(--indigo-700)); }
-  .say:focus { border-color: color-mix(in srgb, var(--marigold) 55%, transparent); outline: none; }
+  .say::placeholder { color: var(--ink-faint); }
+  .say:focus { border-color: var(--accent); outline: none; background: #fff; }
 
   .say-adds {
     margin: 9px 0 13px;
-    font-size: 11.5px;
-    line-height: 1.5;
-    color: color-mix(in srgb, var(--parchment) 52%, var(--indigo-700));
+    font-size: 12px;
+    line-height: 1.55;
+    color: var(--ink-faint);
   }
-  .say-adds span { color: color-mix(in srgb, var(--marigold) 70%, var(--parchment)); }
+  .say-adds span { color: var(--accent-lo); font-weight: 700; }
 
   .say-copy {
     display: inline-flex;
     align-items: center;
     gap: 9px;
     border: 0;
-    border-radius: 12px;
-    padding: 10px 15px;
-    background: var(--violet-600);
-    color: var(--parchment);
-    font-size: 13px;
+    border-radius: var(--r-sm);
+    padding: 11px 17px 13px;
+    background: linear-gradient(180deg, var(--tile-hi), var(--tile));
+    color: #fff;
+    font-size: 13.5px;
     font-weight: 700;
     cursor: pointer;
-    transition: background-color .18s ease, transform .18s cubic-bezier(.2,1.5,.4,1);
+    box-shadow: var(--lip) var(--tile-lo);
+    transition: transform .12s ease, box-shadow .12s ease, filter .18s ease;
   }
-  .say-copy:hover { background: color-mix(in srgb, var(--violet-600) 78%, var(--parchment)); }
-  .say-copy:active { transform: scale(.96); }
+  .say-copy:hover { filter: brightness(1.06); }
+  .say-copy:active { transform: translateY(4px); box-shadow: none; }
   /* Green on success, because "did that work?" should not need reading. */
-  .say-copy.ok { background: var(--leaf); color: var(--ink); }
-  .say-copy .glyph { font-size: 15px; opacity: .85; }
-  .say-copy .bn { font-family: var(--bn); font-size: 14px; }
-  .say-copy .say-en { font-weight: 600; opacity: .8; }
+  .say-copy.ok {
+    background: linear-gradient(180deg, var(--good-hi), var(--good));
+    box-shadow: var(--lip) var(--good-lo);
+    color: var(--good-ink);
+  }
+  .say-copy .glyph { font-size: 15px; opacity: .9; }
+  .say-copy .bn { font-family: var(--bn); font-size: 14.5px; }
+  .say-copy .say-en { font-weight: 600; opacity: .85; }
 
   footer {
     margin-top: 34px;
     padding-top: 18px;
-    border-top: 1px solid color-mix(in srgb, var(--parchment) 10%, transparent);
-    font-size: 12.5px;
-    line-height: 1.6;
-    color: color-mix(in srgb, var(--parchment) 55%, var(--indigo-700));
+    border-top: 1px solid var(--surface-3);
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--ink-faint);
     max-width: 74ch;
   }
-  footer code { font-family: var(--mono); color: color-mix(in srgb, var(--marigold) 80%, var(--parchment)); font-size: 11.5px; }
+  footer code { font-family: var(--mono); color: var(--accent-lo); font-size: 12px; }
 
-  :focus-visible { outline: 2px solid var(--marigold); outline-offset: 2px; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
   @media (prefers-reduced-motion: reduce) {
     * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
   }
-
-

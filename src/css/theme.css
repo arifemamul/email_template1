@@ -1,26 +1,89 @@
-  /* -- One committed visual world: the game screen's night sky. Every colour is
-       explicit so the page holds on either host ground. ----------------------- */
-  :root {
-    --indigo-900: #150C29;
-    --indigo-800: #1B1035;
-    --indigo-700: #2C1A55;
-    --violet-600: #3D2670;
-    --marigold:   #FFB020;
-    --marigold-d: #E08A00;
-    --leaf:       #35C08A;
-    --coral:      #FF6B6B;
+  /* -- One committed visual world: a wooden toy in the sun -------------------- */
 
-    /* One colour per stage of the syllabus. The level picker is 83 identical chips otherwise,
-       which is both duller than it needs to be and less useful: the colour says at a glance
-       where plain letters end and vowel signs begin. They run cool-to-warm so the sequence
+  /*
+   * The game used to be a night sky - deep indigo, one marigold accent, a lot of restraint.
+   * It looked like a designer's work and not like a child's toy, and a five-year-old is the
+   * only audience here. So: daylight, warm paper, and colours a child would pick out of a box.
+   *
+   * Roles, not colours. Every rule below asks for `--surface` or `--ink-soft` rather than for
+   * a hex value, which is what made repainting the whole game possible in one file instead of
+   * eleven. No pigment is named outside this block, and tools/tests/feeltest.mjs holds the
+   * rest of the stylesheets to it.
+   *
+   * Two things are not pigment and are allowed anywhere: pure white, which is light rather
+   * than a colour, and `rgba(var(--shade), a)`, which is this world's one shadow at some
+   * strength. Both describe how a surface is lit, not what it is made of.
+   */
+  :root {
+    /* The ground. A low sun behind warm paper. */
+    --bg:          #FFE9C7;
+    --bg-2:        #FFD9E8;
+    --bg-3:        #CFE9FF;
+
+    /* Raised things: the screen, cards, the menu. Warm white, never pure white - pure white
+       against saturated toy colours is glare, and this is read at arm's length by a child. */
+    --surface:     #FFFBF3;
+    --surface-2:   #FFF3DF;
+    --surface-3:   #F4E7D2;
+
+    /* Holes and wells: an empty board cell, a track, anything the eye should read as recessed. */
+    --well:        #E4DCFF;
+    --well-deep:   #CFC4F5;
+
+    /* Text. Warm near-black rather than grey, because grey on cream is mud. */
+    --ink:         #3B2412;
+    --ink-soft:    #8A6F55;
+    --ink-faint:   #B9A489;
+
+    /* The one thing the eye should go to first, everywhere in the game: a found letter, a
+       chosen tile, the level you are on. */
+    --accent:      #FFB300;
+    --accent-hi:   #FFD466;
+    --accent-lo:   #E08A00;
+    --accent-deep: #B36F00;
+
+    /* Answers. Green means yes and coral means not-that; nothing else may use them. Each has
+       three parts, because every coloured thing in this game is a lit object: a highlight, the
+       body, and the hard lip underneath that makes it look pressable. */
+    --good:        #2FB980;
+    --good-hi:     #6BE0AF;
+    --good-lo:     #1E8C5F;
+    --good-ink:    #06301F;
+    --bad:         #FF6B6B;
+    --bad-hi:      #FFA0A0;
+    --bad-lo:      #D14545;
+    --bad-ink:     #4A0F0F;
+
+    /* A hint gives a letter away, so it is deliberately not the gold of one you found. */
+    --hint:        #FFE08A;
+    --hint-hi:     #FFF0C2;
+    --hint-lo:     #E8C765;
+
+    /* The one shadow in this world, as components so any rule can take it at any strength.
+       Warm rather than neutral: a grey shadow on warm paper reads as dirt. */
+    --shade:       59, 36, 18;
+
+    /* Light thrown by a coloured thing, rather than the thing itself: the halo around a chosen
+       tile, the glow under a star, the shadow inside an empty cell. Components again, so the
+       strength is chosen where it is used and the hue only ever lives here. */
+    --glow-accent: 255, 179, 0;
+    --glow-well:   90, 74, 150;
+
+    /* The tiles a child drags. Berry, because gold is already taken by "you found it" and a
+       tile must not look found before it is used. */
+    --tile:        #7C5CFF;
+    --tile-hi:     #A78BFF;
+    --tile-lo:     #5B3FD1;
+
+    /* One colour per stage of the syllabus. The level picker is hundreds of identical chips
+       otherwise, which is both duller than it needs to be and less useful: the colour says at
+       a glance where plain letters end and vowel signs begin. Cool to warm, so the sequence
        reads as a progression rather than a set of unrelated labels. */
-    --block-1:    #3FA9F5;
-    --block-2:    #35C08A;
-    --block-3:    #F5A623;
-    --block-4:    #FF6B6B;
-    --block-5:    #B478F0;
-    --parchment:  #FDF6E7;
-    --ink:        #2B1B0E;
+    --block-1:     #3FA9F5;
+    --block-2:     #2FB980;
+    --block-3:     #FFA92E;
+    --block-4:     #FF6B6B;
+    --block-5:     #A05CF0;
 
     --bn: "Noto Sans Bengali", "Hind Siliguri", "Baloo Da 2", "Kalpurush",
           "Bangla Sangam MN", "Shonar Bangla", "Nirmala UI", "Vrinda", sans-serif;
@@ -28,24 +91,38 @@
     --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
     --gap: 5px;
-    color-scheme: dark;
+
+    /* Depth. Toy buttons have a hard bottom edge that disappears when pressed, and one shared
+       rule keeps every pressable thing in the game feeling like the same material. */
+    --lip:         0 4px 0;
+    --lift:        0 10px 24px -12px rgba(59, 36, 18, .45);
+    --lift-lg:     0 26px 60px -24px rgba(59, 36, 18, .5);
+
+    --r-sm:        12px;
+    --r-md:        18px;
+    --r-lg:        26px;
+    --r-xl:        38px;
+
+    color-scheme: light;
   }
 
   * { box-sizing: border-box; }
 
   body {
     margin: 0;
-    padding: clamp(16px, 3vw, 40px) clamp(12px, 3vw, 32px) 48px;
+    padding: clamp(14px, 3vw, 40px) clamp(10px, 3vw, 32px) 48px;
+    /* Three suns, low and warm, on paper. Fixed rather than scrolling so the light stays put
+       while the menu moves under it. */
     background:
-      radial-gradient(1100px 620px at 18% -8%, #241546 0%, transparent 60%),
-      radial-gradient(900px 520px at 100% 0%, #2a1a4e 0%, transparent 55%),
-      var(--indigo-900);
-    color: var(--parchment);
+      radial-gradient(1200px 700px at 12% -10%, var(--bg-2) 0%, transparent 62%),
+      radial-gradient(900px 600px at 100% 4%, var(--bg-3) 0%, transparent 58%),
+      var(--bg);
+    background-attachment: fixed;
+    color: var(--ink);
     font-family: var(--ui);
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
   }
 
   /* Sized so the masthead lines up with the phone's left edge and the pair stays centred. */
-  .wrap { max-width: 920px; margin: 0 auto; }
-
+  .wrap { max-width: 940px; margin: 0 auto; }

@@ -71,6 +71,13 @@ if (solvedAgain.lit !== solvedAgain.cells) problems.push('replayed level could n
 // A part-solved level also comes back blank. Resuming was the old behaviour; it was reported
 // as a bug twice - a board arriving with letters you cannot remember placing is worse than a
 // clean one - so leaving a level now discards the attempt.
+//
+// Wait for the auto-advance first. Clearing a board schedules `loadLevel(index + 1)` once the
+// last letter has landed, and this test used to drive straight past it: the pending timer then
+// fired and swapped the wheel out from under the next step, so `game.wheel.indexOf` missed
+// every akshara and the word was never recorded. It looked like flakiness and was a race.
+await p.waitForFunction(() => game.index === 1, null, { timeout: 5000 })
+  .catch(() => problems.push('clearing a board did not advance to the next level'));
 await p.evaluate(() => loadLevel(1));   // level 2, fresh
 const w = await p.evaluate(() => LEVELS[1].words[0]);
 await p.evaluate(x => { game.picked = splitAksharas(x).map(a => game.wheel.indexOf(a)); submitWord(); }, w);

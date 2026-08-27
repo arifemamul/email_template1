@@ -74,6 +74,12 @@
 
         <div id="fx"></div>
 
+        <!-- Sound on or off, remembered per device. Deliberately not in the top bar or the
+             action row: those hold exactly what a child needs and a test holds them to it.
+             This is a thing a parent reaches for once, so it sits small in the corner. -->
+        <button class="mute" id="mute" type="button" aria-pressed="false"
+                title="শব্দ বন্ধ করুন" aria-label="শব্দ চালু বা বন্ধ">🔊</button>
+
       </div>
     </div>
 
@@ -328,7 +334,7 @@
             <tr><td class="w">বাড়ি</td><td class="a">বা + ড়ি</td><td class="n bn">নুক্তা + কার</td></tr>
           </tbody>
         </table>
-        <p style="margin:12px 0 0;font-size:12.5px;line-height:1.55;color:color-mix(in srgb, var(--parchment) 62%, var(--indigo-700))">
+        <p style="margin:12px 0 0;font-size:12.5px;line-height:1.55;color:var(--ink-soft)">
           বাংলায় এক সংকেত মানে এক অক্ষর নয় - মাছ লেখা হয় তিনটি সংকেতে, কিন্তু পড়ার সময় চোখে
           পড়ে দুটি অক্ষর। খেলাটি এই অক্ষর ধরেই ভাগ করে, তাই প্রতিটি ঘরে যা বসে তা পাঠক চিনতে পারে।
         </p>
@@ -348,13 +354,15 @@
 /* include js/03-boards.js    reading a board back out of the level table */
 /* include js/04-state.js     what the player has done, and what is saved */
 /* include js/05-scramble.js  arranging a wheel so it does not give the board away */
-/* include js/06-render.js    drawing the screen and sizing it to the device */
-/* include js/07-speech.js    saying each word aloud as it lands */
-/* include js/08-animate.js   the movement that answers every action */
-/* include js/09-feedback.js  a note a player can copy and send on, no server behind it */
-/* include js/10-menu.js      the alphabet charts, the marks table, the menu bar */
-/* include js/11-primer.js    a printed primer's tables - word building and ফলা */
-/* include js/12-play.js      picking letters, judging a word, finishing a level */
+/* include js/06-sound.js     every sound the game makes, synthesised - no audio files */
+/* include js/07-render.js    drawing the screen and sizing it to the device */
+/* include js/08-speech.js    saying each word aloud as it lands */
+/* include js/09-animate.js   the movement that answers every action */
+/* include js/10-celebrate.js the mascot, and what happens when a board is finished */
+/* include js/11-feedback.js  a note a player can copy and send on, no server behind it */
+/* include js/12-menu.js      the alphabet charts, the marks table, the menu bar */
+/* include js/13-primer.js    a printed primer's tables - word building and ফলা */
+/* include js/14-play.js      picking letters, judging a word, finishing a level */
 </script>
 </body>
 </html>

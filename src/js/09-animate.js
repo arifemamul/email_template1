@@ -67,11 +67,14 @@ function flyLettersToBoard(word, cells) {
     });
   });
 
-  // reveal each cell as its letter lands
-  arrivals.forEach(({ cell, delay }) => {
+  // Reveal each cell as its letter lands, and sound a note with it. The notes climb, so a
+  // four-letter word arriving is a little rising phrase rather than four identical clicks -
+  // the sound and the movement are describing the same event, which is the point.
+  arrivals.forEach(({ cell, delay }, i) => {
     setTimeout(() => {
       cell.classList.add('on', 'arrive');
-      setTimeout(() => cell.classList.remove('arrive'), 460);
+      Sfx.land(i);
+      setTimeout(() => cell.classList.remove('arrive'), 620);
     }, reduced() ? 0 : delay + 330);
   });
   const last = arrivals.length ? arrivals[arrivals.length - 1].delay + 380 : 0;
@@ -106,7 +109,7 @@ function rejectWheel() {
 /** Cells popping in sequence, then confetti, when a level is cleared. */
 const CONFETTI_COLOURS = [
   'var(--block-1)', 'var(--block-2)', 'var(--block-3)', 'var(--block-4)', 'var(--block-5)',
-  'var(--marigold)', 'var(--parchment)'
+  'var(--accent)', 'var(--tile)'
 ];
 
 function celebrateLevel() {

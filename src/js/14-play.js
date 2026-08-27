@@ -25,6 +25,7 @@ function submitWord() {
   if (lv.words.includes(word)) {
     if (done.has(word)) {
       showVerdict(word, "dup");
+      Sfx.dup();
       knockWord(word);
       return;
     }
@@ -37,6 +38,9 @@ function submitWord() {
     persist();
 
     showVerdict(word, "correct");
+    // The reward, in this order: the tone first because it is instant, then the bird, then the
+    // spoken word - which arrives while the letters are still flying to the board.
+    if (!cleared) { Sfx.good(); Bird.say("cheer", 700); }
     Speech.say(word);
     const placed = game.puzzle.words.find(w => w.word === word);
     const settle = placed ? flyLettersToBoard(word, placed.cells) : 0;
@@ -49,13 +53,16 @@ function submitWord() {
     if (cleared) {
       // No pause: the confetti starts and the next board arrives in the same frame, the
       // moment the last letters have landed.
-      setTimeout(() => { celebrateLevel(); loadLevel(game.index + 1); }, settle);
+      setTimeout(() => { celebrateBoard(); loadLevel(game.index + 1); }, settle);
     }
     return;
   }
 
   // -- not a word here ------------------------------------------------------
+  // Soft and low rather than a buzzer. A child at this stage is guessing, which is the
+  // correct thing to be doing, and the game should not sound like it disagrees.
   showVerdict(word, "wrong");
+  Sfx.bad();
   rejectWheel();
 }
 
@@ -158,6 +165,7 @@ el.hint.addEventListener("click", () => {
   }
   if (!target) return;
   game.hints[lv.id] = [...hintSet(), target];
+  Sfx.hint();
   persist();
   refreshBoard();
   drawHud();
@@ -173,6 +181,7 @@ el.hint.addEventListener("click", () => {
 });
 
 el.shuffle.addEventListener("click", () => {
+  Sfx.shuffle();
   // remember where each letter was, so the tiles can slide rather than jump
   const before = new Map();
   el.wheel.querySelectorAll('.tile').forEach(t => before.set(t.textContent, t.getBoundingClientRect()));
@@ -234,8 +243,18 @@ el.levelGrid.addEventListener("click", e => {
   if (e.target.closest(".lv") && guideIsOpen()) closeGuide();
 });
 
-el.prev.addEventListener("click", () => loadLevel(game.index - 1));
-el.next.addEventListener("click", () => loadLevel(game.index + 1));
+el.prev.addEventListener("click", () => { Sfx.page(false); loadLevel(game.index - 1); });
+el.next.addEventListener("click", () => { Sfx.page(true); loadLevel(game.index + 1); });
+
+/* The mute switch. Kept out of the top bar and the action row - those hold exactly what a
+   child needs and nothing else - so it sits in the screen's corner, where a parent can find
+   it and a player will not press it by accident. */
+el.mute.addEventListener("click", () => {
+  const muted = Sfx.toggle();
+  el.mute.setAttribute("aria-pressed", muted ? "true" : "false");
+  el.mute.textContent = muted ? "🔇" : "🔊";
+  el.mute.title = muted ? "শব্দ চালু করুন" : "শব্দ বন্ধ করুন";
+});
 
 /* keep the board and wheel sized to the screen */
 let resizeTimer = null;

@@ -18,6 +18,7 @@ const el = {
   guideClose: document.getElementById("guideClose"),
   levelGlyph: document.getElementById("levelGlyph"),
   levelPass: document.getElementById("levelPass"),
+  mute: document.getElementById("mute"),
   device: document.querySelector(".device")
 };
 
@@ -275,6 +276,9 @@ function drawWheel(alloc) {
     btn.style.left = (cx - tile / 2) + "px";
     btn.style.top = (cy - tile / 2) + "px";
     btn.style.fontSize = GLYPH + "px";
+    // Offsets the resting float in effects.css, so the wheel breathes as a ring rather than
+    // as one object pulsing.
+    btn.style.setProperty("--i", i);
     el.wheel.appendChild(btn);
   }
   drawTrail();
@@ -286,18 +290,38 @@ function drawTrail(tip) {
   const stroke = Math.max(4, Math.round((tileEl ? tileEl.offsetWidth : 56) * 0.14));
   const pts = game.picked.map(i => tileCentres[i]);
   const line = pts.map(p => p.join(",")).join(" ");
-  let svg = `<polyline points="${line}" fill="none" stroke="var(--marigold)" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round"/>`;
+  let svg = `<polyline points="${line}" fill="none" stroke="var(--accent)" stroke-width="${stroke}" stroke-linecap="round" stroke-linejoin="round"/>`;
   if (tip) {
     const last = pts[pts.length - 1];
-    svg += `<line x1="${last[0]}" y1="${last[1]}" x2="${tip[0]}" y2="${tip[1]}" stroke="var(--marigold)" stroke-opacity=".5" stroke-width="${stroke}" stroke-linecap="round"/>`;
+    svg += `<line x1="${last[0]}" y1="${last[1]}" x2="${tip[0]}" y2="${tip[1]}" stroke="var(--accent)" stroke-opacity=".5" stroke-width="${stroke}" stroke-linecap="round"/>`;
   }
   el.trail.innerHTML = svg;
 }
+
+/*
+ * Every route into the wheel - drag, tap, backing up, submitting - ends here, which makes this
+ * the one place that knows the selection changed. Sounding the tile from here rather than from
+ * the four call sites means drag and tap cannot drift apart, and a letter can never be added
+ * silently.
+ */
+let soundedPick = 0;
 
 function markTiles() {
   for (const t of el.wheel.querySelectorAll(".tile")) {
     t.classList.toggle("sel", game.picked.includes(+t.dataset.i));
   }
+  const n = game.picked.length;
+  if (n > soundedPick) {
+    // Up the scale as the word grows, so the sounds themselves say "you are getting
+    // somewhere" before the word has been judged.
+    Sfx.tap(n - 1);
+    Bird.thinking();
+  } else if (n < soundedPick && n > 0) {
+    Sfx.untap(n);
+  } else if (n === 0 && soundedPick > 0) {
+    Bird.rest();
+  }
+  soundedPick = n;
 }
 
 function currentWord() { return game.picked.map(i => game.wheel[i]).join(""); }
