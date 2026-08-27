@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mailproof — HTML email preflight</title>
+<link rel="stylesheet" href="css/studio.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">✉</span>
+    <div>
+      <h1>Mailproof</h1>
+      <p>HTML email preflight — runs entirely in your browser</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <button type="button" id="btn-sample" class="btn">Load sample</button>
+    <button type="button" id="btn-repo" class="btn">Load repo template</button>
+    <label class="btn" for="file-input">Open file…</label>
+    <input type="file" id="file-input" accept=".html,.htm,.txt" hidden>
+    <button type="button" id="btn-run" class="btn btn-primary">Run preflight</button>
+  </div>
+</header>
+
+<main class="workspace">
+
+  <!-- ---------------------------------------------------------- source -->
+  <section class="pane pane-source" aria-label="Email source">
+    <div class="pane-head">
+      <h2>Source</h2>
+      <div class="pane-head-meta">
+        <span id="size-badge" class="badge">0 KB</span>
+        <button type="button" id="btn-clear" class="btn btn-ghost btn-sm">Clear</button>
+      </div>
+    </div>
+    <div class="editor">
+      <div class="gutter" id="gutter" aria-hidden="true"></div>
+      <textarea id="source" spellcheck="false" wrap="off"
+        placeholder="Paste your HTML email here, drop a file on this pane, or load the sample."></textarea>
+    </div>
+    <div class="size-meter" title="Gmail clips messages over 102 KB">
+      <div class="size-meter-fill" id="size-fill"></div>
+      <span class="size-meter-label" id="size-label">Gmail clip limit 102 KB</span>
+    </div>
+  </section>
+
+  <!-- --------------------------------------------------------- preview -->
+  <section class="pane pane-preview" aria-label="Preview">
+    <div class="pane-head">
+      <h2>Preview</h2>
+      <div class="pane-head-meta">
+        <div class="seg" role="group" aria-label="Viewport width">
+          <button type="button" class="seg-btn is-active" data-width="680">Desktop</button>
+          <button type="button" class="seg-btn" data-width="640">Outlook</button>
+          <button type="button" class="seg-btn" data-width="480">Tablet</button>
+          <button type="button" class="seg-btn" data-width="375">iPhone</button>
+          <button type="button" class="seg-btn" data-width="320">Small</button>
+        </div>
+      </div>
+    </div>
+    <div class="preview-toolbar">
+      <div class="seg" role="group" aria-label="Colour scheme">
+        <button type="button" class="seg-btn is-active" data-scheme="light">Light</button>
+        <button type="button" class="seg-btn" data-scheme="native">Dark (Apple)</button>
+        <button type="button" class="seg-btn" data-scheme="forced">Dark (Outlook.com)</button>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="images-off">
+        <span>Images blocked</span>
+      </label>
+      <label class="toggle">
+        <input type="checkbox" id="preview-fixed">
+        <span>Show auto-fixed</span>
+      </label>
+    </div>
+    <div class="preview-stage" id="preview-stage">
+      <div class="preview-frame" id="preview-frame">
+        <iframe id="preview" title="Email preview" sandbox="allow-same-origin"></iframe>
+      </div>
+    </div>
+    <p class="preview-note" id="preview-note">Dark-mode views are approximations of how each client transforms your colours.</p>
+  </section>
+
+  <!-- ---------------------------------------------------------- report -->
+  <section class="pane pane-report" aria-label="Preflight report">
+    <div class="pane-head">
+      <h2>Report</h2>
+      <div class="seg seg-tabs" role="tablist">
+        <button type="button" class="seg-btn is-active" data-tab="findings" role="tab">Findings</button>
+        <button type="button" class="seg-btn" data-tab="fixes" role="tab">Auto-fix</button>
+        <button type="button" class="seg-btn" data-tab="text" role="tab">Plain text</button>
+      </div>
+    </div>
+
+    <div class="tab-panel is-active" id="tab-findings">
+      <div class="scorecard" id="scorecard">
+        <div class="score-ring" id="score-ring">
+          <span class="score-value" id="score-value">—</span>
+          <span class="score-caption">score</span>
+        </div>
+        <ul class="score-counts">
+          <li><span class="dot dot-blocker"></span><b id="count-blocker">0</b> blockers</li>
+          <li><span class="dot dot-warning"></span><b id="count-warning">0</b> warnings</li>
+          <li><span class="dot dot-info"></span><b id="count-info">0</b> notes</li>
+          <li class="score-passed"><b id="count-passed">0</b> checks passed</li>
+        </ul>
+      </div>
+      <div class="filters" id="filters" role="group" aria-label="Filter findings">
+        <button type="button" class="chip is-active" data-filter="all">All</button>
+        <button type="button" class="chip" data-filter="blocker">Blockers</button>
+        <button type="button" class="chip" data-filter="warning">Warnings</button>
+        <button type="button" class="chip" data-filter="info">Notes</button>
+      </div>
+      <div class="findings" id="findings">
+        <p class="empty">Load an email and run preflight to see what breaks, where, and why.</p>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-fixes">
+      <p class="panel-intro">Mechanical fixes only. Anything that needs a human decision — alt copy, dark-mode palettes, layout rebuilds — stays in the findings list.</p>
+      <div class="fixlist" id="fixlist"></div>
+      <div class="panel-actions">
+        <button type="button" id="btn-autofix" class="btn btn-primary">Apply selected fixes</button>
+        <button type="button" id="btn-download" class="btn">Download fixed HTML</button>
+        <button type="button" id="btn-copy" class="btn btn-ghost">Copy</button>
+      </div>
+      <pre class="fixlog" id="fixlog" aria-live="polite"></pre>
+    </div>
+
+    <div class="tab-panel" id="tab-text">
+      <p class="panel-intro">The text/plain alternative your ESP should send alongside the HTML part. Missing it is a deliverability penalty at most providers.</p>
+      <div class="panel-actions">
+        <button type="button" id="btn-copy-text" class="btn btn-ghost btn-sm">Copy plain text</button>
+        <span class="badge" id="text-badge">0 chars</span>
+      </div>
+      <pre class="plaintext" id="plaintext"></pre>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/inliner.js"></script>
+<script src="js/rules.js"></script>
+<script src="js/transform.js"></script>
+<script src="js/sample.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
