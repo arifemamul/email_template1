@@ -1,8 +1,36 @@
-# email_template1
+# শব্দজট · Shobdojot
+
+A Bengali word-cross game for a child who has just learned their letters.
+
+It ships as **one HTML file**. Open [`docs/index.html`](docs/index.html) in any browser and it
+runs: no server, no build step, no install, no sign-up, no ads, no network. The Bengali font is
+embedded, so it renders the same on a machine that has never had one.
+
+Drag or tap letters off a wheel to fill a small crossword. 244 levels in বর্ণমালা order -
+স্বরবর্ণ first, then ক to হ - and each level is named for the letter it teaches, so a child
+reads **কা** at the top of the screen rather than **২১** and knows where in the alphabet they
+are.
+
+**A tile is one akshara.** `কা` is one square, not two, and `ক্ষ` is one tile because it is one
+letter. That decision runs through everything here: the splitter, the board placer, the wheel,
+and the যুক্তবর্ণ page that explains it to the player.
+
+Two limits shape every level, and they are not the same limit:
+
+| | limit | why |
+|---|---|---|
+| the ring | at most 5 letters | how much there is to rule out before the first tile can be picked |
+| the word | at most 3 aksharas | how long the answer is, and so how many chances there are to go wrong |
+
+609 words, all two or three letters. All 57 units of the alphabet are taught.
+
+Behind the menu: the two halves of the বর্ণমালা as charts built from the level table, the full
+বারোখড়ি, and three tables transcribed from a printed Bangladeshi primer - শব্দ গঠন, ফলা and
+103 যুক্তবর্ণ. Every claim in them is re-derived from scratch on each build rather than trusted.
 
 ---
 
-**শব্দজট (Shobdojot)** - a Bengali word-cross puzzle game also lives in this repository:
+## Working on it
 
 - **Edit `src/`.** The page ships as one self-contained file - the service worker plays it
   back offline and the artifact host allows no second request - but it is not authored as one.
@@ -22,14 +50,15 @@
   none of it runs from a `file://` copy; `pwatest` serves the folder over 127.0.0.1 and checks
   it offline for real.
 - **Ship [`docs/index.html`](docs/index.html).** Built from the source by `build.py build`
-  with its comments stripped - 104 KB gzipped against the source's 113 - and publishable with
-  GitHub Pages by pointing Pages at branch `main`, folder `/docs`.
+  with its comments stripped - 305 KB, 126 KB gzipped - and publishable with
+  GitHub Pages by pointing Pages at the default branch, folder `/docs`.
   [`docs/live.html`](docs/live.html) is the same build with the
   `<!doctype>`/`<head>`/`<body>` wrapper removed, for hosts that supply their own. Neither is
   edited directly: `build.py` overwrites both, and the tests run against the built file rather
   than the source, so a mistake in the stripping fails a test instead of shipping.
-- **Test it: `npm test`.** Seventeen browser checks against the built page, about four minutes;
-  `npm run test:all` adds the solve sweep, which opens all 256 levels and wins each one. The
+- **Test it: `npm test`.** Nineteen browser checks against the built page, about five minutes;
+  `npm run test:all` adds the solve sweep, which opens all 244 levels and wins each one
+  (about eleven minutes more). The
   runner refuses to start if `docs/index.html` is not what `src/` would build right now - see
   [`tools/tests/README.md`](tools/tests/README.md) for why that guard is there, and what the
   suite cost before it existed.
