@@ -19,6 +19,121 @@ const clearLevel = async p => {
   await p.waitForTimeout(1700);
 };
 
+/* ---- 0. the finished board is on screen long enough to be looked at ----------------------
+ *
+ * The test that should have existed first. Everything below checks that clearing a level
+ * *advances*, which is the mechanism; none of it asked whether a person saw anything happen,
+ * and the answer was no. The completed board was replaced in the same frame the last letters
+ * landed, so the confetti and the stars were thrown over the next level's empty grid, and with
+ * iOS Reduce Motion turned on the whole reward was skipped and the level simply changed.
+ *
+ * Run under both motion settings, because that is where it went wrong: a hold is not an
+ * animation, and it must not disappear with one.
+ */
+for (const motion of ['no-preference', 'reduce']) {
+  const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: motion });
+  const p = await ctx.newPage();
+  await p.goto(PAGE);
+  await p.waitForFunction(() => document.querySelector('.tile'));
+
+  const seen = await p.evaluate(async () => {
+    // Everything but the last word, so the finish is one submit away.
+    const lv = LEVELS[game.index];
+    game.found[lv.id] = lv.words.slice(0, -1);
+    refreshBoard();
+    const cells = document.querySelectorAll('.cell:not(.blank)').length;
+
+    const start = performance.now();
+    const was = game.index;
+    let advancedAt = null, fullAt = null, chip = false, party = false, celebratedBeforeSwap = false;
+    const tick = setInterval(() => {
+      if (document.querySelector('.chip.good')) chip = true;
+      if (document.querySelector('.bird.party')) party = true;
+      if (advancedAt === null) {
+        if (fullAt === null && document.querySelectorAll('.cell.on').length === cells) {
+          fullAt = performance.now() - start;
+        }
+        // Confetti or a star while the finished board is still up - the reward landing on the
+        // board it is a reward for, which is the part that was wrong.
+        if (document.querySelector('.fly.confetti, .star')) celebratedBeforeSwap = true;
+      }
+      if (advancedAt === null && game.index !== was) advancedAt = performance.now() - start;
+    }, 8);
+
+    const w = lv.words.at(-1);
+    game.picked = splitAksharas(w).map(a => game.wheel.indexOf(a));
+    submitWord();
+    await new Promise(r => setTimeout(r, 3200));
+    clearInterval(tick);
+    return { cells, advancedAt, fullAt, chip, party, celebratedBeforeSwap };
+  });
+
+  const label = `motion ${motion}`;
+  if (seen.advancedAt === null) {
+    problems.push(`${label}: never advanced after the last word`);
+  } else if (seen.fullAt === null) {
+    problems.push(`${label}: the finished board was never fully on screen before the swap`);
+  } else {
+    // A second is the floor. Below that a child has not finished looking at the word they
+    // found before it is taken away, which is the complaint this came from.
+    const visible = seen.advancedAt - seen.fullAt;
+    if (visible < 1000)
+      problems.push(`${label}: the finished board was up for only ${Math.round(visible)}ms `
+                  + `before the next level (want 1000ms or more)`);
+    // And not so long that a child thinks the game has stopped.
+    if (seen.advancedAt > 3000)
+      problems.push(`${label}: took ${Math.round(seen.advancedAt)}ms to advance`);
+    console.log(`${label}: full board at ${Math.round(seen.fullAt)}ms, held `
+              + `${Math.round(visible)}ms, advanced at ${Math.round(seen.advancedAt)}ms`);
+  }
+  // The word just found stays named on screen while the board is looked at.
+  if (!seen.chip) problems.push(`${label}: the word was never shown as found`);
+  // The bird reacts whatever the motion setting - the class is set either way; only the
+  // movement it drives is CSS, and CSS is what reduced motion is allowed to stop.
+  if (!seen.party) problems.push(`${label}: the bird did not react to the board being finished`);
+  if (motion === 'no-preference' && !seen.celebratedBeforeSwap)
+    problems.push('the confetti and stars fired after the swap, over the next level');
+  await ctx.close();
+}
+
+/* ---- 0b. and on an engine with no Web Animations API -------------------------------------
+ *
+ * `fly` calls `el.animate` from inside a loop that runs inside `submitWord`. Unguarded, a
+ * missing Element.animate threw all the way up: the word was already recorded, but the board
+ * never updated and the level never advanced. So the whole game hung on an API that only the
+ * decoration needs. Deleting the API is the cheapest way to prove the guard is real.
+ */
+{
+  const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  await ctx.addInitScript(() => { delete Element.prototype.animate; });
+  const p = await ctx.newPage();
+  const thrown = [];
+  p.on('pageerror', e => thrown.push(e.message));
+  await p.goto(PAGE);
+  await p.waitForFunction(() => document.querySelector('.tile'));
+  const bare = await p.evaluate(async () => {
+    const lv = LEVELS[game.index];
+    game.found[lv.id] = lv.words.slice(0, -1);
+    refreshBoard();
+    const cells = document.querySelectorAll('.cell:not(.blank)').length;
+    const was = game.index;
+    const w = lv.words.at(-1);
+    game.picked = splitAksharas(w).map(a => game.wheel.indexOf(a));
+    submitWord();
+    await new Promise(r => setTimeout(r, 600));
+    const lit = document.querySelectorAll('.cell.on').length;
+    await new Promise(r => setTimeout(r, 2200));
+    return { lit, cells, advanced: game.index === was + 1 };
+  });
+  if (thrown.length) problems.push(`no Element.animate: the page threw - ${thrown[0]}`);
+  if (bare.lit !== bare.cells)
+    problems.push(`no Element.animate: the board showed ${bare.lit} of ${bare.cells} letters`);
+  if (!bare.advanced) problems.push('no Element.animate: the level never advanced');
+  console.log(`no Element.animate: board filled ${bare.lit}/${bare.cells}, advanced `
+            + `${bare.advanced ? 'yes' : 'no'}, ${thrown.length} errors`);
+  await ctx.close();
+}
+
 // ---- 1. it advances on its own, straight away ----
 {
   const p = await fresh();

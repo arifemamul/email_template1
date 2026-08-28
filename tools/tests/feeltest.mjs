@@ -190,12 +190,16 @@ const quiet = await p3.evaluate(() => ({
   birdStill: getComputedStyle(document.querySelector('.bird .bd-head')).animationName === 'none',
   fxHidden: getComputedStyle(document.getElementById('fx')).display === 'none',
 }));
-if (!quiet.muted) problems.push('reduced motion did not default the sound off');
+// Less movement, not less game. This used to default the sound off as well, and the result was
+// a real bug: on an iPhone with iOS Reduce Motion on, finishing a board produced no animation,
+// no sound and no pause - nothing happened at all. Vestibular sensitivity is not sound
+// sensitivity, and the two must not be inferred from one another.
+if (quiet.muted) problems.push('prefers-reduced-motion silenced the game; it should only still it');
 if (!quiet.birdStill) problems.push('the bird still animates under prefers-reduced-motion');
 if (!quiet.fxHidden) problems.push('the effects layer is still shown under prefers-reduced-motion');
 console.log(`bird: ${bird ? bird.parts : 0} parts, idle/think both work; `
           + `mute persists; reduced-motion silences and stills`);
 
 await b.close();
-report(problems, 'FEEL OK: sound climbs and stops, the bird reacts, mute sticks, '
-               + 'and no stylesheet names a colour but theme.css');
+report(problems, 'FEEL OK: sound climbs and stops, the bird reacts, mute sticks, reduced '
+               + 'motion stills without silencing, and no stylesheet names a colour but theme.css');

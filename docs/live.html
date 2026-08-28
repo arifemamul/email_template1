@@ -2512,9 +2512,6 @@ load() {
 try {
 this.muted = localStorage.getItem(this.KEY) === "off";
 } catch { /* private window: default to sound on */ }
-if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-try { if (localStorage.getItem(this.KEY) === null) this.muted = true; } catch { this.muted = true; }
-}
 },
 
 wake() {
@@ -2998,7 +2995,14 @@ const frames = [
 opacity: fade ? 0 : 1, offset: 1 }
 ];
 
+if (typeof el.animate !== 'function') {
+el.remove();
+return Promise.resolve();
+}
 const run = el.animate(frames, { duration, delay, easing, fill: 'forwards' });
+if (!run || !run.finished) {
+return new Promise(done => setTimeout(() => { el.remove(); done(); }, delay + duration + 40));
+}
 return run.finished.then(() => el.remove()).catch(() => el.remove());
 }
 
@@ -3027,6 +3031,10 @@ setTimeout(() => cell.classList.remove('arrive'), 620);
 });
 const last = arrivals.length ? arrivals[arrivals.length - 1].delay + 380 : 0;
 return reduced() ? 0 : last;
+}
+
+function motionOn() {
+return !reduced();
 }
 
 function knockWord(word) {
@@ -3095,6 +3103,7 @@ const now = tile.getBoundingClientRect();
 const dx = from.left - now.left;
 const dy = from.top - now.top;
 if (!dx && !dy) return;
+if (typeof tile.animate !== 'function') return;      // no slide; the tiles are already right
 tile.animate(
 [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'translate(0,0)' }],
 { duration: 420, easing: 'cubic-bezier(.3,1.2,.4,1)' });
@@ -3827,13 +3836,16 @@ table.appendChild(row);
 }
 
 drawJukto();
+
+const SHOW_CLEARED = 1200;
+
 let verdictTimer = null;
 
-function showVerdict(word, result) {
+function showVerdict(word, result, ms = 720) {
 game.verdict = { word, result };
 drawPreview();
 clearTimeout(verdictTimer);
-verdictTimer = setTimeout(() => { game.verdict = null; drawPreview(); }, 720);
+verdictTimer = setTimeout(() => { game.verdict = null; drawPreview(); }, ms);
 }
 
 function submitWord() {
@@ -3862,11 +3874,16 @@ const cleared = done.size === lv.words.length;
 if (cleared) game.completed[lv.id] = true;
 persist();
 
-showVerdict(word, "correct");
+showVerdict(word, "correct", cleared ? SHOW_CLEARED + 400 : undefined);
 if (!cleared) { Sfx.good(); Bird.say("cheer", 700); }
 Speech.say(word);
 const placed = game.puzzle.words.find(w => w.word === word);
-const settle = placed ? flyLettersToBoard(word, placed.cells) : 0;
+let settle = 0;
+try {
+if (placed) settle = flyLettersToBoard(word, placed.cells) || 0;
+} catch (err) {
+settle = 0;
+}
 setTimeout(() => {
 refreshBoard();
 drawHud();
@@ -3874,7 +3891,8 @@ drawLevelGrid();
 }, settle);
 
 if (cleared) {
-setTimeout(() => { celebrateBoard(); loadLevel(game.index + 1); }, settle);
+setTimeout(celebrateBoard, settle);
+setTimeout(() => loadLevel(game.index + 1), settle + SHOW_CLEARED);
 }
 return;
 }

@@ -46,7 +46,22 @@ function fly(from, to, { text = '', cls = '', size = null, delay = 0, duration =
       opacity: fade ? 0 : 1, offset: 1 }
   ];
 
+  // Guarded, because the failure mode without it is not "no animation" but "the game stops".
+  // `fly` is called from inside a loop in `flyLettersToBoard`, which is called from
+  // `submitWord`: a missing Element.animate throws all the way up, `settle` is never assigned,
+  // and finishing a word leaves the board un-updated and the level stuck. Decoration must
+  // never be able to do that, so if the API is not there the flying copy is simply dropped and
+  // the cells reveal on their own.
+  if (typeof el.animate !== 'function') {
+    el.remove();
+    return Promise.resolve();
+  }
   const run = el.animate(frames, { duration, delay, easing, fill: 'forwards' });
+  // `finished` arrived later than `animate` itself in some engines, so fall back to a timer
+  // rather than reading `.then` off undefined.
+  if (!run || !run.finished) {
+    return new Promise(done => setTimeout(() => { el.remove(); done(); }, delay + duration + 40));
+  }
   return run.finished.then(() => el.remove()).catch(() => el.remove());
 }
 
@@ -70,6 +85,9 @@ function flyLettersToBoard(word, cells) {
   // Reveal each cell as its letter lands, and sound a note with it. The notes climb, so a
   // four-letter word arriving is a little rising phrase rather than four identical clicks -
   // the sound and the movement are describing the same event, which is the point.
+  //
+  // Under reduced motion the letters appear at once rather than in sequence: no flight, no
+  // stagger. The notes still sound, because a note is not movement.
   arrivals.forEach(({ cell, delay }, i) => {
     setTimeout(() => {
       cell.classList.add('on', 'arrive');
@@ -79,6 +97,18 @@ function flyLettersToBoard(word, cells) {
   });
   const last = arrivals.length ? arrivals[arrivals.length - 1].delay + 380 : 0;
   return reduced() ? 0 : last;
+}
+
+/**
+ * Whether this device is drawing the flight at all.
+ *
+ * Exported as its own name because two different questions were being answered by `reduced()`
+ * at the call sites - "should I animate this" and "how long until the board is settled" - and
+ * conflating them is what made a cleared board vanish instantly for anyone with reduced motion
+ * turned on. The first question belongs to the motion preference; the second does not.
+ */
+function motionOn() {
+  return !reduced();
 }
 
 /** Nudges the cells of a word the player has already solved. */
@@ -156,6 +186,7 @@ function animateShuffle(before) {
     const dx = from.left - now.left;
     const dy = from.top - now.top;
     if (!dx && !dy) return;
+    if (typeof tile.animate !== 'function') return;      // no slide; the tiles are already right
     tile.animate(
       [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'translate(0,0)' }],
       { duration: 420, easing: 'cubic-bezier(.3,1.2,.4,1)' });

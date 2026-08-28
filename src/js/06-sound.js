@@ -19,8 +19,13 @@
  *     an AudioContext made at load time sits in `suspended` forever on iOS.
  *   - every call is safe on a device with no audio at all. `play` returns silently rather
  *     than throwing, because a missing speaker must never break a puzzle.
- *   - muting is remembered per device, and honours the same reduced-motion preference the
- *     animations do: a person who has asked for less movement is asking for less noise too.
+ *   - muting is remembered per device, and is nobody's business but the player's. An earlier
+ *     version of this file defaulted the sound off for anyone with prefers-reduced-motion set,
+ *     on the reasoning that less movement implies less noise. That was wrong, and it caused a
+ *     real bug: someone playing on an iPhone with iOS Reduce Motion on got no animation, no
+ *     sound and no pause, so finishing a board did nothing visible at all. Vestibular
+ *     sensitivity is not sound sensitivity, and guessing at one from the other took the whole
+ *     reward away from the people who could least afford to lose it.
  */
 const Sfx = {
   ctx: null,
@@ -35,11 +40,6 @@ const Sfx = {
     try {
       this.muted = localStorage.getItem(this.KEY) === "off";
     } catch { /* private window: default to sound on */ }
-    // Someone who has asked the system for reduced motion gets a quiet game by default. They
-    // can still turn sound on; this only decides the default.
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      try { if (localStorage.getItem(this.KEY) === null) this.muted = true; } catch { this.muted = true; }
-    }
   },
 
   /** Built on first use, because that is the only time a browser will allow it. */

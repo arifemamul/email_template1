@@ -1,6 +1,6 @@
-// Guards the cuts to the game screen: no sound BUTTON, no word counter, no pause between
-// levels - while checking that the pronunciation those cuts nearly took with them is intact,
-// and that every word found is still spoken aloud.
+// Guards the cuts to the game screen: no sound BUTTON, no word counter, and nothing between
+// levels that has to be dismissed - while checking that the pronunciation those cuts nearly
+// took with them is intact, and that every word found is still spoken aloud.
 import { launch, PAGE, BUILT } from './harness.mjs';
 import { readFileSync } from 'fs';
 const problems = [];
@@ -12,8 +12,17 @@ for (const [needle, what] of [
   ['Speech.toggle', 'a mute toggle'],
   ['shobdojot.sound', 'a stored sound preference'],
   ['levelSub', 'the word counter element'],
-  ['CLEAR_BEAT', 'the between-level pause constant'],
 ]) if (src.includes(needle)) problems.push(`page still contains ${what} ("${needle}")`);
+
+// CLEAR_BEAT used to be forbidden here: the between-level pause was cut on the grounds that a
+// child should not be made to wait, and this file held it out. That was reversed by a bug
+// report from an iPhone - with no pause the finished board was on screen for about no frames
+// at all, so nobody ever saw the word they had just found. A hold is now required rather than
+// banned, and `advancetest` owns how long it must be. What this file still guards is the thing
+// that was actually wrong with the old pause: a card, a countdown, a button to press.
+for (const [needle, what] of [
+  ['SHOW_CLEARED', 'the hold that lets a finished board be seen'],
+]) if (!src.includes(needle)) problems.push(`page is missing ${what} ("${needle}")`);
 
 // The pronunciation itself stays - only its button went. These must be present.
 for (const [needle, what] of [
@@ -101,10 +110,11 @@ const words = await p.evaluate(() => game.puzzle.words.map(w => w.word));
 for (const w of words.slice(0, -1)) { if (!await trace(w)) break; await p.waitForTimeout(240); }
 const wasOn = await p.evaluate(() => game.index);
 await trace(words.at(-1));
-// the fly animation is ~450ms; by 800ms the next level must already be up, with no beat after it
-await p.waitForTimeout(800);
+// The letters take ~450ms to land and the finished board is then held for SHOW_CLEARED, so the
+// next level is up inside three seconds - with nothing to dismiss on the way.
+await p.waitForFunction(i => game.index === i + 1, wasOn, { timeout: 3000 }).catch(() => {});
 const now = await p.evaluate(() => ({ index: game.index, blank: (game.found[LEVELS[game.index].id] || []).length }));
-if (now.index !== wasOn + 1) problems.push(`did not advance: still on level ${now.index + 1} after 800ms`);
+if (now.index !== wasOn + 1) problems.push(`did not advance: still on level ${now.index + 1} after 3s`);
 if (now.blank !== 0) problems.push(`next level did not arrive blank (${now.blank} words already found)`);
 
 // Every word found should have been spoken, at the rate meant for a learner.

@@ -1,13 +1,35 @@
 /* ============================================================================
    Play
    ============================================================================ */
+
+/*
+ * How long the finished board stays on screen before the next one arrives.
+ *
+ * This used to be nothing at all: the last letters landed and `loadLevel` ran in the same
+ * frame. The reasoning was that a child should not be made to wait, and it was wrong in a way
+ * no test here caught - `advancetest` checked that clearing advances and that the next board
+ * is blank, which is precisely the behaviour that hides the reward. The mechanism was verified
+ * and nobody asked whether a human could see it.
+ *
+ * Measured on the real thing: the completed board was on screen for about no frames at all,
+ * and the confetti and the stars were thrown over the *next* level's empty grid. On a phone
+ * with iOS Reduce Motion turned on it was worse - the whole reward was skipped and the level
+ * simply changed, which is how this came back as a bug report from an iPhone.
+ *
+ * So: the letters land, the board is celebrated, and it is then held for a beat that a person
+ * can actually use. The hold is not an animation and does not scale with one - it applies on
+ * every device and under every motion preference, because being given time to look at
+ * something is not movement.
+ */
+const SHOW_CLEARED = 1200;
+
 let verdictTimer = null;
 
-function showVerdict(word, result) {
+function showVerdict(word, result, ms = 720) {
   game.verdict = { word, result };
   drawPreview();
   clearTimeout(verdictTimer);
-  verdictTimer = setTimeout(() => { game.verdict = null; drawPreview(); }, 720);
+  verdictTimer = setTimeout(() => { game.verdict = null; drawPreview(); }, ms);
 }
 
 function submitWord() {
@@ -37,13 +59,24 @@ function submitWord() {
     if (cleared) game.completed[lv.id] = true;
     persist();
 
-    showVerdict(word, "correct");
+    // The verdict chip is held as long as the board is, so the word a child just found is
+    // still named on screen while they look at where it landed.
+    showVerdict(word, "correct", cleared ? SHOW_CLEARED + 400 : undefined);
     // The reward, in this order: the tone first because it is instant, then the bird, then the
     // spoken word - which arrives while the letters are still flying to the board.
     if (!cleared) { Sfx.good(); Bird.say("cheer", 700); }
     Speech.say(word);
     const placed = game.puzzle.words.find(w => w.word === word);
-    const settle = placed ? flyLettersToBoard(word, placed.cells) : 0;
+    // A backstop, not a substitute for the guards inside. Everything below this line is the
+    // game working; everything in `flyLettersToBoard` is the game looking nice. If some engine
+    // finds a way to break the second, it must not be allowed to take the first with it - the
+    // word is already recorded and saved by now, and the board still has to catch up.
+    let settle = 0;
+    try {
+      if (placed) settle = flyLettersToBoard(word, placed.cells) || 0;
+    } catch (err) {
+      settle = 0;
+    }
     setTimeout(() => {
       refreshBoard();
       drawHud();
@@ -51,9 +84,11 @@ function submitWord() {
     }, settle);
 
     if (cleared) {
-      // No pause: the confetti starts and the next board arrives in the same frame, the
-      // moment the last letters have landed.
-      setTimeout(() => { celebrateBoard(); loadLevel(game.index + 1); }, settle);
+      // Three moments, not one. The letters land, then the finished board is celebrated -
+      // over the board that was finished, which is the whole point and was not true before -
+      // and only then does the next level arrive.
+      setTimeout(celebrateBoard, settle);
+      setTimeout(() => loadLevel(game.index + 1), settle + SHOW_CLEARED);
     }
     return;
   }
