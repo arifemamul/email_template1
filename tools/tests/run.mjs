@@ -48,7 +48,7 @@ const CHECKS = [
   ['advancetest', 'a finished board is held long enough to see, then advances blank'],
   ['replaytest',  'a cleared level can be played again'],
   ['oldsavetest', 'progress saved by an older build still loads'],
-  ['saytest',     'the feedback card copies a note, and keeps one on the device'],
+  ['saytest',     'the report card mails, keeps and copies - with the right report in it'],
   ['pwatest',     'installs, and plays with the network cut'],
 ];
 

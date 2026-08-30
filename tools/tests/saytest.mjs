@@ -17,13 +17,13 @@ const ctx = await b.newContext({ viewport: { width: 1280, height: 1000 }, permis
 const p = await ctx.newPage();
 await p.goto(site.url + '/index.html');
 await p.waitForFunction(() => typeof LEVELS !== 'undefined' && document.getElementById('sayCopy'));
-// The feedback card lives in the About section of the menu now, and only the open section is on
+// The feedback card has a named section of its own now, and only the open section is on
 // screen. Open it the way a player would rather than reaching past the menu.
-const openAbout = async pg => {
-  await pg.click('#tab-about');
+const openReport = async pg => {
+  await pg.click('#tab-report');
   await pg.waitForSelector('#sayNote', { state: 'visible', timeout: 5000 });
 };
-await openAbout(p);
+await openReport(p);
 
 // 1. An empty note is refused rather than copying a bare context block.
 await p.click('#sayCopy');
@@ -70,7 +70,7 @@ if (!await p2.isVisible('#sayNote')) {
   await p2.click('#guideOpen');
   await p2.waitForSelector('#menu', { state: 'visible', timeout: 5000 })
           .catch(() => fail('the menu is unreachable on a phone'));
-  await openAbout(p2).catch(() => fail('the feedback card is unreachable on a phone'));
+  await openReport(p2).catch(() => fail('the feedback card is unreachable on a phone'));
 }
 await p2.fill('#sayNote', 'no clipboard here');
 await p2.click('#sayCopy');
@@ -93,7 +93,7 @@ if (onScreen.includes('sayCopy')) fail('the feedback button leaked onto the game
 await p.evaluate(() => { try { localStorage.removeItem('shobdojot.reports'); } catch {} });
 await p.reload();
 await p.waitForFunction(() => document.getElementById('saySave'));
-await p.click('#tab-about');
+await p.click('#tab-report');
 
 // 6. An empty note is refused here too - an empty entry in the list is worse than none.
 await p.fill('#sayNote', '   ');
@@ -128,7 +128,7 @@ if (kept.box !== '') fail('the note box still holds the note that was just kept'
 //    true of a variable that vanishes when the tab closes.
 await p.reload();
 await p.waitForFunction(() => document.getElementById('sayList'));
-await p.click('#tab-about');
+await p.click('#tab-report');
 const afterReload = await p.evaluate(() => ({
   rows: document.querySelectorAll('.rp').length,
   text: (document.querySelector('.rp-text') || {}).textContent,
@@ -144,7 +144,7 @@ if (!/[০-৯]{2}\/[০-৯]{2}\/[০-৯]{4}/.test(afterReload.when || ''))
 await p.evaluate(() => { try { localStorage.removeItem('shobdojot'); } catch {} });
 await p.reload();
 await p.waitForFunction(() => document.getElementById('sayList'));
-await p.click('#tab-about');
+await p.click('#tab-report');
 const survived = await p.evaluate(() => document.querySelectorAll('.rp').length);
 if (survived !== 1) fail('clearing game progress destroyed the kept reports');
 
@@ -228,7 +228,7 @@ await p5.addInitScript(() => {
 });
 await p5.goto(site.url + '/index.html');
 await p5.waitForFunction(() => document.getElementById('saySave'));
-await p5.click('#tab-about');
+await p5.click('#tab-report');
 await p5.fill('#sayNote', 'জায়গা নেই এমন অবস্থায়');
 await p5.click('#saySave');
 await p5.waitForTimeout(200);
@@ -245,6 +245,107 @@ await p5.close();
 console.log(`reports: kept, survived a reload and a cleared save, escaped as text, `
           + `two-press delete, copy-all in order, corrupt and full stores handled`);
 
-if (!process.exitCode) console.log('FEEDBACK OK: empty refused, note + level copied, shown on screen, fallback works, game screen untouched, and a kept report survives');
+/* ---- the mail route -------------------------------------------------------------------
+ * `mailto:` is the whole delivery mechanism here, so what matters is not that a button exists
+ * but what the URL it builds actually contains: the right mailbox, the level the player was
+ * on, their words, and a length a mail client will not silently truncate.
+ */
+const mailCtx = await b.newContext({ viewport: { width: 1280, height: 1000 } });
+const m = await mailCtx.newPage();
+await m.addInitScript(() => {
+  window.__mailto = [];
+  document.addEventListener('click', e => {
+    const a = e.target.closest && e.target.closest('a[href^="mailto:"]');
+    if (a) { window.__mailto.push(a.href); e.preventDefault(); }
+  }, true);
+});
+await m.goto(site.url + '/index.html');
+await m.waitForFunction(() => document.getElementById('sayMail'));
+await m.click('#tab-report');
+
+// 15. An empty note does not open a mail app with nothing in it.
+await m.fill('#sayNote', '   ');
+await m.click('#sayMail');
+await m.waitForTimeout(150);
+if ((await m.evaluate(() => window.__mailto)).length)
+  fail('an empty note opened the mail app anyway');
+
+// 16. A real one carries the address, the level and the words.
+await m.evaluate(() => loadLevel(5));
+const mailNote = 'পরীক্ষা: এই শব্দের বানান ঠিক নয়';
+await m.fill('#sayNote', mailNote);
+await m.click('#sayMail');
+await m.waitForTimeout(200);
+const links = await m.evaluate(() => window.__mailto);
+if (!links.length) fail('the mail button opened nothing');
+else {
+  const url = new URL(links[0]);
+  const q = new URLSearchParams(url.search);
+  const to = decodeURIComponent(url.pathname);
+  const body = q.get('body') || '';
+  const subject = q.get('subject') || '';
+  const level = await m.evaluate(() => ({ id: LEVELS[5].id, name: LEVELS[5].name,
+                                          words: LEVELS[5].words }));
+  const bnDigit = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[+d]);
+  if (to !== 'emamularif@gmail.com') fail(`the report is addressed to "${to}"`);
+  if (!subject.includes(bnDigit(level.id))) fail(`the subject does not name the level: "${subject}"`);
+  if (!body.includes(mailNote)) fail('the mail body does not contain what was typed');
+  if (!level.words.every(w => body.includes(w)))
+    fail('the mail body does not list the level\'s words');
+  // Some clients truncate a mailto: past ~2000 characters, and a truncated bug report is
+  // worse than a short one.
+  if (links[0].length > 2000) fail(`the mailto: URL is ${links[0].length} characters`);
+  console.log(`mail: to ${to}, subject "${subject}", ${links[0].length} char URL`);
+}
+
+// 16b. A very long note is truncated rather than handed to a client that will silently cut it
+//      somewhere arbitrary. The ceiling only bites on a long note, so this types one.
+await m.evaluate(() => { window.__mailto = []; });
+await m.fill('#sayNote', 'দীর্ঘ নোট। '.repeat(300));
+await m.click('#sayMail');
+await m.waitForTimeout(200);
+const longOne = await m.evaluate(() => window.__mailto);
+if (!longOne.length) fail('a long note opened nothing');
+else if (longOne[0].length > 2000)
+  fail(`a long note built a ${longOne[0].length} character mailto:, past what clients keep`);
+else {
+  const body = new URLSearchParams(new URL(longOne[0]).search).get('body') || '';
+  if (!body.includes('[...]')) fail('a long note was cut without saying it had been cut');
+  console.log(`long note: ${longOne[0].length} char URL, truncation marked`);
+}
+await m.fill('#sayNote', mailNote);
+
+// 17. The status line says the mail app is opening - never that anything was sent. The page
+//     cannot send, and a message implying it did would be the worst thing on this card.
+const mailSaid = await m.textContent('#saySaid');
+if (!mailSaid || !mailSaid.trim()) fail('the mail button said nothing');
+else if (/পাঠানো হয়েছে|sent/i.test(mailSaid))
+  fail(`the status line claims the report was sent: "${mailSaid}"`);
+
+// 18. A kept report can be mailed too, with its own level rather than the current one.
+await m.fill('#sayNote', 'রাখা নোট, পরে মেইল করার জন্য');
+await m.click('#saySave');
+await m.waitForTimeout(150);
+await m.evaluate(() => { window.__mailto = []; loadLevel(30); });
+await m.click('.rp .rp-mail');
+await m.waitForTimeout(200);
+const kept2 = await m.evaluate(() => window.__mailto);
+if (!kept2.length) fail('a kept report could not be mailed');
+else {
+  const q = new URLSearchParams(new URL(kept2[0]).search);
+  if (!(q.get('body') || '').includes('রাখা নোট'))
+    fail('mailing a kept report sent the wrong text');
+  const onNow = await m.evaluate(() => LEVELS[30].id);
+  const bnDigit = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[+d]);
+  if ((q.get('subject') || '').includes(bnDigit(onNow)))
+    fail('a kept report was mailed with the level the player is on now, not the one it is about');
+}
+
+// 19. The address is not sitting in the page as a plain string for a crawler to find.
+const bare = await m.evaluate(() => document.documentElement.innerHTML.includes('emamularif@gmail.com'));
+if (bare) fail('the address is a plain string in the published page');
+await m.close();
+
+if (!process.exitCode) console.log('FEEDBACK OK: empty refused, note + level copied, shown on screen, fallback works, game screen untouched, a kept report survives, and mail carries the right report');
 await b.close();
 await site.close();

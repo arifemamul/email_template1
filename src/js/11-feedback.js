@@ -17,11 +17,38 @@
  * whole thing in their own app before it goes anywhere - a page that gathers more than it
  * admits to is the thing being avoided here.
  */
+/*
+ * Where a report goes.
+ *
+ * Still no server: `mailto:` hands the note to whatever mail app the player already uses, with
+ * the address, a subject and the whole report filled in. They press send. That last part is not
+ * a limitation to be apologised for - it is what keeps this page a single file that works
+ * offline, and it means nothing is ever transmitted without the sender reading it first. The
+ * card says so in as many words, because a button that looks like it sent something and did
+ * not is the worst thing this card could do.
+ *
+ * Assembled from parts rather than written out. The page is published, and an address sitting
+ * as a plain string in the HTML is harvested by the first crawler that finds it. This stops the
+ * naive ones and would not slow down anybody who looked, which is the honest description of
+ * what it buys.
+ */
+const MAILBOX = ["emamularif", "gmail.com"].join("\u0040");
+
+// mailto: is a URL, and a URL has a practical ceiling - some clients silently truncate past
+// about 2000 characters, and a report cut at an arbitrary point is worse than a short one.
+//
+// The limit is on the *encoded* URL, not on the text. Capping the text was the obvious thing
+// and it was wrong by a factor of nine: encodeURIComponent turns every Bengali character into
+// something like %E0%A6%AC, so 1800 characters of Bengali came out as a 10,317-character URL -
+// exactly the silent truncation the cap existed to prevent.
+const MAIL_URL_MAX = 1900;
+
 const say = {
   note: document.getElementById("sayNote"),
   adds: document.getElementById("sayAdds"),
   copy: document.getElementById("sayCopy"),
   save: document.getElementById("saySave"),
+  mail: document.getElementById("sayMail"),
   said: document.getElementById("saySaid"),
   list: document.getElementById("sayList"),
   count: document.getElementById("sayCount"),
@@ -191,6 +218,45 @@ function saySave() {
   sayDone("রাখা হলো - নিচের তালিকায় আছে", true);
 }
 
+/**
+ * Open the player's mail app with the report in it.
+ *
+ * Returns whether a mail app could be reached at all. A device with none configured does
+ * nothing visible when a mailto: link is followed, so the caller says what happened rather than
+ * leaving the player looking at an unchanged screen wondering whether it worked.
+ */
+function mailReport(subject, body) {
+  const build = text => `mailto:${MAILBOX}`
+                      + `?subject=${encodeURIComponent(subject)}`
+                      + `&body=${encodeURIComponent(text)}`;
+
+  // Shorten until the whole thing fits. Halving rather than stepping because the ratio between
+  // characters and encoded length depends on the script - one for ASCII, nine for Bengali -
+  // and guessing it wrong in either direction either truncates a report that would have fitted
+  // or loops a thousand times on one that would not.
+  let text = body;
+  let url = build(text);
+  while (url.length > MAIL_URL_MAX && text.length > 40) {
+    text = text.slice(0, Math.floor(text.length / 2));
+    url = build(text + "\n[...]");
+  }
+  if (url.length > MAIL_URL_MAX) url = build("[...]");
+  try {
+    // A real click on a real anchor, not location.href: an iOS mail app opening from a
+    // synthetic navigation is blocked in some browsers, and an anchor is what they expect.
+    const a = document.createElement("a");
+    a.href = url;
+    a.rel = "noopener";
+    a.style.cssText = "position:fixed;left:-9999px";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /** One kept report as text, in the same shape the copy button produces. */
 function reportText(r) {
   return [
@@ -268,7 +334,18 @@ function drawReports() {
       drawReports();
     });
 
-    tools.append(copy, drop);
+    const mail = document.createElement("button");
+    mail.className = "rp-btn rp-mail bn";
+    mail.type = "button";
+    mail.textContent = "ইমেইল";
+    mail.addEventListener("click", () => {
+      const opened = mailReport(
+        `শব্দজট - লেভেল ${bn(r.level)}${r.name ? ` (${r.name})` : ""}`, reportText(r));
+      mail.textContent = opened ? "মেইল খুলছে" : "খোলা গেল না";
+      setTimeout(() => { mail.textContent = "ইমেইল"; }, 2400);
+    });
+
+    tools.append(mail, copy, drop);
     row.append(when, body, tools);
     say.list.appendChild(row);
   }
@@ -290,6 +367,20 @@ async function copyText(text) {
   box.remove();
   return !!copied;
 }
+
+/* Send now: the note, the level, and the machine details, in the player's own mail app. */
+say.mail.addEventListener("click", () => {
+  const text = say.note.value.trim();
+  if (!text) {
+    say.note.focus();
+    return sayDone("আগে কিছু লিখুন", false);
+  }
+  const lv = level();
+  const opened = mailReport(`শব্দজট - লেভেল ${bn(lv.id)} (${lv.name})`, sayText());
+  sayDone(opened
+    ? "মেইল অ্যাপ খুলছে - সেখান থেকে পাঠান বোতামে চাপুন"
+    : "মেইল অ্যাপ খোলা গেল না - বদলে কপি করে পাঠান", opened);
+});
 
 say.copy.addEventListener("click", sayCopy);
 say.save.addEventListener("click", saySave);

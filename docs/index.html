@@ -810,6 +810,14 @@ font-weight: 700;
 color: var(--ink-soft);
 }
 .say-said.ok { color: var(--good-lo); }
+
+.say-mail {
+background: linear-gradient(180deg, var(--good-hi), var(--good));
+color: var(--good-ink);
+box-shadow: var(--lip) var(--good-lo);
+}
+.rp-mail { color: var(--good-lo); }
+.rp-mail:hover { color: var(--good-ink); }
 .menu {
 display: flex;
 flex-wrap: wrap;
@@ -1571,6 +1579,8 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
                 aria-controls="page-about" title="খেলাটি কী">পরিচিতি</button>
         <button class="tab bn" type="button" role="tab" data-page="play"
                 aria-controls="page-play" title="কীভাবে খেলবে">খেলার নিয়ম</button>
+        <button class="tab bn" type="button" role="tab" data-page="report"
+                aria-controls="page-report" title="ভুল বা মতামত জানান">ভুল পেয়েছেন?</button>
       </nav>
 
       <div class="pages">
@@ -1743,57 +1753,6 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
             আপনার অগ্রগতি এই ব্রাউজারেই জমা থাকে।
           </p>
       </section>
-<section class="card">
-        <h3>ভুল পেয়েছেন?</h3>
-        <p class="deck">
-          বানান ভুল, ঘরে যে বাংলা বলা হয় সেটি নয় এমন কোনো শব্দ, বা কোনো লেভেল শেষ হচ্ছে না -
-          এসব কাউকে জানানো দরকার, আর সাধারণত শিশুর অভিভাবকের চোখেই আগে পড়ে।
-          <br><br>
-          এই খেলার পেছনে কোনো সার্ভার নেই, লগইনও নেই - এটি ইচ্ছে করেই, আর তার মানে এই পাতা
-          নিজে থেকে কিছু পাঠাতে পারে না। তাই দুটি পথ, আর দুটোতেই লেখাটি আপনার হাতেই থাকে।
-          <br><br>
-          <b>রেখে দিন</b> - লেখাটি এই ডিভাইসেই জমা থাকে, সঙ্গে আপনি কোন লেভেলে ছিলেন তা জুড়ে
-          দিয়ে। পরে যখন সময় হয়, নিচের তালিকা থেকে কপি করে পাঠাবেন। রাতে চোখে পড়া ভুলটা সকালে
-          মনে না-ও থাকতে পারে; এটি তার জন্য।
-          <br><br>
-          <b>কপি করুন</b> - এখনই পাঠাবেন হলে সোজা কপি হয়ে যায়, তারপর যেখানে সুবিধা সেখানে
-          পেস্ট করুন: হোয়াটসঅ্যাপ, মেসেঞ্জার, ইমেইল। আপনি না পাঠানো পর্যন্ত কিছুই ডিভাইস ছেড়ে
-          যায় না।
-        </p>
-        <textarea class="say" id="sayNote" rows="3" maxlength="1200"
-                  placeholder="কী ভুল আছে, বা কী হলে আরও ভালো হতো?"></textarea>
-        <p class="say-adds bn">আপনার লেখার সঙ্গে যা যাবে: <span id="sayAdds"></span></p>
-        <div class="say-row">
-          <!-- Keep it here, or take it away now. Two different intentions, so two buttons:
-               folding them into one leaves a player unsure which just happened. -->
-          <button class="say-copy" id="saySave">
-            <span class="glyph" aria-hidden="true">&#128190;</span>
-            <span class="bn">রেখে দিন</span>
-          </button>
-          <button class="say-copy say-ghost" id="sayCopy">
-            <span class="glyph" aria-hidden="true">&#10697;</span>
-            <span class="bn">কপি করুন</span>
-          </button>
-        </div>
-        <!-- What just happened, beside the buttons rather than inside them: these messages are
-             sentences, and a button that grows to hold one moves everything under it. -->
-        <p class="say-said bn" id="saySaid" role="status" aria-live="polite"></p>
-
-        <!-- What was kept. Lives in the same card as the box that writes it, rather than
-             behind a tenth tab: a person is already here when they have something to say, and
-             this is where they will look for it again. -->
-        <div class="rp-head">
-          <h4 class="rp-title bn">রাখা রিপোর্ট <span class="rp-count bn" id="sayCount"></span></h4>
-          <button class="say-copy say-ghost rp-all" id="sayAll" hidden>
-            <span class="bn">সব কপি করুন</span>
-          </button>
-        </div>
-        <p class="say-adds bn">
-          এগুলো শুধু এই ডিভাইসেই থাকে - নিজে না পাঠানো পর্যন্ত কোথাও যায় না। অন্য ফোনে
-          দেখা যাবে না।
-        </p>
-        <div class="rp-list" id="sayList"></div>
-      </section>
           <footer>
           প্রতিটি ছক খেলা তৈরি হওয়ার সময়েই সাজানো হয় - হাতে আঁকা নয়, খেলার সময়েও নয়: একটি
           লেভেলের শব্দগুলোর সব সাজানো ক্রম পরীক্ষা করে সবচেয়ে ছোট ছকটি বেছে নেওয়া হয়, তাই ছকে
@@ -1828,6 +1787,70 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
           বাংলায় এক সংকেত মানে এক অক্ষর নয় - মাছ লেখা হয় তিনটি সংকেতে, কিন্তু পড়ার সময় চোখে
           পড়ে দুটি অক্ষর। খেলাটি এই অক্ষর ধরেই ভাগ করে, তাই প্রতিটি ঘরে যা বসে তা পাঠক চিনতে পারে।
         </p>
+      </section>
+        </section>
+
+        <!-- Reporting a mistake is a parent's job, not a child's, so it gets its own
+             named place rather than living at the bottom of পরিচিতি where it had to be
+             scrolled to and found. -->
+        <section class="page" id="page-report" role="tabpanel" aria-labelledby="tab-report">
+<section class="card">
+        <h3>ভুল পেয়েছেন?</h3>
+        <p class="deck">
+          বানান ভুল, ঘরে যে বাংলা বলা হয় সেটি নয় এমন কোনো শব্দ, বা কোনো লেভেল শেষ হচ্ছে না -
+          এসব কাউকে জানানো দরকার, আর সাধারণত শিশুর অভিভাবকের চোখেই আগে পড়ে।
+          <br><br>
+          এই খেলার পেছনে কোনো সার্ভার নেই, লগইনও নেই - এটি ইচ্ছে করেই। তাই পাতাটি নিজে থেকে
+          কিছু পাঠায় না; আপনার নিজের মেইল অ্যাপে লেখাটি তৈরি করে দেয়, <b>পাঠান</b> বোতামটি
+          আপনিই চাপবেন। যতক্ষণ না চাপছেন, কিছুই ডিভাইস ছেড়ে যায় না।
+          <br><br>
+          <b>ইমেইলে পাঠান</b> - মেইল অ্যাপ খুলে যাবে, ঠিকানা আর পুরো লেখাটি বসানো অবস্থায়।
+          একবার দেখে নিয়ে পাঠিয়ে দিন।
+          <br><br>
+          <b>রেখে দিন</b> - এখন সময় না থাকলে লেখাটি এই ডিভাইসেই জমা থাকে, সঙ্গে আপনি কোন
+          লেভেলে ছিলেন তা জুড়ে দিয়ে। পরে নিচের তালিকা থেকে ইমেইল বা কপি করা যাবে। রাতে চোখে
+          পড়া ভুলটা সকালে মনে না-ও থাকতে পারে; এটি তার জন্য।
+          <br><br>
+          <b>কপি করুন</b> - মেইলের বদলে হোয়াটসঅ্যাপ বা মেসেঞ্জারে পাঠাতে চাইলে।
+        </p>
+        <textarea class="say" id="sayNote" rows="3" maxlength="1200"
+                  placeholder="কী ভুল আছে, বা কী হলে আরও ভালো হতো?"></textarea>
+        <p class="say-adds bn">আপনার লেখার সঙ্গে যা যাবে: <span id="sayAdds"></span></p>
+        <div class="say-row">
+          <!-- Three different intentions, so three buttons: send it now, keep it for later, or
+               take it somewhere else. Folding them into one leaves a player unsure which just
+               happened - and with a mail app involved, unsure whether anything was sent. -->
+          <button class="say-copy say-mail" id="sayMail">
+            <span class="glyph" aria-hidden="true">&#9993;</span>
+            <span class="bn">ইমেইলে পাঠান</span>
+          </button>
+          <button class="say-copy say-ghost" id="saySave">
+            <span class="glyph" aria-hidden="true">&#128190;</span>
+            <span class="bn">রেখে দিন</span>
+          </button>
+          <button class="say-copy say-ghost" id="sayCopy">
+            <span class="glyph" aria-hidden="true">&#10697;</span>
+            <span class="bn">কপি করুন</span>
+          </button>
+        </div>
+        <!-- What just happened, beside the buttons rather than inside them: these messages are
+             sentences, and a button that grows to hold one moves everything under it. -->
+        <p class="say-said bn" id="saySaid" role="status" aria-live="polite"></p>
+
+        <!-- What was kept. Lives in the same card as the box that writes it, rather than
+             behind a tenth tab: a person is already here when they have something to say, and
+             this is where they will look for it again. -->
+        <div class="rp-head">
+          <h4 class="rp-title bn">রাখা রিপোর্ট <span class="rp-count bn" id="sayCount"></span></h4>
+          <button class="say-copy say-ghost rp-all" id="sayAll" hidden>
+            <span class="bn">সব কপি করুন</span>
+          </button>
+        </div>
+        <p class="say-adds bn">
+          এগুলো শুধু এই ডিভাইসেই থাকে - নিজে না পাঠানো পর্যন্ত কোথাও যায় না। অন্য ফোনে
+          দেখা যাবে না। প্রতিটির পাশে <b>ইমেইল</b> চাপলে সেটি মেইল অ্যাপে খুলবে।
+        </p>
+        <div class="rp-list" id="sayList"></div>
       </section>
         </section>
       </div>
@@ -3221,11 +3244,16 @@ setTimeout(() => star.remove(), 1500);
 }
 
 Bird.mount();
+const MAILBOX = ["emamularif", "gmail.com"].join("\u0040");
+
+const MAIL_URL_MAX = 1900;
+
 const say = {
 note: document.getElementById("sayNote"),
 adds: document.getElementById("sayAdds"),
 copy: document.getElementById("sayCopy"),
 save: document.getElementById("saySave"),
+mail: document.getElementById("sayMail"),
 said: document.getElementById("saySaid"),
 list: document.getElementById("sayList"),
 count: document.getElementById("sayCount"),
@@ -3339,6 +3367,32 @@ drawReports();
 sayDone("রাখা হলো - নিচের তালিকায় আছে", true);
 }
 
+function mailReport(subject, body) {
+const build = text => `mailto:${MAILBOX}`
++ `?subject=${encodeURIComponent(subject)}`
++ `&body=${encodeURIComponent(text)}`;
+
+let text = body;
+let url = build(text);
+while (url.length > MAIL_URL_MAX && text.length > 40) {
+text = text.slice(0, Math.floor(text.length / 2));
+url = build(text + "\n[...]");
+}
+if (url.length > MAIL_URL_MAX) url = build("[...]");
+try {
+const a = document.createElement("a");
+a.href = url;
+a.rel = "noopener";
+a.style.cssText = "position:fixed;left:-9999px";
+document.body.appendChild(a);
+a.click();
+a.remove();
+return true;
+} catch {
+return false;
+}
+}
+
 function reportText(r) {
 return [
 r.text,
@@ -3409,7 +3463,18 @@ REPORTS.remove(r.at);
 drawReports();
 });
 
-tools.append(copy, drop);
+const mail = document.createElement("button");
+mail.className = "rp-btn rp-mail bn";
+mail.type = "button";
+mail.textContent = "ইমেইল";
+mail.addEventListener("click", () => {
+const opened = mailReport(
+`শব্দজট - লেভেল ${bn(r.level)}${r.name ? ` (${r.name})` : ""}`, reportText(r));
+mail.textContent = opened ? "মেইল খুলছে" : "খোলা গেল না";
+setTimeout(() => { mail.textContent = "ইমেইল"; }, 2400);
+});
+
+tools.append(mail, copy, drop);
 row.append(when, body, tools);
 say.list.appendChild(row);
 }
@@ -3430,6 +3495,19 @@ const copied = document.execCommand && document.execCommand("copy");
 box.remove();
 return !!copied;
 }
+
+say.mail.addEventListener("click", () => {
+const text = say.note.value.trim();
+if (!text) {
+say.note.focus();
+return sayDone("আগে কিছু লিখুন", false);
+}
+const lv = level();
+const opened = mailReport(`শব্দজট - লেভেল ${bn(lv.id)} (${lv.name})`, sayText());
+sayDone(opened
+? "মেইল অ্যাপ খুলছে - সেখান থেকে পাঠান বোতামে চাপুন"
+: "মেইল অ্যাপ খোলা গেল না - বদলে কপি করে পাঠান", opened);
+});
 
 say.copy.addEventListener("click", sayCopy);
 say.save.addEventListener("click", saySave);

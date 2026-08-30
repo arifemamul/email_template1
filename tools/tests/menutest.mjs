@@ -26,7 +26,7 @@ await p.waitForFunction(() => document.querySelector('.tile') && document.queryS
 const PAGES = await p.$$eval('#menu .tab', ts => ts.map(t => t.dataset.page));
 const SECTIONS = await p.$$eval('.pages .page', ss => ss.map(s => s.id.replace(/^page-/, '')));
 const EXPECTED = ['vowels', 'consonants', 'marks', 'gathon', 'phala', 'jukto',
-                  'levels', 'about', 'play'];
+                  'levels', 'about', 'play', 'report'];
 if (PAGES.join() !== EXPECTED.join())
   problems.push(`tabs are [${PAGES}], expected [${EXPECTED}]`);
 if (SECTIONS.join() !== PAGES.join())
