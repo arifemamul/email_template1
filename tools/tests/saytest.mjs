@@ -104,6 +104,10 @@ if (emptyKept) fail('an empty note was kept');
 
 // 7. A real one is kept, with the level the player was actually on, and the box is emptied so
 //    the next note does not start with the last one still in it.
+//
+//    What the game does with a report ends here: it writes to the drawer and no longer reads
+//    from it. Displaying them, copying them, deleting them and coping with a corrupt store all
+//    belong to docs/reports.html now, and tools/tests/reportspage.mjs is where they are tested.
 await p.evaluate(() => loadLevel(5));
 const note = 'পরীক্ষা: এই শব্দের মানে ঠিক নয়';
 await p.fill('#sayNote', note);
@@ -111,7 +115,6 @@ await p.click('#saySave');
 await p.waitForTimeout(120);
 const kept = await p.evaluate(() => ({
   stored: JSON.parse(localStorage.getItem('shobdojot.reports') || '[]'),
-  rows: document.querySelectorAll('.rp').length,
   box: document.getElementById('sayNote').value,
   onLevel: LEVELS[5].id,
 }));
@@ -120,82 +123,31 @@ else {
   if (kept.stored[0].text !== note) fail('the note was stored as something else');
   if (kept.stored[0].level !== kept.onLevel)
     fail(`the report says level ${kept.stored[0].level}, the player was on ${kept.onLevel}`);
+  if (!kept.stored[0].ua) fail('the report was kept without the browser it came from');
 }
-if (kept.rows !== 1) fail(`${kept.rows} reports drawn, expected 1`);
 if (kept.box !== '') fail('the note box still holds the note that was just kept');
 
-// 8. It is still there after a reload. This is the whole feature - anything above could be
-//    true of a variable that vanishes when the tab closes.
+// 8. It survives a reload. This is the whole point of keeping one - anything weaker would also
+//    be true of a variable that dies with the tab.
 await p.reload();
-await p.waitForFunction(() => document.getElementById('sayList'));
-await p.click('#tab-report');
-const afterReload = await p.evaluate(() => ({
-  rows: document.querySelectorAll('.rp').length,
-  text: (document.querySelector('.rp-text') || {}).textContent,
-  when: (document.querySelector('.rp-when') || {}).textContent,
-}));
-if (afterReload.rows !== 1) fail('the kept report did not survive a reload');
-if (afterReload.text !== note) fail(`after a reload the report reads "${afterReload.text}"`);
-if (!/[০-৯]{2}\/[০-৯]{2}\/[০-৯]{4}/.test(afterReload.when || ''))
-  fail(`the report is not dated in Bengali numerals: "${afterReload.when}"`);
+await p.waitForFunction(() => document.getElementById('saySave'));
+const afterReload = await p.evaluate(() =>
+  JSON.parse(localStorage.getItem('shobdojot.reports') || '[]'));
+if (afterReload.length !== 1) fail('the kept report did not survive a reload');
+else if (afterReload[0].text !== note) fail('the report came back as something else');
 
 // 9. Clearing the game's own save must not take the reports with it. They are separate keys
 //    for exactly this reason, and a child pressing something is how progress gets cleared.
 await p.evaluate(() => { try { localStorage.removeItem('shobdojot'); } catch {} });
 await p.reload();
-await p.waitForFunction(() => document.getElementById('sayList'));
-await p.click('#tab-report');
-const survived = await p.evaluate(() => document.querySelectorAll('.rp').length);
+await p.waitForFunction(() => document.getElementById('saySave'));
+const survived = await p.evaluate(() =>
+  JSON.parse(localStorage.getItem('shobdojot.reports') || '[]').length);
 if (survived !== 1) fail('clearing game progress destroyed the kept reports');
 
-// 10. The note goes back on screen as text, never as markup.
-await p.fill('#sayNote', '<img src=x onerror="window.__pwned=1">');
-await p.click('#saySave');
-await p.waitForTimeout(120);
-const escaped = await p.evaluate(() => ({
-  pwned: !!window.__pwned,
-  imgs: document.querySelectorAll('.rp img').length,
-  shown: document.querySelector('.rp-text').textContent,
-}));
-if (escaped.pwned || escaped.imgs) fail('a report was rendered as markup, not as text');
-if (!escaped.shown.startsWith('<img')) fail('the report text was mangled on the way back');
-
-// 11. Deleting takes two presses, and then it is gone.
-const del = await p.evaluate(async () => {
-  const drop = document.querySelector('.rp .rp-drop');
-  drop.click();
-  const afterOne = JSON.parse(localStorage.getItem('shobdojot.reports') || '[]').length;
-  drop.click();
-  const afterTwo = JSON.parse(localStorage.getItem('shobdojot.reports') || '[]').length;
-  return { afterOne, afterTwo, rows: document.querySelectorAll('.rp').length };
-});
-if (del.afterOne !== 2) fail('one press deleted a report; it should take two');
-if (del.afterTwo !== 1) fail('two presses did not delete the report');
-if (del.rows !== 1) fail(`${del.rows} rows drawn after deleting one of two`);
-
-// 12. "Copy all" takes every one of them, oldest first.
-await p.fill('#sayNote', 'দ্বিতীয় নোট');
-await p.click('#saySave');
-await p.waitForTimeout(120);
-const all = await p.evaluate(async () => {
-  const btn = document.getElementById('sayAll');
-  if (btn.hidden) return { hidden: true };
-  btn.click();
-  await new Promise(r => setTimeout(r, 250));
-  let text = '';
-  try { text = await navigator.clipboard.readText(); } catch {}
-  return { hidden: false, text };
-});
-if (all.hidden) fail('"copy all" stayed hidden with two reports kept');
-else {
-  const first = all.text.indexOf(note);
-  const second = all.text.indexOf('দ্বিতীয় নোট');
-  if (first < 0 || second < 0) fail('"copy all" did not include both reports');
-  else if (first > second) fail('"copy all" put the newest first; they should read oldest first');
-}
-// 13. Rubbish in storage must not take the page down with it. Anything can end up in a
+// 10. Rubbish in the report store must not stop the game loading. Anything can end up in a
 //     localStorage key - another script, a half-finished write, a browser extension - and the
-//     failure mode has to be an empty list, never a game that will not start.
+//     game has to start regardless, whatever the reports page later makes of it.
 const spoiled = await b.newContext({ viewport: { width: 1280, height: 900 } });
 const p4 = await spoiled.newPage();
 let broke = null;
@@ -204,18 +156,13 @@ await p4.addInitScript(() => {
   try { localStorage.setItem('shobdojot.reports', '{not json at all'); } catch {}
 });
 await p4.goto(site.url + '/index.html');
-await p4.waitForFunction(() => document.getElementById('sayList'));
-const corrupt = await p4.evaluate(() => ({
-  rows: document.querySelectorAll('.rp').length,
-  none: !!document.querySelector('.rp-none'),
-  playable: !!document.querySelector('.tile'),
-}));
+await p4.waitForFunction(() => document.querySelector('.tile'));
+const corrupt = await p4.evaluate(() => ({ playable: !!document.querySelector('.tile') }));
 if (broke) fail(`a corrupt report store threw: ${broke}`);
 if (!corrupt.playable) fail('a corrupt report store stopped the game loading');
-if (corrupt.rows || !corrupt.none) fail('a corrupt report store did not fall back to an empty list');
 await p4.close();
 
-// 14. A store that refuses the write must say so and leave the note in the box. Telling
+// 11. A store that refuses the write must say so and leave the note in the box. Telling
 //     someone their words are safe when they are not is the one unforgivable failure here.
 const nostore = await b.newContext({ viewport: { width: 1280, height: 900 } });
 const p5 = await nostore.newPage();
@@ -242,8 +189,8 @@ if (full.claimedOk) fail('a refused write reported success');
 if (!full.stillInBox) fail('a refused write emptied the note box, losing what was typed');
 await p5.close();
 
-console.log(`reports: kept, survived a reload and a cleared save, escaped as text, `
-          + `two-press delete, copy-all in order, corrupt and full stores handled`);
+console.log('reports: kept with its level, survived a reload and a cleared save, '
+          + 'corrupt and full stores handled');
 
 /* ---- the mail route -------------------------------------------------------------------
  * `mailto:` is the whole delivery mechanism here, so what matters is not that a button exists
@@ -322,26 +269,7 @@ if (!mailSaid || !mailSaid.trim()) fail('the mail button said nothing');
 else if (/পাঠানো হয়েছে|sent/i.test(mailSaid))
   fail(`the status line claims the report was sent: "${mailSaid}"`);
 
-// 18. A kept report can be mailed too, with its own level rather than the current one.
-await m.fill('#sayNote', 'রাখা নোট, পরে মেইল করার জন্য');
-await m.click('#saySave');
-await m.waitForTimeout(150);
-await m.evaluate(() => { window.__mailto = []; loadLevel(30); });
-await m.click('.rp .rp-mail');
-await m.waitForTimeout(200);
-const kept2 = await m.evaluate(() => window.__mailto);
-if (!kept2.length) fail('a kept report could not be mailed');
-else {
-  const q = new URLSearchParams(new URL(kept2[0]).search);
-  if (!(q.get('body') || '').includes('রাখা নোট'))
-    fail('mailing a kept report sent the wrong text');
-  const onNow = await m.evaluate(() => LEVELS[30].id);
-  const bnDigit = n => String(n).replace(/\d/g, d => '০১২৩৪৫৬৭৮৯'[+d]);
-  if ((q.get('subject') || '').includes(bnDigit(onNow)))
-    fail('a kept report was mailed with the level the player is on now, not the one it is about');
-}
-
-// 19. The address is not sitting in the page as a plain string for a crawler to find.
+// 18. The address is not sitting in the page as a plain string for a crawler to find.
 const bare = await m.evaluate(() => document.documentElement.innerHTML.includes('emamularif@gmail.com'));
 if (bare) fail('the address is a plain string in the published page');
 await m.close();

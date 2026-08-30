@@ -49,6 +49,7 @@ const CHECKS = [
   ['replaytest',  'a cleared level can be played again'],
   ['oldsavetest', 'progress saved by an older build still loads'],
   ['saytest',     'the report card mails, keeps and copies - with the right report in it'],
+  ['reportspage', 'the unlinked reports page reads what the game kept, and only there'],
   ['pwatest',     'installs, and plays with the network cut'],
 ];
 

@@ -50,9 +50,6 @@ const say = {
   save: document.getElementById("saySave"),
   mail: document.getElementById("sayMail"),
   said: document.getElementById("saySaid"),
-  list: document.getElementById("sayList"),
-  count: document.getElementById("sayCount"),
-  all: document.getElementById("sayAll")
 };
 
 /*
@@ -70,6 +67,11 @@ const say = {
  *
  * Nothing here leaves the device on its own. This is a drawer, not an outbox - the same trade
  * the copy button already makes, only now it will still be there tomorrow.
+ *
+ * The game writes to this drawer and no longer reads from it: `docs/reports.html` is a page of
+ * its own that does the reading, linked from nowhere. A list of a parent's bug reports is not
+ * something a child should meet between levels, and it is easier to go through somewhere the
+ * game is not.
  */
 const REPORTS = {
   KEY: "shobdojot.reports",
@@ -102,9 +104,6 @@ const REPORTS = {
     return this.write(list);
   },
 
-  remove(at) {
-    return this.write(this.read().filter(r => r.at !== at));
-  },
 };
 
 /** ২৭/০৮/২০২৬, ২২:৩০ - Bengali numerals, because the rest of the card is Bengali. */
@@ -214,8 +213,7 @@ function saySave() {
   });
   if (!kept) return sayDone("রাখা গেল না - ব্রাউজারের জায়গা নেই", false);
   say.note.value = "";
-  drawReports();
-  sayDone("রাখা হলো - নিচের তালিকায় আছে", true);
+  sayDone("রাখা হলো", true);
 }
 
 /**
@@ -257,100 +255,6 @@ function mailReport(subject, body) {
   }
 }
 
-/** One kept report as text, in the same shape the copy button produces. */
-function reportText(r) {
-  return [
-    r.text,
-    "",
-    `-- শব্দজট, ${reportDate(r.at)}`,
-    `   লেভেল ${bn(r.level)}${r.name ? ` (${r.name})` : ""}: ${r.words || ""}`,
-    `   ${bn(r.cleared || 0)}টি শেষ, পর্দা ${r.screen || ""}`,
-    `   ${r.ua || ""}`,
-  ].join("\n");
-}
-
-/* ---- reading them back ---------------------------------------------------------------- */
-
-function drawReports() {
-  const list = REPORTS.read();
-  say.count.textContent = list.length ? `${bn(list.length)}টি` : "";
-  say.all.hidden = list.length < 2;
-  say.list.innerHTML = "";
-  if (!list.length) {
-    const none = document.createElement("p");
-    none.className = "rp-none bn";
-    none.textContent = "এখনো কিছু রাখা হয়নি।";
-    say.list.appendChild(none);
-    return;
-  }
-  for (const r of list) {
-    const row = document.createElement("article");
-    row.className = "rp";
-
-    const when = document.createElement("p");
-    when.className = "rp-when bn";
-    when.textContent = `${reportDate(r.at)} · লেভেল ${bn(r.level)}${r.name ? ` (${r.name})` : ""}`;
-
-    // textContent, never innerHTML: this is text the player typed, and it goes back on screen
-    // exactly as typed rather than as markup.
-    const body = document.createElement("p");
-    body.className = "rp-text bn";
-    body.textContent = r.text;
-
-    const tools = document.createElement("div");
-    tools.className = "rp-tools";
-
-    const copy = document.createElement("button");
-    copy.className = "rp-btn bn";
-    copy.type = "button";
-    copy.textContent = "কপি";
-    copy.addEventListener("click", async () => {
-      await copyText(reportText(r));
-      copy.textContent = "কপি হয়েছে";
-      setTimeout(() => { copy.textContent = "কপি"; }, 2000);
-    });
-
-    // Two presses to delete. A single one next to a copy button is how a person loses the note
-    // they came here to send.
-    const drop = document.createElement("button");
-    drop.className = "rp-btn rp-drop bn";
-    drop.type = "button";
-    drop.textContent = "মুছুন";
-    let armed = false;
-    drop.addEventListener("click", () => {
-      if (!armed) {
-        armed = true;
-        drop.textContent = "সত্যি মুছবেন?";
-        drop.classList.add("armed");
-        setTimeout(() => {
-          if (!armed) return;
-          armed = false;
-          drop.textContent = "মুছুন";
-          drop.classList.remove("armed");
-        }, 3000);
-        return;
-      }
-      REPORTS.remove(r.at);
-      drawReports();
-    });
-
-    const mail = document.createElement("button");
-    mail.className = "rp-btn rp-mail bn";
-    mail.type = "button";
-    mail.textContent = "ইমেইল";
-    mail.addEventListener("click", () => {
-      const opened = mailReport(
-        `শব্দজট - লেভেল ${bn(r.level)}${r.name ? ` (${r.name})` : ""}`, reportText(r));
-      mail.textContent = opened ? "মেইল খুলছে" : "খোলা গেল না";
-      setTimeout(() => { mail.textContent = "ইমেইল"; }, 2400);
-    });
-
-    tools.append(mail, copy, drop);
-    row.append(when, body, tools);
-    say.list.appendChild(row);
-  }
-}
-
 /** Copy by whichever route this browser allows. Shared by the note box and every kept report. */
 async function copyText(text) {
   try {
@@ -384,14 +288,5 @@ say.mail.addEventListener("click", () => {
 
 say.copy.addEventListener("click", sayCopy);
 say.save.addEventListener("click", saySave);
-say.all.addEventListener("click", async () => {
-  const list = REPORTS.read();
-  if (!list.length) return;
-  // Oldest first when they go out together, so they read as a history rather than in reverse.
-  const text = [...list].reverse().map(reportText).join("\n\n———\n\n");
-  const ok = await copyText(text);
-  sayDone(ok ? `${bn(list.length)}টি কপি হয়েছে` : "কপি করা গেল না", ok);
-});
 addEventListener("resize", drawSayAdds);
 drawSayAdds();
-drawReports();
