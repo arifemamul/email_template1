@@ -2,166 +2,74 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Dynamic Pong Wars</title>
-<meta name="description" content="A dynamic, customizable Pong Wars: two balls fight over territory. Pause, reset, recolor and retune everything live. No dependencies." />
+<meta name="description" content="Pong Wars with live controls: two balls fight over the board while you retune colour, speed, grid and ball count." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=DM+Mono:wght@400;500&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&display=swap" />
 <style>
   :root {
-    --day: #fdfbf6;
-    --night: #262b44;
-    --surface: #14161f;
-    --surface-2: #1d2030;
-    --text: #f4f5f8;
-    --muted: #a2a8bd;
-    --line: rgba(255, 255, 255, 0.14);
-    --on-top: #12141c;
-    --on-top-muted: rgba(18, 20, 28, 0.66);
-    --on-bottom: #f4f5f8;
-    --on-bottom-muted: rgba(244, 245, 248, 0.7);
-    --radius: 14px;
-    --font-ui: "Archivo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --font-mono: "DM Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    --day: #dbe7e3;
+    --night: #24525f;
+    --bg-top: #b4bcbb;
+    --bg-bottom: #949fa0;
+    --hud-text: #1d2a2d;
+    --hud-muted: rgba(29, 42, 45, 0.6);
+    --surface: #0e1a1e;
+    --surface-2: #16262b;
+    --text: #eef3f2;
+    --muted: rgba(238, 243, 242, 0.66);
+    --line: rgba(255, 255, 255, 0.16);
+    --hud-h: 62px;
+    --font-mono: "DM Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   }
 
   * { box-sizing: border-box; }
 
-  html, body { height: 100%; }
+  html { height: 100%; }
 
   body {
     margin: 0;
-    padding: clamp(16px, 3vw, 36px);
-    font-family: var(--font-ui);
-    color: var(--text);
-    /* The gradient spans the document, not the viewport: the header sits on the
-       day end and the footer on the night end, which is what their contrast
-       colors are computed from. background-attachment: fixed breaks that as
-       soon as the page scrolls. */
-    background: linear-gradient(160deg, var(--day) 0%, var(--night) 100%);
     min-height: 100vh;
     min-height: 100dvh;
+    font-family: var(--font-mono);
+    color: var(--hud-text);
+    background: linear-gradient(to bottom, var(--bg-top) 0%, var(--bg-top) 52%, var(--bg-bottom) 100%);
     transition: background 320ms ease;
     touch-action: manipulation;
+    overflow: hidden;
+  }
+
+  /* Board and readout fill the viewport as one column: the board takes every
+     pixel it can while staying square, the readout keeps a fixed strip. */
+  .scene {
     display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  .board-area {
+    flex: 0 1 auto;
+    min-height: 0;
+    display: flex;
+    align-items: center;
     justify-content: center;
   }
 
-  .app {
-    width: 100%;
-    max-width: 1120px;
-    display: flex;
-    flex-direction: column;
-    gap: clamp(16px, 2.4vw, 26px);
-  }
-
-  header { text-align: center; }
-
-  h1 {
-    margin: 0;
-    font-family: var(--font-ui);
-    font-weight: 700;
-    font-size: clamp(26px, 4.6vw, 42px);
-    letter-spacing: -0.035em;
-    color: var(--on-top);
-  }
-
-  .tagline {
-    margin: 8px 0 0;
-    font-size: 14px;
-    color: var(--on-top-muted);
-  }
-
-  main {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 300px;
-    gap: clamp(16px, 2.4vw, 26px);
-    align-items: start;
-  }
-
-  .card {
-    /* Solid first, so browsers without color-mix (iOS < 16.2) still get a
-       readable card instead of a transparent one. */
-    background: var(--surface);
-    background: color-mix(in srgb, var(--surface) 86%, transparent);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.32);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-  }
-
-  .stage { padding: clamp(12px, 1.8vw, 20px); }
-
-  .stage-inner {
-    width: min(100%, 68vh);
-    margin: 0 auto;
-  }
-
-  .scoreboard {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-bottom: 12px;
-    font-variant-numeric: tabular-nums;
-  }
-
-  .team {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-
-  .team .swatch {
-    width: 14px;
-    height: 14px;
-    border-radius: 4px;
-    border: 1px solid var(--line);
-  }
-
-  .team .count {
-    font-family: var(--font-mono);
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--text);
-    letter-spacing: 0;
-  }
-
-  .team.night { flex-direction: row-reverse; }
-
-  .bar {
-    position: relative;
-    flex: 1;
-    height: 8px;
-    border-radius: 999px;
-    overflow: hidden;
-    background: var(--night);
-    border: 1px solid var(--line);
-  }
-
-  .bar span {
-    position: absolute;
-    inset: 0 auto 0 0;
-    background: var(--day);
-    transition: width 120ms linear;
-  }
-
+  /* The largest square that fits between the viewport width and the height
+     left over by the readout. */
   .board-wrap {
     position: relative;
+    line-height: 0;
+    aspect-ratio: 1 / 1;
+    width: min(100%, calc(100vh - var(--hud-h)));
+    width: min(100%, calc(100dvh - var(--hud-h) - env(safe-area-inset-bottom, 0px)));
+    max-height: 100%;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    border-radius: 10px;
-    overflow: hidden;
-    background: var(--night);
   }
 
   canvas {
@@ -170,33 +78,114 @@
     height: 100%;
   }
 
-  .board-wrap.paused::after {
-    content: "Paused";
+  .board-wrap::after {
+    content: "paused";
     position: absolute;
     inset: 0;
     display: grid;
     place-items: center;
-    font-size: clamp(18px, 3vw, 28px);
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    font-size: clamp(15px, 3.4vw, 20px);
+    letter-spacing: 0.22em;
     color: #fff;
-    background: rgba(6, 8, 14, 0.52);
-    backdrop-filter: blur(2px);
+    background: rgba(8, 14, 16, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 180ms ease, visibility 180ms ease;
   }
 
-  .panel {
-    padding: clamp(14px, 1.8vw, 20px);
+  .board-wrap.paused::after { opacity: 1; visibility: visible; }
+
+  .hud {
+    flex: 0 0 auto;
+    min-height: var(--hud-h);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 10px;
+    padding: 14px clamp(12px, 3vw, 22px);
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+  }
+
+  .score {
+    grid-column: 2;
+    margin: 0;
+    font-size: clamp(14px, 3.6vw, 17px);
+    font-variant-numeric: tabular-nums;
+    color: var(--hud-text);
+    white-space: nowrap;
+  }
+
+  .hud-btn {
+    grid-column: 3;
+    justify-self: end;
+    min-height: 34px;
+    padding: 6px 12px;
+    font: inherit;
+    font-size: 13px;
+    color: var(--hud-muted);
+    background: transparent;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: color 160ms ease, background 160ms ease;
+  }
+
+  .hud-btn:hover { color: var(--hud-text); }
+  .hud-btn:focus-visible { outline: 2px solid var(--hud-text); outline-offset: 3px; }
+
+  /* Controls stay out of the way until asked for. */
+  .backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 12, 14, 0.42);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 240ms ease, visibility 240ms ease;
+  }
+
+  .backdrop.open { opacity: 1; visibility: visible; }
+
+  .sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0 auto;
+    width: min(100%, 460px);
+    max-height: 86vh;
+    max-height: 86dvh;
+    overflow-y: auto;
+    padding: 20px clamp(16px, 4vw, 22px) max(20px, env(safe-area-inset-bottom));
     display: flex;
     flex-direction: column;
     gap: 18px;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-bottom: 0;
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -18px 50px rgba(0, 0, 0, 0.4);
+    transform: translateY(101%);
+    visibility: hidden;
+    transition: transform 280ms cubic-bezier(0.32, 0.72, 0, 1), visibility 280ms;
     -webkit-user-select: none;
     user-select: none;
   }
 
-  .panel h2 {
+  .sheet.open { transform: none; visibility: visible; }
+
+  .grip {
+    width: 40px;
+    height: 4px;
+    margin: -6px auto 0;
+    border-radius: 999px;
+    background: var(--line);
+  }
+
+  .group { display: flex; flex-direction: column; gap: 10px; }
+
+  .group h2 {
     margin: 0;
-    font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 400;
     letter-spacing: 0.16em;
@@ -204,32 +193,28 @@
     color: var(--muted);
   }
 
-  .group { display: flex; flex-direction: column; gap: 10px; }
-
   .buttons { display: flex; gap: 8px; }
 
-  button {
+  button.action {
     flex: 1;
     min-height: 44px;
     padding: 10px 12px;
     font: inherit;
     font-size: 14px;
-    font-weight: 600;
     color: var(--text);
     background: var(--surface-2);
     border: 1px solid var(--line);
     border-radius: 10px;
     cursor: pointer;
-    transition: transform 80ms ease, background 160ms ease, border-color 160ms ease;
+    transition: transform 80ms ease, background 160ms ease;
   }
 
-  button:hover { background: color-mix(in srgb, var(--surface-2) 70%, #fff); }
-  button:active { transform: translateY(1px); }
-  button:focus-visible { outline: 2px solid var(--day); outline-offset: 2px; }
+  button.action:active { transform: translateY(1px); }
+  button.action:focus-visible { outline: 2px solid var(--day); outline-offset: 2px; }
 
-  button.primary {
+  button.action.primary {
     background: var(--day);
-    color: #14161f;
+    color: #10191c;
     border-color: transparent;
   }
 
@@ -242,12 +227,7 @@
   }
 
   .row label { color: var(--muted); }
-
-  .row .value {
-    font-family: var(--font-mono);
-    font-variant-numeric: tabular-nums;
-    color: var(--text);
-  }
+  .row .value { font-variant-numeric: tabular-nums; color: var(--text); }
 
   input[type="range"] {
     width: 100%;
@@ -269,35 +249,31 @@
   .presets { display: flex; flex-wrap: wrap; gap: 8px; }
 
   .preset {
+    position: relative;
     width: 44px;
     height: 44px;
     padding: 0;
     flex: 0 0 auto;
-    border-radius: 9px;
-    border: 1px solid var(--line);
     overflow: hidden;
-    position: relative;
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
   }
 
-  .preset:hover { background: none; }
+  .preset:focus-visible { outline: 2px solid var(--day); outline-offset: 2px; }
   .preset i { position: absolute; top: 0; bottom: 0; width: 50%; }
   .preset i:first-child { left: 0; }
   .preset i:last-child { right: 0; }
 
-  .hint {
+  .note {
     margin: 0;
-    font-family: var(--font-mono);
     font-size: 12px;
     line-height: 1.7;
     color: var(--muted);
   }
 
-  .hint-touch { display: none; }
-
-  @media (hover: none) {
-    .hint-keys { display: none; }
-    .hint-touch { display: block; }
-  }
+  .note a { color: var(--text); }
 
   kbd {
     font: inherit;
@@ -308,106 +284,84 @@
     border: 1px solid var(--line);
   }
 
-  footer {
-    text-align: center;
-    font-size: 13px;
-    color: var(--on-bottom-muted);
-  }
+  .note-touch { display: none; }
 
-  footer a { color: var(--on-bottom); }
-
-  @media (max-width: 820px) {
-    main { grid-template-columns: minmax(0, 1fr); }
+  @media (hover: none) {
+    .note-keys { display: none; }
+    .note-touch { display: block; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    body, .bar span, button { transition: none; }
+    body, .sheet, .backdrop, .board-wrap::after, button.action { transition: none; }
   }
 </style>
 </head>
 <body>
-<div class="app">
-  <header>
-    <h1>Dynamic Pong Wars</h1>
-    <p class="tagline">Two balls, one board, an endless turf war &mdash; recolor and retune it while it runs.</p>
-  </header>
 
-  <main>
-    <section class="card stage">
-      <div class="stage-inner">
-      <div class="scoreboard">
-        <div class="team day">
-          <span class="swatch" id="swatchDay"></span>
-          <span>Day</span>
-          <span class="count" id="scoreDay">0</span>
-        </div>
-        <div class="bar"><span id="scoreBar"></span></div>
-        <div class="team night">
-          <span class="swatch" id="swatchNight"></span>
-          <span>Night</span>
-          <span class="count" id="scoreNight">0</span>
-        </div>
-      </div>
+<div class="scene">
+  <div class="board-area">
+    <div class="board-wrap" id="boardWrap">
+      <canvas id="board" width="800" height="800" aria-label="Pong Wars board"></canvas>
+    </div>
+  </div>
+  <div class="hud">
+    <p class="score" id="score">day 512 | night 512</p>
+    <button type="button" class="hud-btn" id="sheetToggle" aria-expanded="false" aria-controls="sheet">controls</button>
+  </div>
+</div>
 
-      <div class="board-wrap" id="boardWrap">
-        <canvas id="board" width="800" height="800" aria-label="Pong Wars board"></canvas>
-      </div>
-      </div>
-    </section>
+<div class="backdrop" id="backdrop"></div>
 
-    <aside class="card panel">
-      <div class="group">
-        <h2>Playback</h2>
-        <div class="buttons">
-          <button id="toggle" class="primary" type="button">Pause</button>
-          <button id="reset" type="button">Reset</button>
-        </div>
-      </div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="false" aria-label="Controls">
+  <div class="grip"></div>
 
-      <div class="group">
-        <h2>Colors</h2>
-        <div class="row">
-          <label for="dayColor">Day</label>
-          <input type="color" id="dayColor" value="#fdfbf6" />
-        </div>
-        <div class="row">
-          <label for="nightColor">Night</label>
-          <input type="color" id="nightColor" value="#262b44" />
-        </div>
-        <div class="presets" id="presets"></div>
-      </div>
+  <div class="group">
+    <h2>Playback</h2>
+    <div class="buttons">
+      <button type="button" class="action primary" id="toggle">Pause</button>
+      <button type="button" class="action" id="reset">Reset</button>
+    </div>
+  </div>
 
-      <div class="group">
-        <h2>Physics</h2>
-        <div class="row">
-          <label for="speed">Speed</label>
-          <span class="value" id="speedValue">1.0&times;</span>
-        </div>
-        <input type="range" id="speed" min="0.2" max="2.5" step="0.1" value="1" />
+  <div class="group">
+    <h2>Colours</h2>
+    <div class="row">
+      <label for="dayColor">Day</label>
+      <input type="color" id="dayColor" value="#dbe7e3" />
+    </div>
+    <div class="row">
+      <label for="nightColor">Night</label>
+      <input type="color" id="nightColor" value="#24525f" />
+    </div>
+    <div class="presets" id="presets"></div>
+  </div>
 
-        <div class="row">
-          <label for="grid">Grid</label>
-          <span class="value" id="gridValue">32 &times; 32</span>
-        </div>
-        <input type="range" id="grid" min="12" max="64" step="4" value="32" />
+  <div class="group">
+    <h2>Physics</h2>
+    <div class="row">
+      <label for="speed">Speed</label>
+      <span class="value" id="speedValue">1.0&times;</span>
+    </div>
+    <input type="range" id="speed" min="0.2" max="2.5" step="0.1" value="1" />
 
-        <div class="row">
-          <label for="balls">Balls per side</label>
-          <span class="value" id="ballsValue">1</span>
-        </div>
-        <input type="range" id="balls" min="1" max="4" step="1" value="1" />
-      </div>
+    <div class="row">
+      <label for="grid">Grid</label>
+      <span class="value" id="gridValue">32 &times; 32</span>
+    </div>
+    <input type="range" id="grid" min="12" max="64" step="4" value="32" />
 
-      <p class="hint hint-keys">
-        <kbd>Space</kbd> play/pause &middot; <kbd>R</kbd> reset &middot; <kbd>C</kbd> next palette
-      </p>
-      <p class="hint hint-touch">Tap the board to pause or resume.</p>
-    </aside>
-  </main>
+    <div class="row">
+      <label for="balls">Balls per side</label>
+      <span class="value" id="ballsValue">1</span>
+    </div>
+    <input type="range" id="balls" min="1" max="4" step="1" value="1" />
+  </div>
 
-  <footer>
-    Inspired by <a href="https://github.com/vnglst/pong-wars">Koen van Gilst&rsquo;s Pong Wars</a>. No dependencies &mdash; it&rsquo;s one HTML file.
-  </footer>
+  <p class="note note-keys">
+    <kbd>Space</kbd> play/pause &middot; <kbd>R</kbd> reset &middot; <kbd>C</kbd> next palette &middot; <kbd>Esc</kbd> close
+  </p>
+  <p class="note note-touch">Tap the board to pause or resume.</p>
+  <p class="note">Inspired by <a href="https://github.com/vnglst/pong-wars">Koen van Gilst&rsquo;s Pong Wars</a>.</p>
 </div>
 
 <script>
@@ -419,19 +373,23 @@
   var NIGHT = 1;
 
   var PALETTES = [
+    ["#dbe7e3", "#24525f"],
     ["#fdfbf6", "#262b44"],
     ["#f4d35e", "#0d3b66"],
     ["#ffd6e0", "#3d2c8d"],
     ["#c1f4c5", "#1b4332"],
-    ["#ffe8d6", "#6b2737"],
-    ["#e0fbfc", "#293241"]
+    ["#ffe8d6", "#6b2737"]
   ];
 
   var canvas = document.getElementById("board");
   var ctx = canvas.getContext("2d");
   var boardWrap = document.getElementById("boardWrap");
+  var sheet = document.getElementById("sheet");
+  var backdrop = document.getElementById("backdrop");
 
   var ui = {
+    score: document.getElementById("score"),
+    sheetToggle: document.getElementById("sheetToggle"),
     toggle: document.getElementById("toggle"),
     reset: document.getElementById("reset"),
     dayColor: document.getElementById("dayColor"),
@@ -442,12 +400,7 @@
     grid: document.getElementById("grid"),
     gridValue: document.getElementById("gridValue"),
     balls: document.getElementById("balls"),
-    ballsValue: document.getElementById("ballsValue"),
-    scoreDay: document.getElementById("scoreDay"),
-    scoreNight: document.getElementById("scoreNight"),
-    scoreBar: document.getElementById("scoreBar"),
-    swatchDay: document.getElementById("swatchDay"),
-    swatchNight: document.getElementById("swatchNight")
+    ballsValue: document.getElementById("ballsValue")
   };
 
   var state = {
@@ -457,7 +410,7 @@
     perSide: 1,
     running: true,
     paletteIndex: 0,
-    colors: ["#fdfbf6", "#262b44"],
+    colors: PALETTES[0].slice(),
     grid: null,
     balls: []
   };
@@ -501,39 +454,35 @@
     return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
   }
 
-  // The page chrome is derived from the two team colors, so recoloring the
-  // board recolors the whole page — background, cards, text and all.
+  // Everything off the board — page gradient, sheet, readout — is derived from
+  // the two team colours, so recolouring the board recolours the page.
   function applyTheme() {
     var day = state.colors[DAY];
     var night = state.colors[NIGHT];
     var darker = luminance(day) < luminance(night) ? day : night;
-    var surface = mix(darker, "#05060a", 0.62);
-    var light = luminance(surface) > 0.4;
+    var surface = mix(darker, "#05080a", 0.55);
+    var lightSurface = luminance(surface) > 0.4;
+    var bgBottom = mix(night, "#d3d8d8", 0.66);
     var root = document.documentElement.style;
 
     root.setProperty("--day", day);
     root.setProperty("--night", night);
+    root.setProperty("--bg-top", mix(day, "#9aa2a2", 0.45));
+    root.setProperty("--bg-bottom", bgBottom);
     root.setProperty("--surface", surface);
-    root.setProperty("--surface-2", mix(surface, light ? "#000000" : "#ffffff", 0.12));
-    root.setProperty("--text", light ? "#12141c" : "#f4f5f8");
-    root.setProperty("--muted", light ? "rgba(18,20,28,0.62)" : "rgba(244,245,248,0.66)");
-    root.setProperty("--line", light ? "rgba(0,0,0,0.16)" : "rgba(255,255,255,0.14)");
+    root.setProperty("--surface-2", mix(surface, lightSurface ? "#000000" : "#ffffff", 0.12));
+    root.setProperty("--text", lightSurface ? "#10191c" : "#eef3f2");
+    root.setProperty("--muted", lightSurface ? "rgba(16,25,28,0.62)" : "rgba(238,243,242,0.66)");
+    root.setProperty("--line", lightSurface ? "rgba(0,0,0,0.16)" : "rgba(255,255,255,0.16)");
 
-    // The gradient runs from the day color at the top to the night color at
-    // the bottom, so the header and footer contrast against those, not the card.
-    setOn(root, "top", day);
-    setOn(root, "bottom", night);
+    // The readout sits on the bottom of the gradient, so it takes its contrast
+    // from there rather than from the sheet.
+    var darkOnBottom = luminance(bgBottom) > 0.42;
+    root.setProperty("--hud-text", darkOnBottom ? "#1d2a2d" : "#eef3f2");
+    root.setProperty("--hud-muted", darkOnBottom ? "rgba(29,42,45,0.6)" : "rgba(238,243,242,0.66)");
 
-    ui.swatchDay.style.background = day;
-    ui.swatchNight.style.background = night;
     ui.dayColor.value = day;
     ui.nightColor.value = night;
-  }
-
-  function setOn(root, name, background) {
-    var dark = luminance(background) > 0.45;
-    root.setProperty("--on-" + name, dark ? "#12141c" : "#f4f5f8");
-    root.setProperty("--on-" + name + "-muted", dark ? "rgba(18,20,28,0.66)" : "rgba(244,245,248,0.7)");
   }
 
   // ------------------------------------------------------------------ setup
@@ -655,19 +604,27 @@
   function draw() {
     var n = state.n;
     var square = state.square;
+    // The game thinks in an 800-unit space; the canvas may be any size, so
+    // scale on the way out. Cell edges are rounded to whole device pixels and
+    // shared between neighbours, which is what keeps the grid seam-free at
+    // fractional scales instead of leaving hairlines between squares.
+    var scale = canvas.width / SIZE;
 
     for (var j = 0; j < n; j++) {
+      var top = Math.round(j * square * scale);
+      var bottom = Math.round((j + 1) * square * scale);
       for (var i = 0; i < n; i++) {
+        var left = Math.round(i * square * scale);
+        var right = Math.round((i + 1) * square * scale);
         ctx.fillStyle = state.colors[state.grid[j * n + i]];
-        // Overdraw by a hair to avoid seams between squares.
-        ctx.fillRect(i * square, j * square, square + 0.5, square + 0.5);
+        ctx.fillRect(left, top, right - left, bottom - top);
       }
     }
 
     for (var b = 0; b < state.balls.length; b++) {
       var ball = state.balls[b];
       ctx.beginPath();
-      ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+      ctx.arc(ball.x * scale, ball.y * scale, ball.r * scale, 0, Math.PI * 2);
       // A ball wears the other team's color, so it always contrasts with the
       // territory it is currently painting.
       ctx.fillStyle = state.colors[ball.team === DAY ? NIGHT : DAY];
@@ -676,16 +633,26 @@
     }
   }
 
+  function resizeCanvas() {
+    var displayed = canvas.getBoundingClientRect().width;
+    if (!displayed) return;
+
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var pixels = Math.max(1, Math.round(displayed * dpr));
+
+    if (canvas.width !== pixels) {
+      canvas.width = pixels;
+      canvas.height = pixels;
+    }
+    draw();
+  }
+
   function updateScore() {
     var day = 0;
     for (var c = 0; c < state.grid.length; c++) {
       if (state.grid[c] === DAY) day++;
     }
-    var night = state.grid.length - day;
-
-    ui.scoreDay.textContent = day;
-    ui.scoreNight.textContent = night;
-    ui.scoreBar.style.width = ((day / state.grid.length) * 100).toFixed(2) + "%";
+    ui.score.textContent = "day " + day + " | night " + (state.grid.length - day);
   }
 
   var scoreTick = 0;
@@ -707,6 +674,13 @@
     boardWrap.classList.toggle("paused", !running);
   }
 
+  function setSheet(open) {
+    sheet.classList.toggle("open", open);
+    backdrop.classList.toggle("open", open);
+    ui.sheetToggle.setAttribute("aria-expanded", open ? "true" : "false");
+    ui.sheetToggle.textContent = open ? "close" : "controls";
+  }
+
   function setPalette(index) {
     state.paletteIndex = (index + PALETTES.length) % PALETTES.length;
     state.colors = PALETTES[state.paletteIndex].slice();
@@ -726,10 +700,15 @@
   });
 
   ui.toggle.addEventListener("click", function () { setRunning(!state.running); });
-  // The board itself is the play/pause control on touch, where there is no
-  // keyboard and the buttons sit below the fold.
-  boardWrap.addEventListener("click", function () { setRunning(!state.running); });
   ui.reset.addEventListener("click", reset);
+  ui.sheetToggle.addEventListener("click", function () {
+    setSheet(!sheet.classList.contains("open"));
+  });
+  backdrop.addEventListener("click", function () { setSheet(false); });
+
+  // The board itself is the play/pause control on touch, where there is no
+  // keyboard and the controls sit behind a sheet.
+  boardWrap.addEventListener("click", function () { setRunning(!state.running); });
 
   ui.dayColor.addEventListener("input", function () {
     state.colors[DAY] = ui.dayColor.value;
@@ -770,11 +749,17 @@
       reset();
     } else if (key === "c") {
       setPalette(state.paletteIndex + 1);
+    } else if (key === "escape") {
+      setSheet(false);
     }
   });
 
+  window.addEventListener("resize", resizeCanvas);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(resizeCanvas);
+
   applyTheme();
   reset();
+  resizeCanvas();
   setRunning(true);
   requestAnimationFrame(loop);
 })();
