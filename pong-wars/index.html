@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Dynamic Pong Wars</title>
 <meta name="description" content="A dynamic, customizable Pong Wars: two balls fight over territory. Pause, reset, recolor and retune everything live. No dependencies." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=DM+Mono:wght@400;500&display=swap" />
 <style>
   :root {
     --day: #fdfbf6;
@@ -19,6 +22,8 @@
     --on-bottom: #f4f5f8;
     --on-bottom-muted: rgba(244, 245, 248, 0.7);
     --radius: 14px;
+    --font-ui: "Archivo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: "DM Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   }
 
   * { box-sizing: border-box; }
@@ -28,11 +33,17 @@
   body {
     margin: 0;
     padding: clamp(16px, 3vw, 36px);
-    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: var(--font-ui);
     color: var(--text);
+    /* The gradient spans the document, not the viewport: the header sits on the
+       day end and the footer on the night end, which is what their contrast
+       colors are computed from. background-attachment: fixed breaks that as
+       soon as the page scrolls. */
     background: linear-gradient(160deg, var(--day) 0%, var(--night) 100%);
-    background-attachment: fixed;
+    min-height: 100vh;
+    min-height: 100dvh;
     transition: background 320ms ease;
+    touch-action: manipulation;
     display: flex;
     justify-content: center;
   }
@@ -49,8 +60,10 @@
 
   h1 {
     margin: 0;
-    font-size: clamp(24px, 4.4vw, 40px);
-    letter-spacing: -0.03em;
+    font-family: var(--font-ui);
+    font-weight: 700;
+    font-size: clamp(26px, 4.6vw, 42px);
+    letter-spacing: -0.035em;
     color: var(--on-top);
   }
 
@@ -68,10 +81,14 @@
   }
 
   .card {
+    /* Solid first, so browsers without color-mix (iOS < 16.2) still get a
+       readable card instead of a transparent one. */
+    background: var(--surface);
     background: color-mix(in srgb, var(--surface) 86%, transparent);
     border: 1px solid var(--line);
     border-radius: var(--radius);
     box-shadow: 0 18px 44px rgba(0, 0, 0, 0.32);
+    -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
   }
 
@@ -95,9 +112,9 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--muted);
   }
@@ -110,8 +127,9 @@
   }
 
   .team .count {
+    font-family: var(--font-mono);
     font-size: 18px;
-    font-weight: 700;
+    font-weight: 500;
     color: var(--text);
     letter-spacing: 0;
   }
@@ -137,6 +155,8 @@
 
   .board-wrap {
     position: relative;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
     width: 100%;
     aspect-ratio: 1 / 1;
     border-radius: 10px;
@@ -170,12 +190,16 @@
     display: flex;
     flex-direction: column;
     gap: 18px;
+    -webkit-user-select: none;
+    user-select: none;
   }
 
   .panel h2 {
     margin: 0;
+    font-family: var(--font-mono);
     font-size: 11px;
-    letter-spacing: 0.14em;
+    font-weight: 400;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--muted);
   }
@@ -186,6 +210,7 @@
 
   button {
     flex: 1;
+    min-height: 44px;
     padding: 10px 12px;
     font: inherit;
     font-size: 14px;
@@ -217,17 +242,23 @@
   }
 
   .row label { color: var(--muted); }
-  .row .value { font-variant-numeric: tabular-nums; color: var(--text); font-weight: 600; }
+
+  .row .value {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
 
   input[type="range"] {
     width: 100%;
+    height: 28px;
     accent-color: var(--day);
     cursor: pointer;
   }
 
   input[type="color"] {
-    width: 44px;
-    height: 30px;
+    width: 52px;
+    height: 34px;
     padding: 0;
     border: 1px solid var(--line);
     border-radius: 8px;
@@ -238,8 +269,8 @@
   .presets { display: flex; flex-wrap: wrap; gap: 8px; }
 
   .preset {
-    width: 34px;
-    height: 34px;
+    width: 44px;
+    height: 44px;
     padding: 0;
     flex: 0 0 auto;
     border-radius: 9px;
@@ -255,9 +286,17 @@
 
   .hint {
     margin: 0;
+    font-family: var(--font-mono);
     font-size: 12px;
-    line-height: 1.6;
+    line-height: 1.7;
     color: var(--muted);
+  }
+
+  .hint-touch { display: none; }
+
+  @media (hover: none) {
+    .hint-keys { display: none; }
+    .hint-touch { display: block; }
   }
 
   kbd {
@@ -359,9 +398,10 @@
         <input type="range" id="balls" min="1" max="4" step="1" value="1" />
       </div>
 
-      <p class="hint">
+      <p class="hint hint-keys">
         <kbd>Space</kbd> play/pause &middot; <kbd>R</kbd> reset &middot; <kbd>C</kbd> next palette
       </p>
+      <p class="hint hint-touch">Tap the board to pause or resume.</p>
     </aside>
   </main>
 
@@ -686,6 +726,9 @@
   });
 
   ui.toggle.addEventListener("click", function () { setRunning(!state.running); });
+  // The board itself is the play/pause control on touch, where there is no
+  // keyboard and the buttons sit below the fold.
+  boardWrap.addEventListener("click", function () { setRunning(!state.running); });
   ui.reset.addEventListener("click", reset);
 
   ui.dayColor.addEventListener("input", function () {
