@@ -68,7 +68,7 @@ const say = {
  * Nothing here leaves the device on its own. This is a drawer, not an outbox - the same trade
  * the copy button already makes, only now it will still be there tomorrow.
  *
- * The game writes to this drawer and no longer reads from it: `docs/reports.html` is a page of
+ * The game writes to this drawer and no longer reads from it: `docs/reports/` is a page of
  * its own that does the reading, linked from nowhere. A list of a parent's bug reports is not
  * something a child should meet between levels, and it is easier to go through somewhere the
  * game is not.

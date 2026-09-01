@@ -93,7 +93,9 @@ export async function serveDocs() {
   const root = join(REPO, 'docs');
   const server = createServer(async (req, res) => {
     const path = decodeURIComponent(req.url.split('?')[0]);
-    const file = join(root, path === '/' ? 'index.html' : path);
+    // A trailing slash means a folder, and a folder means its index - the same thing GitHub
+    // Pages does, so `/reports/` in a test resolves to what it resolves to on the site.
+    const file = join(root, path.endsWith('/') ? path + 'index.html' : path);
     try {
       const body = await readFile(file);
       res.writeHead(200, { 'content-type': TYPES[extname(file)] || 'application/octet-stream' });

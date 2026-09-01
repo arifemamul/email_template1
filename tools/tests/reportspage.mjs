@@ -1,5 +1,5 @@
 /*
- * docs/reports.html - the page that reads back what the game kept.
+ * docs/reports/ - the page that reads back what the game kept.
  *
  * Two claims are being tested, and they are different in kind.
  *
@@ -23,7 +23,7 @@ const problems = [];
 const site = await serveDocs();
 const b = await launch();
 const GAME = site.url + '/index.html';
-const PAGE = site.url + '/reports.html';
+const PAGE = site.url + '/reports/';
 
 // ---- the game writes, the page reads, in one browser --------------------------------------
 const mine = await b.newContext({ viewport: { width: 1280, height: 1000 },
@@ -52,8 +52,8 @@ if (await g.evaluate(() => !!document.getElementById('sayList')))
 
 // ---- nothing anywhere points at the page --------------------------------------------------
 const mentions = await g.evaluate(() =>
-  document.documentElement.innerHTML.toLowerCase().includes('reports.html'));
-if (mentions) problems.push('the game mentions reports.html; it is meant to be unlinked');
+  /reports\.html|reports\//.test(document.documentElement.innerHTML.toLowerCase()));
+if (mentions) problems.push('the game mentions the reports page; it is meant to be unlinked');
 await g.close();
 
 const p = await mine.newPage();
@@ -180,7 +180,84 @@ await q.close();
 // not installed, and putting it in the shell would list it in the cache for anyone poking
 // about in devtools.
 const sw = readFileSync(join(REPO, 'docs', 'sw.js'), 'utf8');
-if (/reports\.html/.test(sw)) problems.push('reports.html is in the service worker shell');
+const shell = (sw.match(/^const SHELL = \[(.*)\];$/m) || [])[1];
+if (!shell) problems.push('could not find the service worker shell list to check it');
+else if (/reports/.test(shell)) problems.push('the reports page is in the service worker shell');
+
+// ---- and offline it is never answered with the game ---------------------------------------
+// The near miss this guards: the worker used to fall back to the cached game for ANY navigation
+// it could not serve, on the grounds that the game was the only page there is. It no longer is.
+// With nothing cached and no network, that fallback put the game at the reports address - a page
+// that looks like it worked, which is worse than a plain failure for someone checking whether
+// their notes are still there.
+//
+// This asks docs/sw.js directly rather than taking a browser offline, because a browser context
+// set offline does NOT make the worker's own fetch() fail - it kept succeeding against the test
+// server, so the fallback branch never ran and a deliberately broken worker passed. Running the
+// real file against a stubbed cache and a failing network is the only way to reach the decision.
+const swpage = await (await b.newContext()).newPage();
+swpage.on('pageerror', e => problems.push('sw harness: ' + e.message));
+await swpage.goto('about:blank');
+
+const verdicts = await swpage.evaluate(async source => {
+  const SHELL_BODY = 'THE-GAME';
+  const handlers = {};
+  const fake = {
+    addEventListener: (name, fn) => { handlers[name] = fn; },
+    skipWaiting() {}, clients: { claim() {} },
+    location: { origin: 'https://example.test' },
+  };
+  let online = true;
+  const box = {
+    open: () => Promise.resolve({ addAll: () => Promise.resolve(), put: () => Promise.resolve() }),
+    keys: () => Promise.resolve([]),
+    delete: () => Promise.resolve(true),
+    // Nothing has been visited yet, so the only thing in the cache is the precached shell.
+    match: key => Promise.resolve(typeof key === 'string' && key.includes('index.html')
+      ? new Response(SHELL_BODY) : undefined),
+  };
+  const net = () => online ? Promise.resolve(new Response('FROM-NETWORK'))
+                           : Promise.reject(new TypeError('offline'));
+  new Function('self', 'caches', 'fetch', source)(fake, box, net);
+
+  const ask = async (url, mode) => {
+    let answer;
+    handlers.fetch({ request: { method: 'GET', url, mode }, respondWith: p => { answer = p; } });
+    if (answer === undefined) return 'not handled';
+    try {
+      const res = await answer;
+      if (!res) return 'nothing';
+      if (res.type === 'error') return 'network error';
+      return await res.text();
+    } catch (err) { return 'rejected'; }
+  };
+
+  online = false;
+  const offReports = await ask('https://example.test/reports/', 'navigate');
+  const offReportsFile = await ask('https://example.test/reports/index.html', 'navigate');
+  const offGame = await ask('https://example.test/index.html', 'navigate');
+  online = true;
+  const onReports = await ask('https://example.test/reports/', 'navigate');
+  return { offReports, offReportsFile, offGame, onReports, SHELL_BODY };
+}, sw);
+
+for (const [what, got] of [['reports/', verdicts.offReports],
+                           ['reports/index.html', verdicts.offReportsFile]]) {
+  if (got === verdicts.SHELL_BODY)
+    problems.push(`offline with nothing cached, ${what} was answered with the game`);
+  else if (got !== 'network error' && got !== 'rejected' && got !== 'nothing')
+    problems.push(`offline, ${what} was answered with something unexpected: "${got}"`);
+}
+// The game's own fallback is the one being narrowed, not removed: it still has to hold.
+if (verdicts.offGame !== verdicts.SHELL_BODY)
+  problems.push(`offline with nothing cached, the game did not fall back to its shell: `
+              + `"${verdicts.offGame}"`);
+// And with a network, the reports page is served from the network like anything else.
+if (verdicts.onReports !== 'FROM-NETWORK')
+  problems.push(`online, reports/ was not served from the network: "${verdicts.onReports}"`);
+console.log(`worker: offline reports/ -> ${verdicts.offReports}, offline game -> `
+          + `${verdicts.offGame === verdicts.SHELL_BODY ? 'its shell' : verdicts.offGame}`);
+await swpage.close();
 
 await b.close();
 await site.close();

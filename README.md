@@ -56,7 +56,16 @@ Behind the menu: the two halves of the বর্ণমালা as charts built 
   `<!doctype>`/`<head>`/`<body>` wrapper removed, for hosts that supply their own. Neither is
   edited directly: `build.py` overwrites both, and the tests run against the built file rather
   than the source, so a mistake in the stripping fails a test instead of shipping.
-- **Test it: `npm test`.** Nineteen browser checks against the built page, about five minutes;
+- **The kept reports are a second page, at [`docs/reports/`](docs/reports/index.html).** Once
+  Pages is pointed at `/docs`, its address is `…/reports/` alongside the game - a folder rather
+  than a filename, so nothing has to be typed with an extension. It is linked from nowhere and
+  carries `noindex`, but the address is not what keeps it private: the notes live in
+  `localStorage`, which is per-origin **per browser profile**, so the page shows what this
+  browser wrote and a stranger opening the same URL sees an empty list. It is deliberately not
+  in the service worker's shell either - it is opened on purpose, not installed - and with no
+  network and nothing cached the worker lets the browser report that plainly instead of
+  answering the reports address with the game.
+- **Test it: `npm test`.** Twenty browser checks against the built page, about five minutes;
   `npm run test:all` adds the solve sweep, which opens all 244 levels and wins each one
   (about eleven minutes more). The
   runner refuses to start if `docs/index.html` is not what `src/` would build right now - see

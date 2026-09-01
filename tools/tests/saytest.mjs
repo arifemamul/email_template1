@@ -107,7 +107,7 @@ if (emptyKept) fail('an empty note was kept');
 //
 //    What the game does with a report ends here: it writes to the drawer and no longer reads
 //    from it. Displaying them, copying them, deleting them and coping with a corrupt store all
-//    belong to docs/reports.html now, and tools/tests/reportspage.mjs is where they are tested.
+//    belong to docs/reports/ now, and tools/tests/reportspage.mjs is where they are tested.
 await p.evaluate(() => loadLevel(5));
 const note = 'পরীক্ষা: এই শব্দের মানে ঠিক নয়';
 await p.fill('#sayNote', note);
