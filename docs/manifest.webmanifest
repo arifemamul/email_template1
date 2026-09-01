@@ -1,15 +1,15 @@
 {
   "name": "শব্দজট - Shobdojot",
   "short_name": "শব্দজট",
-  "description": "A Bengali word puzzle: one akshara at a time, 156 levels, free and offline.",
+  "description": "A Bengali word puzzle: one akshara at a time, 244 levels, free and offline.",
   "lang": "bn-BD",
   "dir": "ltr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#1B1035",
-  "theme_color": "#1B1035",
+  "background_color": "#FFE9C7",
+  "theme_color": "#FFE9C7",
   "categories": ["education", "games", "kids"],
   "icons": [
     {

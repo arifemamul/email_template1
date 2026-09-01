@@ -66,6 +66,7 @@ MAX_AKSHARAS = 3
 BARO_CONSONANTS = 'কখগঘঙচছজঝঞটঠডঢণতথদধনপফবভমযরলশষসহ'
 BARO_SIGNS = ['', 'া', 'ি', 'ী', 'ু', 'ূ', 'ৃ', 'ে', 'ৈ', 'ো', 'ৌ', 'ং']
 WORKER = REPO / 'docs/sw.js'              # offline cache; its version is stamped below
+MANIFEST = REPO / 'docs/manifest.webmanifest'   # the install card; two fields stamped below
 WEB = REPO / 'docs/index.html'            # built, comments stripped
 # The same page with the document wrapper taken off, for hosts that supply their own
 # <!doctype>/<html>/<head>/<body> - claude.ai artifacts among them. Generated, never edited:
@@ -502,6 +503,21 @@ def write_builds(levels):
         fresh = re.sub(r"const VERSION = '[^']*';", f"const VERSION = '{stamp}';", worker, count=1)
         if fresh != worker:
             WORKER.write_text(fresh, encoding='utf-8')
+
+    # The install card carries two facts that live somewhere else: how many levels there are,
+    # and what colour the page is. Both had gone stale - it advertised 156 levels and painted a
+    # dark purple splash from a palette the redesign replaced, so the app opened on purple and
+    # then turned cream. Stamped for the same reason VERSION is: a number a human has to
+    # remember to update is a number that ends up wrong.
+    if MANIFEST.exists():
+        card = MANIFEST.read_text(encoding='utf-8')
+        paper = re.search(r'--bg:\s*(#[0-9A-Fa-f]{6})', (SRC / 'css/theme.css').read_text(encoding='utf-8'))
+        fresh = re.sub(r'(\d+) levels', f'{len(levels)} levels', card, count=1)
+        if paper:
+            fresh = re.sub(r'"(background_color|theme_color)": "#[0-9A-Fa-f]{6}"',
+                           lambda m: f'"{m.group(1)}": "{paper.group(1)}"', fresh)
+        if fresh != card:
+            MANIFEST.write_text(fresh, encoding='utf-8')
 
     before_live = LIVE.read_text(encoding='utf-8') if LIVE.exists() else ''
     live_src = unwrap(built)

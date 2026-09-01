@@ -38,13 +38,27 @@ const man = await p.evaluate(async () => {
   if (!link) return null;
   const r = await fetch(link.href);
   const j = await r.json();
-  return { name: j.name, display: j.display, icons: j.icons.length, start: j.start_url };
+  const meta = document.querySelector('meta[name=theme-color]');
+  return { name: j.name, display: j.display, icons: j.icons.length, start: j.start_url,
+           // The two facts the card repeats from elsewhere, and what they should agree with.
+           says: (j.description.match(/(\d+) levels/) || [])[1],
+           levels: String(LEVELS.length),
+           splash: [j.background_color, j.theme_color],
+           paper: meta ? meta.getAttribute('content') : null };
 });
 console.log('manifest:', JSON.stringify(man));
 if (!man) problems.push('no manifest link');
 else {
   if (man.display !== 'standalone') problems.push(`display is ${man.display}`);
   if (man.icons < 2) problems.push('needs a maskable icon as well as a plain one');
+  // Both of these had gone stale in a file nobody opens: it advertised a level count from an
+  // older build, and a splash colour from the palette before the redesign, so the app opened
+  // dark purple and then turned cream. Neither shows up anywhere a test was looking.
+  if (man.says !== man.levels)
+    problems.push(`the manifest advertises ${man.says} levels; the page has ${man.levels}`);
+  for (const colour of man.splash)
+    if ((colour || '').toUpperCase() !== (man.paper || '').toUpperCase())
+      problems.push(`the manifest paints the splash ${colour}; the page is ${man.paper}`);
 }
 
 // what actually got cached
