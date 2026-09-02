@@ -1,7 +1,7 @@
 // The feedback card: does it refuse an empty note, copy a full one, attach the level the
 // player is actually on, keep one on the device, and still work when the clipboard API is
 // missing?
-import { launch, PAGE, serveDocs } from './harness.mjs';
+import { launch, PAGE, serveDocs, openSection } from './harness.mjs';
 
 // The clipboard API needs a secure origin, so this one is served rather than file://.
 const site = await serveDocs();
@@ -20,7 +20,7 @@ await p.waitForFunction(() => typeof LEVELS !== 'undefined' && document.getEleme
 // The feedback card has a named section of its own now, and only the open section is on
 // screen. Open it the way a player would rather than reaching past the menu.
 const openReport = async pg => {
-  await pg.click('#tab-report');
+  await openSection(pg, 'report');
   await pg.waitForSelector('#sayNote', { state: 'visible', timeout: 5000 });
 };
 await openReport(p);
@@ -68,8 +68,8 @@ await p2.waitForFunction(() => document.getElementById('sayCopy'));
 // rather than reading the moment the click lands.
 if (!await p2.isVisible('#sayNote')) {
   await p2.click('#guideOpen');
-  await p2.waitForSelector('#menu', { state: 'visible', timeout: 5000 })
-          .catch(() => fail('the menu is unreachable on a phone'));
+  await p2.waitForSelector('#menuPop', { state: 'visible', timeout: 5000 })
+          .catch(() => fail('the options are unreachable on a phone'));
   await openReport(p2).catch(() => fail('the feedback card is unreachable on a phone'));
 }
 await p2.fill('#sayNote', 'no clipboard here');
@@ -93,7 +93,7 @@ if (onScreen.includes('sayCopy')) fail('the feedback button leaked onto the game
 await p.evaluate(() => { try { localStorage.removeItem('shobdojot.reports'); } catch {} });
 await p.reload();
 await p.waitForFunction(() => document.getElementById('saySave'));
-await p.click('#tab-report');
+await openSection(p, 'report');
 
 // 6. An empty note is refused here too - an empty entry in the list is worse than none.
 await p.fill('#sayNote', '   ');
@@ -175,7 +175,7 @@ await p5.addInitScript(() => {
 });
 await p5.goto(site.url + '/index.html');
 await p5.waitForFunction(() => document.getElementById('saySave'));
-await p5.click('#tab-report');
+await openSection(p5, 'report');
 await p5.fill('#sayNote', 'জায়গা নেই এমন অবস্থায়');
 await p5.click('#saySave');
 await p5.waitForTimeout(200);
@@ -208,7 +208,7 @@ await m.addInitScript(() => {
 });
 await m.goto(site.url + '/index.html');
 await m.waitForFunction(() => document.getElementById('sayMail'));
-await m.click('#tab-report');
+await openSection(m, 'report');
 
 // 15. An empty note does not open a mail app with nothing in it.
 await m.fill('#sayNote', '   ');

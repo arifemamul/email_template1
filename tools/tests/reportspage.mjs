@@ -15,7 +15,7 @@
  * stopped being true - a report cached into the page at build time, say - the URL alone would
  * be protecting nothing at all.
  */
-import { launch, serveDocs, report, REPO } from './harness.mjs';
+import { launch, serveDocs, report, REPO, openSection } from './harness.mjs';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -32,7 +32,7 @@ const g = await mine.newPage();
 g.on('pageerror', e => problems.push('game: ' + e.message));
 await g.goto(GAME);
 await g.waitForFunction(() => document.querySelector('.tile'));
-await g.click('#tab-report');
+await openSection(g, 'report');
 
 const NOTES = [
   [0, 'প্রথম নোট: কলম শব্দের মানে ভুল'],

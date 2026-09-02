@@ -6,7 +6,7 @@
  * changes how many levels ক has, and nobody notices because a chart is not something you play.
  * This counts what the page shows against what the page holds.
  */
-import { launch, PAGE, report } from './harness.mjs';
+import { launch, PAGE, report, openSection } from './harness.mjs';
 
 const problems = [];
 const b = await launch();
@@ -17,35 +17,56 @@ const p = await ctx.newPage();
 p.on('pageerror', e => problems.push('pageerror: ' + e.message));
 p.on('console', m => { if (m.type() === 'error') problems.push('console: ' + m.text()); });
 await p.goto(PAGE);
-await p.waitForFunction(() => document.querySelector('.tile') && document.querySelector('#menu .tab'));
+await p.waitForFunction(() => document.querySelector('.tile') && document.querySelector('#menuPop .opt'));
 
 // Read off the page rather than written out here. A hardcoded list silently stops testing
 // whatever gets added next: two sections were added and this file kept passing, because it was
 // still checking the six it knew about. The tab bar and the sections also have to agree with
 // each other, and that agreement is itself worth asserting.
-const PAGES = await p.$$eval('#menu .tab', ts => ts.map(t => t.dataset.page));
+const PAGES = await p.$$eval('#menuPop .opt', os => os.map(o => o.dataset.page));
 const SECTIONS = await p.$$eval('.pages .page', ss => ss.map(s => s.id.replace(/^page-/, '')));
+// The order here is the menu's, which is the teaching order a child meets them in: the letters,
+// then what the letters take, then how letters join into words, then the game, then the rest.
 const EXPECTED = ['vowels', 'consonants', 'marks', 'gathon', 'phala', 'jukto',
-                  'levels', 'about', 'play', 'report'];
+                  'levels', 'play', 'about', 'report'];
 if (PAGES.join() !== EXPECTED.join())
-  problems.push(`tabs are [${PAGES}], expected [${EXPECTED}]`);
-if (SECTIONS.join() !== PAGES.join())
-  problems.push(`tabs [${PAGES}] and sections [${SECTIONS}] do not match`);
+  problems.push(`options are [${PAGES}], expected [${EXPECTED}]`);
+// Compared as sets, not as sequences. They used to have to be in the same order because the
+// menu was a flat bar mirroring the sections; grouping the options moved খেলার নিয়ম up beside
+// লেভেল, so the two orders differ on purpose now. What still has to hold is that there is a
+// section behind every option and an option in front of every section.
+const missing = PAGES.filter(k => !SECTIONS.includes(k));
+const stranded = SECTIONS.filter(k => !PAGES.includes(k));
+if (missing.length) problems.push(`options with no section: [${missing}]`);
+if (stranded.length) problems.push(`sections with no option: [${stranded}]`);
 
 // ---- one section at a time, and the one you clicked ------------------------------------
 for (const key of PAGES) {
-  await p.click(`#tab-${key}`);
+  await openSection(p, key);
   const state = await p.evaluate(k => {
     const shown = [...document.querySelectorAll('.pages .page')]
       .filter(x => getComputedStyle(x).display !== 'none').map(x => x.id);
-    const tab = document.querySelector(`#tab-${k}`);
-    return { shown, selected: tab.getAttribute('aria-selected'), lit: tab.classList.contains('on') };
+    const opt = document.querySelector(`#opt-${k}`);
+    return {
+      shown,
+      current: opt.getAttribute('aria-current'),
+      lit: opt.classList.contains('on'),
+      // The head of the panel names the section. It used to say "মেনু" for all ten.
+      head: document.getElementById('guideTitle').textContent.trim(),
+      says: opt.querySelector('.opt-t b').textContent.trim(),
+      // Choosing an option puts the options away; leaving them open over the thing you just
+      // asked to read is how a menu becomes a wall.
+      popOpen: !document.getElementById('menuPop').hidden,
+    };
   }, key);
   if (state.shown.length !== 1 || state.shown[0] !== `page-${key}`) {
     problems.push(`${key}: showing [${state.shown}], expected only page-${key}`);
   }
-  if (state.selected !== 'true') problems.push(`${key}: tab not marked selected`);
-  if (!state.lit) problems.push(`${key}: tab not lit`);
+  if (state.current !== 'true') problems.push(`${key}: option not marked as the current one`);
+  if (!state.lit) problems.push(`${key}: option not lit`);
+  if (state.head !== state.says)
+    problems.push(`${key}: the head says "${state.head}", the option says "${state.says}"`);
+  if (state.popOpen) problems.push(`${key}: the options stayed open after choosing one`);
 }
 
 // ---- the charts count what the game actually holds -------------------------------------
@@ -82,7 +103,7 @@ const dead = [...charts.vowels, ...charts.consonants].filter(t => !t.clickable).
 if (dead.join('') !== 'ঙঞণ') problems.push(`letters with no level: [${dead.join(' ')}], expected ঙ ঞ ণ`);
 
 // ---- tapping a letter opens that letter's first level ----------------------------------
-await p.click('#tab-consonants');
+await openSection(p, 'consonants');
 const jumped = await p.evaluate(async () => {
   const tiles = [...document.querySelectorAll('#chartConsonants .ch')];
   const m = tiles.find(t => t.querySelector('.ch-l').textContent === 'ম');
@@ -96,7 +117,7 @@ if (jumped.index !== jumped.firstM)
   problems.push(`tapping ম opened level ${jumped.index + 1}, not its first (${jumped.firstM + 1})`);
 
 // ---- every কার row shows a real word that really carries the sign -----------------------
-await p.click('#tab-marks');
+await openSection(p, 'marks');
 const marks = await p.evaluate(() => [...document.querySelectorAll('#markTable .mk')].map(r => ({
   glyph: r.querySelector('.mk-g').textContent,
   eg: r.querySelector('.mk-eg').textContent,
@@ -195,18 +216,52 @@ console.log(`বারোখড়ি: ${pickers.length} letters, 12 forms each,
 const phone = await (await b.newContext({ viewport: { width: 360, height: 640 } })).newPage();
 await phone.goto(PAGE);
 await phone.waitForFunction(() => document.querySelector('.tile'));
-if (await phone.isVisible('#menu')) problems.push('the menu is on screen before the button is pressed');
+if (await phone.isVisible('#menuPop'))
+  problems.push('the options are on screen before the button is pressed');
 await phone.click('#guideOpen');
-await phone.waitForSelector('#menu', { state: 'visible', timeout: 5000 })
-  .catch(() => problems.push('the menu did not open on a phone'));
+await phone.waitForSelector('#menuPop', { state: 'visible', timeout: 5000 })
+  .catch(() => problems.push('the options did not open on a phone'));
+
+// Every option has to be reachable without scrolling the options themselves: ten of them in a
+// flat wrapped row was the thing that made this menu hard to use, and a grouped list that
+// runs off the bottom of a 640px phone would be the same problem in a new shape.
+// Ten options, their descriptions and four group headings do not fit above the fold of a
+// 360x640 phone, and squeezing them until they do would mean taking away either the
+// descriptions or the size of the targets - the two things that made the menu usable. So the
+// sheet scrolls, and what has to hold is that every option can actually be got to and is big
+// enough to hit once you are there.
+const reach = await phone.evaluate(async () => {
+  const pop = document.getElementById('menuPop');
+  const opts = [...document.querySelectorAll('#menuPop .opt')];
+  const out = [];
+  for (const o of opts) {
+    o.scrollIntoView({ block: 'center' });
+    await new Promise(r => requestAnimationFrame(r));
+    const r = o.getBoundingClientRect();
+    out.push({
+      key: o.dataset.page,
+      tall: Math.round(r.height),
+      onScreen: r.top >= -1 && r.bottom <= innerHeight + 1,
+    });
+  }
+  pop.scrollTop = 0;
+  return { opts: out, scrolls: pop.scrollHeight > pop.clientHeight + 1 };
+});
+for (const o of reach.opts) {
+  if (o.tall < 44) problems.push(`${o.key}: the option is ${o.tall}px tall, under the 44px floor`);
+  if (!o.onScreen) problems.push(`${o.key}: the option cannot be scrolled into view`);
+}
+console.log(`phone: ${reach.opts.length} options, ${Math.min(...reach.opts.map(o => o.tall))}px `
+          + `shortest, all reachable${reach.scrolls ? ' (the sheet scrolls)' : ' without scrolling'}`);
+
 for (const key of PAGES) {
-  await phone.click(`#tab-${key}`).catch(() => problems.push(`${key}: tab not tappable on a phone`));
+  await openSection(phone, key).catch(() => problems.push(`${key}: option not tappable on a phone`));
 }
 // And the game is still playable underneath once it closes.
 await phone.click('#guideClose');
 const back = await phone.evaluate(() => ({
-  menuGone: getComputedStyle(document.querySelector('#menu')).display === 'none'
-            || !document.querySelector('.guide').classList.contains('open'),
+  menuGone: document.getElementById('menuPop').hidden
+            && !document.querySelector('.guide').classList.contains('open'),
   tiles: document.querySelectorAll('.tile').length,
   cell: Math.round(document.querySelector('.cell').getBoundingClientRect().width)
 }));

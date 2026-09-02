@@ -37,7 +37,7 @@ const CHECKS = [
   ['glyphcheck',  'every letter is one size, and every box holds it'],
   ['fittest',     'board, wheel and buttons fit at every screen size'],
   ['rowcheck',    'the actions row fits everywhere'],
-  ['guidetest',   'the guide opens, closes and holds what it should'],
+  ['guidetest',   'the bar, the options behind it, and where a section is read'],
   ['menutest',    'every section opens, charts and বারোখড়ি counted from the game'],
   ['primertest',  "the primer's sums, কার words, ফলা and যুক্তবর্ণ are drawn from PRIMER"],
   ['feeltest',     'sound, the bird, the mute switch, and the one-file palette'],

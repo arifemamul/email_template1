@@ -232,14 +232,56 @@ el.shuffle.addEventListener("click", () => {
   animateShuffle(before);
 });
 
-/* The guide sheet. On a wide screen the notes are simply on the page and this never runs;
-   the class it toggles has no styling above the touch breakpoint. */
+/* The options, and the sheet they open.
+ *
+ * Two things, deliberately separate. The options are a panel that drops out of the bar and is
+ * the same at every width. The sheet is where a chosen section is read, and it only exists on a
+ * narrow screen - on a wide one the section is simply the right-hand column, always there.
+ *
+ * The button used to open the sheet directly, with the ten sections as a bar of pills inside
+ * it. That put a child two decisions deep before anything was named: press মেনু, then read ten
+ * identical pills to find out what mostly was not what they wanted. */
+const menuIsOpen = () => !el.menuPop.hidden;
 const guideIsOpen = () => el.guide.classList.contains("open");
+
+/* The phone sheet hangs off the bottom of the bar, and the bar's height depends on the font,
+   the safe area and whether the strapline fits - so it is measured rather than guessed. */
+function markBar() {
+  if (!el.bar) return;
+  document.documentElement.style.setProperty("--bar-bottom",
+    Math.round(el.bar.getBoundingClientRect().bottom) + "px");
+}
+
+function openMenu() {
+  markBar();
+  el.menuPop.hidden = false;
+  el.scrim.hidden = false;
+  el.guideOpen.setAttribute("aria-expanded", "true");
+  Sfx.page(true);
+  const here = el.menuPop.querySelector(".opt.on") || el.menuPop.querySelector(".opt");
+  if (here) here.focus();
+}
+
+function closeMenu(giveFocusBack = true) {
+  if (el.menuPop.hidden) return;
+  el.menuPop.hidden = true;
+  el.scrim.hidden = true;
+  el.guideOpen.setAttribute("aria-expanded", "false");
+  if (giveFocusBack) el.guideOpen.focus();
+}
+
+/* Choosing an option. On a phone that means opening the sheet to read it; on a wide screen the
+   section is already on the page beside the game, so all that is left is to get the panel out
+   of the way and put the focus where the reading is. */
+function chooseSection() {
+  closeMenu(false);
+  if (window.matchMedia("(max-width: 1024px)").matches) openGuide();
+  else el.guide.querySelector(".guide-title").focus?.();
+}
 
 function openGuide() {
   el.guide.classList.add("open");
   document.body.classList.add("guide-open");
-  el.guideOpen.setAttribute("aria-expanded", "true");
   el.guide.scrollTop = 0;
   el.guideClose.focus();
 }
@@ -247,7 +289,6 @@ function openGuide() {
 function closeGuide() {
   el.guide.classList.remove("open");
   document.body.classList.remove("guide-open");
-  el.guideOpen.setAttribute("aria-expanded", "false");
   el.guideOpen.focus();
 }
 
@@ -270,8 +311,42 @@ drawLevelCount();
    a no-op on a device with no Bengali voice, so nothing here needs to check first. */
 Speech.init();
 
-el.guideOpen.addEventListener("click", openGuide);
+el.guideOpen.addEventListener("click", () => (menuIsOpen() ? closeMenu() : openMenu()));
 el.guideClose.addEventListener("click", closeGuide);
+
+/* Back to the options rather than out altogether: someone who opened ফলা and wanted যুক্তবর্ণ
+   should not have to close the sheet and start again. */
+el.guideBack.addEventListener("click", () => {
+  if (guideIsOpen()) closeGuide();
+  openMenu();
+});
+
+/* Escape closes the innermost thing that is open, and a press outside the options closes them -
+   the two ways anyone expects to get out of a menu. */
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  if (menuIsOpen()) closeMenu();
+  else if (guideIsOpen()) closeGuide();
+});
+
+document.addEventListener("pointerdown", e => {
+  if (!menuIsOpen()) return;
+  if (e.target.closest("#menuPop") || e.target.closest("#guideOpen")) return;
+  closeMenu(false);
+});
+
+/* The bar only paints its background once the page has scrolled under it - see the comment on
+   `.bar::after`. Passive, because this listener must never be a reason a scroll stutters. */
+function markScrolled() {
+  if (el.bar) el.bar.classList.toggle("stuck", scrollY > 4);
+}
+addEventListener("scroll", markScrolled, { passive: true });
+markScrolled();
+
+/* The bar's height changes with the width - the strapline drops out below 620px - so the sheet
+   that hangs off it has to be re-measured rather than measured once. */
+addEventListener("resize", markBar);
+markBar();
 
 // Picking a level from inside the sheet means the player wants to play it, so get out of the way.
 el.levelGrid.addEventListener("click", e => {

@@ -1,40 +1,150 @@
-  /* -- The menu bar and the eight sections behind it ------------------------- */
-  .menu {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-bottom: 16px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--surface-3);
+  /* -- The options -----------------------------------------------------------
+       A panel that drops out of the bar, holding ten options in four named groups. It replaces
+       a flat row of ten identical pills that wrapped into four ragged lines: same shape, same
+       colour, same size, whether it led to a chart to read or to the level you play next.
+
+       Anchored to the bar on a wide screen and a full sheet on a phone, which is the same
+       decision the game itself makes about the notes - there is no room beside a phone. */
+  .menu-pop {
+    position: absolute;
+    top: calc(100% - 4px);
+    right: 0;
+    z-index: 60;
+    width: min(560px, calc(100vw - 28px));
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 18px;
+    padding: 16px 16px 18px;
+    background: var(--surface);
+    border-radius: var(--r-lg);
+    box-shadow: 0 18px 44px rgba(var(--shade), .22), 0 2px 0 var(--surface-3);
+    animation: pop-in .18s cubic-bezier(.22, 1, .36, 1);
+  }
+  .menu-pop[hidden] { display: none; }
+
+  @keyframes pop-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: none; }
+  }
+  /* A drop is movement, and someone who has asked for less of it still needs the menu. It
+     appears instead of arriving. */
+  @media (prefers-reduced-motion: reduce) {
+    .menu-pop { animation: none; }
   }
 
-  /* Tabs are buttons, so they are shaped like every other button in the game: a pill with a
-     hard bottom lip that vanishes when pressed. A row of outlined text was cheaper and read
-     as a row of links. */
-  .tab {
-    border: 0;
-    border-radius: 999px;
-    padding: 8px 15px 10px;
-    background: var(--surface);
-    color: var(--ink-soft);
-    font-size: 14px;
+  /* Invisible by default: on a wide screen its whole job is to catch a press that lands
+     anywhere but the options. Over a phone it dims the game as well, because there the options
+     are a sheet and the game behind them should read as put away rather than merely covered. */
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 55;
+    background: transparent;
+  }
+  .scrim[hidden] { display: none; }
+  @media (max-width: 620px) {
+    .scrim { background: rgba(var(--shade), .34); }
+  }
+
+  .menu-group { min-width: 0; }
+
+  /* The group name. Bengali, so no letter-spacing and no uppercase - both are wrong for a
+     caseless script and pull matra clusters apart. Told apart by a coloured rule instead. */
+  .menu-head {
+    font-family: var(--bn);
+    font-size: 13px;
     font-weight: 700;
+    color: var(--ink-faint);
+    margin: 6px 0 6px 2px;
+    padding-left: 8px;
+    border-left: 3px solid var(--block-1);
+  }
+  .menu-group[data-block="2"] .menu-head { border-left-color: var(--block-2); }
+  .menu-group[data-block="3"] .menu-head { border-left-color: var(--block-3); }
+  .menu-group[data-block="4"] .menu-head { border-left-color: var(--block-4); }
+
+  /* One option: a tile, its name, and the sentence that used to be a `title` attribute - which
+     is to say a sentence nobody on a phone has ever seen. Laid out as a row so the tap target
+     is the whole width rather than the few characters of the label. */
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    border: 0;
+    border-radius: var(--r-md);
+    padding: 8px 10px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: start;
     cursor: pointer;
-    white-space: nowrap;
-    box-shadow: var(--lip) var(--surface-3);
-    transition: transform .12s ease, box-shadow .12s ease,
-                background-color .16s ease, color .16s ease;
+    transition: background-color .14s ease;
   }
-  .tab:hover { color: var(--ink); background: var(--accent-hi); }
-  .tab:active { transform: translateY(4px); box-shadow: none; }
-  /* The section you are on, in the game's own gold rather than a grey - a child should be able
-     to see where they are without reading. */
-  .tab.on {
-    background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+  .opt:hover { background: var(--surface-2); }
+  .opt:active { background: var(--surface-3); }
+
+  /* The tile carries the option's own first letter, in the group's colour, so the options are
+     told apart by shape and colour before they are read - which matters when the reader is
+     five and the labels are all the same length. */
+  .opt-g {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 38px; height: 38px;
+    border-radius: 11px;
+    background: var(--block-1);
     color: var(--ink);
-    box-shadow: var(--lip) var(--accent-lo);
+    font-size: 18px;
+    font-weight: 700;
+    box-shadow: 0 2px 0 rgba(var(--shade), .10);
   }
-  .tab.on:active { transform: translateY(4px); box-shadow: none; }
+  .menu-group[data-block="2"] .opt-g { background: var(--block-2); }
+  .menu-group[data-block="3"] .opt-g { background: var(--block-3); }
+  .menu-group[data-block="4"] .opt-g { background: var(--block-4); }
+
+  .opt-t { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .opt-t b {
+    font-family: var(--bn);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.25;
+  }
+  .opt-t i {
+    font-family: var(--bn);
+    font-style: normal;
+    font-size: 12.5px;
+    color: var(--ink-faint);
+    line-height: 1.35;
+  }
+
+  /* Where you are. A child should be able to see it without reading, so it is the game's own
+     gold rather than a grey - the same signal the level tile on the board uses. */
+  .opt.on { background: var(--accent-hi); }
+  .opt.on .opt-g {
+    background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+    box-shadow: 0 2px 0 var(--accent-lo);
+  }
+  .opt.on .opt-t b { color: var(--ink); }
+
+  /* One column on a phone, and the panel becomes a sheet under the bar rather than a card
+     hanging off it: at 390px a two-column card would be two 170px columns of clipped Bengali. */
+  @media (max-width: 620px) {
+    .menu-pop {
+      position: fixed;
+      inset: auto 0 0;
+      top: var(--bar-bottom, 64px);
+      width: auto;
+      grid-template-columns: 1fr;
+      gap: 2px;
+      border-radius: var(--r-lg) var(--r-lg) 0 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    }
+    .opt { padding: 10px; }
+  }
 
   .page { display: none; }
   .page.on { display: block; }
@@ -45,7 +155,7 @@
      opposite typography. The English reads as a label at 11px with wide letter-spacing; that
      same spacing pulls Bengali matra clusters apart, and 11px is unreadable in the script. So
      the row is sized for the Bengali and the English half is shrunk back down inside it. */
-  .page > h3 {
+  .page > h3, .page .card > h3:first-child {
     margin: 0 0 12px;
     font-size: 21px;
     font-family: var(--bn);
@@ -56,6 +166,24 @@
     gap: 8px;
     flex-wrap: wrap;
   }
+
+  /* A heading that says exactly what the panel's head says one line above it. Seven of the ten
+     sections open with their own name - "কার ও চিহ্ন" under a head reading কার ও চিহ্ন - and
+     three do not: শব্দ গঠন opens on "কার চিহ্ন ছাড়া শব্দ গঠন", which is a different sentence
+     and earns its line. So this is decided by the words rather than by the markup, in
+     `showPage`, and a heading that stops being a repeat starts showing again on its own.
+
+     Hidden from the screen, not from the page: `display: none` would take it out of the
+     accessibility tree too and leave the panel with no heading to navigate by. */
+  .page h3.dup {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
   /* Cards inside a section carry a Bengali heading too, so the small-caps English treatment
      they inherited from `.card h3` has to come off there as well. */
   .page .card h3 {

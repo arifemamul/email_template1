@@ -269,26 +269,55 @@ function drawBaro() {
 /* ---- the menu bar ---------------------------------------------------------------------- */
 
 const MENU_KEY = "shobdojot.page";
-const tabs = [...document.querySelectorAll("#menu .tab")];
+const opts = [...document.querySelectorAll("#menuPop .opt")];
 
+/* Which section is on screen, and the head that names it. The head used to say "মেনু" above a
+   bar of ten pills, on a sheet opened from a button also marked মেনু: three chances to say the
+   same word and none to say which of the ten you were reading. */
 function showPage(key, remember = true) {
-  for (const tab of tabs) {
-    const on = tab.dataset.page === key;
-    tab.classList.toggle("on", on);
-    tab.setAttribute("aria-selected", on ? "true" : "false");
+  let title = "";
+  for (const opt of opts) {
+    const on = opt.dataset.page === key;
+    opt.classList.toggle("on", on);
+    // A menu item is not a tab, so it is not `aria-selected`. `aria-current` is the one that
+    // says "this is the one you are on" for a list of destinations.
+    if (on) opt.setAttribute("aria-current", "true");
+    else opt.removeAttribute("aria-current");
+    if (on) title = opt.querySelector(".opt-t b").textContent;
   }
   for (const page of document.querySelectorAll(".pages .page")) {
     page.classList.toggle("on", page.id === `page-${key}`);
+    // The head names the section, so a section opening with its own name says it twice. Seven
+    // of the ten do; three open on something longer than their name and are left alone. Decided
+    // on the words rather than on the markup, so a heading that is edited to say something new
+    // comes back on its own.
+    const first = page.querySelector("h3");
+    if (first) first.classList.toggle("dup", first.textContent.trim() === title);
   }
+  if (el.guideTitle) el.guideTitle.textContent = title;
   // Which section you were reading is a per-device convenience, so it goes in localStorage and
   // is allowed to fail: a private window or blocked site data must not break the menu.
   if (remember) { try { localStorage.setItem(MENU_KEY, key); } catch {} }
 }
 
-for (const tab of tabs) {
-  tab.id = `tab-${tab.dataset.page}`;
-  tab.addEventListener("click", () => showPage(tab.dataset.page));
+for (const opt of opts) {
+  opt.id = `opt-${opt.dataset.page}`;
+  opt.addEventListener("click", () => {
+    showPage(opt.dataset.page);
+    chooseSection();
+  });
 }
+
+/* Arrow keys walk the options, Home and End jump to the ends. A menu that can only be used
+   with a pointer is a menu half the people who need it most cannot use. */
+el.menuPop.addEventListener("keydown", e => {
+  const here = opts.indexOf(document.activeElement);
+  if (here < 0) return;
+  const step = { ArrowDown: 1, ArrowUp: -1, Home: -here, End: opts.length - 1 - here }[e.key];
+  if (step === undefined) return;
+  e.preventDefault();
+  opts[(here + step + opts.length) % opts.length].focus();
+});
 
 drawCharts();
 drawBaro();
@@ -296,6 +325,6 @@ drawBaro();
 let opening = "levels";
 try {
   const saved = localStorage.getItem(MENU_KEY);
-  if (saved && tabs.some(t => t.dataset.page === saved)) opening = saved;
+  if (saved && opts.some(o => o.dataset.page === saved)) opening = saved;
 } catch { /* no stored preference; levels it is */ }
 showPage(opening, false);

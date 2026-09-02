@@ -115,6 +115,40 @@ export async function serveDocs() {
 }
 
 /**
+ * Open a section the way a player does: press মেনু, then choose from the options.
+ *
+ * Every test used to click `#tab-<key>` straight off the page, which worked while the ten
+ * sections were a row of pills that was always on screen. They are behind a button now, and a
+ * test that reaches past the button has stopped testing the only route a player has. On a phone
+ * choosing an option also opens the sheet to read it in, which is why this waits for the
+ * section rather than for the click.
+ */
+export async function openSection(page, key) {
+  const opt = `#opt-${key}`;
+  if (!(await page.isVisible(opt))) {
+    // On a narrow screen the open sheet covers the whole screen, bar included, so the button
+    // that opens the options is underneath it and cannot be pressed. The way back is the
+    // sheet's own ‹ মেনু - which is the way a player has too, and the reason it exists.
+    const sheetOpen = await page.evaluate(() =>
+      document.querySelector('.guide').classList.contains('open'));
+    await page.click(sheetOpen ? '#guideBack' : '#guideOpen');
+  }
+  await page.waitForSelector(opt, { state: 'visible' });
+  await page.click(opt);
+  // Wait for the section to be readable, not merely selected. On a narrow screen choosing an
+  // option also opens the sheet, and the sheet slides - a test that read the page the moment
+  // the class flipped was looking at it mid-slide, still off the bottom of the screen.
+  await page.waitForFunction(k => {
+    const pg = document.getElementById(`page-${k}`);
+    if (!pg || !pg.classList.contains('on')) return false;
+    const guide = document.querySelector('.guide');
+    if (!matchMedia('(max-width: 1024px)').matches) return true;
+    return guide.classList.contains('open')
+        && Math.abs(guide.getBoundingClientRect().top) < 2;
+  }, key);
+}
+
+/**
  * Where a test may drop a screenshot. Diagnostics for whoever is reading a failure - not
  * artefacts, and gitignored. Tests used to write these to a relative path, which put them in
  * the repository root once the runner started setting cwd there.

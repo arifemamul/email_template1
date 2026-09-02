@@ -1,4 +1,16 @@
-import { launch, PAGE, serveDocs } from './harness.mjs';
+/*
+ * The bar, the options behind it, and the sheet they open.
+ *
+ * There used to be two designs here and this file tested the seam between them: a gold masthead
+ * with a row of ten pills on a wide screen, and a separate strip with a hamburger on a phone.
+ * Which one you got depended on the width, so half of what this checked was "the right one of
+ * the two is showing".
+ *
+ * One bar now, at every width, and the width decides one thing only: where a chosen section is
+ * read. Wide, it is the column beside the game and always there. Narrow, there is no room
+ * beside a phone, so it is a sheet over the top. That is the seam worth testing now.
+ */
+import { launch, PAGE, openSection } from './harness.mjs';
 const b = await launch();
 const problems = [];
 
@@ -11,26 +23,27 @@ const sizes = [
   [{ width: 1440, height: 900 }, 'wide desktop', false],
 ];
 
-for (const [viewport, name, touch] of sizes) {
-  const p = await b.newPage({ viewport, hasTouch: touch });
+for (const [viewport, name, sheet] of sizes) {
+  const p = await b.newPage({ viewport, hasTouch: sheet });
+  p.on('pageerror', e => problems.push(`${name}: pageerror ${e.message}`));
   await p.goto(PAGE);
   await p.waitForFunction(() => document.querySelectorAll('#levelGrid .lv').length > 0);
 
   const state = await p.evaluate(() => {
-    // Actually rendered, not merely styled: a child of a display:none parent still reports
-    // its own display, so computed style alone says the menu button is visible on desktop.
+    // Actually rendered, not merely styled: a child of a display:none parent still reports its
+    // own display, so computed style alone once said the menu button was visible on desktop.
     const vis = s => { const e = document.querySelector(s); if (!e) return false;
       if (getComputedStyle(e).visibility === 'hidden') return false;
       return e.getClientRects().length > 0; };
     const dev = document.querySelector('.device').getBoundingClientRect();
+    const bar = document.querySelector('.bar').getBoundingClientRect();
     return {
-      touchBar: vis('.touch-bar'),
-      masthead: vis('header'),
-      // display: contents generates no box of its own, so ask about its contents
+      bar: vis('.bar'),
+      button: vis('#guideOpen'),
+      barTop: Math.round(bar.top),
+      optionsShowing: vis('#menuPop'),
       guideVisible: vis('.guide .panel') || vis('.guide .levels-card'),
       guideBoxed: vis('.guide'),
-      menuButton: vis('.touch-menu'),
-      // does the board fit the first screen without scrolling?
       deviceBottom: Math.round(dev.bottom),
       viewportH: innerHeight,
       wheelBottom: Math.round(document.getElementById('wheel').getBoundingClientRect().bottom),
@@ -38,104 +51,187 @@ for (const [viewport, name, touch] of sizes) {
     };
   });
 
-  if (touch) {
-    if (!state.touchBar) problems.push(`${name}: no touch bar`);
-    if (state.masthead) problems.push(`${name}: masthead still showing`);
-    if (state.guideBoxed) problems.push(`${name}: guide is open on load`);
+  // ---- true at every width ------------------------------------------------------------
+  if (!state.bar) problems.push(`${name}: no bar`);
+  if (!state.button) problems.push(`${name}: no menu button`);
+  // The bar is sticky, not fixed: at the top of the page it sits below the page's own padding,
+  // which is where it belongs. What matters is that it pins to the top once anything scrolls
+  // under it - otherwise the only way to the menu is to scroll back up.
+  const pinned = await p.evaluate(async () => {
+    // On a phone the game is built to fit the first screen, so there may be nothing to scroll
+    // and nothing to pin the bar over. Asking anyway turns "this page fits" into a failure.
+    const room = document.documentElement.scrollHeight - innerHeight;
+    if (room < 40) return { skipped: room };
+    scrollTo(0, Math.min(400, room));
+    await new Promise(r => requestAnimationFrame(r));
+    await new Promise(r => requestAnimationFrame(r));
+    const top = Math.round(document.querySelector('.bar').getBoundingClientRect().top);
+    const painted = document.querySelector('.bar').classList.contains('stuck');
+    scrollTo(0, 0);
+    return { top, painted };
+  });
+  if (pinned.skipped === undefined) {
+    if (pinned.top > 1)
+      problems.push(`${name}: scrolled, the bar sits ${pinned.top}px down instead of pinning`);
+    // And it paints a background once it does, or what is under it shows through what is on it.
+    if (!pinned.painted) problems.push(`${name}: the bar did not paint its background once scrolled`);
+  }
+  if (state.optionsShowing)
+    problems.push(`${name}: the options are on screen before the button is pressed`);
+
+  // The options open, and land under the bar rather than over it or off the screen.
+  await p.click('#guideOpen');
+  await p.waitForSelector('#menuPop', { state: 'visible' });
+  const pop = await p.evaluate(() => {
+    const r = document.getElementById('menuPop').getBoundingClientRect();
+    const opts = [...document.querySelectorAll('#menuPop .opt')];
+    return {
+      expanded: document.getElementById('guideOpen').getAttribute('aria-expanded'),
+      // Measured from the button, not from the bar's box: the bar carries bottom padding, so
+      // the options tuck up into it on purpose and "overlapping the bar" is not the question.
+      // The question is whether they hang below the thing that opened them.
+      belowButton: Math.round(r.top - document.getElementById('guideOpen').getBoundingClientRect().bottom),
+      offRight: Math.round(r.right - innerWidth),
+      offLeft: Math.round(-r.left),
+      count: opts.length,
+      groups: document.querySelectorAll('#menuPop .menu-group').length,
+      // Every option says what it leads to. They used to carry that sentence in a `title`,
+      // which is a tooltip - something no touch device has ever shown anyone.
+      described: opts.filter(o => (o.querySelector('.opt-t i')?.textContent || '').trim()).length,
+      focused: document.activeElement?.classList.contains('opt'),
+    };
+  });
+  if (pop.expanded !== 'true') problems.push(`${name}: aria-expanded not set when open`);
+  if (pop.belowButton < -2)
+    problems.push(`${name}: the options cover the button by ${-pop.belowButton}px`);
+  if (pop.offRight > 1) problems.push(`${name}: the options run ${pop.offRight}px off the right`);
+  if (pop.offLeft > 1) problems.push(`${name}: the options run ${pop.offLeft}px off the left`);
+  if (pop.groups < 3) problems.push(`${name}: ${pop.groups} groups; the point was grouping them`);
+  if (pop.described !== pop.count)
+    problems.push(`${name}: ${pop.count - pop.described} options have no description`);
+  if (!pop.focused) problems.push(`${name}: opening the options did not move focus into them`);
+
+  // Escape closes them, and gives the focus back to the button that opened them.
+  await p.keyboard.press('Escape');
+  await p.waitForTimeout(120);
+  const esc = await p.evaluate(() => ({
+    hidden: document.getElementById('menuPop').hidden,
+    onButton: document.activeElement?.id === 'guideOpen',
+  }));
+  if (!esc.hidden) problems.push(`${name}: Escape did not close the options`);
+  if (!esc.onButton) problems.push(`${name}: Escape left the focus adrift`);
+
+  // A press anywhere else closes them too.
+  await p.click('#guideOpen');
+  await p.waitForSelector('#menuPop', { state: 'visible' });
+  // On a phone the options are a sheet from the bar to the bottom edge, so the bottom corner of
+  // the screen is *inside* them - pressing there chose an option rather than closing anything.
+  // The scrim is what makes "somewhere else" exist at all; press it where it is not covered.
+  await p.mouse.click(6, 6);
+  await p.waitForTimeout(140);
+  if (!(await p.evaluate(() => document.getElementById('menuPop').hidden)))
+    problems.push(`${name}: a press outside did not close the options`);
+
+  if (sheet) {
+    // ---- narrow: the game owns the first screen, the notes are a sheet ------------------
+    if (state.guideBoxed) problems.push(`${name}: the sheet is open on load`);
     if (state.wheelBottom > state.viewportH)
       problems.push(`${name}: wheel bottom ${state.wheelBottom} past viewport ${state.viewportH}`);
 
-    // open it
-    await p.click('#guideOpen');
-    await p.waitForTimeout(400);
+    await openSection(p, 'levels');
     const open = await p.evaluate(() => ({
       visible: getComputedStyle(document.querySelector('.guide')).visibility,
-      expanded: document.getElementById('guideOpen').getAttribute('aria-expanded'),
       bodyLocked: getComputedStyle(document.body).overflow,
+      optionsGone: document.getElementById('menuPop').hidden,
+      // Five cards across the ten sections - levels, what-this-is, how-to-play,
+      // one-tile-one-akshara and the feedback card. They are in the DOM whichever section is
+      // open, so this counts the markup rather than what is on screen.
       cards: document.querySelectorAll('.guide .card').length,
       hasFooter: !!document.querySelector('.guide footer'),
       levels: document.querySelectorAll('.guide #levelGrid .lv').length,
-      guideTop: Math.round(document.querySelector('.guide').getBoundingClientRect().top)
+      guideTop: Math.round(document.querySelector('.guide').getBoundingClientRect().top),
+      head: document.getElementById('guideTitle').textContent.trim(),
+      canGoBack: !!document.getElementById('guideBack'),
     }));
-    if (open.visible !== 'visible') problems.push(`${name}: guide did not open`);
-    if (open.expanded !== 'true') problems.push(`${name}: aria-expanded not set`);
+    if (open.visible !== 'visible') problems.push(`${name}: the sheet did not open`);
     if (open.bodyLocked !== 'hidden') problems.push(`${name}: body not scroll-locked`);
-    // Five cards spread across six sections - levels, what-this-is, how-to-play,
-    // one-tile-one-akshara and the feedback card. They exist in the DOM whichever section is
-    // open, so this counts the markup rather than what is on screen.
-    if (open.cards !== 5) problems.push(`${name}: guide has ${open.cards} cards, expected 5`);
-    if (!open.hasFooter) problems.push(`${name}: footer missing from guide`);
-    // Not a hardcoded count: the picker must hold every level there is.
+    if (!open.optionsGone) problems.push(`${name}: the options stayed open behind the sheet`);
+    if (open.cards !== 5) problems.push(`${name}: the sheet has ${open.cards} cards, expected 5`);
+    if (!open.hasFooter) problems.push(`${name}: footer missing from the sheet`);
+    if (open.head !== 'লেভেল') problems.push(`${name}: the head says "${open.head}", not লেভেল`);
+    if (!open.canGoBack) problems.push(`${name}: no way back to the options from the sheet`);
     const total = await p.evaluate(() => LEVELS.length);
     if (open.levels !== total)
-      problems.push(`${name}: ${open.levels} level buttons in guide, expected ${total}`);
-    if (open.guideTop > 2) problems.push(`${name}: guide not flush to the top (${open.guideTop})`);
+      problems.push(`${name}: ${open.levels} level buttons, expected ${total}`);
+    if (open.guideTop > 2) problems.push(`${name}: the sheet is not flush to the top (${open.guideTop})`);
 
-    // picking a level closes it and loads that level
+    // ‹ মেনু goes back to the options rather than out altogether - someone who opened the wrong
+    // section should not have to close everything and start over.
+    await p.click('#guideBack');
+    await p.waitForTimeout(320);
+    const back = await p.evaluate(() => ({
+      options: !document.getElementById('menuPop').hidden,
+      sheet: getComputedStyle(document.querySelector('.guide')).visibility,
+    }));
+    if (!back.options) problems.push(`${name}: ‹ মেনু did not bring the options back`);
+    if (back.sheet === 'visible') problems.push(`${name}: ‹ মেনু left the sheet open`);
+
+    // Picking a level closes the sheet and loads it.
+    await openSection(p, 'levels');
     await p.click('.guide #levelGrid .lv:nth-child(5)');
     await p.waitForTimeout(400);
     const after = await p.evaluate(() => ({
       visible: getComputedStyle(document.querySelector('.guide')).visibility,
       index: game.index,
-      expanded: document.getElementById('guideOpen').getAttribute('aria-expanded')
     }));
-    if (after.visible === 'visible') problems.push(`${name}: guide stayed open after picking a level`);
+    if (after.visible === 'visible') problems.push(`${name}: the sheet stayed open after picking a level`);
     if (after.index !== 4) problems.push(`${name}: level ${after.index + 1} loaded, expected 5`);
-    if (after.expanded !== 'false') problems.push(`${name}: aria-expanded stuck at true`);
 
-    // escape closes it too
-    await p.click('#guideOpen');
-    await p.waitForTimeout(320);
+    // Escape closes the sheet too.
+    await openSection(p, 'levels');
     await p.keyboard.press('Escape');
     await p.waitForTimeout(320);
-    const esc = await p.evaluate(() => getComputedStyle(document.querySelector('.guide')).visibility);
-    if (esc === 'visible') problems.push(`${name}: Escape did not close the guide`);
+    if ((await p.evaluate(() => getComputedStyle(document.querySelector('.guide')).visibility)) === 'visible')
+      problems.push(`${name}: Escape did not close the sheet`);
 
-    console.log(`${name}: bar+menu ok, board ends ${state.wheelBottom}/${state.viewportH}, ` +
-      `guide holds ${open.cards} cards + ${open.levels} levels + footer`);
+    console.log(`${name}: bar + ${pop.count} options in ${pop.groups} groups, board ends `
+              + `${state.wheelBottom}/${state.viewportH}, sheet holds ${open.cards} cards + `
+              + `${open.levels} levels + footer`);
   } else {
-    if (state.touchBar) problems.push(`${name}: touch bar showing on desktop`);
-    if (!state.masthead) problems.push(`${name}: masthead hidden on desktop`);
+    // ---- wide: the section is the column beside the game --------------------------------
     if (!state.guideVisible) problems.push(`${name}: notes hidden on desktop`);
-    if (state.menuButton) problems.push(`${name}: menu button showing on desktop`);
-    // The level picker used to have a column of its own under the phone; it is a section of
-    // the menu now, so the desktop layout is game on the left, menu on the right, footer last.
     const cols = await p.evaluate(() => {
       const dev = document.querySelector('.device').getBoundingClientRect();
-      const menu = document.querySelector('.menu').getBoundingClientRect();
       const pages = document.querySelector('.pages').getBoundingClientRect();
-      // The footer is build notes, so it lives inside the পরিচিতি section rather than under
-      // all six - it used to sit below every section, which read as a caption to whatever was
-      // on screen, including the alphabet chart.
+      // The footer is build notes, so it lives inside পরিচিতি rather than under all ten - it
+      // used to sit below every section, which read as a caption to whatever was on screen,
+      // including the alphabet chart.
       const ft = document.querySelector('footer');
       return {
-        sideBySide: menu.left > dev.right - 4 && pages.left > dev.right - 4,
-        menuAbovePages: menu.bottom <= pages.top + 4,
+        sideBySide: pages.left > dev.right - 4,
         footerInAbout: !!ft.closest('#page-about'),
-        tabs: document.querySelectorAll('#menu .tab').length,
+        options: document.querySelectorAll('#menuPop .opt').length,
         sections: document.querySelectorAll('.pages .page').length,
         onePageShowing: [...document.querySelectorAll('.pages .page')]
           .filter(x => getComputedStyle(x).display !== 'none').length
       };
     });
-    if (!cols.sideBySide) problems.push(`${name}: the menu is not beside the game`);
-    if (!cols.menuAbovePages) problems.push(`${name}: the menu bar is not above its sections`);
+    if (!cols.sideBySide) problems.push(`${name}: the notes are not beside the game`);
     if (!cols.footerInAbout) problems.push(`${name}: the footer is not inside the পরিচিতি section`);
-    // One tab per section, counted rather than written out - this file said 6 and kept saying
-    // it after two sections were added, so the literal was the bug. menutest owns which
-    // sections exist and in what order; here it only has to be a tab for each of them.
-    if (cols.tabs !== cols.sections)
-      problems.push(`${name}: ${cols.tabs} tabs for ${cols.sections} sections`);
-    if (cols.tabs < 6) problems.push(`${name}: only ${cols.tabs} tabs`);
+    // One option per section, counted rather than written out - this file said 6 and kept
+    // saying it after two sections were added, so the literal was the bug. menutest owns which
+    // sections exist and in what order; here it only has to be an option for each of them.
+    if (cols.options !== cols.sections)
+      problems.push(`${name}: ${cols.options} options for ${cols.sections} sections`);
     if (cols.onePageShowing !== 1)
       problems.push(`${name}: ${cols.onePageShowing} sections showing, expected exactly 1`);
-    // And it really is on screen when that section is open.
-    await p.click('#tab-about');
+
+    await openSection(p, 'about');
     const footerShows = await p.evaluate(() =>
       getComputedStyle(document.querySelector('footer')).display !== 'none'
       && document.querySelector('footer').getBoundingClientRect().height > 0);
     if (!footerShows) problems.push(`${name}: the footer does not show when পরিচিতি is open`);
-    console.log(`${name}: two-up intact, no hamburger, ${cols.tabs} tabs, one section showing`);
+    console.log(`${name}: two-up intact, ${cols.options} options behind the bar, one section showing`);
   }
   if (state.overflow > 1) problems.push(`${name}: page scrolls sideways by ${state.overflow}px`);
   await p.close();

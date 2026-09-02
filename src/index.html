@@ -31,20 +31,92 @@
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <p class="eyebrow bn">বাংলা শব্দ খেলা / <span id="eyebrowCount">লেভেল</span> / ব্রাউজারেই চলে</p>
-    <h1>শব্দজট</h1>
-  </header>
+  <!-- One bar, at every size. There used to be two: a tall gold masthead on wide screens and a
+       separate strip on phones, so the way in was in a different place depending on the screen.
+       One bar means one place to look, and it puts the board on the first screen everywhere
+       rather than only on a phone. -->
+  <header class="bar">
+    <div class="bar-name">
+      <span class="mark bn">শব্দজট</span>
+      <span class="eyebrow bn">বাংলা শব্দ খেলা · <span id="eyebrowCount">লেভেল</span> · ব্রাউজারেই চলে</span>
+    </div>
 
-  <!-- Stands in for the masthead on phones and tablets, where the game itself should own the
-       first screen. The notes move behind the button rather than below the fold. -->
-  <div class="touch-bar">
-    <span class="touch-title bn">শব্দজট</span>
-    <button class="touch-menu" id="guideOpen" aria-expanded="false" aria-controls="guide">
+    <button class="bar-menu" id="guideOpen" type="button"
+            aria-haspopup="true" aria-expanded="false" aria-controls="menuPop">
       <span class="bars" aria-hidden="true"></span>
       <span class="label bn">মেনু</span>
     </button>
+
+  <!-- The options. Ten of them used to sit in one flat row of identical pills that wrapped into
+       four ragged lines, which gave a child no way to tell লেভেল - where you play - from ফলা,
+       something to read: every one was the same shape in the same colour. Four groups in
+       teaching order now, each option carrying its own tile and the sentence that used to be a
+       `title` attribute - a tooltip no touch device has ever shown anyone. -->
+  <!-- Something to press that is not the menu. On a wide screen the options are a small card
+       and everything around them is already "outside", but on a phone they are a sheet running
+       from the bar to the bottom edge, so there was nothing left to tap: the only ways out were
+       the button and a keyboard, and a child has neither in mind. Dimmed where it covers the
+       game, invisible where it is only catching stray presses. -->
+  <div class="scrim" id="scrim" hidden></div>
+
+  <div class="menu-pop" id="menuPop" role="menu" aria-label="মেনু" hidden>
+    <div class="menu-group" data-block="1">
+      <p class="menu-head bn">বর্ণমালা</p>
+      <button class="opt" type="button" role="menuitem" data-page="vowels">
+        <span class="opt-g bn" aria-hidden="true">স্ব</span>
+        <span class="opt-t"><b class="bn">স্বরবর্ণ</b><i class="bn">এগারোটি স্বরবর্ণ</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="consonants">
+        <span class="opt-g bn" aria-hidden="true">ব্য</span>
+        <span class="opt-t"><b class="bn">ব্যঞ্জনবর্ণ</b><i class="bn">ক থেকে হ - বত্রিশটি ব্যঞ্জনবর্ণ</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="marks">
+        <span class="opt-g bn" aria-hidden="true">কা</span>
+        <span class="opt-t"><b class="bn">কার ও চিহ্ন</b><i class="bn">বর্ণের সঙ্গে যে চিহ্নগুলো বসে</i></span>
+      </button>
+    </div>
+
+    <div class="menu-group" data-block="2">
+      <p class="menu-head bn">শব্দ গড়া</p>
+      <button class="opt" type="button" role="menuitem" data-page="gathon">
+        <span class="opt-g bn" aria-hidden="true">শ</span>
+        <span class="opt-t"><b class="bn">শব্দ গঠন</b><i class="bn">বর্ণ জুড়ে শব্দ বানানো</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="phala">
+        <span class="opt-g bn" aria-hidden="true">ফ</span>
+        <span class="opt-t"><b class="bn">ফলা</b><i class="bn">ব্যঞ্জনবর্ণের সংক্ষিপ্ত রূপ</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="jukto">
+        <span class="opt-g bn" aria-hidden="true">যু</span>
+        <span class="opt-t"><b class="bn">যুক্তবর্ণ</b><i class="bn">দুই বর্ণ মিলে এক বর্ণ</i></span>
+      </button>
+    </div>
+
+    <div class="menu-group" data-block="3">
+      <p class="menu-head bn">খেলা</p>
+      <button class="opt" type="button" role="menuitem" data-page="levels">
+        <span class="opt-g bn" aria-hidden="true">লে</span>
+        <span class="opt-t"><b class="bn">লেভেল</b><i class="bn">বর্ণ অনুসারে সব লেভেল</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="play">
+        <span class="opt-g bn" aria-hidden="true">খে</span>
+        <span class="opt-t"><b class="bn">খেলার নিয়ম</b><i class="bn">কীভাবে খেলবে</i></span>
+      </button>
+    </div>
+
+    <div class="menu-group" data-block="4">
+      <p class="menu-head bn">আরও</p>
+      <button class="opt" type="button" role="menuitem" data-page="about">
+        <span class="opt-g bn" aria-hidden="true">প</span>
+        <span class="opt-t"><b class="bn">পরিচিতি</b><i class="bn">খেলাটি কী</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="report">
+        <span class="opt-g bn" aria-hidden="true">ভু</span>
+        <span class="opt-t"><b class="bn">ভুল পেয়েছেন?</b><i class="bn">ভুল বা মতামত জানান</i></span>
+      </button>
+    </div>
   </div>
+  </header>
 
   <div class="stage">
     <div class="device">
@@ -84,43 +156,23 @@
     </div>
 
     <div class="guide" id="guide" aria-label="Alphabet, levels and how this game works">
+      <!-- The head names what you are reading. It used to say only "মেনু", above a bar of ten
+           pills, on a sheet you had already opened from a button marked মেনু - three chances to
+           say the same word and none to say which section you were in. The title is set from
+           whichever option was chosen, and ‹ goes back to the options rather than shutting the
+           whole thing. -->
       <div class="guide-head">
-        <span class="guide-title bn">মেনু</span>
-        <button class="guide-close bn" id="guideClose" aria-label="মেনু বন্ধ করুন">বন্ধ</button>
+        <button class="guide-back bn" id="guideBack" type="button"
+                aria-label="মেনুতে ফিরুন">‹ <span class="bn">মেনু</span></button>
+        <span class="guide-title bn" id="guideTitle">মেনু</span>
+        <button class="guide-close bn" id="guideClose" aria-label="বন্ধ করুন">বন্ধ</button>
       </div>
-
-      <!-- The menu bar. One section is on screen at a time, which is the point: the guide used
-           to be one long scroll with the level grid on top, and a child looking for the letter
-           chart had to know it was down there. Eight named places instead, in teaching order:
-           the letters, then what the letters take, then how letters join into words. -->
-      <nav class="menu" id="menu" role="tablist" aria-label="Sections">
-        <button class="tab bn" type="button" role="tab" data-page="vowels"
-                aria-controls="page-vowels" title="এগারোটি স্বরবর্ণ">স্বরবর্ণ</button>
-        <button class="tab bn" type="button" role="tab" data-page="consonants"
-                aria-controls="page-consonants" title="ক থেকে হ - বত্রিশটি ব্যঞ্জনবর্ণ">ব্যঞ্জনবর্ণ</button>
-        <button class="tab bn" type="button" role="tab" data-page="marks"
-                aria-controls="page-marks" title="বর্ণের সঙ্গে যে চিহ্নগুলো বসে">কার ও চিহ্ন</button>
-        <button class="tab bn" type="button" role="tab" data-page="gathon"
-                aria-controls="page-gathon" title="বর্ণ জুড়ে শব্দ বানানো">শব্দ গঠন</button>
-        <button class="tab bn" type="button" role="tab" data-page="phala"
-                aria-controls="page-phala" title="ব্যঞ্জনবর্ণের সংক্ষিপ্ত রূপ">ফলা</button>
-        <button class="tab bn" type="button" role="tab" data-page="jukto"
-                aria-controls="page-jukto" title="দুই বর্ণ মিলে এক বর্ণ">যুক্তবর্ণ</button>
-        <button class="tab bn" type="button" role="tab" data-page="levels"
-                aria-controls="page-levels" title="বর্ণ অনুসারে সব লেভেল">লেভেল</button>
-        <button class="tab bn" type="button" role="tab" data-page="about"
-                aria-controls="page-about" title="খেলাটি কী">পরিচিতি</button>
-        <button class="tab bn" type="button" role="tab" data-page="play"
-                aria-controls="page-play" title="কীভাবে খেলবে">খেলার নিয়ম</button>
-        <button class="tab bn" type="button" role="tab" data-page="report"
-                aria-controls="page-report" title="ভুল বা মতামত জানান">ভুল পেয়েছেন?</button>
-      </nav>
 
       <div class="pages">
         <!-- The two halves of the বর্ণমালা, as a chart a child can read AND as the way into the
              game: every letter that has levels is a button that opens its first one. Built in
              js/10-menu.js from LEVELS, so the chart cannot claim a letter the game has lost. -->
-        <section class="page" id="page-vowels" role="tabpanel" aria-labelledby="tab-vowels">
+        <section class="page" id="page-vowels" role="region" aria-labelledby="opt-vowels">
           <h3>স্বরবর্ণ</h3>
           <p class="deck">
             এগারোটি বর্ণ, আর প্রতিটি বাঙালি শিশু সবার আগে এই ক্রমেই মুখস্থ করে। খেলাটিও এই
@@ -130,7 +182,7 @@
           <div class="chart" id="chartVowels"></div>
         </section>
 
-        <section class="page" id="page-consonants" role="tabpanel" aria-labelledby="tab-consonants">
+        <section class="page" id="page-consonants" role="region" aria-labelledby="opt-consonants">
           <h3>ব্যঞ্জনবর্ণ</h3>
           <p class="deck">
             বত্রিশটি বর্ণ, ক থেকে হ। স্বরবর্ণের পরে খেলাটি এই ক্রমেই চলে - যেকোনো বর্ণে চাপ
@@ -145,7 +197,7 @@
           <div class="chart" id="chartConsonants"></div>
         </section>
 
-        <section class="page" id="page-marks" role="tabpanel" aria-labelledby="tab-marks">
+        <section class="page" id="page-marks" role="region" aria-labelledby="opt-marks">
           <h3>কার ও চিহ্ন</h3>
           <p class="deck">
             বাংলা বর্ণ খুব কম সময়েই একা থাকে। একটি <b>কার</b> বর্ণের সঙ্গে বসে উচ্চারণ বদলে
@@ -178,7 +230,7 @@
              the বর্ণমালা tells a child what the letters are and the বারোখড়ি tells them what
              each letter becomes, but neither shows the step between - that two letters put
              side by side make a word. A primer teaches that with equations, so this does. -->
-        <section class="page" id="page-gathon" role="tabpanel" aria-labelledby="tab-gathon">
+        <section class="page" id="page-gathon" role="region" aria-labelledby="opt-gathon">
           <h3>কার চিহ্ন ছাড়া শব্দ গঠন</h3>
           <p class="deck">
             কোনো কার নেই, কোনো চিহ্ন নেই - শুধু বর্ণের পর বর্ণ। এভাবেই শিশু প্রথম শব্দ পড়ে:
@@ -198,7 +250,7 @@
           <div class="kw-list" id="karList"></div>
         </section>
 
-        <section class="page" id="page-phala" role="tabpanel" aria-labelledby="tab-phala">
+        <section class="page" id="page-phala" role="region" aria-labelledby="opt-phala">
           <h3>ফলা চিহ্নের পরিচয়</h3>
           <p class="deck" id="phalaNote"></p>
           <div class="phala" id="phalaTable"></div>
@@ -209,7 +261,7 @@
              so. Every row is checked by tools/build.py - the parts really do join into the
              form, and the form really is a single akshara by the same splitter the board
              uses. -->
-        <section class="page" id="page-jukto" role="tabpanel" aria-labelledby="tab-jukto">
+        <section class="page" id="page-jukto" role="region" aria-labelledby="opt-jukto">
           <h3>যুক্তবর্ণ বা যুক্তাক্ষর</h3>
           <p class="deck" id="juktoNote"></p>
           <p class="deck">
@@ -220,14 +272,14 @@
           <div class="jk" id="juktoTable"></div>
         </section>
 
-        <section class="page" id="page-levels" role="tabpanel" aria-labelledby="tab-levels">
+        <section class="page" id="page-levels" role="region" aria-labelledby="opt-levels">
 <section class="card levels-card">
         <h3>লেভেল</h3>
         <div class="levels" id="levelGrid"></div>
       </section>
         </section>
 
-        <section class="page" id="page-about" role="tabpanel" aria-labelledby="tab-about">
+        <section class="page" id="page-about" role="region" aria-labelledby="opt-about">
 <section class="card">
         <h3>পরিচিতি</h3>
         <p class="deck">
@@ -295,7 +347,7 @@
           অক্ষর নিয়েই কিনা: কা লেভেলের সব শব্দ কা দিয়ে শুরু, না হলে বিল্ড ব্যর্থ হয়।
           </footer>
         </section>
-        <section class="page" id="page-play" role="tabpanel" aria-labelledby="tab-play">
+        <section class="page" id="page-play" role="region" aria-labelledby="opt-play">
 <section class="card">
         <h3>খেলার নিয়ম</h3>
         <ul class="how">
@@ -326,7 +378,7 @@
         <!-- Reporting a mistake is a parent's job, not a child's, so it gets its own
              named place rather than living at the bottom of পরিচিতি where it had to be
              scrolled to and found. -->
-        <section class="page" id="page-report" role="tabpanel" aria-labelledby="tab-report">
+        <section class="page" id="page-report" role="region" aria-labelledby="opt-report">
 <section class="card">
         <h3>ভুল পেয়েছেন?</h3>
         <p class="deck">

@@ -12,7 +12,7 @@
  * button sends a child to whatever level happens to sit at index undefined - which is how the
  * rule "playable words are buttons, the rest are text" ends up being worth a test.
  */
-import { launch, PAGE, report } from './harness.mjs';
+import { launch, PAGE, report, openSection } from './harness.mjs';
 
 const problems = [];
 const b = await launch();
@@ -21,10 +21,10 @@ const p = await ctx.newPage();
 p.on('pageerror', e => problems.push('pageerror: ' + e.message));
 p.on('console', m => { if (m.type() === 'error') problems.push('console: ' + m.text()); });
 await p.goto(PAGE);
-await p.waitForFunction(() => document.querySelector('.tile') && document.querySelector('#menu .tab'));
+await p.waitForFunction(() => document.querySelector('.tile') && document.querySelector('#menuPop .opt'));
 
 // ---- the equations: what is drawn is what PRIMER holds, and it adds up ------------------
-await p.click('#tab-gathon');
+await openSection(p, 'gathon');
 const eqs = await p.evaluate(() => {
   const read = id => [...document.querySelectorAll('#' + id + ' .eq')].map(e => ({
     parts: [...e.querySelectorAll('.eq-l')].map(x => x.textContent),
@@ -92,7 +92,7 @@ if (!jumped) {
 }
 
 // ---- every কার picker shows its own words, and each really carries the sign --------------
-await p.click('#tab-gathon');
+await openSection(p, 'gathon');
 const kars = await p.$$eval('.kp', bs => bs.length);
 if (kars !== 10) problems.push(`${kars} কার in the picker, expected 10`);
 
@@ -137,7 +137,7 @@ for (let i = 0; i < kars; i++) {
 console.log(`কার যোগে বানান: ${kars} কার, ${totalWords} words across them`);
 
 // ---- ফলা: every mark, its forms and its words -------------------------------------------
-await p.click('#tab-phala');
+await openSection(p, 'phala');
 const phala = await p.evaluate(() => {
   const cards = [...document.querySelectorAll('.ph')].map(c => ({
     name: c.querySelector('.ph-h').textContent.replace(c.querySelector('.ph-m').textContent, ''),
@@ -207,7 +207,7 @@ const words = phala.cards.reduce((n, c) => n + c.words.length, 0);
 console.log(`ফলা: ${phala.cards.length} marks, ${forms} forms, ${words} words`);
 
 // ---- যুক্তবর্ণ: the parts really make the letter, and the letter is one tile -------------
-await p.click('#tab-jukto');
+await openSection(p, 'jukto');
 const jukto = await p.evaluate(() => {
   const rows = [...document.querySelectorAll('.jr')].map(r => ({
     form: r.querySelector('.jr-f').textContent,
@@ -285,7 +285,7 @@ await phone.goto(PAGE);
 await phone.waitForFunction(() => document.querySelector('.tile'));
 await phone.click('#guideOpen');
 for (const key of ['gathon', 'phala', 'jukto']) {
-  await phone.click(`#tab-${key}`).catch(() => problems.push(`${key}: tab not tappable on a phone`));
+  await openSection(phone, key).catch(() => problems.push(`${key}: tab not tappable on a phone`));
   const fits = await phone.evaluate(k => {
     const s = document.querySelector(`#page-${k}`);
     return { wide: s.scrollWidth > s.clientWidth + 1, empty: !s.textContent.trim() };

@@ -104,28 +104,49 @@ min-height: 100vh;
 }
 
 .wrap { max-width: 940px; margin: 0 auto; }
-header { margin-bottom: clamp(14px, 2.2vw, 22px); }
+.bar {
+position: sticky;
+top: 0;
+isolation: isolate;
+z-index: 50;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 12px;
+margin: 0 0 clamp(12px, 1.8vw, 20px);
+padding: 10px 0 12px;
+}
+
+.bar::after {
+content: "";
+position: absolute;
+inset: 0;
+z-index: -1;
+background: linear-gradient(var(--bg) 64%, rgba(var(--shade), 0));
+opacity: 0;
+transition: opacity .2s ease;
+}
+.bar.stuck::after { opacity: 1; }
+
+.bar-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+.mark {
+font-family: var(--bn);
+font-size: clamp(26px, 3.4vw, 38px);
+line-height: 1.06;
+font-weight: 700;
+color: var(--accent);
+text-shadow: 0 2px 0 var(--accent-lo), 0 4px 10px rgba(var(--glow-accent), .34);
+}
 
 .eyebrow {
 font-family: var(--bn);
 font-size: 13px;
 color: var(--ink-soft);
-margin: 0 0 8px;
+margin: 0;
 font-weight: 600;
 }
-
-h1 {
-font-family: var(--bn);
-font-size: clamp(40px, 7.4vw, 68px);
-line-height: 1.05;
-margin: 0;
-color: var(--accent);
-text-wrap: balance;
-text-shadow:
-0 2px 0 var(--accent-lo),
-0 3px 0 var(--accent-lo),
-0 6px 12px rgba(var(--glow-accent), .38);
-}
+@media (max-width: 620px) { .eyebrow { display: none; } }
 
 .deck {
 margin: 0;
@@ -137,6 +158,49 @@ line-height: 1.62;
 .deck b { color: var(--ink); font-weight: 600; }
 
 .card .deck:not(:last-child) { margin-bottom: 16px; }
+
+.bar-menu {
+display: inline-flex;
+align-items: center;
+gap: 9px;
+flex: none;
+border: 0;
+background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+box-shadow: var(--lip) var(--accent-lo);
+color: var(--ink);
+border-radius: 99px;
+padding: 10px 18px 12px 15px;
+font: inherit;
+font-size: 15px;
+font-weight: 700;
+cursor: pointer;
+transition: filter .16s ease, transform .12s ease, box-shadow .12s ease;
+}
+.bar-menu:hover { filter: brightness(1.04); }
+.bar-menu:active { transform: translateY(4px); box-shadow: none; }
+
+.bar-menu .bars {
+width: 16px; height: 12px;
+border-top: 2.5px solid currentColor;
+border-bottom: 2.5px solid currentColor;
+position: relative;
+transition: border-color .18s ease;
+}
+.bar-menu .bars::before,
+.bar-menu .bars::after {
+content: "";
+position: absolute;
+left: 0; right: 0; top: 50%;
+border-top: 2.5px solid currentColor;
+transform: translateY(-1.5px);
+transition: transform .18s ease;
+}
+.bar-menu[aria-expanded="true"] .bars {
+border-top-color: transparent;
+border-bottom-color: transparent;
+}
+.bar-menu[aria-expanded="true"] .bars::before { transform: translateY(-1.5px) rotate(45deg); }
+.bar-menu[aria-expanded="true"] .bars::after  { transform: translateY(-1.5px) rotate(-45deg); }
 
 .stage {
 display: grid;
@@ -151,7 +215,39 @@ justify-content: center;
 .device { grid-area: game; }
 
 .guide { grid-area: notes; min-width: 0; }
-.guide-head, .touch-bar { display: none; }
+
+.guide-head {
+display: flex;
+align-items: center;
+gap: 10px;
+margin-bottom: 14px;
+}
+.guide-close { display: none; }
+
+.guide-back {
+display: inline-flex;
+align-items: center;
+gap: 4px;
+border: 0;
+background: var(--surface);
+box-shadow: var(--lip) var(--surface-3);
+color: var(--ink-soft);
+border-radius: 99px;
+padding: 7px 15px 9px;
+font: inherit;
+font-size: 14px;
+font-weight: 700;
+cursor: pointer;
+}
+.guide-back:hover { color: var(--ink); background: var(--accent-hi); }
+.guide-back:active { transform: translateY(4px); box-shadow: none; }
+
+.guide-title {
+font-family: var(--bn);
+font-size: 19px;
+font-weight: 700;
+color: var(--ink);
+}
 
 @media (max-width: 860px) {
 .stage {
@@ -162,59 +258,6 @@ grid-template-rows: auto auto;
 }
 
 @media (max-width: 1024px) {
-header { display: none; }
-
-.touch-bar {
-display: flex;
-align-items: center;
-justify-content: space-between;
-gap: 12px;
-margin-bottom: 10px;
-}
-
-.touch-title {
-font-family: var(--bn);
-font-size: 26px;
-font-weight: 700;
-color: var(--accent);
-line-height: 1;
-}
-
-.touch-menu {
-display: inline-flex;
-align-items: center;
-gap: 9px;
-border: 1px solid var(--surface-3);
-background: linear-gradient(180deg, #fff, var(--surface-2));
-box-shadow: var(--lip) var(--surface-3);
-color: var(--ink);
-border-radius: 99px;
-padding: 9px 15px 11px 12px;
-font: inherit;
-font-size: 12px;
-letter-spacing: .12em;
-text-transform: uppercase;
-font-weight: 700;
-cursor: pointer;
-transition: background-color .16s ease, transform .16s ease;
-}
-.touch-menu:hover { background: var(--accent-hi); }
-.touch-menu:active { transform: translateY(4px); box-shadow: none; }
-
-.touch-menu .bars {
-width: 15px; height: 11px;
-border-top: 2px solid currentColor;
-border-bottom: 2px solid currentColor;
-position: relative;
-}
-.touch-menu .bars::after {
-content: "";
-position: absolute;
-left: 0; right: 0; top: 50%;
-border-top: 2px solid currentColor;
-transform: translateY(-1px);
-}
-
 .stage {
 grid-template-columns: minmax(0, 1fr);
 grid-template-areas: "game";
@@ -227,7 +270,7 @@ grid-area: auto;
 display: block;
 position: fixed;
 inset: 0;
-z-index: 40;
+z-index: 60;
 overflow-y: auto;
 overscroll-behavior: contain;
 -webkit-overflow-scrolling: touch;
@@ -241,8 +284,6 @@ transition: transform .26s cubic-bezier(.22, 1, .36, 1), visibility .26s;
 body.guide-open { overflow: hidden; }
 
 .guide-head {
-display: flex;
-align-items: center;
 justify-content: space-between;
 position: sticky;
 top: -14px;
@@ -252,36 +293,20 @@ background: linear-gradient(var(--surface-3) 78%, transparent);
 z-index: 1;
 }
 
-.guide-title {
-font-size: 11px;
-letter-spacing: .18em;
-text-transform: uppercase;
-font-weight: 800;
-color: var(--ink);
-}
-
 .guide-close {
+display: inline-block;
 border: 0;
 background: linear-gradient(180deg, var(--accent-hi), var(--accent));
 box-shadow: var(--lip) var(--accent-lo);
 color: var(--ink);
 border-radius: 99px;
-padding: 8px 16px;
+padding: 8px 18px 10px;
 font: inherit;
-font-size: 12px;
-letter-spacing: .12em;
-text-transform: uppercase;
+font-size: 15px;
 font-weight: 700;
 cursor: pointer;
 }
 .guide-close:active { transform: translateY(4px); box-shadow: none; }
-
-.guide-title.bn, .guide-close.bn, .touch-menu .label.bn {
-letter-spacing: 0;
-text-transform: none;
-font-size: 15px;
-}
-
 }
 
 .device {
@@ -731,42 +756,134 @@ background: linear-gradient(180deg, var(--good-hi), var(--good));
 color: var(--good-ink);
 box-shadow: var(--lip) var(--good-lo);
 }
-.menu {
-display: flex;
-flex-wrap: wrap;
-gap: 6px;
-margin-bottom: 16px;
-padding-bottom: 14px;
-border-bottom: 1px solid var(--surface-3);
+.menu-pop {
+position: absolute;
+top: calc(100% - 4px);
+right: 0;
+z-index: 60;
+width: min(560px, calc(100vw - 28px));
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 6px 18px;
+padding: 16px 16px 18px;
+background: var(--surface);
+border-radius: var(--r-lg);
+box-shadow: 0 18px 44px rgba(var(--shade), .22), 0 2px 0 var(--surface-3);
+animation: pop-in .18s cubic-bezier(.22, 1, .36, 1);
+}
+.menu-pop[hidden] { display: none; }
+
+@keyframes pop-in {
+from { opacity: 0; transform: translateY(-8px); }
+to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+.menu-pop { animation: none; }
 }
 
-.tab {
-border: 0;
-border-radius: 999px;
-padding: 8px 15px 10px;
-background: var(--surface);
-color: var(--ink-soft);
-font-size: 14px;
+.scrim {
+position: fixed;
+inset: 0;
+z-index: 55;
+background: transparent;
+}
+.scrim[hidden] { display: none; }
+@media (max-width: 620px) {
+.scrim { background: rgba(var(--shade), .34); }
+}
+
+.menu-group { min-width: 0; }
+
+.menu-head {
+font-family: var(--bn);
+font-size: 13px;
 font-weight: 700;
+color: var(--ink-faint);
+margin: 6px 0 6px 2px;
+padding-left: 8px;
+border-left: 3px solid var(--block-1);
+}
+.menu-group[data-block="2"] .menu-head { border-left-color: var(--block-2); }
+.menu-group[data-block="3"] .menu-head { border-left-color: var(--block-3); }
+.menu-group[data-block="4"] .menu-head { border-left-color: var(--block-4); }
+
+.opt {
+display: flex;
+align-items: center;
+gap: 11px;
+width: 100%;
+border: 0;
+border-radius: var(--r-md);
+padding: 8px 10px;
+background: transparent;
+color: inherit;
+font: inherit;
+text-align: start;
 cursor: pointer;
-white-space: nowrap;
-box-shadow: var(--lip) var(--surface-3);
-transition: transform .12s ease, box-shadow .12s ease,
-background-color .16s ease, color .16s ease;
+transition: background-color .14s ease;
 }
-.tab:hover { color: var(--ink); background: var(--accent-hi); }
-.tab:active { transform: translateY(4px); box-shadow: none; }
-.tab.on {
-background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+.opt:hover { background: var(--surface-2); }
+.opt:active { background: var(--surface-3); }
+
+.opt-g {
+flex: none;
+display: grid;
+place-items: center;
+width: 38px; height: 38px;
+border-radius: 11px;
+background: var(--block-1);
 color: var(--ink);
-box-shadow: var(--lip) var(--accent-lo);
+font-size: 18px;
+font-weight: 700;
+box-shadow: 0 2px 0 rgba(var(--shade), .10);
 }
-.tab.on:active { transform: translateY(4px); box-shadow: none; }
+.menu-group[data-block="2"] .opt-g { background: var(--block-2); }
+.menu-group[data-block="3"] .opt-g { background: var(--block-3); }
+.menu-group[data-block="4"] .opt-g { background: var(--block-4); }
+
+.opt-t { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.opt-t b {
+font-family: var(--bn);
+font-size: 16px;
+font-weight: 700;
+color: var(--ink);
+line-height: 1.25;
+}
+.opt-t i {
+font-family: var(--bn);
+font-style: normal;
+font-size: 12.5px;
+color: var(--ink-faint);
+line-height: 1.35;
+}
+
+.opt.on { background: var(--accent-hi); }
+.opt.on .opt-g {
+background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+box-shadow: 0 2px 0 var(--accent-lo);
+}
+.opt.on .opt-t b { color: var(--ink); }
+
+@media (max-width: 620px) {
+.menu-pop {
+position: fixed;
+inset: auto 0 0;
+top: var(--bar-bottom, 64px);
+width: auto;
+grid-template-columns: 1fr;
+gap: 2px;
+border-radius: var(--r-lg) var(--r-lg) 0 0;
+overflow-y: auto;
+overscroll-behavior: contain;
+padding-bottom: calc(20px + env(safe-area-inset-bottom));
+}
+.opt { padding: 10px; }
+}
 
 .page { display: none; }
 .page.on { display: block; }
 .page > .card + .card { margin-top: 22px; }
-.page > h3 {
+.page > h3, .page .card > h3:first-child {
 margin: 0 0 12px;
 font-size: 21px;
 font-family: var(--bn);
@@ -777,6 +894,16 @@ align-items: baseline;
 gap: 8px;
 flex-wrap: wrap;
 }
+
+.page h3.dup {
+position: absolute;
+width: 1px; height: 1px;
+margin: -1px; padding: 0;
+overflow: hidden;
+clip-path: inset(50%);
+white-space: nowrap;
+}
+
 .page .card h3 {
 font-family: var(--bn);
 font-size: 14px;
@@ -1409,20 +1536,92 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
 }
 </style>
 <div class="wrap">
-  <header>
-    <p class="eyebrow bn">বাংলা শব্দ খেলা / <span id="eyebrowCount">লেভেল</span> / ব্রাউজারেই চলে</p>
-    <h1>শব্দজট</h1>
-  </header>
+  <!-- One bar, at every size. There used to be two: a tall gold masthead on wide screens and a
+       separate strip on phones, so the way in was in a different place depending on the screen.
+       One bar means one place to look, and it puts the board on the first screen everywhere
+       rather than only on a phone. -->
+  <header class="bar">
+    <div class="bar-name">
+      <span class="mark bn">শব্দজট</span>
+      <span class="eyebrow bn">বাংলা শব্দ খেলা · <span id="eyebrowCount">লেভেল</span> · ব্রাউজারেই চলে</span>
+    </div>
 
-  <!-- Stands in for the masthead on phones and tablets, where the game itself should own the
-       first screen. The notes move behind the button rather than below the fold. -->
-  <div class="touch-bar">
-    <span class="touch-title bn">শব্দজট</span>
-    <button class="touch-menu" id="guideOpen" aria-expanded="false" aria-controls="guide">
+    <button class="bar-menu" id="guideOpen" type="button"
+            aria-haspopup="true" aria-expanded="false" aria-controls="menuPop">
       <span class="bars" aria-hidden="true"></span>
       <span class="label bn">মেনু</span>
     </button>
+
+  <!-- The options. Ten of them used to sit in one flat row of identical pills that wrapped into
+       four ragged lines, which gave a child no way to tell লেভেল - where you play - from ফলা,
+       something to read: every one was the same shape in the same colour. Four groups in
+       teaching order now, each option carrying its own tile and the sentence that used to be a
+       `title` attribute - a tooltip no touch device has ever shown anyone. -->
+  <!-- Something to press that is not the menu. On a wide screen the options are a small card
+       and everything around them is already "outside", but on a phone they are a sheet running
+       from the bar to the bottom edge, so there was nothing left to tap: the only ways out were
+       the button and a keyboard, and a child has neither in mind. Dimmed where it covers the
+       game, invisible where it is only catching stray presses. -->
+  <div class="scrim" id="scrim" hidden></div>
+
+  <div class="menu-pop" id="menuPop" role="menu" aria-label="মেনু" hidden>
+    <div class="menu-group" data-block="1">
+      <p class="menu-head bn">বর্ণমালা</p>
+      <button class="opt" type="button" role="menuitem" data-page="vowels">
+        <span class="opt-g bn" aria-hidden="true">স্ব</span>
+        <span class="opt-t"><b class="bn">স্বরবর্ণ</b><i class="bn">এগারোটি স্বরবর্ণ</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="consonants">
+        <span class="opt-g bn" aria-hidden="true">ব্য</span>
+        <span class="opt-t"><b class="bn">ব্যঞ্জনবর্ণ</b><i class="bn">ক থেকে হ - বত্রিশটি ব্যঞ্জনবর্ণ</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="marks">
+        <span class="opt-g bn" aria-hidden="true">কা</span>
+        <span class="opt-t"><b class="bn">কার ও চিহ্ন</b><i class="bn">বর্ণের সঙ্গে যে চিহ্নগুলো বসে</i></span>
+      </button>
+    </div>
+
+    <div class="menu-group" data-block="2">
+      <p class="menu-head bn">শব্দ গড়া</p>
+      <button class="opt" type="button" role="menuitem" data-page="gathon">
+        <span class="opt-g bn" aria-hidden="true">শ</span>
+        <span class="opt-t"><b class="bn">শব্দ গঠন</b><i class="bn">বর্ণ জুড়ে শব্দ বানানো</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="phala">
+        <span class="opt-g bn" aria-hidden="true">ফ</span>
+        <span class="opt-t"><b class="bn">ফলা</b><i class="bn">ব্যঞ্জনবর্ণের সংক্ষিপ্ত রূপ</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="jukto">
+        <span class="opt-g bn" aria-hidden="true">যু</span>
+        <span class="opt-t"><b class="bn">যুক্তবর্ণ</b><i class="bn">দুই বর্ণ মিলে এক বর্ণ</i></span>
+      </button>
+    </div>
+
+    <div class="menu-group" data-block="3">
+      <p class="menu-head bn">খেলা</p>
+      <button class="opt" type="button" role="menuitem" data-page="levels">
+        <span class="opt-g bn" aria-hidden="true">লে</span>
+        <span class="opt-t"><b class="bn">লেভেল</b><i class="bn">বর্ণ অনুসারে সব লেভেল</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="play">
+        <span class="opt-g bn" aria-hidden="true">খে</span>
+        <span class="opt-t"><b class="bn">খেলার নিয়ম</b><i class="bn">কীভাবে খেলবে</i></span>
+      </button>
+    </div>
+
+    <div class="menu-group" data-block="4">
+      <p class="menu-head bn">আরও</p>
+      <button class="opt" type="button" role="menuitem" data-page="about">
+        <span class="opt-g bn" aria-hidden="true">প</span>
+        <span class="opt-t"><b class="bn">পরিচিতি</b><i class="bn">খেলাটি কী</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="report">
+        <span class="opt-g bn" aria-hidden="true">ভু</span>
+        <span class="opt-t"><b class="bn">ভুল পেয়েছেন?</b><i class="bn">ভুল বা মতামত জানান</i></span>
+      </button>
+    </div>
   </div>
+  </header>
 
   <div class="stage">
     <div class="device">
@@ -1462,43 +1661,23 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
     </div>
 
     <div class="guide" id="guide" aria-label="Alphabet, levels and how this game works">
+      <!-- The head names what you are reading. It used to say only "মেনু", above a bar of ten
+           pills, on a sheet you had already opened from a button marked মেনু - three chances to
+           say the same word and none to say which section you were in. The title is set from
+           whichever option was chosen, and ‹ goes back to the options rather than shutting the
+           whole thing. -->
       <div class="guide-head">
-        <span class="guide-title bn">মেনু</span>
-        <button class="guide-close bn" id="guideClose" aria-label="মেনু বন্ধ করুন">বন্ধ</button>
+        <button class="guide-back bn" id="guideBack" type="button"
+                aria-label="মেনুতে ফিরুন">‹ <span class="bn">মেনু</span></button>
+        <span class="guide-title bn" id="guideTitle">মেনু</span>
+        <button class="guide-close bn" id="guideClose" aria-label="বন্ধ করুন">বন্ধ</button>
       </div>
-
-      <!-- The menu bar. One section is on screen at a time, which is the point: the guide used
-           to be one long scroll with the level grid on top, and a child looking for the letter
-           chart had to know it was down there. Eight named places instead, in teaching order:
-           the letters, then what the letters take, then how letters join into words. -->
-      <nav class="menu" id="menu" role="tablist" aria-label="Sections">
-        <button class="tab bn" type="button" role="tab" data-page="vowels"
-                aria-controls="page-vowels" title="এগারোটি স্বরবর্ণ">স্বরবর্ণ</button>
-        <button class="tab bn" type="button" role="tab" data-page="consonants"
-                aria-controls="page-consonants" title="ক থেকে হ - বত্রিশটি ব্যঞ্জনবর্ণ">ব্যঞ্জনবর্ণ</button>
-        <button class="tab bn" type="button" role="tab" data-page="marks"
-                aria-controls="page-marks" title="বর্ণের সঙ্গে যে চিহ্নগুলো বসে">কার ও চিহ্ন</button>
-        <button class="tab bn" type="button" role="tab" data-page="gathon"
-                aria-controls="page-gathon" title="বর্ণ জুড়ে শব্দ বানানো">শব্দ গঠন</button>
-        <button class="tab bn" type="button" role="tab" data-page="phala"
-                aria-controls="page-phala" title="ব্যঞ্জনবর্ণের সংক্ষিপ্ত রূপ">ফলা</button>
-        <button class="tab bn" type="button" role="tab" data-page="jukto"
-                aria-controls="page-jukto" title="দুই বর্ণ মিলে এক বর্ণ">যুক্তবর্ণ</button>
-        <button class="tab bn" type="button" role="tab" data-page="levels"
-                aria-controls="page-levels" title="বর্ণ অনুসারে সব লেভেল">লেভেল</button>
-        <button class="tab bn" type="button" role="tab" data-page="about"
-                aria-controls="page-about" title="খেলাটি কী">পরিচিতি</button>
-        <button class="tab bn" type="button" role="tab" data-page="play"
-                aria-controls="page-play" title="কীভাবে খেলবে">খেলার নিয়ম</button>
-        <button class="tab bn" type="button" role="tab" data-page="report"
-                aria-controls="page-report" title="ভুল বা মতামত জানান">ভুল পেয়েছেন?</button>
-      </nav>
 
       <div class="pages">
         <!-- The two halves of the বর্ণমালা, as a chart a child can read AND as the way into the
              game: every letter that has levels is a button that opens its first one. Built in
              js/10-menu.js from LEVELS, so the chart cannot claim a letter the game has lost. -->
-        <section class="page" id="page-vowels" role="tabpanel" aria-labelledby="tab-vowels">
+        <section class="page" id="page-vowels" role="region" aria-labelledby="opt-vowels">
           <h3>স্বরবর্ণ</h3>
           <p class="deck">
             এগারোটি বর্ণ, আর প্রতিটি বাঙালি শিশু সবার আগে এই ক্রমেই মুখস্থ করে। খেলাটিও এই
@@ -1508,7 +1687,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
           <div class="chart" id="chartVowels"></div>
         </section>
 
-        <section class="page" id="page-consonants" role="tabpanel" aria-labelledby="tab-consonants">
+        <section class="page" id="page-consonants" role="region" aria-labelledby="opt-consonants">
           <h3>ব্যঞ্জনবর্ণ</h3>
           <p class="deck">
             বত্রিশটি বর্ণ, ক থেকে হ। স্বরবর্ণের পরে খেলাটি এই ক্রমেই চলে - যেকোনো বর্ণে চাপ
@@ -1523,7 +1702,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
           <div class="chart" id="chartConsonants"></div>
         </section>
 
-        <section class="page" id="page-marks" role="tabpanel" aria-labelledby="tab-marks">
+        <section class="page" id="page-marks" role="region" aria-labelledby="opt-marks">
           <h3>কার ও চিহ্ন</h3>
           <p class="deck">
             বাংলা বর্ণ খুব কম সময়েই একা থাকে। একটি <b>কার</b> বর্ণের সঙ্গে বসে উচ্চারণ বদলে
@@ -1556,7 +1735,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
              the বর্ণমালা tells a child what the letters are and the বারোখড়ি tells them what
              each letter becomes, but neither shows the step between - that two letters put
              side by side make a word. A primer teaches that with equations, so this does. -->
-        <section class="page" id="page-gathon" role="tabpanel" aria-labelledby="tab-gathon">
+        <section class="page" id="page-gathon" role="region" aria-labelledby="opt-gathon">
           <h3>কার চিহ্ন ছাড়া শব্দ গঠন</h3>
           <p class="deck">
             কোনো কার নেই, কোনো চিহ্ন নেই - শুধু বর্ণের পর বর্ণ। এভাবেই শিশু প্রথম শব্দ পড়ে:
@@ -1576,7 +1755,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
           <div class="kw-list" id="karList"></div>
         </section>
 
-        <section class="page" id="page-phala" role="tabpanel" aria-labelledby="tab-phala">
+        <section class="page" id="page-phala" role="region" aria-labelledby="opt-phala">
           <h3>ফলা চিহ্নের পরিচয়</h3>
           <p class="deck" id="phalaNote"></p>
           <div class="phala" id="phalaTable"></div>
@@ -1587,7 +1766,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
              so. Every row is checked by tools/build.py - the parts really do join into the
              form, and the form really is a single akshara by the same splitter the board
              uses. -->
-        <section class="page" id="page-jukto" role="tabpanel" aria-labelledby="tab-jukto">
+        <section class="page" id="page-jukto" role="region" aria-labelledby="opt-jukto">
           <h3>যুক্তবর্ণ বা যুক্তাক্ষর</h3>
           <p class="deck" id="juktoNote"></p>
           <p class="deck">
@@ -1598,14 +1777,14 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
           <div class="jk" id="juktoTable"></div>
         </section>
 
-        <section class="page" id="page-levels" role="tabpanel" aria-labelledby="tab-levels">
+        <section class="page" id="page-levels" role="region" aria-labelledby="opt-levels">
 <section class="card levels-card">
         <h3>লেভেল</h3>
         <div class="levels" id="levelGrid"></div>
       </section>
         </section>
 
-        <section class="page" id="page-about" role="tabpanel" aria-labelledby="tab-about">
+        <section class="page" id="page-about" role="region" aria-labelledby="opt-about">
 <section class="card">
         <h3>পরিচিতি</h3>
         <p class="deck">
@@ -1673,7 +1852,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
           অক্ষর নিয়েই কিনা: কা লেভেলের সব শব্দ কা দিয়ে শুরু, না হলে বিল্ড ব্যর্থ হয়।
           </footer>
         </section>
-        <section class="page" id="page-play" role="tabpanel" aria-labelledby="tab-play">
+        <section class="page" id="page-play" role="region" aria-labelledby="opt-play">
 <section class="card">
         <h3>খেলার নিয়ম</h3>
         <ul class="how">
@@ -1704,7 +1883,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
         <!-- Reporting a mistake is a parent's job, not a child's, so it gets its own
              named place rather than living at the bottom of পরিচিতি where it had to be
              scrolled to and found. -->
-        <section class="page" id="page-report" role="tabpanel" aria-labelledby="tab-report">
+        <section class="page" id="page-report" role="region" aria-labelledby="opt-report">
 <section class="card">
         <h3>ভুল পেয়েছেন?</h3>
         <p class="deck">
@@ -2584,6 +2763,11 @@ next: document.getElementById("next"),
 guide: document.getElementById("guide"),
 guideOpen: document.getElementById("guideOpen"),
 guideClose: document.getElementById("guideClose"),
+guideBack: document.getElementById("guideBack"),
+guideTitle: document.getElementById("guideTitle"),
+menuPop: document.getElementById("menuPop"),
+scrim: document.getElementById("scrim"),
+bar: document.querySelector(".bar"),
 levelGlyph: document.getElementById("levelGlyph"),
 levelPass: document.getElementById("levelPass"),
 mute: document.getElementById("mute"),
@@ -3515,24 +3699,42 @@ table.appendChild(row);
 }
 
 const MENU_KEY = "shobdojot.page";
-const tabs = [...document.querySelectorAll("#menu .tab")];
+const opts = [...document.querySelectorAll("#menuPop .opt")];
 
 function showPage(key, remember = true) {
-for (const tab of tabs) {
-const on = tab.dataset.page === key;
-tab.classList.toggle("on", on);
-tab.setAttribute("aria-selected", on ? "true" : "false");
+let title = "";
+for (const opt of opts) {
+const on = opt.dataset.page === key;
+opt.classList.toggle("on", on);
+if (on) opt.setAttribute("aria-current", "true");
+else opt.removeAttribute("aria-current");
+if (on) title = opt.querySelector(".opt-t b").textContent;
 }
 for (const page of document.querySelectorAll(".pages .page")) {
 page.classList.toggle("on", page.id === `page-${key}`);
+const first = page.querySelector("h3");
+if (first) first.classList.toggle("dup", first.textContent.trim() === title);
 }
+if (el.guideTitle) el.guideTitle.textContent = title;
 if (remember) { try { localStorage.setItem(MENU_KEY, key); } catch {} }
 }
 
-for (const tab of tabs) {
-tab.id = `tab-${tab.dataset.page}`;
-tab.addEventListener("click", () => showPage(tab.dataset.page));
+for (const opt of opts) {
+opt.id = `opt-${opt.dataset.page}`;
+opt.addEventListener("click", () => {
+showPage(opt.dataset.page);
+chooseSection();
+});
 }
+
+el.menuPop.addEventListener("keydown", e => {
+const here = opts.indexOf(document.activeElement);
+if (here < 0) return;
+const step = { ArrowDown: 1, ArrowUp: -1, Home: -here, End: opts.length - 1 - here }[e.key];
+if (step === undefined) return;
+e.preventDefault();
+opts[(here + step + opts.length) % opts.length].focus();
+});
 
 drawCharts();
 drawBaro();
@@ -3540,7 +3742,7 @@ drawBaro();
 let opening = "levels";
 try {
 const saved = localStorage.getItem(MENU_KEY);
-if (saved && tabs.some(t => t.dataset.page === saved)) opening = saved;
+if (saved && opts.some(o => o.dataset.page === saved)) opening = saved;
 } catch { /* no stored preference; levels it is */ }
 showPage(opening, false);
 
@@ -3927,12 +4129,42 @@ drawPreview();
 animateShuffle(before);
 });
 
+const menuIsOpen = () => !el.menuPop.hidden;
 const guideIsOpen = () => el.guide.classList.contains("open");
+
+function markBar() {
+if (!el.bar) return;
+document.documentElement.style.setProperty("--bar-bottom",
+Math.round(el.bar.getBoundingClientRect().bottom) + "px");
+}
+
+function openMenu() {
+markBar();
+el.menuPop.hidden = false;
+el.scrim.hidden = false;
+el.guideOpen.setAttribute("aria-expanded", "true");
+Sfx.page(true);
+const here = el.menuPop.querySelector(".opt.on") || el.menuPop.querySelector(".opt");
+if (here) here.focus();
+}
+
+function closeMenu(giveFocusBack = true) {
+if (el.menuPop.hidden) return;
+el.menuPop.hidden = true;
+el.scrim.hidden = true;
+el.guideOpen.setAttribute("aria-expanded", "false");
+if (giveFocusBack) el.guideOpen.focus();
+}
+
+function chooseSection() {
+closeMenu(false);
+if (window.matchMedia("(max-width: 1024px)").matches) openGuide();
+else el.guide.querySelector(".guide-title").focus?.();
+}
 
 function openGuide() {
 el.guide.classList.add("open");
 document.body.classList.add("guide-open");
-el.guideOpen.setAttribute("aria-expanded", "true");
 el.guide.scrollTop = 0;
 el.guideClose.focus();
 }
@@ -3940,7 +4172,6 @@ el.guideClose.focus();
 function closeGuide() {
 el.guide.classList.remove("open");
 document.body.classList.remove("guide-open");
-el.guideOpen.setAttribute("aria-expanded", "false");
 el.guideOpen.focus();
 }
 
@@ -3955,8 +4186,34 @@ drawLevelCount();
 
 Speech.init();
 
-el.guideOpen.addEventListener("click", openGuide);
+el.guideOpen.addEventListener("click", () => (menuIsOpen() ? closeMenu() : openMenu()));
 el.guideClose.addEventListener("click", closeGuide);
+
+el.guideBack.addEventListener("click", () => {
+if (guideIsOpen()) closeGuide();
+openMenu();
+});
+
+document.addEventListener("keydown", e => {
+if (e.key !== "Escape") return;
+if (menuIsOpen()) closeMenu();
+else if (guideIsOpen()) closeGuide();
+});
+
+document.addEventListener("pointerdown", e => {
+if (!menuIsOpen()) return;
+if (e.target.closest("#menuPop") || e.target.closest("#guideOpen")) return;
+closeMenu(false);
+});
+
+function markScrolled() {
+if (el.bar) el.bar.classList.toggle("stuck", scrollY > 4);
+}
+addEventListener("scroll", markScrolled, { passive: true });
+markScrolled();
+
+addEventListener("resize", markBar);
+markBar();
 
 el.levelGrid.addEventListener("click", e => {
 if (e.target.closest(".lv") && guideIsOpen()) closeGuide();
