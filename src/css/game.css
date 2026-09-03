@@ -15,6 +15,9 @@
        is the limit and no frame can invent more of it. */
     width: 510px;
     max-width: 100%;
+    /* 176px is what the page around the game takes on a wide screen: the bar above it and the
+       margins either side of that. On a phone the bar is gone and a tab bar is at the foot
+       instead, so the sum is different - see the touch rules below. */
     height: min(770px, calc(100vh - 176px));
     height: min(770px, calc(100dvh - 176px));
     min-height: 540px;

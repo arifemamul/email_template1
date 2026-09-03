@@ -21,6 +21,7 @@ const el = {
   menuPop: document.getElementById("menuPop"),
   scrim: document.getElementById("scrim"),
   bar: document.querySelector(".bar"),
+  tabbar: document.getElementById("tabbar"),
   levelGlyph: document.getElementById("levelGlyph"),
   levelPass: document.getElementById("levelPass"),
   mute: document.getElementById("mute"),

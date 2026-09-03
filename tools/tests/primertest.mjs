@@ -283,7 +283,10 @@ console.log(`যুক্তবর্ণ: ${total} letters, ${juktoWords} words 
 const phone = await (await b.newContext({ viewport: { width: 360, height: 640 } })).newPage();
 await phone.goto(PAGE);
 await phone.waitForFunction(() => document.querySelector('.tile'));
-await phone.click('#guideOpen');
+// A phone opens the options from the tab bar at the foot of the screen; the top bar's button
+// is not on screen at this width. `openSection` below knows both routes - this one only has to
+// prove the bar is there and opens something.
+await phone.click('#tabbar .tb[data-block="2"]');
 for (const key of ['gathon', 'phala', 'jukto']) {
   await openSection(phone, key).catch(() => problems.push(`${key}: tab not tappable on a phone`));
   const fits = await phone.evaluate(k => {

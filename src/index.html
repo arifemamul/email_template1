@@ -57,8 +57,6 @@
        from the bar to the bottom edge, so there was nothing left to tap: the only ways out were
        the button and a keyboard, and a child has neither in mind. Dimmed where it covers the
        game, invisible where it is only catching stray presses. -->
-  <div class="scrim" id="scrim" hidden></div>
-
   <div class="menu-pop" id="menuPop" role="menu" aria-label="মেনু" hidden>
     <div class="menu-group" data-block="1">
       <p class="menu-head bn">বর্ণমালা</p>
@@ -117,6 +115,56 @@
     </div>
   </div>
   </header>
+
+  <!-- The way in on a phone: a bar at the foot of the screen, where a thumb already is, with
+       one tab per group of options. It replaces the button in the top bar on narrow screens -
+       reaching the far top corner of a 6-inch phone is a stretch a child makes with two hands.
+       The top bar goes with it, because the name is decoration on a phone and the height it
+       took is the height this needs.
+
+       The icons are drawn rather than typed. An icon font or a symbol like ▦ is a box on a
+       phone that has no glyph for it, and this game is played on phones nobody here can test;
+       a path is a path everywhere. Four different silhouettes on purpose - a first pass drew
+       বর্ণমালা as a book and শব্দ গড়া as two blocks, and at 20px both read as "two shapes
+       side by side", which is a bar where half the tabs look alike. -->
+  <nav class="tabbar" id="tabbar" aria-label="মেনু">
+    <button class="tb" type="button" data-block="1" aria-haspopup="true" aria-expanded="false">
+      <span class="tb-g" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor">
+        <rect x="3.5" y="3.5" width="17" height="17" rx="3"/>
+        <rect x="6.8" y="7.4" width="10.4" height="2" rx="1" fill="#fff"/>
+        <rect x="6.8" y="11" width="7" height="2" rx="1" fill="#fff"/>
+        <rect x="6.8" y="14.6" width="9" height="2" rx="1" fill="#fff"/>
+      </svg></span>
+      <span class="tb-l bn">বর্ণমালা</span>
+    </button>
+    <button class="tb" type="button" data-block="2" aria-haspopup="true" aria-expanded="false">
+      <span class="tb-g" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor">
+        <rect x="1.8" y="7.8" width="7.4" height="8.4" rx="2.2"/>
+        <rect x="14.8" y="7.8" width="7.4" height="8.4" rx="2.2"/>
+        <rect x="11.2" y="8.9" width="1.6" height="6.2" rx=".8"/>
+        <rect x="8.9" y="11.2" width="6.2" height="1.6" rx=".8"/>
+      </svg></span>
+      <span class="tb-l bn">শব্দ গড়া</span>
+    </button>
+    <button class="tb" type="button" data-block="3" aria-haspopup="true" aria-expanded="false">
+      <span class="tb-g" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor">
+        <rect x="3.4" y="3.4" width="7.6" height="7.6" rx="2.2"/>
+        <rect x="13" y="3.4" width="7.6" height="7.6" rx="2.2"/>
+        <rect x="3.4" y="13" width="7.6" height="7.6" rx="2.2"/>
+        <rect x="13" y="13" width="7.6" height="7.6" rx="2.2"/>
+      </svg></span>
+      <span class="tb-l bn">খেলা</span>
+    </button>
+    <button class="tb" type="button" data-block="4" aria-haspopup="true" aria-expanded="false">
+      <span class="tb-g" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor">
+        <circle cx="4.4" cy="12" r="2.3"/><circle cx="12" cy="12" r="2.3"/>
+        <circle cx="19.6" cy="12" r="2.3"/>
+      </svg></span>
+      <span class="tb-l bn">আরও</span>
+    </button>
+  </nav>
+
+  <div class="scrim" id="scrim" hidden></div>
 
   <div class="stage">
     <div class="device">

@@ -32,13 +32,91 @@
     .menu-pop { animation: none; }
   }
 
+  /* -- The bar at the foot of the screen ----------------------------------------
+       Phones and tablets only. On a wide screen the options hang off a button in the top bar,
+       which is where a pointer already is; on a phone the thumb is at the bottom and the top
+       corner of a six-inch screen is a two-handed reach. One tab per group, so the four names
+       a child navigates by are on screen the whole time instead of behind a button.
+
+       Hidden above the touch breakpoint, where `.bar` keeps its button. */
+  .tabbar { display: none; }
+
+  @media (max-width: 1024px) {
+    .tabbar {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      z-index: 70;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      padding: 7px 8px calc(8px + env(safe-area-inset-bottom));
+      background: linear-gradient(180deg, #fff, var(--surface));
+      box-shadow: 0 -6px 20px rgba(var(--shade), .12), inset 0 2px 0 var(--surface-3);
+    }
+
+    .tb {
+      display: grid;
+      justify-items: center;
+      gap: 5px;
+      border: 0;
+      background: transparent;
+      padding: 5px 2px 3px;
+      border-radius: var(--r-md);
+      font: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* The same tinted tile the level grid and the option list use, so a tab belongs to the
+       group it opens by colour before it is read. */
+    .tb-g {
+      display: grid;
+      place-items: center;
+      width: 34px; height: 34px;
+      border-radius: 11px;
+      --hue: var(--block-1);
+      color: color-mix(in srgb, var(--hue) 78%, var(--ink));
+      background: color-mix(in srgb, var(--hue) 22%, #fff);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .tb-g svg { width: 20px; height: 20px; display: block; }
+    .tb[data-block="2"] .tb-g { --hue: var(--block-2); }
+    .tb[data-block="3"] .tb-g { --hue: var(--block-3); }
+    .tb[data-block="4"] .tb-g { --hue: var(--block-4); }
+
+    .tb-l {
+      font-family: var(--bn);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink-faint);
+      line-height: 1;
+    }
+
+    /* Open, or holding the section you are reading: the game's own gold, and pressed down like
+       every other button here. */
+    .tb[aria-expanded="true"] .tb-g,
+    .tb[aria-current="true"] .tb-g {
+      background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+      box-shadow: 0 3px 0 var(--accent-lo);
+      color: var(--ink);
+    }
+    .tb[aria-expanded="true"] .tb-l,
+    .tb[aria-current="true"] .tb-l { color: var(--ink); }
+    .tb:active .tb-g { transform: translateY(3px); box-shadow: none; }
+  }
+
   /* Invisible by default: on a wide screen its whole job is to catch a press that lands
      anywhere but the options. Over a phone it dims the game as well, because there the options
      are a sheet and the game behind them should read as put away rather than merely covered. */
   .scrim {
     position: fixed;
     inset: 0;
-    z-index: 55;
+    /* Under the bar, and therefore under the options panel, which is a child of the bar and so
+       stacks at the bar's level whatever its own z-index says. Above the bar, the scrim painted
+       over the panel and swallowed every tap meant for an option - the menu closed instead of
+       choosing. Under it, a press on the dimmed game still closes, because the handler asks
+       what was pressed rather than what was covered. */
+    z-index: 45;
     background: transparent;
   }
   .scrim[hidden] { display: none; }
@@ -130,20 +208,40 @@
 
   /* One column on a phone, and the panel becomes a sheet under the bar rather than a card
      hanging off it: at 390px a two-column card would be two 170px columns of clipped Bengali. */
-  @media (max-width: 620px) {
+  /* On a phone the options come up out of the tab that opened them, so they sit above the bar
+     rather than dropping from a button at the top that is no longer there. One group at a
+     time - the tab chose it - which is what makes four tabs four different things rather than
+     four ways to open the same list. */
+  @media (max-width: 1024px) {
     .menu-pop {
       position: fixed;
-      inset: auto 0 0;
-      top: var(--bar-bottom, 64px);
+      inset: auto 0 var(--tabbar-h, 72px);
+      top: auto;
       width: auto;
+      max-height: 62vh;
       grid-template-columns: 1fr;
       gap: 2px;
       border-radius: var(--r-lg) var(--r-lg) 0 0;
       overflow-y: auto;
       overscroll-behavior: contain;
-      padding-bottom: calc(20px + env(safe-area-inset-bottom));
+      padding-bottom: 16px;
+      animation: rise-in .18s cubic-bezier(.22, 1, .36, 1);
     }
     .opt { padding: 10px; }
+
+    /* Only the group whose tab was pressed. */
+    .menu-pop[data-only="1"] .menu-group:not([data-block="1"]),
+    .menu-pop[data-only="2"] .menu-group:not([data-block="2"]),
+    .menu-pop[data-only="3"] .menu-group:not([data-block="3"]),
+    .menu-pop[data-only="4"] .menu-group:not([data-block="4"]) { display: none; }
+  }
+
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .menu-pop { animation: none; }
   }
 
   /* -- Each vowel beside its own কার --------------------------------------------

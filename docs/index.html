@@ -277,6 +277,15 @@ grid-template-rows: auto auto;
 }
 
 @media (max-width: 1024px) {
+.bar {
+z-index: 65;
+height: 0;
+margin: 0;
+padding: 0;
+overflow: visible;
+}
+.bar-name, .bar-menu, .bar::after { display: none; }
+
 .stage {
 grid-template-columns: minmax(0, 1fr);
 grid-template-areas: "game";
@@ -294,7 +303,7 @@ overflow-y: auto;
 overscroll-behavior: contain;
 -webkit-overflow-scrolling: touch;
 background: var(--surface-3);
-padding: 14px 14px calc(34px + env(safe-area-inset-bottom));
+padding: 14px 14px calc(34px + var(--tabbar-h, 72px) + env(safe-area-inset-bottom));
 transform: translateY(100%);
 visibility: hidden;
 transition: transform .26s cubic-bezier(.22, 1, .36, 1), visibility .26s;
@@ -800,10 +809,72 @@ to   { opacity: 1; transform: none; }
 .menu-pop { animation: none; }
 }
 
+.tabbar { display: none; }
+
+@media (max-width: 1024px) {
+.tabbar {
+position: fixed;
+left: 0; right: 0; bottom: 0;
+z-index: 70;
+display: grid;
+grid-template-columns: repeat(4, 1fr);
+gap: 2px;
+padding: 7px 8px calc(8px + env(safe-area-inset-bottom));
+background: linear-gradient(180deg, #fff, var(--surface));
+box-shadow: 0 -6px 20px rgba(var(--shade), .12), inset 0 2px 0 var(--surface-3);
+}
+
+.tb {
+display: grid;
+justify-items: center;
+gap: 5px;
+border: 0;
+background: transparent;
+padding: 5px 2px 3px;
+border-radius: var(--r-md);
+font: inherit;
+cursor: pointer;
+-webkit-tap-highlight-color: transparent;
+}
+
+.tb-g {
+display: grid;
+place-items: center;
+width: 34px; height: 34px;
+border-radius: 11px;
+--hue: var(--block-1);
+color: color-mix(in srgb, var(--hue) 78%, var(--ink));
+background: color-mix(in srgb, var(--hue) 22%, #fff);
+transition: transform .12s ease, box-shadow .12s ease;
+}
+.tb-g svg { width: 20px; height: 20px; display: block; }
+.tb[data-block="2"] .tb-g { --hue: var(--block-2); }
+.tb[data-block="3"] .tb-g { --hue: var(--block-3); }
+.tb[data-block="4"] .tb-g { --hue: var(--block-4); }
+
+.tb-l {
+font-family: var(--bn);
+font-size: 12px;
+font-weight: 700;
+color: var(--ink-faint);
+line-height: 1;
+}
+
+.tb[aria-expanded="true"] .tb-g,
+.tb[aria-current="true"] .tb-g {
+background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+box-shadow: 0 3px 0 var(--accent-lo);
+color: var(--ink);
+}
+.tb[aria-expanded="true"] .tb-l,
+.tb[aria-current="true"] .tb-l { color: var(--ink); }
+.tb:active .tb-g { transform: translateY(3px); box-shadow: none; }
+}
+
 .scrim {
 position: fixed;
 inset: 0;
-z-index: 55;
+z-index: 45;
 background: transparent;
 }
 .scrim[hidden] { display: none; }
@@ -883,20 +954,35 @@ box-shadow: 0 2px 0 var(--accent-lo);
 }
 .opt.on .opt-t b { color: var(--ink); }
 
-@media (max-width: 620px) {
+@media (max-width: 1024px) {
 .menu-pop {
 position: fixed;
-inset: auto 0 0;
-top: var(--bar-bottom, 64px);
+inset: auto 0 var(--tabbar-h, 72px);
+top: auto;
 width: auto;
+max-height: 62vh;
 grid-template-columns: 1fr;
 gap: 2px;
 border-radius: var(--r-lg) var(--r-lg) 0 0;
 overflow-y: auto;
 overscroll-behavior: contain;
-padding-bottom: calc(20px + env(safe-area-inset-bottom));
+padding-bottom: 16px;
+animation: rise-in .18s cubic-bezier(.22, 1, .36, 1);
 }
 .opt { padding: 10px; }
+
+.menu-pop[data-only="1"] .menu-group:not([data-block="1"]),
+.menu-pop[data-only="2"] .menu-group:not([data-block="2"]),
+.menu-pop[data-only="3"] .menu-group:not([data-block="3"]),
+.menu-pop[data-only="4"] .menu-group:not([data-block="4"]) { display: none; }
+}
+
+@keyframes rise-in {
+from { opacity: 0; transform: translateY(10px); }
+to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+.menu-pop { animation: none; }
 }
 
 .pairs {
@@ -1567,12 +1653,20 @@ button { font: inherit; color: inherit; }
 
 .device, .levels { user-select: none; -webkit-user-select: none; }
 
+@media (min-width: 701px) and (max-width: 1024px) {
+body { padding-bottom: 0; }
+.device {
+height: min(770px, calc(100vh - 120px - env(safe-area-inset-bottom)));
+height: min(770px, calc(100dvh - 120px - env(safe-area-inset-bottom)));
+}
+}
+
 @media (max-width: 700px) {
-body { padding: 14px 12px 24px; }
+body { padding: 14px 12px 0; }
 .device {
 width: 100%;
-height: min(700px, calc(100vh - 104px));
-height: min(700px, calc(100dvh - 104px));
+height: min(700px, calc(100vh - 112px - env(safe-area-inset-bottom)));
+height: min(700px, calc(100dvh - 112px - env(safe-area-inset-bottom)));
 min-height: 440px;
 padding: 7px;
 border-radius: 30px;
@@ -1625,8 +1719,6 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
        from the bar to the bottom edge, so there was nothing left to tap: the only ways out were
        the button and a keyboard, and a child has neither in mind. Dimmed where it covers the
        game, invisible where it is only catching stray presses. -->
-  <div class="scrim" id="scrim" hidden></div>
-
   <div class="menu-pop" id="menuPop" role="menu" aria-label="মেনু" hidden>
     <div class="menu-group" data-block="1">
       <p class="menu-head bn">বর্ণমালা</p>
@@ -1685,6 +1777,56 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
     </div>
   </div>
   </header>
+
+  <!-- The way in on a phone: a bar at the foot of the screen, where a thumb already is, with
+       one tab per group of options. It replaces the button in the top bar on narrow screens -
+       reaching the far top corner of a 6-inch phone is a stretch a child makes with two hands.
+       The top bar goes with it, because the name is decoration on a phone and the height it
+       took is the height this needs.
+
+       The icons are drawn rather than typed. An icon font or a symbol like ▦ is a box on a
+       phone that has no glyph for it, and this game is played on phones nobody here can test;
+       a path is a path everywhere. Four different silhouettes on purpose - a first pass drew
+       বর্ণমালা as a book and শব্দ গড়া as two blocks, and at 20px both read as "two shapes
+       side by side", which is a bar where half the tabs look alike. -->
+  <nav class="tabbar" id="tabbar" aria-label="মেনু">
+    <button class="tb" type="button" data-block="1" aria-haspopup="true" aria-expanded="false">
+      <span class="tb-g" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor">
+        <rect x="3.5" y="3.5" width="17" height="17" rx="3"/>
+        <rect x="6.8" y="7.4" width="10.4" height="2" rx="1" fill="#fff"/>
+        <rect x="6.8" y="11" width="7" height="2" rx="1" fill="#fff"/>
+        <rect x="6.8" y="14.6" width="9" height="2" rx="1" fill="#fff"/>
+      </svg></span>
+      <span class="tb-l bn">বর্ণমালা</span>
+    </button>
+    <button class="tb" type="button" data-block="2" aria-haspopup="true" aria-expanded="false">
+      <span class="tb-g" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor">
+        <rect x="1.8" y="7.8" width="7.4" height="8.4" rx="2.2"/>
+        <rect x="14.8" y="7.8" width="7.4" height="8.4" rx="2.2"/>
+        <rect x="11.2" y="8.9" width="1.6" height="6.2" rx=".8"/>
+        <rect x="8.9" y="11.2" width="6.2" height="1.6" rx=".8"/>
+      </svg></span>
+      <span class="tb-l bn">শব্দ গড়া</span>
+    </button>
+    <button class="tb" type="button" data-block="3" aria-haspopup="true" aria-expanded="false">
+      <span class="tb-g" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor">
+        <rect x="3.4" y="3.4" width="7.6" height="7.6" rx="2.2"/>
+        <rect x="13" y="3.4" width="7.6" height="7.6" rx="2.2"/>
+        <rect x="3.4" y="13" width="7.6" height="7.6" rx="2.2"/>
+        <rect x="13" y="13" width="7.6" height="7.6" rx="2.2"/>
+      </svg></span>
+      <span class="tb-l bn">খেলা</span>
+    </button>
+    <button class="tb" type="button" data-block="4" aria-haspopup="true" aria-expanded="false">
+      <span class="tb-g" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor">
+        <circle cx="4.4" cy="12" r="2.3"/><circle cx="12" cy="12" r="2.3"/>
+        <circle cx="19.6" cy="12" r="2.3"/>
+      </svg></span>
+      <span class="tb-l bn">আরও</span>
+    </button>
+  </nav>
+
+  <div class="scrim" id="scrim" hidden></div>
 
   <div class="stage">
     <div class="device">
@@ -2854,6 +2996,7 @@ guideTitle: document.getElementById("guideTitle"),
 menuPop: document.getElementById("menuPop"),
 scrim: document.getElementById("scrim"),
 bar: document.querySelector(".bar"),
+tabbar: document.getElementById("tabbar"),
 levelGlyph: document.getElementById("levelGlyph"),
 levelPass: document.getElementById("levelPass"),
 mute: document.getElementById("mute"),
@@ -3849,7 +3992,26 @@ const first = page.querySelector("h3");
 if (first) first.classList.toggle("dup", first.textContent.trim() === title);
 }
 if (el.guideTitle) el.guideTitle.textContent = title;
+markTab(key);
 if (remember) { try { localStorage.setItem(MENU_KEY, key); } catch {} }
+}
+
+const tabs = [...document.querySelectorAll("#tabbar .tb")];
+for (const tab of tabs) {
+tab.addEventListener("click", () => {
+const block = tab.dataset.block;
+if (menuIsOpen() && el.menuPop.dataset.only === block) closeMenu();
+else openMenu(block);
+});
+}
+
+function markTab(key) {
+const holder = document.getElementById(`opt-${key}`);
+const block = holder ? holder.closest(".menu-group").dataset.block : null;
+for (const tab of tabs) {
+if (tab.dataset.block === block) tab.setAttribute("aria-current", "true");
+else tab.removeAttribute("aria-current");
+}
 }
 
 for (const opt of opts) {
@@ -4266,27 +4428,41 @@ const menuIsOpen = () => !el.menuPop.hidden;
 const guideIsOpen = () => el.guide.classList.contains("open");
 
 function markBar() {
-if (!el.bar) return;
+if (el.bar) {
 document.documentElement.style.setProperty("--bar-bottom",
 Math.round(el.bar.getBoundingClientRect().bottom) + "px");
 }
+if (el.tabbar) {
+document.documentElement.style.setProperty("--tabbar-h",
+Math.round(el.tabbar.getBoundingClientRect().height) + "px");
+}
+}
 
-function openMenu() {
+function openMenu(block) {
 markBar();
+if (block) el.menuPop.dataset.only = block;
+else delete el.menuPop.dataset.only;
 el.menuPop.hidden = false;
 el.scrim.hidden = false;
 el.guideOpen.setAttribute("aria-expanded", "true");
+for (const tab of el.tabbar.querySelectorAll(".tb"))
+tab.setAttribute("aria-expanded", tab.dataset.block === block ? "true" : "false");
 Sfx.page(true);
-const here = el.menuPop.querySelector(".opt.on") || el.menuPop.querySelector(".opt");
+const shown = [...el.menuPop.querySelectorAll(".opt")].filter(o => o.offsetParent !== null);
+const here = shown.find(o => o.classList.contains("on")) || shown[0];
 if (here) here.focus();
 }
 
 function closeMenu(giveFocusBack = true) {
 if (el.menuPop.hidden) return;
+const from = el.menuPop.dataset.only;
 el.menuPop.hidden = true;
 el.scrim.hidden = true;
 el.guideOpen.setAttribute("aria-expanded", "false");
-if (giveFocusBack) el.guideOpen.focus();
+for (const tab of el.tabbar.querySelectorAll(".tb")) tab.setAttribute("aria-expanded", "false");
+if (!giveFocusBack) return;
+const tab = from && el.tabbar.querySelector(`.tb[data-block="${from}"]`);
+(tab && tab.offsetParent !== null ? tab : el.guideOpen).focus();
 }
 
 function chooseSection() {
@@ -4336,6 +4512,7 @@ else if (guideIsOpen()) closeGuide();
 document.addEventListener("pointerdown", e => {
 if (!menuIsOpen()) return;
 if (e.target.closest("#menuPop") || e.target.closest("#guideOpen")) return;
+if (e.target.closest("#tabbar")) return;
 closeMenu(false);
 });
 

@@ -126,12 +126,22 @@ export async function serveDocs() {
 export async function openSection(page, key) {
   const opt = `#opt-${key}`;
   if (!(await page.isVisible(opt))) {
-    // On a narrow screen the open sheet covers the whole screen, bar included, so the button
-    // that opens the options is underneath it and cannot be pressed. The way back is the
-    // sheet's own ‹ মেনু - which is the way a player has too, and the reason it exists.
-    const sheetOpen = await page.evaluate(() =>
-      document.querySelector('.guide').classList.contains('open'));
-    await page.click(sheetOpen ? '#guideBack' : '#guideOpen');
+    // Three routes in, and which one exists depends on the width. A test that knows only one
+    // of them has stopped testing the others.
+    const route = await page.evaluate(k => {
+      const showing = s => { const e = document.querySelector(s);
+        return !!e && e.getClientRects().length > 0 && getComputedStyle(e).visibility !== 'hidden'; };
+      // A phone: a tab at the foot of the screen, the one holding this section's group. The
+      // tab bar sits above the sheet, so this works whether or not a section is already open.
+      if (showing('#tabbar'))
+        return `#tabbar .tb[data-block="${
+          document.getElementById(`opt-${k}`).closest('.menu-group').dataset.block}"]`;
+      // A wide screen: the button in the top bar.
+      if (showing('#guideOpen')) return '#guideOpen';
+      // Neither, which means an open sheet is covering the bar: its own ‹ মেনু goes back.
+      return '#guideBack';
+    }, key);
+    await page.click(route);
   }
   await page.waitForSelector(opt, { state: 'visible' });
   await page.click(opt);

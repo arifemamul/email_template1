@@ -9,16 +9,28 @@
   .device, .levels { user-select: none; -webkit-user-select: none; }
 
   /* -- Phones: drop the bezel, give the game the viewport ------------------- */
+  /* Between a phone and a desktop the same swap applies - no top bar, a tab bar at the foot -
+     so the frame's height has to account for the second and not the first. */
+  @media (min-width: 701px) and (max-width: 1024px) {
+    body { padding-bottom: 0; }
+    .device {
+      height: min(770px, calc(100vh - 120px - env(safe-area-inset-bottom)));
+      height: min(770px, calc(100dvh - 120px - env(safe-area-inset-bottom)));
+    }
+  }
+
   @media (max-width: 700px) {
-    body { padding: 14px 12px 24px; }
+    body { padding: 14px 12px 0; }
     .device {
       width: 100%;
-      /* The masthead is gone at this width and the touch bar is much shorter, so the frame
-         starts higher up the page. The 700px cap stays: past it the extra height lands as
-         empty space inside the frame rather than as a bigger board, since the cells are
-         already at their comfortable maximum. */
-      height: min(700px, calc(100vh - 104px));
-      height: min(700px, calc(100dvh - 104px));
+      /* Nothing above the frame at this width - the top bar is hidden and the way in is the
+         tab bar at the foot - so what has to be left over is the tab bar and the page's own
+         padding. 104px was the old sum, when a short top bar sat above the frame and nothing
+         sat below it; the two very nearly cancel. The 700px cap stays: past it the extra
+         height lands as empty space inside the frame rather than as a bigger board, since the
+         cells are already at their comfortable maximum. */
+      height: min(700px, calc(100vh - 112px - env(safe-area-inset-bottom)));
+      height: min(700px, calc(100dvh - 112px - env(safe-area-inset-bottom)));
       min-height: 440px;
       padding: 7px;
       border-radius: 30px;

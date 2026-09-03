@@ -283,47 +283,68 @@ const opened = await p.evaluate(async () => {
 if (opened.after === undefined) problems.push('a বারোখড়ি row opened nothing');
 console.log(`বারোখড়ি: ${pickers.length} letters, 12 forms each, "${opened.label}" opened level ${opened.after + 1}`);
 
-// ---- phone: the whole menu is behind the one button ------------------------------------
+// ---- phone: four tabs at the foot of the screen -----------------------------------------
+// The way in is a tab bar here, not the button in the top bar - that bar is not on screen at
+// this width at all, because reaching the far top corner of a phone is a two-handed stretch
+// and a thumb is already at the bottom.
 const phone = await (await b.newContext({ viewport: { width: 360, height: 640 } })).newPage();
 await phone.goto(PAGE);
 await phone.waitForFunction(() => document.querySelector('.tile'));
 if (await phone.isVisible('#menuPop'))
-  problems.push('the options are on screen before the button is pressed');
-await phone.click('#guideOpen');
-await phone.waitForSelector('#menuPop', { state: 'visible', timeout: 5000 })
-  .catch(() => problems.push('the options did not open on a phone'));
+  problems.push('the options are on screen before a tab is pressed');
+if (await phone.isVisible('#guideOpen'))
+  problems.push("the top bar's button is still on screen on a phone");
 
-// Every option has to be reachable without scrolling the options themselves: ten of them in a
-// flat wrapped row was the thing that made this menu hard to use, and a grouped list that
-// runs off the bottom of a 640px phone would be the same problem in a new shape.
-// Ten options, their descriptions and four group headings do not fit above the fold of a
-// 360x640 phone, and squeezing them until they do would mean taking away either the
-// descriptions or the size of the targets - the two things that made the menu usable. So the
-// sheet scrolls, and what has to hold is that every option can actually be got to and is big
-// enough to hit once you are there.
-const reach = await phone.evaluate(async () => {
-  const pop = document.getElementById('menuPop');
-  const opts = [...document.querySelectorAll('#menuPop .opt')];
-  const out = [];
-  for (const o of opts) {
-    o.scrollIntoView({ block: 'center' });
-    await new Promise(r => requestAnimationFrame(r));
-    const r = o.getBoundingClientRect();
-    out.push({
-      key: o.dataset.page,
-      tall: Math.round(r.height),
-      onScreen: r.top >= -1 && r.bottom <= innerHeight + 1,
-    });
-  }
-  pop.scrollTop = 0;
-  return { opts: out, scrolls: pop.scrollHeight > pop.clientHeight + 1 };
-});
-for (const o of reach.opts) {
-  if (o.tall < 44) problems.push(`${o.key}: the option is ${o.tall}px tall, under the 44px floor`);
-  if (!o.onScreen) problems.push(`${o.key}: the option cannot be scrolled into view`);
+const tabs = await phone.$$eval('#tabbar .tb', ts => ts.map(t => ({
+  block: t.dataset.block,
+  label: t.querySelector('.tb-l').textContent.trim(),
+  // Drawn, not typed: an icon font or a symbol like ▦ is a box on a phone with no glyph for it.
+  drawn: t.querySelectorAll('.tb-g svg *').length,
+  tall: Math.round(t.getBoundingClientRect().height),
+})));
+if (tabs.length !== 4) problems.push(`${tabs.length} tabs, expected one per group`);
+for (const t of tabs) {
+  if (!t.drawn) problems.push(`tab "${t.label}" has no drawn icon`);
+  if (t.tall < 44) problems.push(`tab "${t.label}" is ${t.tall}px tall, under the 44px floor`);
 }
-console.log(`phone: ${reach.opts.length} options, ${Math.min(...reach.opts.map(o => o.tall))}px `
-          + `shortest, all reachable${reach.scrolls ? ' (the sheet scrolls)' : ' without scrolling'}`);
+
+// Each tab opens its own group and nothing else - which is what makes four tabs four things
+// rather than four ways to open one list - and pressing the open one puts it away again.
+const reach = [];
+for (const t of tabs) {
+  await phone.click(`#tabbar .tb[data-block="${t.block}"]`);
+  await phone.waitForSelector('#menuPop', { state: 'visible', timeout: 5000 })
+    .catch(() => problems.push(`tab "${t.label}" opened nothing`));
+  const shown = await phone.$$eval('#menuPop .menu-group', gs => gs
+    .filter(g => getComputedStyle(g).display !== 'none').map(g => g.dataset.block));
+  if (shown.join() !== t.block)
+    problems.push(`tab "${t.label}" showed groups [${shown}], expected only ${t.block}`);
+  // Measured one group at a time, because one group is what is on screen: measuring all ten at
+  // once reported the seven that were hidden as 0px tall, a check failing on its own mistake.
+  reach.push(...await phone.evaluate(() => {
+    const pop = document.getElementById('menuPop').getBoundingClientRect();
+    return [...document.querySelectorAll('#menuPop .opt')]
+      .filter(o => getComputedStyle(o.closest('.menu-group')).display !== 'none')
+      .map(o => {
+        const r = o.getBoundingClientRect();
+        return { key: o.dataset.page, tall: Math.round(r.height),
+                 below: Math.round(r.bottom - Math.min(pop.bottom, innerHeight)) };
+      });
+  }));
+  await phone.click(`#tabbar .tb[data-block="${t.block}"]`);
+  await phone.waitForTimeout(140);
+  if (!(await phone.evaluate(() => document.getElementById('menuPop').hidden)))
+    problems.push(`tab "${t.label}" did not close when pressed again`);
+}
+for (const o of reach) {
+  if (o.tall < 44) problems.push(`${o.key}: the option is ${o.tall}px tall, under the 44px floor`);
+  if (o.below > 1) problems.push(`${o.key}: the option is ${o.below}px past the bottom of the screen`);
+}
+if (reach.length !== PAGES.length)
+  problems.push(`${reach.length} options across the tabs, expected ${PAGES.length}`);
+console.log(`tab bar: ${tabs.length} tabs, ${Math.min(...tabs.map(t => t.tall))}px shortest; `
+          + `${reach.length} options behind them, ${Math.min(...reach.map(o => o.tall))}px `
+          + `shortest, none off the screen`);
 
 for (const key of PAGES) {
   await openSection(phone, key).catch(() => problems.push(`${key}: option not tappable on a phone`));

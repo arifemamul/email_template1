@@ -38,8 +38,12 @@ for (const [viewport, name, sheet] of sizes) {
     const dev = document.querySelector('.device').getBoundingClientRect();
     const bar = document.querySelector('.bar').getBoundingClientRect();
     return {
-      bar: vis('.bar'),
+      // The bar is emptied rather than removed on a phone - it still holds the options panel,
+      // which is why it cannot be display:none - so its own box is not the question. What is
+      // on screen is.
+      bar: vis('.bar-name'),
       button: vis('#guideOpen'),
+      tabbar: vis('#tabbar'),
       barTop: Math.round(bar.top),
       optionsShowing: vis('#menuPop'),
       guideVisible: vis('.guide .panel') || vis('.guide .levels-card'),
@@ -52,61 +56,82 @@ for (const [viewport, name, sheet] of sizes) {
   });
 
   // ---- true at every width ------------------------------------------------------------
-  if (!state.bar) problems.push(`${name}: no bar`);
-  if (!state.button) problems.push(`${name}: no menu button`);
-  // The bar is sticky, not fixed: at the top of the page it sits below the page's own padding,
-  // which is where it belongs. What matters is that it pins to the top once anything scrolls
-  // under it - otherwise the only way to the menu is to scroll back up.
-  const pinned = await p.evaluate(async () => {
-    // On a phone the game is built to fit the first screen, so there may be nothing to scroll
-    // and nothing to pin the bar over. Asking anyway turns "this page fits" into a failure.
-    const room = document.documentElement.scrollHeight - innerHeight;
-    if (room < 40) return { skipped: room };
-    scrollTo(0, Math.min(400, room));
-    await new Promise(r => requestAnimationFrame(r));
-    await new Promise(r => requestAnimationFrame(r));
-    const top = Math.round(document.querySelector('.bar').getBoundingClientRect().top);
-    const painted = document.querySelector('.bar').classList.contains('stuck');
-    scrollTo(0, 0);
-    return { top, painted };
-  });
-  if (pinned.skipped === undefined) {
-    if (pinned.top > 1)
-      problems.push(`${name}: scrolled, the bar sits ${pinned.top}px down instead of pinning`);
-    // And it paints a background once it does, or what is under it shows through what is on it.
-    if (!pinned.painted) problems.push(`${name}: the bar did not paint its background once scrolled`);
+  // The way in is not the same thing at every width, and that is the point of this block: on a
+  // wide screen it is the button in the top bar, and on a phone it is a tab at the foot of the
+  // screen, because the far top corner of a phone is a two-handed reach. What has to be true
+  // either way is that there IS one, that it opens, and that it can be got out of.
+  const wayIn = sheet ? '#tabbar .tb[data-block="3"]' : '#guideOpen';
+  if (sheet) {
+    if (!state.tabbar) problems.push(`${name}: no tab bar`);
+    if (state.bar) problems.push(`${name}: the top bar is still on screen on a phone`);
+    if (state.button) problems.push(`${name}: the top bar's button is still on screen on a phone`);
+  } else {
+    if (!state.bar) problems.push(`${name}: no bar`);
+    if (!state.button) problems.push(`${name}: no menu button`);
+    if (state.tabbar) problems.push(`${name}: the tab bar is showing on a wide screen`);
+    // The bar is sticky, not fixed: at the top of the page it sits below the page's own
+    // padding, which is where it belongs. What matters is that it pins once anything scrolls
+    // under it - otherwise the only way to the menu is to scroll back up.
+    const pinned = await p.evaluate(async () => {
+      const room = document.documentElement.scrollHeight - innerHeight;
+      if (room < 40) return { skipped: room };
+      scrollTo(0, Math.min(400, room));
+      await new Promise(r => requestAnimationFrame(r));
+      await new Promise(r => requestAnimationFrame(r));
+      const top = Math.round(document.querySelector('.bar').getBoundingClientRect().top);
+      const painted = document.querySelector('.bar').classList.contains('stuck');
+      scrollTo(0, 0);
+      return { top, painted };
+    });
+    if (pinned.skipped === undefined) {
+      if (pinned.top > 1)
+        problems.push(`${name}: scrolled, the bar sits ${pinned.top}px down instead of pinning`);
+      if (!pinned.painted)
+        problems.push(`${name}: the bar did not paint its background once scrolled`);
+    }
   }
   if (state.optionsShowing)
-    problems.push(`${name}: the options are on screen before the button is pressed`);
+    problems.push(`${name}: the options are on screen before anything is pressed`);
 
-  // The options open, and land under the bar rather than over it or off the screen.
-  await p.click('#guideOpen');
+  // The options open, and land where the thing that opened them is.
+  await p.click(wayIn);
   await p.waitForSelector('#menuPop', { state: 'visible' });
-  const pop = await p.evaluate(() => {
+  // It rises into place over about 180ms. Measured the moment it becomes visible, the numbers
+  // are the animation's, not the layout's - which read as the options covering the tab that
+  // opened them by 233px, a geometry that never actually happens.
+  await p.waitForTimeout(280);
+  const pop = await p.evaluate(opener => {
     const r = document.getElementById('menuPop').getBoundingClientRect();
-    const opts = [...document.querySelectorAll('#menuPop .opt')];
+    const shown = [...document.querySelectorAll('#menuPop .menu-group')]
+      .filter(g => getComputedStyle(g).display !== 'none');
+    const opts = shown.flatMap(g => [...g.querySelectorAll('.opt')]);
     return {
-      expanded: document.getElementById('guideOpen').getAttribute('aria-expanded'),
-      // Measured from the button, not from the bar's box: the bar carries bottom padding, so
-      // the options tuck up into it on purpose and "overlapping the bar" is not the question.
-      // The question is whether they hang below the thing that opened them.
-      belowButton: Math.round(r.top - document.getElementById('guideOpen').getBoundingClientRect().bottom),
+      expanded: document.querySelector(opener).getAttribute('aria-expanded'),
+      // Measured from whatever opened them: the panel hangs below a button in the top bar and
+      // sits on top of a tab at the foot, so the number to check is the gap, either way.
+      gap: Math.round(document.querySelector(opener).getBoundingClientRect().top >= r.bottom
+        ? document.querySelector(opener).getBoundingClientRect().top - r.bottom
+        : r.top - document.querySelector(opener).getBoundingClientRect().bottom),
       offRight: Math.round(r.right - innerWidth),
       offLeft: Math.round(-r.left),
+      offBottom: Math.round(r.bottom - innerHeight),
       count: opts.length,
-      groups: document.querySelectorAll('#menuPop .menu-group').length,
+      groups: shown.length,
       // Every option says what it leads to. They used to carry that sentence in a `title`,
       // which is a tooltip - something no touch device has ever shown anyone.
       described: opts.filter(o => (o.querySelector('.opt-t i')?.textContent || '').trim()).length,
       focused: document.activeElement?.classList.contains('opt'),
     };
-  });
+  }, wayIn);
   if (pop.expanded !== 'true') problems.push(`${name}: aria-expanded not set when open`);
-  if (pop.belowButton < -2)
-    problems.push(`${name}: the options cover the button by ${-pop.belowButton}px`);
+  if (pop.gap < -2) problems.push(`${name}: the options cover what opened them by ${-pop.gap}px`);
   if (pop.offRight > 1) problems.push(`${name}: the options run ${pop.offRight}px off the right`);
   if (pop.offLeft > 1) problems.push(`${name}: the options run ${pop.offLeft}px off the left`);
-  if (pop.groups < 3) problems.push(`${name}: ${pop.groups} groups; the point was grouping them`);
+  if (pop.offBottom > 1) problems.push(`${name}: the options run ${pop.offBottom}px off the bottom`);
+  // A tab opens one group; the button in the top bar opens all four.
+  const wantGroups = sheet ? 1 : 4;
+  if (pop.groups !== wantGroups)
+    problems.push(`${name}: ${pop.groups} groups on screen, expected ${wantGroups}`);
   if (pop.described !== pop.count)
     problems.push(`${name}: ${pop.count - pop.described} options have no description`);
   if (!pop.focused) problems.push(`${name}: opening the options did not move focus into them`);
@@ -114,15 +139,15 @@ for (const [viewport, name, sheet] of sizes) {
   // Escape closes them, and gives the focus back to the button that opened them.
   await p.keyboard.press('Escape');
   await p.waitForTimeout(120);
-  const esc = await p.evaluate(() => ({
+  const esc = await p.evaluate(opener => ({
     hidden: document.getElementById('menuPop').hidden,
-    onButton: document.activeElement?.id === 'guideOpen',
-  }));
+    onButton: document.activeElement === document.querySelector(opener),
+  }), wayIn);
   if (!esc.hidden) problems.push(`${name}: Escape did not close the options`);
   if (!esc.onButton) problems.push(`${name}: Escape left the focus adrift`);
 
   // A press anywhere else closes them too.
-  await p.click('#guideOpen');
+  await p.click(wayIn);
   await p.waitForSelector('#menuPop', { state: 'visible' });
   // On a phone the options are a sheet from the bar to the bottom edge, so the bottom corner of
   // the screen is *inside* them - pressing there chose an option rather than closing anything.
@@ -194,7 +219,7 @@ for (const [viewport, name, sheet] of sizes) {
     if ((await p.evaluate(() => getComputedStyle(document.querySelector('.guide')).visibility)) === 'visible')
       problems.push(`${name}: Escape did not close the sheet`);
 
-    console.log(`${name}: bar + ${pop.count} options in ${pop.groups} groups, board ends `
+    console.log(`${name}: tab bar + ${pop.count} options in the group it opens, board ends `
               + `${state.wheelBottom}/${state.viewportH}, sheet holds ${open.cards} cards + `
               + `${open.levels} levels + footer`);
   } else {

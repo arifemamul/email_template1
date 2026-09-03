@@ -247,27 +247,50 @@ const guideIsOpen = () => el.guide.classList.contains("open");
 /* The phone sheet hangs off the bottom of the bar, and the bar's height depends on the font,
    the safe area and whether the strapline fits - so it is measured rather than guessed. */
 function markBar() {
-  if (!el.bar) return;
-  document.documentElement.style.setProperty("--bar-bottom",
-    Math.round(el.bar.getBoundingClientRect().bottom) + "px");
+  if (el.bar) {
+    document.documentElement.style.setProperty("--bar-bottom",
+      Math.round(el.bar.getBoundingClientRect().bottom) + "px");
+  }
+  // The options sit on top of the tab bar, and its height depends on the phone's safe area -
+  // measured rather than guessed, for the same reason the top bar's was.
+  if (el.tabbar) {
+    document.documentElement.style.setProperty("--tabbar-h",
+      Math.round(el.tabbar.getBoundingClientRect().height) + "px");
+  }
 }
 
-function openMenu() {
+/*
+ * `block` names one group of options, which is what a tab at the foot of the screen asks for.
+ * Without it - the button in the top bar on a wide screen - the panel shows all four.
+ */
+function openMenu(block) {
   markBar();
+  if (block) el.menuPop.dataset.only = block;
+  else delete el.menuPop.dataset.only;
   el.menuPop.hidden = false;
   el.scrim.hidden = false;
   el.guideOpen.setAttribute("aria-expanded", "true");
+  for (const tab of el.tabbar.querySelectorAll(".tb"))
+    tab.setAttribute("aria-expanded", tab.dataset.block === block ? "true" : "false");
   Sfx.page(true);
-  const here = el.menuPop.querySelector(".opt.on") || el.menuPop.querySelector(".opt");
+  // Focus the option you are on if it is in the group being shown, and the first one otherwise:
+  // focusing a hidden option puts the keyboard somewhere the screen is not.
+  const shown = [...el.menuPop.querySelectorAll(".opt")].filter(o => o.offsetParent !== null);
+  const here = shown.find(o => o.classList.contains("on")) || shown[0];
   if (here) here.focus();
 }
 
 function closeMenu(giveFocusBack = true) {
   if (el.menuPop.hidden) return;
+  const from = el.menuPop.dataset.only;
   el.menuPop.hidden = true;
   el.scrim.hidden = true;
   el.guideOpen.setAttribute("aria-expanded", "false");
-  if (giveFocusBack) el.guideOpen.focus();
+  for (const tab of el.tabbar.querySelectorAll(".tb")) tab.setAttribute("aria-expanded", "false");
+  // Back to whatever opened it, which on a phone is the tab rather than the top bar's button.
+  if (!giveFocusBack) return;
+  const tab = from && el.tabbar.querySelector(`.tb[data-block="${from}"]`);
+  (tab && tab.offsetParent !== null ? tab : el.guideOpen).focus();
 }
 
 /* Choosing an option. On a phone that means opening the sheet to read it; on a wide screen the
@@ -332,6 +355,9 @@ document.addEventListener("keydown", e => {
 document.addEventListener("pointerdown", e => {
   if (!menuIsOpen()) return;
   if (e.target.closest("#menuPop") || e.target.closest("#guideOpen")) return;
+  // The tab bar has its own handler, which toggles. Letting this one fire as well would close
+  // the panel and then the tab would open it again, so pressing a tab would do nothing at all.
+  if (e.target.closest("#tabbar")) return;
   closeMenu(false);
 });
 

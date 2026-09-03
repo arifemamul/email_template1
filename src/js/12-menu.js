@@ -336,9 +336,34 @@ function showPage(key, remember = true) {
     if (first) first.classList.toggle("dup", first.textContent.trim() === title);
   }
   if (el.guideTitle) el.guideTitle.textContent = title;
+  markTab(key);
   // Which section you were reading is a per-device convenience, so it goes in localStorage and
   // is allowed to fail: a private window or blocked site data must not break the menu.
   if (remember) { try { localStorage.setItem(MENU_KEY, key); } catch {} }
+}
+
+/*
+ * The tab bar. Each tab opens one group, which is what makes four tabs four different things
+ * rather than four ways to open the same list, and pressing the tab that is already open
+ * closes it - the way every bar like this behaves.
+ */
+const tabs = [...document.querySelectorAll("#tabbar .tb")];
+for (const tab of tabs) {
+  tab.addEventListener("click", () => {
+    const block = tab.dataset.block;
+    if (menuIsOpen() && el.menuPop.dataset.only === block) closeMenu();
+    else openMenu(block);
+  });
+}
+
+/** Which tab holds the section on screen, so the bar says where you are. */
+function markTab(key) {
+  const holder = document.getElementById(`opt-${key}`);
+  const block = holder ? holder.closest(".menu-group").dataset.block : null;
+  for (const tab of tabs) {
+    if (tab.dataset.block === block) tab.setAttribute("aria-current", "true");
+    else tab.removeAttribute("aria-current");
+  }
 }
 
 for (const opt of opts) {

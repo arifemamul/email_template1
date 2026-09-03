@@ -196,6 +196,28 @@
        about it is a sheet over the top. Width-gated rather than pointer-gated: a narrow desktop
        window gets the same treatment, which is no loss, and it stays testable. */
   @media (max-width: 1024px) {
+    /* The top bar goes. Its button has moved to the foot of the screen, which leaves it
+       holding a name - decoration on a phone, where the game should own the screen - and the
+       height it was taking is very nearly the height the tab bar needs. Taking it back is what
+       keeps the board the size it was: without this a 360x640 phone lost its cells from 47px
+       to the 30px floor, which is a worse trade than the reach the bar buys. */
+    .bar {
+      /* Above the sheet, which is z-index 60. The options panel is a child of this header and
+         so paints at the header's level whatever its own z-index says - at 50 it opened behind
+         an open sheet, so switching section from a tab showed nothing at all. The tab bar
+         itself is higher again, at 70, because it has to stay reachable over both. */
+      z-index: 65;
+      /* Emptied rather than removed. The options panel is a child of this header - that is how
+         it anchors under the button on a wide screen - and `display: none` here takes the panel
+         with it, so on a phone the tab bar opened nothing at all. Zero height gives the frame
+         the space back without taking the panel off the page. */
+      height: 0;
+      margin: 0;
+      padding: 0;
+      overflow: visible;
+    }
+    .bar-name, .bar-menu, .bar::after { display: none; }
+
     /* The stage is only the game here; the rest is a sheet over it. */
     .stage {
       grid-template-columns: minmax(0, 1fr);
@@ -216,7 +238,9 @@
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
       background: var(--surface-3);
-      padding: 14px 14px calc(34px + env(safe-area-inset-bottom));
+      /* The tab bar stays on top of the sheet - it is how you switch section without closing
+         anything - so the sheet has to keep its last lines clear of it. */
+      padding: 14px 14px calc(34px + var(--tabbar-h, 72px) + env(safe-area-inset-bottom));
       transform: translateY(100%);
       visibility: hidden;
       transition: transform .26s cubic-bezier(.22, 1, .36, 1), visibility .26s;

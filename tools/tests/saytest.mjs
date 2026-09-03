@@ -67,7 +67,9 @@ await p2.waitForFunction(() => document.getElementById('sayCopy'));
 // On a phone the whole guide slides up behind the Guide button, over 260ms - so wait for it
 // rather than reading the moment the click lands.
 if (!await p2.isVisible('#sayNote')) {
-  await p2.click('#guideOpen');
+  // The way in at this width is the tab at the foot of the screen holding this section's
+  // group, not the button in the top bar - that bar is not on screen on a phone.
+  await p2.click('#tabbar .tb[data-block="4"]');
   await p2.waitForSelector('#menuPop', { state: 'visible', timeout: 5000 })
           .catch(() => fail('the options are unreachable on a phone'));
   await openReport(p2).catch(() => fail('the feedback card is unreachable on a phone'));
