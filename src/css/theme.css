@@ -124,5 +124,7 @@
     min-height: 100vh;
   }
 
-  /* Sized so the masthead lines up with the phone's left edge and the pair stays centred. */
-  .wrap { max-width: 940px; margin: 0 auto; }
+  /* Wide enough for both columns to get what they ask for, and centred. 940px before, which
+     was 30px short of the game column's 510 once the notes had their 460 - and the board's
+     cells are sized by the game column's width, so the page cap was what held them at 50px. */
+  .wrap { max-width: 1060px; margin: 0 auto; }

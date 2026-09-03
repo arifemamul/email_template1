@@ -132,7 +132,7 @@
        take their own places in this grid as if it were not there. */
   .stage {
     display: grid;
-    grid-template-columns: minmax(0, 400px) minmax(300px, 460px);
+    grid-template-columns: minmax(0, 510px) minmax(300px, 460px);
     grid-template-areas: "game notes";
     grid-template-rows: auto;
     gap: clamp(20px, 3vw, 44px);

@@ -8,7 +8,12 @@
    */
   .device {
     position: relative;
-    width: 410px;
+    /* 410px before. The board's cells are sized for the widest level in the game - seven
+       columns - so they are limited by this width and nothing else: at 410px seven columns
+       came to 44px a cell against 60px wheel tiles. 510px gives them the 60px the tiles have.
+       `max-width: 100%` still applies, so a phone is unaffected: there the screen's own width
+       is the limit and no frame can invent more of it. */
+    width: 510px;
     max-width: 100%;
     height: min(770px, calc(100vh - 176px));
     height: min(770px, calc(100dvh - 176px));

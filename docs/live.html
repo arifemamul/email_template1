@@ -103,7 +103,7 @@ font-family: var(--ui);
 min-height: 100vh;
 }
 
-.wrap { max-width: 940px; margin: 0 auto; }
+.wrap { max-width: 1060px; margin: 0 auto; }
 .bar {
 position: sticky;
 top: 0;
@@ -204,7 +204,7 @@ border-bottom-color: transparent;
 
 .stage {
 display: grid;
-grid-template-columns: minmax(0, 400px) minmax(300px, 460px);
+grid-template-columns: minmax(0, 510px) minmax(300px, 460px);
 grid-template-areas: "game notes";
 grid-template-rows: auto;
 gap: clamp(20px, 3vw, 44px);
@@ -311,7 +311,7 @@ cursor: pointer;
 
 .device {
 position: relative;
-width: 410px;
+width: 510px;
 max-width: 100%;
 height: min(770px, calc(100vh - 176px));
 height: min(770px, calc(100dvh - 176px));
@@ -2823,7 +2823,7 @@ const usable = screenEl.clientHeight
 const width = screenEl.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
 
 const gap = 5;
-const MIN_CELL = GLYPH_BOX, MAX_CELL = 46;
+const MIN_CELL = GLYPH_BOX, MAX_CELL = 60;
 const byWidth = Math.floor((width - gap * (BOARD_MAX.cols - 1)) / BOARD_MAX.cols);
 const rowGaps = gap * (BOARD_MAX.rows - 1);
 const boardFor = c => BOARD_MAX.rows * c + rowGaps;

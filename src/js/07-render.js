@@ -98,7 +98,7 @@ function allocateSpace() {
   // 64, which spent spare desktop height on ever-bigger boxes; with the letter fixed at
   // GLYPH that just draws a small letter in a large square, so cells stop at the comfortable
   // size and the leftover height goes to the wheel instead.
-  const MIN_CELL = GLYPH_BOX, MAX_CELL = 46;
+  const MIN_CELL = GLYPH_BOX, MAX_CELL = 60;
   // Sized for the largest board in the game, not the one on screen, so the answer is the same
   // on every level. The board area then takes only the height this level's rows need.
   const byWidth = Math.floor((width - gap * (BOARD_MAX.cols - 1)) / BOARD_MAX.cols);
