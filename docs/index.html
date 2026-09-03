@@ -2880,11 +2880,10 @@ const floorHeight = boardFor(floorCell) + WHEEL_FLOOR;
 const deficit = Math.max(0, floorHeight - usable);
 const budget = usable + deficit;
 
-const SHARE = WHEEL_MAX <= 4 ? 0.30 : WHEEL_MAX <= 6 ? 0.26 : 0.21;
-let cell = Math.floor((budget - rowGaps) / (BOARD_MAX.rows + 1 / SHARE));
+let cell = Math.floor((budget - rowGaps) / (BOARD_MAX.rows + RING_PER_TILE(WHEEL_MAX)));
 cell = Math.min(cell, MAX_CELL, byWidth);
 
-let wheel = Math.max(WHEEL_FLOOR, Math.min(width, Math.round(cell / SHARE)));
+let wheel = Math.max(WHEEL_FLOOR, Math.min(width, ringFor(cell, WHEEL_MAX)));
 
 if (cell < MIN_CELL) {
 cell = Math.min(MIN_CELL, byWidth);
@@ -2898,13 +2897,17 @@ el.boardArea.style.height = Math.round(boardFor(cell)) + 'px';
 return { cell, wheel: Math.round(wheel), deficit: Math.ceil(deficit) };
 }
 
-const GLYPH = 21;       // px - board cells and wheel tiles alike
-const GLYPH_BOX = 37;   // px - the smallest box that holds a GLYPH letter with air around it
+const GLYPH = 24;       // px - board cells and wheel tiles alike
+const GLYPH_BOX = 42;   // px - the smallest box that holds a GLYPH letter with air around it
 
 function glyphFor(box) {
 if (box >= GLYPH_BOX) return GLYPH;
 return Math.max(13, Math.floor(box * GLYPH / GLYPH_BOX));
 }
+
+const GAP = 1.38;                                     // tile-widths, neighbour to neighbour
+const RING_PER_TILE = n => 1 + GAP / Math.sin(Math.PI / Math.max(3, n));
+const ringFor = (tile, n) => Math.round(tile * RING_PER_TILE(n));
 
 function drawBoard(alloc) {
 const p = game.puzzle;
@@ -2960,10 +2963,10 @@ div.classList.toggle("hinted", hinted.has(div.dataset.pos));
 }
 
 function drawWheel(alloc) {
-const size = alloc.wheel;
 const n = game.wheel.length;
 const tile = Math.max(GLYPH_BOX, alloc.cell);
-const radius = size / 2 - tile / 2;
+const size = alloc.wheel;
+const radius = Math.min(size / 2 - tile / 2, (tile * GAP) / (2 * Math.sin(Math.PI / Math.max(3, n))));
 
 el.wheel.style.width = el.wheel.style.height = size + "px";
 el.trail.setAttribute("viewBox", `0 0 ${size} ${size}`);

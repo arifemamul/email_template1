@@ -128,26 +128,20 @@ function allocateSpace() {
   // for and the letter they press to put it there. Drawn at 44px and 60px they were not, and
   // the wheel became the big thing on the screen with the board a smaller record beside it.
   //
-  // So this solves for the largest U that fits both at once. A tile is a fixed share of the
-  // wheel's diameter - the share that keeps eight of them from touching - so a wheel whose
-  // tiles are U across is U/SHARE wide, and the height needed is:
+  // The wheel's height is a function of the tile now - see `ringFor` - so this solves for the
+  // largest tile T whose board and whose ring both fit:
   //
-  //     rows * U + rowGaps  +  U / SHARE  <=  budget
+  //     rows * T + rowGaps  +  ringFor(T, WHEEL_MAX)  <=  budget
   //
-  // which rearranges to the single division below. The previous version gave the wheel what
-  // it asked for first and let the board have the rest, which is why the two never agreed.
-  const SHARE = WHEEL_MAX <= 4 ? 0.30 : WHEEL_MAX <= 6 ? 0.26 : 0.21;
-  let cell = Math.floor((budget - rowGaps) / (BOARD_MAX.rows + 1 / SHARE));
+  // ringFor is linear in T, so that rearranges to one division. The previous version gave the
+  // wheel the diameter it asked for first and let the board have the rest, which is why the
+  // two sizes could never agree.
+  let cell = Math.floor((budget - rowGaps) / (BOARD_MAX.rows + RING_PER_TILE(WHEEL_MAX)));
   cell = Math.min(cell, MAX_CELL, byWidth);
 
-  // The wheel is then whatever holds tiles that size - never under its own floor, because a
-  // ring too small to space its tiles apart is worse than a ring bigger than its tiles need.
-  let wheel = Math.max(WHEEL_FLOOR, Math.min(width, Math.round(cell / SHARE)));
-
-  // Deliberately not expanded into the height left over. Filling it spread five 42px tiles
-  // around a 250px ring, which read as a sparse hoop rather than as a set of letters. The ring
-  // stays in proportion to the tiles on it and `.wheel-area` centres it, so the slack becomes
-  // even space above and below instead of a band under the buttons.
+  // Budgeted for the fullest wheel in the game, so the slot is the same height on every level
+  // and the wheel does not move when the level does. What is drawn in it is this level's ring.
+  let wheel = Math.max(WHEEL_FLOOR, Math.min(width, ringFor(cell, WHEEL_MAX)));
 
   if (cell < MIN_CELL) {
     // Width, not height, is what forced this - see glyphFor. Give the board its floor if the
@@ -192,8 +186,8 @@ function allocateSpace() {
  * ফড়িং, sets it, measuring about 1.45x its font size across. Raise either one and the check
  * says which letter stopped fitting.
  */
-const GLYPH = 21;       // px - board cells and wheel tiles alike
-const GLYPH_BOX = 37;   // px - the smallest box that holds a GLYPH letter with air around it
+const GLYPH = 24;       // px - board cells and wheel tiles alike
+const GLYPH_BOX = 42;   // px - the smallest box that holds a GLYPH letter with air around it
 
 /*
  * The one case the pair above cannot honour. Height it can always find - the wheel gives
@@ -210,6 +204,37 @@ function glyphFor(box) {
   if (box >= GLYPH_BOX) return GLYPH;
   return Math.max(13, Math.floor(box * GLYPH / GLYPH_BOX));
 }
+
+/*
+ * How wide a ring has to be to carry n tiles of size T.
+ *
+ * This used to be a share: the tile was a fixed fraction of the wheel's diameter, 0.26 for a
+ * five-letter wheel. That was calibrated the other way round - pick a diameter, take a share of
+ * it - and once the tile stopped following the wheel it left the wheel following nothing. A
+ * 42px tile asked for a 162px ring whatever was on it, so four letters sat 94px apart centre to
+ * centre with 52px of air between them. Which is the long gap between the letters.
+ *
+ * Sized from the letters instead. Two neighbours on a circle of centre-radius R are
+ * 2R·sin(π/n) apart in a straight line, and GAP says what that span is as a multiple of a
+ * tile - 1.0 would have them touching, so
+ *
+ *     2R * sin(π/n) = T * GAP    ->    R = T * GAP / (2 * sin(π/n))
+ *
+ * and the ring is that plus half a tile on each side.
+ *
+ * The straight line, not the arc along the circle. Measuring the arc looks the same in algebra
+ * and is not: at three letters the arc between neighbours is a third of the circle and the
+ * chord across it is much shorter, so an arc-spaced ring left 6px between three letters and
+ * 12px between five. The gap a child sees is the chord.
+ *
+ * `ringFor` sizes the box, and only ever for the fullest wheel in the game, so the box is one
+ * size per screen. The radius the tiles are actually placed on is worked out per level in
+ * `drawWheel` from the same GAP - a box that never moves, with the letters on it as close
+ * together as they should be whether there are three of them or five.
+ */
+const GAP = 1.38;                                     // tile-widths, neighbour to neighbour
+const RING_PER_TILE = n => 1 + GAP / Math.sin(Math.PI / Math.max(3, n));
+const ringFor = (tile, n) => Math.round(tile * RING_PER_TILE(n));
 
 function drawBoard(alloc) {
   const p = game.puzzle;
@@ -270,29 +295,23 @@ function refreshBoard() {
 }
 
 function drawWheel(alloc) {
-  // Trust the allocation. This used to impose its own 148px floor, which quietly overrode
-  // every budget upstream - the wheel drew itself bigger than the space it had been given and
-  // `.screen`, which hides its overflow, ate the difference along with the letters in it.
-  const size = alloc.wheel;
   const n = game.wheel.length;
-  // Sized for the fullest wheel in the game rather than this level's, for the same reason the
-  // cells are: a tile should be one size per screen. A level with fewer tiles gets the same
-  // tile, spaced further apart around the ring.
-  //
-  // Never below GLYPH_BOX either: the letter no longer shrinks with the tile, so the tile is
-  // what has to give way. Eight tiles at the wheel's floor sit 50px apart centre to centre,
-  // so holding them at 30px cannot make them touch.
   // The board's number, not the wheel's own. `allocate` solved for one size that both could
   // hold, so a tile is a cell - which is the point: the letter on the wheel and the letter in
   // the board are the same letter, and were being drawn at two different sizes.
   //
   // GLYPH_BOX is the one exception, and it only bites where width has already forced the cells
   // under it: a tile that small could not hold its own letter, and shrinking the thing being
-  // pressed to match the thing being filled in would be the wrong way round. Anything above
-  // that floor takes the cell's size exactly - a 44px tap target with the ring spacing them
-  // well apart, rather than a bigger circle that disagrees with the board it feeds.
+  // pressed to match the thing being filled in would be the wrong way round.
   const tile = Math.max(GLYPH_BOX, alloc.cell);
-  const radius = size / 2 - tile / 2;
+  // The slot, unchanged on every level: budgeted for the fullest wheel in the game so that the
+  // lower half of the screen never jumps when the level does.
+  const size = alloc.wheel;
+  // Where the tiles actually sit, which is not the same question as how big the box is. The
+  // box is fixed so nothing moves between levels; the tiles come in as close as the spacing
+  // rule wants, so four letters are not spread around a ring built for five. That was the long
+  // gap: 42px tiles 94px apart, with 52px of air between each one.
+  const radius = Math.min(size / 2 - tile / 2, (tile * GAP) / (2 * Math.sin(Math.PI / Math.max(3, n))));
 
   el.wheel.style.width = el.wheel.style.height = size + "px";
   el.trail.setAttribute("viewBox", `0 0 ${size} ${size}`);
