@@ -101,7 +101,21 @@ function allocateSpace() {
   const MIN_CELL = GLYPH_BOX, MAX_CELL = 60;
   // Sized for the largest board in the game, not the one on screen, so the answer is the same
   // on every level. The board area then takes only the height this level's rows need.
-  const byWidth = Math.floor((width - gap * (BOARD_MAX.cols - 1)) / BOARD_MAX.cols);
+  // Two width limits, and they answer different questions.
+  //
+  // `byWidest` is what the widest board in the game can take, and it used to be the only one:
+  // every level was drawn at that size so the boxes never changed between levels. The cost of
+  // that turns out to be one level. Of 244 boards, 50 are two columns wide, 85 are three, 10
+  // are four, 71 are five, 27 are six - and exactly one is seven. So 243 levels were drawn at
+  // the size a single seven-column board needed, which on a phone is 42px against a 60px tile.
+  //
+  // `byHere` is what this level's own columns can take. The letter inside the box is a fixed
+  // 17px either way - see GLYPH - so a bigger box is more air around the same letter, never a
+  // bigger letter on some levels than others. What it changes is how much of the screen the
+  // board fills, and it fills it now.
+  const hereCols = game.puzzle ? game.puzzle.cols : BOARD_MAX.cols;
+  const byWidest = Math.floor((width - gap * (BOARD_MAX.cols - 1)) / BOARD_MAX.cols);
+  const byHere = Math.floor((width - gap * (hereCols - 1)) / hereCols);
   const rowGaps = gap * (BOARD_MAX.rows - 1);
   const boardFor = c => BOARD_MAX.rows * c + rowGaps;
 
@@ -112,7 +126,7 @@ function allocateSpace() {
   // tiles a finger can still hit. Width can force the cells smaller than MIN_CELL - a
   // six-column board on a narrow phone leaves no choice - but height never may.
   const WHEEL_FLOOR = Math.min(wheelWant, 132);
-  const floorCell = Math.min(byWidth, MIN_CELL);
+  const floorCell = Math.min(byWidest, MIN_CELL);
   const floorHeight = boardFor(floorCell) + WHEEL_FLOOR;
 
   // If even that will not fit, say by how much rather than letting the difference be clipped.
@@ -136,24 +150,30 @@ function allocateSpace() {
   // bigger than the letters being chosen from, which is backwards. The board is a record of
   // what has been found; the wheel is the thing being used.
   let wheel = Math.min(wheelWant, width, budget - boardFor(MIN_CELL));
-  let cell = Math.min(MAX_CELL, byWidth,
-                      Math.floor((budget - wheel - rowGaps) / BOARD_MAX.rows));
 
-  if (cell < MIN_CELL) {
-    // Take back only as much as the cells need to reach their floor, and no more.
-    cell = Math.min(MIN_CELL, byWidth);
-    wheel = Math.max(WHEEL_FLOOR, budget - boardFor(cell));
+  // What height allows, for the tallest board in the game. Constant per screen, and therefore
+  // the thing the slot is reserved at - so the wheel below it never moves when the level does,
+  // which is the whole reason the old code sized every board for the widest one.
+  let roomy = Math.min(MAX_CELL, Math.floor((budget - wheel - rowGaps) / BOARD_MAX.rows));
+
+  if (roomy < MIN_CELL) {
+    // Take back only as much as the cells need to reach their floor, and no more. Driven by
+    // height alone, so it lands the same way on every level and the wheel stays put.
+    roomy = MIN_CELL;
+    wheel = Math.max(WHEEL_FLOOR, budget - boardFor(roomy));
   }
 
-  cell = Math.max(1, Math.min(cell, byWidth));
-  wheel = Math.max(WHEEL_FLOOR, Math.min(wheel, width, budget - boardFor(cell)));
+  wheel = Math.max(WHEEL_FLOOR, Math.min(wheel, width, budget - boardFor(roomy)));
+
+  // This level's cell: as big as the slot allows, and as big as this level's own columns do.
+  const cell = Math.max(1, Math.min(roomy, byHere));
 
   // The full height, every level, not this level's rows. Reserving only what the open board
   // needs moved everything below it: on a 360px phone the wheel sat anywhere from 381px to
   // 445px down the screen depending on how many rows the level had, so changing level shifted
   // the whole lower half of the game. The board is centred in its slot instead, and the wheel
   // stays where the player last reached for it.
-  el.boardArea.style.height = Math.round(boardFor(cell)) + 'px';
+  el.boardArea.style.height = Math.round(boardFor(roomy)) + 'px';
   return { cell, wheel: Math.round(wheel), deficit: Math.ceil(deficit) };
 }
 

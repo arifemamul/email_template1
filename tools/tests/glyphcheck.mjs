@@ -90,11 +90,22 @@ for (const [w, h, name] of [[320,568,'iPhone SE'],[360,640,'small Android'],[412
   if (r.tightest.air < 2)
     problems.push(`${name}: "${r.tightest.letter}" has only ${r.tightest.air}px clearance in its box (L${r.tightest.level})`);
 }
-// -- one box size per screen, whatever the level ------------------------------------------
-// A box may only change size when the screen does. It used to be sized from whichever board
-// was open, so a wide half-empty grid got 30px cells while a small board got 46px on the same
-// phone - with the letter fixed at 17px either way, it read as cramped on one level and lost
-// in space on the next.
+// -- box sizes across levels ---------------------------------------------------------------
+// This used to require one box size per screen, whatever the level. The reason was real: a box
+// sized from whichever board was open gave a wide half-empty grid 30px cells and a small board
+// 46px on the same phone, and with the letter fixed at 17px either way it read as cramped on
+// one level and lost in space on the next.
+//
+// Reversed at the author's request, who wants the board as large as it can be on every level.
+// What has changed since that decision is the ceiling: the cap is 60px now rather than 46, and
+// the column counts are lopsided - of 244 boards, one is seven columns wide, 27 are six, and
+// the remaining 216 are five or fewer. Sizing every board for the widest one meant 243 levels
+// paid for a single seven-column board. So the spread is narrow where it exists at all: no
+// variation on a desktop or an iPad, and 60/50/42 on a 390px phone with 216 levels at 60.
+//
+// The floor still holds - no box under GLYPH_BOX - and so does everything in the next block,
+// which is where the part of the old rule worth keeping now lives: the board's slot and the
+// wheel below it may not move when the level changes.
 for (const [w, h, name] of [[320,568,'iPhone SE'],[360,640,'small Android'],
                             [412,915,'Pixel 7'],[820,1180,'iPad'],[1280,900,'desktop']]) {
   const q = await (await b.newContext({ viewport: { width: w, height: h } })).newPage();
@@ -114,9 +125,10 @@ for (const [w, h, name] of [[320,568,'iPhone SE'],[360,640,'small Android'],
   });
   const cellSizes = r.cells.map(([px]) => px), tileSizes = r.tiles.map(([px]) => px);
   console.log(`${name.padEnd(14)} box ${cellSizes.join('/')}px   tile ${tileSizes.join('/')}px`);
-  if (cellSizes.length !== 1)
-    problems.push(`${name}: cells drawn at ${cellSizes.length} sizes across levels ` +
-                  `(${r.cells.map(([px, lv]) => `${px}px on L${lv}`).join(', ')})`);
+  // A box may be as big as its own level allows, up to the cap, and never under the floor.
+  const under = cellSizes.filter(px => px < 30);
+  if (under.length)
+    problems.push(`${name}: cells drawn at ${under.join('/')}px, under the 30px box floor`);
   if (tileSizes.length !== 1)
     problems.push(`${name}: wheel tiles drawn at ${tileSizes.length} sizes across levels ` +
                   `(${r.tiles.map(([px, lv]) => `${px}px on L${lv}`).join(', ')})`);
@@ -152,8 +164,24 @@ for (const [w, h, name] of [[320,568,'iPhone SE'],[360,640,'small Android'],
     for (const [k, m] of Object.entries(seen)) out[k] = [...m.entries()];
     return out;
   });
-  const moving = Object.entries(r).filter(([, v]) => v.length > 1);
-  const tile = r['tile size'][0][0], cell = r['cell size'][0][0];
+  // Cell size is allowed to vary now, and only cell size. A board is drawn at the size its own
+  // columns allow rather than at the size the widest board in the game allows - 243 of the 244
+  // levels were paying for the one seven-column board - and the letter inside the box is a
+  // fixed GLYPH either way, so a wider box is more air around the same letter.
+  //
+  // Everything else must still hold still. The slot the board sits in is reserved at what
+  // height allows for the tallest board, not at what this level uses, so the wheel below it
+  // does not move when the level changes: that was the reason every board was sized for the
+  // widest one, and it is the part worth keeping.
+  const MAY_VARY = new Set(['cell size']);
+  const moving = Object.entries(r).filter(([k, v]) => v.length > 1 && !MAY_VARY.has(k));
+  const cells = r['cell size'].map(([v]) => v);
+  console.log(`${' '.repeat(14)} cells ${Math.min(...cells)}-${Math.max(...cells)}px `
+            + `across ${r['cell size'].length} distinct sizes, slot fixed at `
+            + `${r['board slot height'][0][0]}px`);
+  if (Math.min(...cells) < m.GLYPH_BOX)
+    problems.push(`${name}: a cell is ${Math.min(...cells)}px, under the ${m.GLYPH_BOX}px floor`);
+  const tile = r['tile size'][0][0], cell = Math.max(...r['cell size'].map(([v]) => v));
   console.log(`${name.padEnd(14)} tile ${tile}px, cell ${cell}px, ` +
               `${moving.length ? moving.length + ' MEASURES VARY' : 'nothing varies across levels'}`);
   for (const [k, vals] of moving)

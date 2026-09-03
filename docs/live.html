@@ -2824,32 +2824,35 @@ const width = screenEl.clientWidth - parseFloat(style.paddingLeft) - parseFloat(
 
 const gap = 5;
 const MIN_CELL = GLYPH_BOX, MAX_CELL = 60;
-const byWidth = Math.floor((width - gap * (BOARD_MAX.cols - 1)) / BOARD_MAX.cols);
+const hereCols = game.puzzle ? game.puzzle.cols : BOARD_MAX.cols;
+const byWidest = Math.floor((width - gap * (BOARD_MAX.cols - 1)) / BOARD_MAX.cols);
+const byHere = Math.floor((width - gap * (hereCols - 1)) / hereCols);
 const rowGaps = gap * (BOARD_MAX.rows - 1);
 const boardFor = c => BOARD_MAX.rows * c + rowGaps;
 
 const wheelWant = Math.min(width, WHEEL_MAX <= 4 ? 210 : WHEEL_MAX <= 5 ? 230 : 250);
 
 const WHEEL_FLOOR = Math.min(wheelWant, 132);
-const floorCell = Math.min(byWidth, MIN_CELL);
+const floorCell = Math.min(byWidest, MIN_CELL);
 const floorHeight = boardFor(floorCell) + WHEEL_FLOOR;
 
 const deficit = Math.max(0, floorHeight - usable);
 const budget = usable + deficit;
 
 let wheel = Math.min(wheelWant, width, budget - boardFor(MIN_CELL));
-let cell = Math.min(MAX_CELL, byWidth,
-Math.floor((budget - wheel - rowGaps) / BOARD_MAX.rows));
 
-if (cell < MIN_CELL) {
-cell = Math.min(MIN_CELL, byWidth);
-wheel = Math.max(WHEEL_FLOOR, budget - boardFor(cell));
+let roomy = Math.min(MAX_CELL, Math.floor((budget - wheel - rowGaps) / BOARD_MAX.rows));
+
+if (roomy < MIN_CELL) {
+roomy = MIN_CELL;
+wheel = Math.max(WHEEL_FLOOR, budget - boardFor(roomy));
 }
 
-cell = Math.max(1, Math.min(cell, byWidth));
-wheel = Math.max(WHEEL_FLOOR, Math.min(wheel, width, budget - boardFor(cell)));
+wheel = Math.max(WHEEL_FLOOR, Math.min(wheel, width, budget - boardFor(roomy)));
 
-el.boardArea.style.height = Math.round(boardFor(cell)) + 'px';
+const cell = Math.max(1, Math.min(roomy, byHere));
+
+el.boardArea.style.height = Math.round(boardFor(roomy)) + 'px';
 return { cell, wheel: Math.round(wheel), deficit: Math.ceil(deficit) };
 }
 
