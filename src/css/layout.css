@@ -1,36 +1,37 @@
   /* -- The bar ---------------------------------------------------------------
        One bar at every width, holding the name and the way into everything else. It replaces
        two things that used to disagree: a 68px gold masthead on wide screens, and a separate
-       strip with the menu button on phones. Sticky, because a child who has scrolled down a
-       chart of the বর্ণমালা should not have to scroll back up to leave it. */
+       strip with the menu button on phones.
+
+       It is a shelf, not a strip of page. Everything else in this game is a solid object with a
+       hard lip under it - the tiles, the buttons, the cards - and the bar was the one piece of
+       chrome that looked like a web page header instead: transparent, with a wash of paper
+       fading in behind it once you scrolled. Same paper, same lip, same radius as the panel it
+       opens, so the bar reads as the lid of the box the game comes in.
+
+       Sticky, because a child who has scrolled down a chart of the বর্ণমালা should not have to
+       scroll back up to leave it. */
   .bar {
     position: sticky;
     top: 0;
-    isolation: isolate;
     z-index: 50;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
     margin: 0 0 clamp(12px, 1.8vw, 20px);
-    padding: 10px 0 12px;
+    padding: 12px 14px 14px 18px;
+    background: linear-gradient(180deg, #fff, var(--surface));
+    border-radius: var(--r-lg);
+    /* The lip is the object; the second shadow is depth, and it deepens once the bar is
+       holding itself above something. That is what `stuck` is for now - the class used to fade
+       a wash in, which an opaque shelf has no need of. */
+    box-shadow: var(--lip) var(--surface-3), 0 6px 18px rgba(var(--shade), .07);
+    transition: box-shadow .22s ease;
   }
-
-  /* The bar has to be readable once content scrolls under it, and the page behind it is a
-     painted gradient rather than a flat colour - so a wash of paper is the only thing that
-     works. But painted always, that wash is a cream rectangle sitting on a pink gradient at
-     the top of the page, which reads as a stray box rather than as a bar. So it is painted
-     only once there is something underneath it to hide. */
-  .bar::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(var(--bg) 64%, rgba(var(--shade), 0));
-    opacity: 0;
-    transition: opacity .2s ease;
+  .bar.stuck {
+    box-shadow: var(--lip) var(--surface-3), 0 14px 30px rgba(var(--shade), .16);
   }
-  .bar.stuck::after { opacity: 1; }
 
   .bar-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 
@@ -38,11 +39,13 @@
      what made the old masthead read as a toy rather than a title, so it stays. */
   .mark {
     font-family: var(--bn);
-    font-size: clamp(26px, 3.4vw, 38px);
+    font-size: clamp(24px, 2.8vw, 31px);
     line-height: 1.06;
     font-weight: 700;
     color: var(--accent);
-    text-shadow: 0 2px 0 var(--accent-lo), 0 4px 10px rgba(var(--glow-accent), .34);
+    /* One hard edge under it, not a glow as well. On paper rather than on the page's gradient
+       the glow smeared into the shelf and made the name look out of focus. */
+    text-shadow: 0 2px 0 var(--accent-lo);
   }
 
   /* This line is Bengali. It carried letter-spacing and text-transform: uppercase, which is a
@@ -72,38 +75,51 @@
      something else follows. */
   .card .deck:not(:last-child) { margin-bottom: 16px; }
 
-  /* The button that opens the options. Shaped like every other button in the game - a pill with
-     a hard bottom lip that vanishes when pressed - and big enough to be a target rather than a
-     detail, because on a phone it is the only way to anything that is not the board. */
+  /* The button that opens the options. Shaped like the tiles a child taps on the wheel rather
+     than like a link: a squarer block with a real lip, sized to be a target instead of a
+     detail. On a phone it is the only way to anything that is not the board, and it was a
+     slim pill competing with a 38px gold wordmark for attention - so it is the loudest thing
+     on the shelf now, and the wordmark is quieter. */
   .bar-menu {
     display: inline-flex;
     align-items: center;
-    gap: 9px;
+    gap: 10px;
     flex: none;
     border: 0;
     background: linear-gradient(180deg, var(--accent-hi), var(--accent));
-    box-shadow: var(--lip) var(--accent-lo);
+    box-shadow: 0 5px 0 var(--accent-lo), 0 8px 16px rgba(var(--glow-accent), .3);
     color: var(--ink);
-    border-radius: 99px;
-    padding: 10px 18px 12px 15px;
+    border-radius: 15px;
+    padding: 11px 18px 12px 14px;
     font: inherit;
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 700;
     cursor: pointer;
-    transition: filter .16s ease, transform .12s ease, box-shadow .12s ease;
+    transition: filter .16s ease, transform .1s ease, box-shadow .1s ease;
   }
-  .bar-menu:hover { filter: brightness(1.04); }
-  .bar-menu:active { transform: translateY(4px); box-shadow: none; }
+  .bar-menu:hover { filter: brightness(1.05); }
+  /* Down by the height of its own lip, like every other button in the game. */
+  .bar-menu:active {
+    transform: translateY(5px);
+    box-shadow: 0 0 0 var(--accent-lo), 0 2px 6px rgba(var(--glow-accent), .22);
+  }
+  /* Held down while the options are out, so the button reads as the open drawer's handle. */
+  .bar-menu[aria-expanded="true"] {
+    transform: translateY(5px);
+    box-shadow: 0 0 0 var(--accent-lo);
+  }
 
-  /* Three lines drawn rather than typed, so it never depends on a glyph being present. They
-     become an X while the options are open, so the button says what pressing it will do. */
+  /* Three lines drawn rather than typed, so it never depends on a glyph being present. The box
+     they are drawn in has to be positioned, or the two absolute strokes below find the sticky
+     bar instead and stretch a dark rule across the whole shelf. */
   .bar-menu .bars {
-    width: 16px; height: 12px;
+    width: 17px; height: 13px;
     border-top: 2.5px solid currentColor;
     border-bottom: 2.5px solid currentColor;
     position: relative;
     transition: border-color .18s ease;
   }
+
   /* Two strokes lying on top of each other: one middle line while closed, an X once they turn
      apart. Drawing only one of them left the button showing a single slash. */
   .bar-menu .bars::before,
