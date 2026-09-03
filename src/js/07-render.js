@@ -122,27 +122,38 @@ function allocateSpace() {
   const deficit = Math.max(0, floorHeight - usable);
   const budget = usable + deficit;
 
-  // Split in this order, which is the order the two parts matter in:
+  // One size for both, solved for together rather than split.
   //
-  //   1. the wheel gets the size it wants. It is what the player reads and aims at, and a
-  //      letter has to be picked out of it before anything can be spelled;
-  //   2. the board takes what is left, its cells shrinking to fit;
-  //   3. only when the cells reach the glyph's floor - below which the letter would not fit
-  //      inside its box at all - does the wheel start giving space back.
+  // A board cell and a wheel tile are the same object to a child: the letter they are hunting
+  // for and the letter they press to put it there. Drawn at 44px and 60px they were not, and
+  // the wheel became the big thing on the screen with the board a smaller record beside it.
   //
-  // It used to run the other way round, the board taking cells up to a comfortable size and
-  // the wheel taking the remainder. On a 360px phone that left the wheel pinned at its 132px
-  // floor with 30px tiles while the board had 38px cells: the boxes being filled in were
-  // bigger than the letters being chosen from, which is backwards. The board is a record of
-  // what has been found; the wheel is the thing being used.
-  let wheel = Math.min(wheelWant, width, budget - boardFor(MIN_CELL));
-  let cell = Math.min(MAX_CELL, byWidth,
-                      Math.floor((budget - wheel - rowGaps) / BOARD_MAX.rows));
+  // So this solves for the largest U that fits both at once. A tile is a fixed share of the
+  // wheel's diameter - the share that keeps eight of them from touching - so a wheel whose
+  // tiles are U across is U/SHARE wide, and the height needed is:
+  //
+  //     rows * U + rowGaps  +  U / SHARE  <=  budget
+  //
+  // which rearranges to the single division below. The previous version gave the wheel what
+  // it asked for first and let the board have the rest, which is why the two never agreed.
+  const SHARE = WHEEL_MAX <= 4 ? 0.30 : WHEEL_MAX <= 6 ? 0.26 : 0.21;
+  let cell = Math.floor((budget - rowGaps) / (BOARD_MAX.rows + 1 / SHARE));
+  cell = Math.min(cell, MAX_CELL, byWidth);
+
+  // The wheel is then whatever holds tiles that size - never under its own floor, because a
+  // ring too small to space its tiles apart is worse than a ring bigger than its tiles need.
+  let wheel = Math.max(WHEEL_FLOOR, Math.min(width, Math.round(cell / SHARE)));
+
+  // Deliberately not expanded into the height left over. Filling it spread five 42px tiles
+  // around a 250px ring, which read as a sparse hoop rather than as a set of letters. The ring
+  // stays in proportion to the tiles on it and `.wheel-area` centres it, so the slack becomes
+  // even space above and below instead of a band under the buttons.
 
   if (cell < MIN_CELL) {
-    // Take back only as much as the cells need to reach their floor, and no more.
+    // Width, not height, is what forced this - see glyphFor. Give the board its floor if the
+    // width allows it and let the wheel take what is left, as it used to.
     cell = Math.min(MIN_CELL, byWidth);
-    wheel = Math.max(WHEEL_FLOOR, budget - boardFor(cell));
+    wheel = Math.max(WHEEL_FLOOR, Math.min(width, budget - boardFor(cell)));
   }
 
   cell = Math.max(1, Math.min(cell, byWidth));
@@ -271,9 +282,16 @@ function drawWheel(alloc) {
   // Never below GLYPH_BOX either: the letter no longer shrinks with the tile, so the tile is
   // what has to give way. Eight tiles at the wheel's floor sit 50px apart centre to centre,
   // so holding them at 30px cannot make them touch.
-  const full = WHEEL_MAX;
-  const tile = Math.max(GLYPH_BOX,
-                        Math.round(size * (full <= 4 ? 0.30 : full <= 6 ? 0.26 : 0.21)));
+  // The board's number, not the wheel's own. `allocate` solved for one size that both could
+  // hold, so a tile is a cell - which is the point: the letter on the wheel and the letter in
+  // the board are the same letter, and were being drawn at two different sizes.
+  //
+  // GLYPH_BOX is the one exception, and it only bites where width has already forced the cells
+  // under it: a tile that small could not hold its own letter, and shrinking the thing being
+  // pressed to match the thing being filled in would be the wrong way round. Anything above
+  // that floor takes the cell's size exactly - a 44px tap target with the ring spacing them
+  // well apart, rather than a bigger circle that disagrees with the board it feeds.
+  const tile = Math.max(GLYPH_BOX, alloc.cell);
   const radius = size / 2 - tile / 2;
 
   el.wheel.style.width = el.wheel.style.height = size + "px";

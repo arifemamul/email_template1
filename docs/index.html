@@ -2880,13 +2880,15 @@ const floorHeight = boardFor(floorCell) + WHEEL_FLOOR;
 const deficit = Math.max(0, floorHeight - usable);
 const budget = usable + deficit;
 
-let wheel = Math.min(wheelWant, width, budget - boardFor(MIN_CELL));
-let cell = Math.min(MAX_CELL, byWidth,
-Math.floor((budget - wheel - rowGaps) / BOARD_MAX.rows));
+const SHARE = WHEEL_MAX <= 4 ? 0.30 : WHEEL_MAX <= 6 ? 0.26 : 0.21;
+let cell = Math.floor((budget - rowGaps) / (BOARD_MAX.rows + 1 / SHARE));
+cell = Math.min(cell, MAX_CELL, byWidth);
+
+let wheel = Math.max(WHEEL_FLOOR, Math.min(width, Math.round(cell / SHARE)));
 
 if (cell < MIN_CELL) {
 cell = Math.min(MIN_CELL, byWidth);
-wheel = Math.max(WHEEL_FLOOR, budget - boardFor(cell));
+wheel = Math.max(WHEEL_FLOOR, Math.min(width, budget - boardFor(cell)));
 }
 
 cell = Math.max(1, Math.min(cell, byWidth));
@@ -2960,9 +2962,7 @@ div.classList.toggle("hinted", hinted.has(div.dataset.pos));
 function drawWheel(alloc) {
 const size = alloc.wheel;
 const n = game.wheel.length;
-const full = WHEEL_MAX;
-const tile = Math.max(GLYPH_BOX,
-Math.round(size * (full <= 4 ? 0.30 : full <= 6 ? 0.26 : 0.21)));
+const tile = Math.max(GLYPH_BOX, alloc.cell);
 const radius = size / 2 - tile / 2;
 
 el.wheel.style.width = el.wheel.style.height = size + "px";
