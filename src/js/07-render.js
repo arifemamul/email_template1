@@ -114,8 +114,17 @@ function allocateSpace() {
   // bigger letter on some levels than others. What it changes is how much of the screen the
   // board fills, and it fills it now.
   const hereCols = game.puzzle ? game.puzzle.cols : BOARD_MAX.cols;
+  // An empty column on a board is not waste, and it is not a box either.
+  //
+  // A board can be several islands, and an island beside another is placed with a blank column
+  // between them: that blank is what stops আট and আম from reading as আটআম, a four-cell run
+  // with no solution. 91 of the 93 boards that have one need it for that. But separating two
+  // islands takes a gap, not a whole box, and it was being given a whole box - so a six-column
+  // board with one blank was drawing six 50px boxes where it needed five boxes and a gutter.
+  const hereGaps = game.puzzle ? emptyColumns(game.puzzle) : 0;
+  const hereBoxes = hereCols - hereGaps;
   const byWidest = Math.floor((width - gap * (BOARD_MAX.cols - 1)) / BOARD_MAX.cols);
-  const byHere = Math.floor((width - gap * (hereCols - 1)) / hereCols);
+  const byHere = Math.floor((width - gap * (hereCols - 1)) / (hereBoxes + hereGaps * GUTTER));
   const rowGaps = gap * (BOARD_MAX.rows - 1);
   const boardFor = c => BOARD_MAX.rows * c + rowGaps;
 
@@ -217,12 +226,38 @@ function allocateSpace() {
 const GLYPH = 17;       // px - board cells and wheel tiles alike
 const GLYPH_BOX = 30;   // px - the smallest box that holds a GLYPH letter with air around it
 
+/*
+ * A blank column's width, as a fraction of a box. Wide enough to read as a gap between two
+ * islands - which is the only job it has - and narrow enough that the boxes either side of it
+ * get most of what it used to take.
+ */
+const GUTTER = 0.42;
+
+/** Which columns of a board hold nothing, and how many. Cheap, and the answer never changes. */
+const emptyByBoard = new WeakMap();
+function emptyColumnSet(puzzle) {
+  let set = emptyByBoard.get(puzzle);
+  if (!set) {
+    const used = new Set();
+    for (const w of puzzle.words) for (const [, c] of w.cells) used.add(c);
+    set = new Set();
+    for (let c = 0; c < puzzle.cols; c++) if (!used.has(c)) set.add(c);
+    emptyByBoard.set(puzzle, set);
+  }
+  return set;
+}
+const emptyColumns = puzzle => emptyColumnSet(puzzle).size;
+
 function drawBoard(alloc) {
   const p = game.puzzle;
   const gap = 5;
   const cell = alloc.cell;
 
-  el.board.style.gridTemplateColumns = `repeat(${p.cols}, ${cell}px)`;
+  // A track per column rather than one width repeated, so a blank column can be a gutter.
+  const blanks = emptyColumnSet(p);
+  const gutter = Math.round(cell * GUTTER);
+  el.board.style.gridTemplateColumns = Array.from(
+    { length: p.cols }, (_, c) => (blanks.has(c) ? gutter : cell) + 'px').join(' ');
   el.board.style.gridAutoRows = cell + "px";
   el.board.innerHTML = "";
 

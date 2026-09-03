@@ -325,7 +325,39 @@ def cluster_layout(words, max_rows=8, max_cols=9):
     if (min_r, min_c) != (0, 0):
         occupied = {(r - min_r, c - min_c): a for (r, c), a in occupied.items()}
         placed = [(w, [(r - min_r, c - min_c) for r, c in cells]) for w, cells in placed]
-    return occupied, placed, islands
+    return squeeze(occupied, placed, [w for w, _ in placed]) + (islands,)
+
+
+def squeeze(occupied, placed, words):
+    """
+    Empty columns removed, where removing one does not put two words side by side.
+
+    A board can be several islands, and an island that starts beside another is placed with a
+    blank column between them - that blank is what stops আট and আম from reading as আটআম, a
+    four-cell run the player has no way to solve. 91 of the 93 boards with an empty column
+    need theirs for exactly that reason, and `stray_runs` is what says so.
+
+    The other two are simply wide: the column is empty and nothing would come to sit beside
+    anything if it went. Those are the ones this removes. It is a small win by itself - two
+    boards - and the reason it is worth having is that the page pays for the widest board in
+    the game, so a column that no board needs is a column every phone pays for.
+
+    Columns only. A blank row is the same idea in the scarcer direction, and the board's slot
+    is reserved from the tallest board in the game rather than from this one, so taking a row
+    out of one board changes nothing until it is taken out of the tallest.
+    """
+    cols = max(c for _, c in occupied) + 1
+    used = {c for _, c in occupied}
+    gaps = [c for c in range(cols) if c not in used]
+    if not gaps:
+        return occupied, placed
+
+    shift = {c: c - sum(1 for g in gaps if g < c) for c in used}
+    packed = {(r, shift[c]): a for (r, c), a in occupied.items()}
+    if stray_runs(packed, words):
+        return occupied, placed          # the blank is holding two words apart; leave it
+
+    return packed, [(w, [(r, shift[c]) for r, c in cells]) for w, cells in placed]
 
 
 def grid_size(occupied):
