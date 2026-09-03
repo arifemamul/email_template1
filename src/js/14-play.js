@@ -394,7 +394,7 @@ el.levelGrid.addEventListener("click", e => {
 function sayLevelLetter() {
   if (!Speech.available) return;
   Sfx.tap();
-  Speech.say(level().name);
+  Speech.say(level().name, { rate: Speech.AGAIN });
 }
 
 el.levelName.addEventListener("click", sayLevelLetter);
@@ -412,7 +412,7 @@ el.board.addEventListener("click", e => {
   const word = wordAt(cell.dataset.pos);
   if (!word || !Speech.available) return;
   Sfx.tap();
-  Speech.say(word);
+  Speech.say(word, { rate: Speech.AGAIN });
 });
 el.board.addEventListener("keydown", e => {
   if (e.key !== "Enter" && e.key !== " ") return;

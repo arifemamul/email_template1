@@ -189,7 +189,8 @@ if (said.length < words.length)
     // A voice, and a `say` that records instead of speaking.
     Speech.voice = { lang: 'bn-BD', name: 'test' };
     const said = [];
-    Speech.say = t => { said.push(t); return true; };
+    const rates = [];
+    Speech.say = (t, o = {}) => { said.push(t); rates.push(o.rate ?? Speech.RATE); return true; };
     loadLevel(0);
     drawHud();
     const chipBefore = document.getElementById('levelName').classList.contains('says');
@@ -216,6 +217,9 @@ if (said.length < words.length)
       cellLabels: [...new Set(saying.map(c => c.getAttribute('aria-label')))],
       fromCells: said.slice(said1), unfound,
       focusable: saying.every(c => c.getAttribute('tabindex') === '0'),
+      // Asking to hear something a second time is asking to hear it properly, so a press is
+      // slower than the moment the word landed.
+      landedAt: rates[0], againAt: rates.slice(1), RATE: Speech.RATE, AGAIN: Speech.AGAIN,
     };
   });
 
@@ -234,8 +238,20 @@ if (said.length < words.length)
   if (!heard.unfound)
     problems.push('every cell on the board says something; an unfound word must stay quiet');
   if (!heard.focusable) problems.push('a cell that speaks cannot be reached from a keyboard');
+  if (heard.landedAt !== heard.RATE)
+    problems.push(`a word landed at rate ${heard.landedAt}, expected ${heard.RATE}`);
+  if (heard.againAt.some(r => r !== heard.AGAIN))
+    problems.push(`a replayed press used ${JSON.stringify(heard.againAt)}, expected ${heard.AGAIN}`);
+  if (!(heard.AGAIN < heard.RATE))
+    problems.push(`pressing to hear again (${heard.AGAIN}) is not slower than landing (${heard.RATE})`);
+  // Below about 0.4 a speechSynthesis voice stops sounding slow and starts sounding broken.
+  if (heard.AGAIN < 0.4)
+    problems.push(`${heard.AGAIN} is slow enough to distort the voice into a word nobody says`);
+  if (heard.RATE > 0.6)
+    problems.push(`${heard.RATE} is a native-speed run at a word, not a learner's pace`);
   console.log(`again: the chip says "${heard.chipSaid}", and ${heard.cells} cells say `
-            + `"${heard.word}" - ${heard.unfound} cells of unfound words stay quiet`);
+            + `"${heard.word}" - ${heard.unfound} cells of unfound words stay quiet; `
+            + `landing ${heard.RATE}, pressed ${heard.AGAIN}`);
   await q.close();
 }
 

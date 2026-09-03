@@ -3358,7 +3358,10 @@ if (this.playing) { this.playing.pause(); this.playing = null; }
 if ("speechSynthesis" in window) speechSynthesis.cancel();
 },
 
-say(text, { rate = 0.6 } = {}) {
+RATE: 0.5,
+AGAIN: 0.4,
+
+say(text, { rate = 0.5 } = {}) {
 if (!text) return false;
 
 const clip = VOICE_CLIPS[text];
@@ -4578,7 +4581,7 @@ if (e.target.closest(".lv") && guideIsOpen()) closeGuide();
 function sayLevelLetter() {
 if (!Speech.available) return;
 Sfx.tap();
-Speech.say(level().name);
+Speech.say(level().name, { rate: Speech.AGAIN });
 }
 
 el.levelName.addEventListener("click", sayLevelLetter);
@@ -4594,7 +4597,7 @@ if (!cell || !cell.dataset.pos) return;
 const word = wordAt(cell.dataset.pos);
 if (!word || !Speech.available) return;
 Sfx.tap();
-Speech.say(word);
+Speech.say(word, { rate: Speech.AGAIN });
 });
 el.board.addEventListener("keydown", e => {
 if (e.key !== "Enter" && e.key !== " ") return;

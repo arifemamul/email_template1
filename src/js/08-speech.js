@@ -65,10 +65,22 @@ const Speech = {
   },
 
   /**
-   * Say something Bengali. `rate` is deliberately well below 1: a learner needs to hear the
-   * shape of a word, not a native-speed run at it.
+   * Say something Bengali.
+   *
+   * `rate` is deliberately well below 1: a learner needs to hear the shape of a word, not a
+   * native-speed run at it. 0.6 was already slow and is slower now, because the audience is
+   * five and hearing a word once at speed is not how a sound is learned.
+   *
+   * `AGAIN` is slower still, and it is what the two replay presses use - the letter chip and a
+   * found word. Asking to hear something a second time is asking to hear it properly, so the
+   * second time is not a repeat of the first. Not lower than this: below about 0.4 a
+   * speechSynthesis voice stops sounding slow and starts sounding broken, which teaches a
+   * child a word that nobody says.
    */
-  say(text, { rate = 0.6 } = {}) {
+  RATE: 0.5,
+  AGAIN: 0.4,
+
+  say(text, { rate = 0.5 } = {}) {
     if (!text) return false;
 
     const clip = VOICE_CLIPS[text];
