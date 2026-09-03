@@ -22,6 +22,7 @@ const el = {
   scrim: document.getElementById("scrim"),
   bar: document.querySelector(".bar"),
   tabbar: document.getElementById("tabbar"),
+  levelName: document.getElementById("levelName"),
   levelGlyph: document.getElementById("levelGlyph"),
   levelPass: document.getElementById("levelPass"),
   mute: document.getElementById("mute"),
@@ -63,6 +64,21 @@ function drawHud() {
   const lv = level();
   el.levelGlyph.textContent = lv.name;
   el.levelPass.textContent = lv.pass ? bn(lv.pass) : "";
+
+  // The chip says its own letter when pressed, on a device that can say anything at all.
+  // Marked here rather than once at startup because the voice list arrives asynchronously -
+  // `Speech.init` re-picks on `voiceschanged` - and this runs on every level.
+  const canSay = Speech.available;
+  el.levelName.classList.toggle("says", canSay);
+  if (canSay) {
+    el.levelName.setAttribute("role", "button");
+    el.levelName.setAttribute("tabindex", "0");
+    el.levelName.setAttribute("aria-label", `${lv.name} - উচ্চারণ শুনুন`);
+  } else {
+    el.levelName.removeAttribute("role");
+    el.levelName.removeAttribute("tabindex");
+    el.levelName.removeAttribute("aria-label");
+  }
 }
 
 /**
@@ -279,9 +295,47 @@ function drawBoard(alloc) {
         div.appendChild(span);
         if (shown.has(k)) div.classList.add("on");
         if (hinted.has(k) && !div.classList.contains("blank")) div.classList.add("hinted");
+        markSayable(div);
       }
       el.board.appendChild(div);
     }
+  }
+}
+
+/*
+ * The word a cell can say, or null.
+ *
+ * Only a word wholly found, never one a hint has half-revealed: a hint gives the letter away,
+ * and saying the word it belongs to would give away the rest. A crossing cell belongs to two
+ * words, and the one starting there is the one being pointed at.
+ */
+function wordAt(pos) {
+  const done = foundSet();
+  const holds = game.puzzle.words.filter(
+    w => done.has(w.word) && w.cells.some(([r, c]) => key(r, c) === pos));
+  if (!holds.length) return null;
+  const starts = holds.find(w => key(w.cells[0][0], w.cells[0][1]) === pos);
+  return (starts || holds[0]).word;
+}
+
+/*
+ * Mark the cells that will say something when pressed.
+ *
+ * Nothing is marked when the device cannot speak - `Speech.available` is false on a phone with
+ * no Bengali voice and no recordings - because a cell that looks pressable and then says
+ * nothing teaches a child that pressing things does nothing.
+ */
+function markSayable(div) {
+  const word = Speech.available ? wordAt(div.dataset.pos) : null;
+  div.classList.toggle("says", !!word);
+  if (word) {
+    div.setAttribute("role", "button");
+    div.setAttribute("tabindex", "0");
+    div.setAttribute("aria-label", `${word} - আবার শুনুন`);
+  } else {
+    div.removeAttribute("role");
+    div.removeAttribute("tabindex");
+    div.removeAttribute("aria-label");
   }
 }
 
@@ -308,6 +362,7 @@ function refreshBoard() {
     if (div.classList.contains("blank")) continue;
     div.classList.toggle("on", shown.has(div.dataset.pos));
     div.classList.toggle("hinted", hinted.has(div.dataset.pos));
+    markSayable(div);
   }
 }
 

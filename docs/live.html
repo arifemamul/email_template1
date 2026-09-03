@@ -366,6 +366,10 @@ display: flex; align-items: center; justify-content: space-between;
 gap: 10px; padding-top: 5px; flex: none;
 }
 
+.now-letter.says { cursor: pointer; }
+.now-letter.says:active .glyph { transform: translateY(3px); box-shadow: none; }
+.now-letter.says:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 99px; }
+
 .now-letter {
 flex: 1 1 auto;
 min-width: 0;
@@ -441,6 +445,10 @@ background: linear-gradient(180deg, var(--accent-hi), var(--accent));
 box-shadow: inset 0 2px 0 rgba(255,255,255,.6), var(--lip) var(--accent-lo);
 }
 .cell.on span { opacity: 1; transform: scale(1); }
+
+.cell.says { cursor: pointer; }
+.cell.says:active { transform: translateY(2px); }
+.cell.says:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
 
 .cell.hinted {
 background: linear-gradient(180deg, var(--hint-hi), var(--hint));
@@ -2976,6 +2984,7 @@ menuPop: document.getElementById("menuPop"),
 scrim: document.getElementById("scrim"),
 bar: document.querySelector(".bar"),
 tabbar: document.getElementById("tabbar"),
+levelName: document.getElementById("levelName"),
 levelGlyph: document.getElementById("levelGlyph"),
 levelPass: document.getElementById("levelPass"),
 mute: document.getElementById("mute"),
@@ -3009,6 +3018,18 @@ el.hint.disabled = isClear();
 const lv = level();
 el.levelGlyph.textContent = lv.name;
 el.levelPass.textContent = lv.pass ? bn(lv.pass) : "";
+
+const canSay = Speech.available;
+el.levelName.classList.toggle("says", canSay);
+if (canSay) {
+el.levelName.setAttribute("role", "button");
+el.levelName.setAttribute("tabindex", "0");
+el.levelName.setAttribute("aria-label", `${lv.name} - উচ্চারণ শুনুন`);
+} else {
+el.levelName.removeAttribute("role");
+el.levelName.removeAttribute("tabindex");
+el.levelName.removeAttribute("aria-label");
+}
 }
 
 function allocateSpace() {
@@ -3117,9 +3138,33 @@ span.style.fontSize = GLYPH + "px";
 div.appendChild(span);
 if (shown.has(k)) div.classList.add("on");
 if (hinted.has(k) && !div.classList.contains("blank")) div.classList.add("hinted");
+markSayable(div);
 }
 el.board.appendChild(div);
 }
+}
+}
+
+function wordAt(pos) {
+const done = foundSet();
+const holds = game.puzzle.words.filter(
+w => done.has(w.word) && w.cells.some(([r, c]) => key(r, c) === pos));
+if (!holds.length) return null;
+const starts = holds.find(w => key(w.cells[0][0], w.cells[0][1]) === pos);
+return (starts || holds[0]).word;
+}
+
+function markSayable(div) {
+const word = Speech.available ? wordAt(div.dataset.pos) : null;
+div.classList.toggle("says", !!word);
+if (word) {
+div.setAttribute("role", "button");
+div.setAttribute("tabindex", "0");
+div.setAttribute("aria-label", `${word} - আবার শুনুন`);
+} else {
+div.removeAttribute("role");
+div.removeAttribute("tabindex");
+div.removeAttribute("aria-label");
 }
 }
 
@@ -3141,6 +3186,7 @@ for (const div of el.board.children) {
 if (div.classList.contains("blank")) continue;
 div.classList.toggle("on", shown.has(div.dataset.pos));
 div.classList.toggle("hinted", hinted.has(div.dataset.pos));
+markSayable(div);
 }
 }
 
@@ -4506,6 +4552,35 @@ markBar();
 
 el.levelGrid.addEventListener("click", e => {
 if (e.target.closest(".lv") && guideIsOpen()) closeGuide();
+});
+
+function sayLevelLetter() {
+if (!Speech.available) return;
+Sfx.tap();
+Speech.say(level().name);
+}
+
+el.levelName.addEventListener("click", sayLevelLetter);
+el.levelName.addEventListener("keydown", e => {
+if (e.key !== "Enter" && e.key !== " ") return;
+e.preventDefault();
+sayLevelLetter();
+});
+
+el.board.addEventListener("click", e => {
+const cell = e.target.closest(".cell");
+if (!cell || !cell.dataset.pos) return;
+const word = wordAt(cell.dataset.pos);
+if (!word || !Speech.available) return;
+Sfx.tap();
+Speech.say(word);
+});
+el.board.addEventListener("keydown", e => {
+if (e.key !== "Enter" && e.key !== " ") return;
+const cell = e.target.closest(".cell");
+if (!cell || !cell.dataset.pos || !wordAt(cell.dataset.pos)) return;
+e.preventDefault();
+cell.click();
 });
 
 el.prev.addEventListener("click", () => { Sfx.page(false); loadLevel(game.index - 1); });

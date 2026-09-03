@@ -150,6 +150,95 @@ if (said.length < words.length)
   if (spoke.length) problems.push(`spoke Bengali through an English voice: ${JSON.stringify(spoke)}`);
 }
 
+// ---- hearing it again --------------------------------------------------------------------
+// A word is spoken once, as it lands - which is also the moment a child is watching letters fly
+// rather than listening. So the letter this level is about and any word already found can be
+// pressed to hear again. Both are silent, and must not look pressable, on a device with no
+// Bengali voice and no recordings: something that invites a press and then says nothing teaches
+// a child that pressing things does nothing.
+{
+  const q = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
+  await q.goto(PAGE);
+  await q.waitForFunction(() => document.querySelector('.tile'));
+
+  // A word has to be found before any cell could invite a press, so find one first. Asking at
+  // load time asked nothing: there were no candidate cells yet, and the check passed against a
+  // build that marked every found cell whether the device could speak or not.
+  const mute = await q.evaluate(async () => {
+    const word = LEVELS[0].words[0];
+    loadLevel(0);
+    game.picked = splitAksharas(word).map(a => game.wheel.indexOf(a));
+    submitWord();
+    await new Promise(r => setTimeout(r, 600));
+    return {
+      available: Speech.available,
+      found: (game.found[LEVELS[0].id] || []).length,
+      chip: document.getElementById('levelName').classList.contains('says'),
+      cells: document.querySelectorAll('.cell.says').length,
+      gold: document.querySelectorAll('.cell.on').length,
+    };
+  });
+  if (!mute.found) problems.push('the silent case never found a word, so it tested nothing');
+  if (!mute.gold) problems.push('no cell was filled in, so there was nothing that could speak');
+  if (mute.available)
+    problems.push('this browser has a Bengali voice, so the silent case went untested');
+  if (mute.chip) problems.push('the letter chip invites a press on a device that cannot speak');
+  if (mute.cells) problems.push(`${mute.cells} cells invite a press on a device that cannot speak`);
+
+  const heard = await q.evaluate(async () => {
+    // A voice, and a `say` that records instead of speaking.
+    Speech.voice = { lang: 'bn-BD', name: 'test' };
+    const said = [];
+    Speech.say = t => { said.push(t); return true; };
+    loadLevel(0);
+    drawHud();
+    const chipBefore = document.getElementById('levelName').classList.contains('says');
+
+    const word = LEVELS[0].words[0];
+    game.picked = splitAksharas(word).map(a => game.wheel.indexOf(a));
+    submitWord();
+    await new Promise(r => setTimeout(r, 600));
+
+    const chip = document.getElementById('levelName');
+    chip.click();
+    const said1 = said.length;
+    // Every cell of the found word says that word, and no cell of an unfound one says anything.
+    const saying = [...document.querySelectorAll('.cell.says')];
+    saying.forEach(c => c.click());
+    const unfound = [...document.querySelectorAll('.cell:not(.blank):not(.says)')].length;
+
+    return {
+      chipBefore, chipAfter: chip.classList.contains('says'),
+      chipLabel: chip.getAttribute('aria-label'),
+      chipSaid: said[said1 - 1],
+      letter: LEVELS[0].name,
+      word, cells: saying.length, aksharas: splitAksharas(word).length,
+      cellLabels: [...new Set(saying.map(c => c.getAttribute('aria-label')))],
+      fromCells: said.slice(said1), unfound,
+      focusable: saying.every(c => c.getAttribute('tabindex') === '0'),
+    };
+  });
+
+  if (!heard.chipBefore || !heard.chipAfter)
+    problems.push('the letter chip does not invite a press once there is a voice');
+  if (heard.chipSaid !== heard.letter)
+    problems.push(`pressing the chip said "${heard.chipSaid}", expected "${heard.letter}"`);
+  if (!heard.chipLabel || !heard.chipLabel.startsWith(heard.letter))
+    problems.push(`the chip is labelled "${heard.chipLabel}", which does not name its letter`);
+  if (heard.cells !== heard.aksharas)
+    problems.push(`${heard.cells} cells say the word, expected ${heard.aksharas} - one per akshara`);
+  if (heard.cellLabels.length !== 1 || !heard.cellLabels[0].startsWith(heard.word))
+    problems.push(`the found word's cells are labelled ${JSON.stringify(heard.cellLabels)}`);
+  if (heard.fromCells.some(x => x !== heard.word))
+    problems.push(`a cell of "${heard.word}" said something else: ${JSON.stringify(heard.fromCells)}`);
+  if (!heard.unfound)
+    problems.push('every cell on the board says something; an unfound word must stay quiet');
+  if (!heard.focusable) problems.push('a cell that speaks cannot be reached from a keyboard');
+  console.log(`again: the chip says "${heard.chipSaid}", and ${heard.cells} cells say `
+            + `"${heard.word}" - ${heard.unfound} cells of unfound words stay quiet`);
+  await q.close();
+}
+
 await b.close();
 if (problems.length) { console.log('PROBLEMS:'); problems.forEach(x => console.log(' - ' + x)); process.exitCode = 1; }
 else console.log(`QUIET: no sound button, no word counter, no pause - and all ${words.length} words spoken`);

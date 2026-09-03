@@ -379,6 +379,49 @@ el.levelGrid.addEventListener("click", e => {
   if (e.target.closest(".lv") && guideIsOpen()) closeGuide();
 });
 
+/* -- Hearing it again ---------------------------------------------------------------------
+ *
+ * A word is spoken once, as it lands. That is the moment it teaches - and it is also the moment
+ * a child is watching letters fly onto the board rather than listening to them. So the two
+ * things on screen that hold Bengali worth hearing can be pressed for it again: the letter this
+ * level is about, and any word already found.
+ *
+ * Both go quiet on a device with no Bengali voice and no recordings. `Speech.say` refuses to
+ * read Bengali with an English voice - see the note at the top of 08-speech.js, it is the most
+ * important line in there - so on such a phone these would be two things that look pressable
+ * and do nothing, which is worse than not offering them.
+ */
+function sayLevelLetter() {
+  if (!Speech.available) return;
+  Sfx.tap();
+  Speech.say(level().name);
+}
+
+el.levelName.addEventListener("click", sayLevelLetter);
+el.levelName.addEventListener("keydown", e => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  e.preventDefault();
+  sayLevelLetter();
+});
+
+/* Delegated, because the cells are rebuilt on every level and a listener per cell would have to
+   be rebuilt with them. `wordAt` is what decides whether a cell has anything to say. */
+el.board.addEventListener("click", e => {
+  const cell = e.target.closest(".cell");
+  if (!cell || !cell.dataset.pos) return;
+  const word = wordAt(cell.dataset.pos);
+  if (!word || !Speech.available) return;
+  Sfx.tap();
+  Speech.say(word);
+});
+el.board.addEventListener("keydown", e => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const cell = e.target.closest(".cell");
+  if (!cell || !cell.dataset.pos || !wordAt(cell.dataset.pos)) return;
+  e.preventDefault();
+  cell.click();
+});
+
 el.prev.addEventListener("click", () => { Sfx.page(false); loadLevel(game.index - 1); });
 el.next.addEventListener("click", () => { Sfx.page(true); loadLevel(game.index + 1); });
 
