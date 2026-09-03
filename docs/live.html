@@ -431,17 +431,36 @@ user-select: none;
 }
 
 .cell.on {
-background: linear-gradient(180deg, var(--accent-hi), var(--accent));
-box-shadow: inset 0 2px 0 rgba(255,255,255,.6), var(--lip) var(--accent-lo);
+background:
+linear-gradient(180deg, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 38%),
+linear-gradient(180deg, var(--accent-hi), var(--accent));
+box-shadow:
+inset 0 2px 0 rgba(255,255,255,.7),
+var(--lip) var(--accent-lo),
+0 6px 16px rgba(var(--glow-accent), .45);
+animation: cell-land .42s cubic-bezier(.2, 1.7, .4, 1);
 }
-.cell.on span { opacity: 1; transform: scale(1); }
+.cell.on span {
+opacity: 1;
+transform: scale(1);
+text-shadow: 0 1px 0 rgba(255,255,255,.55);
+}
+
+@keyframes cell-land {
+0%   { transform: scale(.86); }
+58%  { transform: scale(1.08); }
+100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+.cell.on { animation: none; }
+}
 
 .cell.hinted {
 background: linear-gradient(180deg, var(--hint-hi), var(--hint));
 box-shadow: inset 0 2px 0 rgba(255,255,255,.7), var(--lip) var(--hint-lo);
 }
 
-.preview { height: 52px; display: grid; place-items: center; flex: none; }
+.preview { height: 42px; display: grid; place-items: center; flex: none; }
 
 .preview .hint-text {
 font-family: var(--bn);
@@ -506,10 +525,10 @@ display: flex; align-items: center; gap: 7px;
 background: linear-gradient(180deg, #fff, var(--surface-2));
 border: 0;
 border-radius: 99px;
-padding: 9px 17px 11px;
+padding: 7px 15px 9px;
 color: var(--ink);
 font-family: var(--bn);
-font-size: 14px;
+font-size: 13.5px;
 font-weight: 700;
 cursor: pointer;
 box-shadow: var(--lip) var(--surface-3), 0 0 0 1px rgba(var(--shade), .07);
@@ -2826,7 +2845,7 @@ const usable = screenEl.clientHeight
 const width = screenEl.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
 
 const gap = 5;
-const MIN_CELL = GLYPH_BOX, MAX_CELL = 46;
+const MIN_CELL = GLYPH_BOX, MAX_CELL = 58;
 const byWidth = Math.floor((width - gap * (BOARD_MAX.cols - 1)) / BOARD_MAX.cols);
 const rowGaps = gap * (BOARD_MAX.rows - 1);
 const boardFor = c => BOARD_MAX.rows * c + rowGaps;
@@ -2856,8 +2875,13 @@ el.boardArea.style.height = Math.round(boardFor(cell)) + 'px';
 return { cell, wheel: Math.round(wheel), deficit: Math.ceil(deficit) };
 }
 
-const GLYPH = 17;       // px - board cells and wheel tiles alike
-const GLYPH_BOX = 30;   // px - the smallest box that holds a GLYPH letter with air around it
+const GLYPH = 21;       // px - board cells and wheel tiles alike
+const GLYPH_BOX = 37;   // px - the smallest box that holds a GLYPH letter with air around it
+
+function glyphFor(box) {
+if (box >= GLYPH_BOX) return GLYPH;
+return Math.max(13, Math.floor(box * GLYPH / GLYPH_BOX));
+}
 
 function drawBoard(alloc) {
 const p = game.puzzle;
@@ -2881,7 +2905,7 @@ div.dataset.pos = k;
 if (letter !== undefined) {
 const span = document.createElement("span");
 span.textContent = letter;
-span.style.fontSize = GLYPH + "px";
+span.style.fontSize = glyphFor(cell) + "px";
 div.appendChild(span);
 if (shown.has(k)) div.classList.add("on");
 if (hinted.has(k) && !div.classList.contains("blank")) div.classList.add("hinted");
@@ -2940,7 +2964,7 @@ btn.dataset.i = i;
 btn.style.width = btn.style.height = tile + "px";
 btn.style.left = (cx - tile / 2) + "px";
 btn.style.top = (cy - tile / 2) + "px";
-btn.style.fontSize = GLYPH + "px";
+btn.style.fontSize = glyphFor(Math.min(tile, alloc.cell)) + "px";
 btn.style.setProperty("--i", i);
 el.wheel.appendChild(btn);
 }

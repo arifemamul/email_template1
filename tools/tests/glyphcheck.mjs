@@ -77,13 +77,36 @@ for (const [w, h, name] of [[320,568,'iPhone SE'],[360,640,'small Android'],[412
           tightest = { air: +air.toFixed(1), letter: t.textContent, level: i + 1, tile: true };
       }
     }
-    return { minCell: Math.round(minCell), minTile: Math.round(minTile), worst, fonts: [...fonts], tightest };
+    // The widest a cell could be on this screen: the board's own width shared between the
+    // columns of the widest level in the game. That is what width-starvation is measured
+    // against, so a height-starved cell cannot hide behind the same excuse.
+    const screenEl = document.querySelector('.screen');
+    const cs = getComputedStyle(screenEl);
+    const avail = screenEl.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const cols = Math.max(...BOARDS.map(b => b.cols));
+    const widest = Math.floor((avail - 5 * (cols - 1)) / cols);
+    return { minCell: Math.round(minCell), minTile: Math.round(minTile), worst,
+             fonts: [...fonts], tightest, widest };
   });
   console.log(`${name.padEnd(14)} ${String(w).padStart(4)}x${h}  smallest cell ${r.minCell}px (L${r.worst}), ` +
               `smallest tile ${r.minTile}px, letter ${r.fonts.join(' / ')}`);
+  // One size per screen, board and wheel alike, on every level: this is the promise, and it is
+  // the one that matters to a learner meeting ন্ধু for the first time.
   if (r.fonts.length !== 1) problems.push(`${name}: letters drawn at ${r.fonts.length} different sizes (${r.fonts})`);
-  if (r.fonts[0] !== m.GLYPH + 'px') problems.push(`${name}: letters drawn at ${r.fonts[0]}, expected ${m.GLYPH}px`);
-  if (r.minCell < m.GLYPH_BOX) problems.push(`${name}: a cell is ${r.minCell}px, under the ${m.GLYPH_BOX}px floor`);
+  // GLYPH is what a screen with room draws. Width alone can deny it - a six-column board on a
+  // 375px phone leaves 32px a cell and there is nothing to trade for the rest - and then the
+  // letter comes down with the box in the same proportion rather than overflowing it. So the
+  // letter is GLYPH, or the box's honest share of GLYPH, and never below the 13px floor.
+  const want = r.minCell >= m.GLYPH_BOX
+    ? m.GLYPH
+    : Math.max(13, Math.floor(r.minCell * m.GLYPH / m.GLYPH_BOX));
+  if (r.fonts[0] !== want + 'px')
+    problems.push(`${name}: letters drawn at ${r.fonts[0]}, expected ${want}px for a ${r.minCell}px cell`);
+  // Height may never force a box under the floor - the wheel gives space back until the cells
+  // reach it. Only width may, so a cell under the floor has to be as wide as the screen allows.
+  if (r.minCell < m.GLYPH_BOX && r.minCell < r.widest)
+    problems.push(`${name}: a cell is ${r.minCell}px, under the ${m.GLYPH_BOX}px floor, with `
+                + `${r.widest}px of width available - so height gave it up, which it may not`);
   if (r.minTile < m.GLYPH_BOX) problems.push(`${name}: a tile is ${r.minTile}px, under the ${m.GLYPH_BOX}px floor`);
   console.log(`${' '.repeat(14)} tightest fit: "${r.tightest.letter}" on L${r.tightest.level}` +
               `${r.tightest.tile ? ' (wheel)' : ''} with ${r.tightest.air}px to spare`);

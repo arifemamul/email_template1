@@ -98,7 +98,7 @@ function allocateSpace() {
   // 64, which spent spare desktop height on ever-bigger boxes; with the letter fixed at
   // GLYPH that just draws a small letter in a large square, so cells stop at the comfortable
   // size and the leftover height goes to the wheel instead.
-  const MIN_CELL = GLYPH_BOX, MAX_CELL = 46;
+  const MIN_CELL = GLYPH_BOX, MAX_CELL = 58;
   // Sized for the largest board in the game, not the one on screen, so the answer is the same
   // on every level. The board area then takes only the height this level's rows need.
   const byWidth = Math.floor((width - gap * (BOARD_MAX.cols - 1)) / BOARD_MAX.cols);
@@ -181,8 +181,24 @@ function allocateSpace() {
  * ফড়িং, sets it, measuring about 1.45x its font size across. Raise either one and the check
  * says which letter stopped fitting.
  */
-const GLYPH = 17;       // px - board cells and wheel tiles alike
-const GLYPH_BOX = 30;   // px - the smallest box that holds a GLYPH letter with air around it
+const GLYPH = 21;       // px - board cells and wheel tiles alike
+const GLYPH_BOX = 37;   // px - the smallest box that holds a GLYPH letter with air around it
+
+/*
+ * The one case the pair above cannot honour. Height it can always find - the wheel gives
+ * space back until the cells reach GLYPH_BOX - but width it cannot: a six-column board on a
+ * 375px phone leaves 32px per cell and there is nothing to trade for the rest.
+ *
+ * So the letter comes down with the box when the box is forced under its floor, in the same
+ * proportion, and every letter on that screen comes down with it - board cells and wheel tiles
+ * both take this number. A letter is still one size wherever it appears, which is the promise
+ * that matters; what it is no longer is the same size on a 375px phone as on a desktop, which
+ * was never a promise a fixed letter could keep against a fixed board width.
+ */
+function glyphFor(box) {
+  if (box >= GLYPH_BOX) return GLYPH;
+  return Math.max(13, Math.floor(box * GLYPH / GLYPH_BOX));
+}
 
 function drawBoard(alloc) {
   const p = game.puzzle;
@@ -206,7 +222,7 @@ function drawBoard(alloc) {
       if (letter !== undefined) {
         const span = document.createElement("span");
         span.textContent = letter;
-        span.style.fontSize = GLYPH + "px";
+        span.style.fontSize = glyphFor(cell) + "px";
         div.appendChild(span);
         if (shown.has(k)) div.classList.add("on");
         if (hinted.has(k) && !div.classList.contains("blank")) div.classList.add("hinted");
@@ -280,7 +296,9 @@ function drawWheel(alloc) {
     btn.style.width = btn.style.height = tile + "px";
     btn.style.left = (cx - tile / 2) + "px";
     btn.style.top = (cy - tile / 2) + "px";
-    btn.style.fontSize = GLYPH + "px";
+    // The wheel takes the board's number, not its own: the two sit on one screen and a letter
+    // that is 21px on a tile and 18px in the cell it lands in reads as two different letters.
+    btn.style.fontSize = glyphFor(Math.min(tile, alloc.cell)) + "px";
     // Offsets the resting float in effects.css, so the wheel breathes as a ring rather than
     // as one object pulsing.
     btn.style.setProperty("--i", i);
