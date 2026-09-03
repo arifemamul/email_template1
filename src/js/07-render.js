@@ -122,6 +122,7 @@ function allocateSpace() {
   // What each part would like, before anyone gives anything up.
   const wheelWant = Math.min(width, WHEEL_MAX <= 4 ? 210 : WHEEL_MAX <= 5 ? 230 : 250);
 
+
   // ...and the layout we refuse to go below: cells small but still readable, and a wheel with
   // tiles a finger can still hit. Width can force the cells smaller than MIN_CELL - a
   // six-column board on a narrow phone leaves no choice - but height never may.
@@ -135,6 +136,14 @@ function allocateSpace() {
   // the letters still in it.
   const deficit = Math.max(0, floorHeight - usable);
   const budget = usable + deficit;
+  // A tile is this share of the wheel's diameter - the same number `drawWheel` draws with.
+  const SHARE = WHEEL_MAX <= 4 ? 0.30 : WHEEL_MAX <= 6 ? 0.26 : 0.21;
+  // Where the two would come out equal: SHARE*w for a tile against (budget - w - rowGaps)/rows
+  // for a cell, solved for w. Below this the wheel is taking so much height that the boxes
+  // being filled in are smaller than the letters being chosen from - on a 360x640 phone the
+  // wheel took its full 230px and left the board at its 30px floor against 60px tiles, which
+  // is a board that reads as an afterthought to its own wheel.
+  const balance = (budget - rowGaps) / (SHARE * BOARD_MAX.rows + 1);
 
   // Split in this order, which is the order the two parts matter in:
   //
@@ -149,7 +158,11 @@ function allocateSpace() {
   // floor with 30px tiles while the board had 38px cells: the boxes being filled in were
   // bigger than the letters being chosen from, which is backwards. The board is a record of
   // what has been found; the wheel is the thing being used.
-  let wheel = Math.min(wheelWant, width, budget - boardFor(MIN_CELL));
+  // The wheel still gets what it wants wherever the height allows it - it is what the player
+  // reads and aims at. It only gives way when what it wants would starve the board past the
+  // point above, and never below its own floor.
+  let wheel = Math.min(wheelWant, width, budget - boardFor(MIN_CELL),
+                       Math.max(WHEEL_FLOOR, Math.floor(balance)));
 
   // What height allows, for the tallest board in the game. Constant per screen, and therefore
   // the thing the slot is reserved at - so the wheel below it never moves when the level does,

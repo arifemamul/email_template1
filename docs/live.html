@@ -2838,8 +2838,11 @@ const floorHeight = boardFor(floorCell) + WHEEL_FLOOR;
 
 const deficit = Math.max(0, floorHeight - usable);
 const budget = usable + deficit;
+const SHARE = WHEEL_MAX <= 4 ? 0.30 : WHEEL_MAX <= 6 ? 0.26 : 0.21;
+const balance = (budget - rowGaps) / (SHARE * BOARD_MAX.rows + 1);
 
-let wheel = Math.min(wheelWant, width, budget - boardFor(MIN_CELL));
+let wheel = Math.min(wheelWant, width, budget - boardFor(MIN_CELL),
+Math.max(WHEEL_FLOOR, Math.floor(balance)));
 
 let roomy = Math.min(MAX_CELL, Math.floor((budget - wheel - rowGaps) / BOARD_MAX.rows));
 
