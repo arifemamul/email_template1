@@ -146,6 +146,50 @@
     .opt { padding: 10px; }
   }
 
+  /* -- Each vowel beside its own কার --------------------------------------------
+       One pair per swatch, letter on the left and the sign it becomes on the right, sharing a
+       colour so the pairing is visible before any of it is read. Ten pairs, five block
+       colours, cycling - the colour binds a letter to its sign inside one pair rather than
+       identifying the pair among all ten, and no two neighbours share one. */
+  .pairs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  /* Tinted the way the level grid tints these same five colours - mixed into paper rather than
+     used raw. Raw, they are five saturated blocks that belong to some other game; the grid's
+     recipe is what makes them read as this one's. A touch stronger than the grid's 15%, because
+     a tile there is one of 244 and these are ten things a child is asked to compare. */
+  .pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    --hue: var(--block-1);
+    background: color-mix(in srgb, var(--hue) 22%, #fff);
+    box-shadow: var(--lip) color-mix(in srgb, var(--hue) 30%, #fff);
+  }
+  .pair[data-block="2"] { --hue: var(--block-2); }
+  .pair[data-block="3"] { --hue: var(--block-3); }
+  .pair[data-block="4"] { --hue: var(--block-4); }
+  .pair[data-block="5"] { --hue: var(--block-5); }
+
+  .pair-v, .pair-k {
+    font-family: var(--bn);
+    font-size: 27px;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--hue) 76%, var(--ink));
+    line-height: 1;
+    padding: 12px 4px 14px;
+    text-align: center;
+  }
+  /* A hairline between the two halves, in the paper rather than in a new colour: the halves are
+     one object seen twice, so a rule is enough and a second fill would split the pair in two. */
+  .pair-k { box-shadow: inset 1px 0 0 rgba(255, 255, 255, .8); }
+
   .page { display: none; }
   .page.on { display: block; }
   /* Two cards in one section (About holds the notes and the feedback card) need the gap the

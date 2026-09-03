@@ -102,6 +102,39 @@ function letterTile(letter) {
   return tile;
 }
 
+/*
+ * Each vowel beside the sign it becomes, one colour per pair.
+ *
+ * The table under this names every sign - "ই-কার" - and shows it attached to ক, as কি. What it
+ * never shows is ই and ি side by side, so the name is the only thing telling a child that the
+ * sign came from that letter, and a name is a thing you have to be able to read already.
+ *
+ * The sign is drawn on a dotted circle, U+25CC, which is what the circle is in Unicode for: the
+ * placeholder a combining mark sits on when it has no letter to sit on. The embedded font
+ * carries it deliberately - it is in the face's unicode-range - so this does not depend on
+ * whatever the device would otherwise substitute.
+ *
+ * Five colours for ten pairs. The colour's job is to bind a letter to its own sign inside one
+ * pair, not to be unique across all ten, and the palette has five block colours - so they
+ * cycle, and no two neighbours share one. A new pigment here would be a new pigment outside
+ * theme.css, which the feel check refuses for good reason.
+ */
+function drawKarPairs() {
+  const box = document.getElementById("karPairs");
+  if (!box) return;
+  box.innerHTML = "";
+  KARS.forEach(([sign, name, vowel], i) => {
+    const pair = document.createElement("div");
+    pair.className = "pair";
+    pair.dataset.block = (i % 5) + 1;
+    // Read as one thing - "ই-কার" - rather than as two glyphs, one of which is a lone mark.
+    pair.setAttribute("aria-label", name);
+    pair.innerHTML = `<span class="pair-v bn" aria-hidden="true">${vowel}</span>`
+                   + `<span class="pair-k bn" aria-hidden="true">\u25CC${sign}</span>`;
+    box.appendChild(pair);
+  });
+}
+
 function drawCharts() {
   for (const [id, letters] of [["chartVowels", SWARABARNA],
                                ["chartConsonants", BYANJANBARNA]]) {
@@ -135,6 +168,8 @@ function drawCharts() {
     }
     table.appendChild(r);
   };
+
+  drawKarPairs();
 
   for (const [sign, name, vowel] of KARS) {
     row(`ক${sign}`, name, `বর্ণের উপর ${vowel} লেখে`, exampleWord(sign));

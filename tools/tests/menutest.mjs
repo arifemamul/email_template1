@@ -129,6 +129,38 @@ for (const m of marks) {
   if (!m.live) problems.push(`${m.glyph}: no example word in the game carries this sign`);
   else if (!m.onBoard) problems.push(`${m.glyph}: example "${m.eg}" is on no board`);
 }
+// ---- each vowel beside its own কার ------------------------------------------------------
+// The pairing is the whole content of that strip, so what is worth checking is that it agrees
+// with the table under it rather than that ten swatches exist. A swatch claims "ই becomes ি";
+// the row below claims "ি is called ই-কার". Both come from KARS, and if either is edited
+// without the other this is what says so.
+const pairs = await p.evaluate(() => [...document.querySelectorAll('#karPairs .pair')].map(x => ({
+  label: x.getAttribute('aria-label'),
+  vowel: x.querySelector('.pair-v').textContent,
+  // the dotted circle U+25CC is the placeholder the sign is drawn on; the sign is the rest
+  sign: x.querySelector('.pair-k').textContent.replace('\u25CC', ''),
+  block: x.dataset.block,
+  // The sign must be hidden from a screen reader: read out, a lone combining mark is noise.
+  spoken: [...x.querySelectorAll('[aria-hidden="true"]')].length,
+})));
+const signsInTable = marks.map(m => m.glyph.replace(/^ক/, '')).filter(Boolean);
+if (pairs.length !== 10) problems.push(`${pairs.length} কার pairs, expected 10`);
+for (const pr of pairs) {
+  // "ই-কার" names ই, and the sign beside it must be the one the table calls that.
+  if (pr.label !== `${pr.vowel}-কার`)
+    problems.push(`pair "${pr.label}" shows the vowel ${pr.vowel}, which the name does not match`);
+  if (!signsInTable.includes(pr.sign))
+    problems.push(`pair "${pr.label}" shows a sign the mark table does not list`);
+  if (pr.spoken !== 2)
+    problems.push(`pair "${pr.label}" leaves a bare glyph readable; a lone mark read aloud is noise`);
+}
+// Neighbours must differ, or the colour stops saying "these two belong together".
+for (let i = 1; i < pairs.length; i++)
+  if (pairs[i].block === pairs[i - 1].block)
+    problems.push(`pairs ${i} and ${i + 1} share block colour ${pairs[i].block}`);
+console.log(`kar pairs: ${pairs.length}, ${new Set(pairs.map(x => x.block)).size} colours, `
+          + `each vowel matched to the sign the table names`);
+
 console.log(`charts: ${charts.vowels.length} vowels, ${charts.consonants.length} consonants, `
           + `${marks.length} marks; ${dead.length} letters without levels (${dead.join(' ')})`);
 
