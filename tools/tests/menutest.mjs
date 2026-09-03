@@ -134,32 +134,71 @@ for (const m of marks) {
 // with the table under it rather than that ten swatches exist. A swatch claims "ই becomes ি";
 // the row below claims "ি is called ই-কার". Both come from KARS, and if either is edited
 // without the other this is what says so.
-const pairs = await p.evaluate(() => [...document.querySelectorAll('#karPairs .pair')].map(x => ({
-  label: x.getAttribute('aria-label'),
-  vowel: x.querySelector('.pair-v').textContent,
-  // the dotted circle U+25CC is the placeholder the sign is drawn on; the sign is the rest
-  sign: x.querySelector('.pair-k').textContent.replace('\u25CC', ''),
-  block: x.dataset.block,
-  // The sign must be hidden from a screen reader: read out, a lone combining mark is noise.
-  spoken: [...x.querySelectorAll('[aria-hidden="true"]')].length,
-})));
-const signsInTable = marks.map(m => m.glyph.replace(/^ক/, '')).filter(Boolean);
+//
+// The sign is drawn, not typed, because a lone কার cannot be set as text - three of the ten
+// have zero advance width and paint nothing, and on a space the shaper inserts a dotted circle.
+// So the second thing checked here is that the drawing is the right drawing: the outline in the
+// page for the sign the label names, and no dotted circle anywhere in the strip.
+const pairs = await p.evaluate(() => {
+  const nameToSign = {};
+  for (const [sign, name] of KARS) nameToSign[name] = sign;
+  return [...document.querySelectorAll('#karPairs .pair')].map(x => {
+    const svg = x.querySelector('.pair-k svg');
+    const label = x.getAttribute('aria-label');
+    const want = nameToSign[label];
+    return {
+      label,
+      vowel: x.querySelector('.pair-v').textContent,
+      wantSign: want,
+      // The outline the page holds for the sign this pair claims to show. Compared as path
+      // data rather than as markup: the browser rewrites innerHTML - a self-closing <path/>
+      // comes back as <path></path> - so comparing the strings compares the browser's
+      // formatting, which is a check that fails on everything and means nothing.
+      matchesShape: !!(svg && want && KAR_SHAPES[want]
+                    && svg.getAttribute('viewBox') === KAR_SHAPES[want].box
+                    && JSON.stringify([...svg.querySelectorAll('path')].map(q => q.getAttribute('d')))
+                       === JSON.stringify([...KAR_SHAPES[want].paths.matchAll(/ d="([^"]*)"/g)]
+                                          .map(m => m[1]))),
+      pieces: svg ? svg.querySelectorAll('path').length : 0,
+      block: x.dataset.block,
+      // Nothing in the pair may be read aloud but the label: a lone combining mark is noise.
+      hidden: [...x.querySelectorAll('[aria-hidden="true"]')].length,
+      // The ink, not the box - a shape that renders at zero height is a shape nobody can see.
+      ink: svg ? Math.round(svg.querySelector('g').getBoundingClientRect().height) : 0,
+    };
+  });
+});
+// ো and ৌ have precomposed glyphs in the font and both are drawn WITH a dotted circle baked
+// into the outline - the font means them for a character chart. They have to be built from
+// their pieces (ে + া, ে + ৗ) instead, and two paths rather than one is what says they were.
+const TWO_PIECE = { 'ও-কার': 2, 'ঔ-কার': 2 };
 if (pairs.length !== 10) problems.push(`${pairs.length} কার pairs, expected 10`);
 for (const pr of pairs) {
-  // "ই-কার" names ই, and the sign beside it must be the one the table calls that.
   if (pr.label !== `${pr.vowel}-কার`)
     problems.push(`pair "${pr.label}" shows the vowel ${pr.vowel}, which the name does not match`);
-  if (!signsInTable.includes(pr.sign))
-    problems.push(`pair "${pr.label}" shows a sign the mark table does not list`);
-  if (pr.spoken !== 2)
+  if (!pr.wantSign)
+    problems.push(`pair "${pr.label}" is named nothing the mark table lists`);
+  else if (!pr.matchesShape)
+    problems.push(`pair "${pr.label}" draws something other than the outline held for ${pr.wantSign}`);
+  if (pr.pieces !== (TWO_PIECE[pr.label] || 1))
+    problems.push(`pair "${pr.label}" is drawn from ${pr.pieces} outline(s), expected `
+                + `${TWO_PIECE[pr.label] || 1} - the precomposed glyph carries a dotted circle`);
+  if (pr.hidden !== 2)
     problems.push(`pair "${pr.label}" leaves a bare glyph readable; a lone mark read aloud is noise`);
+  if (pr.ink < 8)
+    problems.push(`pair "${pr.label}" draws its sign ${pr.ink}px tall - too small to make out`);
 }
+// No dotted circle, which is the thing this chart exists to avoid showing.
+const circled = await p.evaluate(() =>
+  document.getElementById('karPairs').textContent.includes('\u25CC'));
+if (circled) problems.push('a dotted circle is back in the কার pairs');
 // Neighbours must differ, or the colour stops saying "these two belong together".
 for (let i = 1; i < pairs.length; i++)
   if (pairs[i].block === pairs[i - 1].block)
     problems.push(`pairs ${i} and ${i + 1} share block colour ${pairs[i].block}`);
-console.log(`kar pairs: ${pairs.length}, ${new Set(pairs.map(x => x.block)).size} colours, `
-          + `each vowel matched to the sign the table names`);
+console.log(`kar pairs: ${pairs.length} drawn from the font's own outlines, ink `
+          + `${Math.min(...pairs.map(x => x.ink))}-${Math.max(...pairs.map(x => x.ink))}px, `
+          + `no dotted circles`);
 
 console.log(`charts: ${charts.vowels.length} vowels, ${charts.consonants.length} consonants, `
           + `${marks.length} marks; ${dead.length} letters without levels (${dead.join(' ')})`);

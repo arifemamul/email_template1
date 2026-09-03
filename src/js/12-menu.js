@@ -109,10 +109,12 @@ function letterTile(letter) {
  * never shows is ই and ি side by side, so the name is the only thing telling a child that the
  * sign came from that letter, and a name is a thing you have to be able to read already.
  *
- * The sign is drawn on a dotted circle, U+25CC, which is what the circle is in Unicode for: the
- * placeholder a combining mark sits on when it has no letter to sit on. The embedded font
- * carries it deliberately - it is in the face's unicode-range - so this does not depend on
- * whatever the device would otherwise substitute.
+ * The sign is drawn, not typed. A কার is a combining mark, so as text it needs something to
+ * combine with: alone, ু ূ and ৃ have zero advance width and paint nothing at all, and on a
+ * space the shaper inserts a dotted circle - ◌া - which is the right Unicode answer to "a mark
+ * with no base" and the wrong one to "show me the sign". So it comes from the face as an
+ * outline instead, extracted at build time by kar_shapes in tools/build.py: the same shape the
+ * game writes with, owing nothing to a shaper or a platform's idea of an orphan mark.
  *
  * Five colours for ten pairs. The colour's job is to bind a letter to its own sign inside one
  * pair, not to be unique across all ten, and the palette has five block colours - so they
@@ -129,8 +131,12 @@ function drawKarPairs() {
     pair.dataset.block = (i % 5) + 1;
     // Read as one thing - "ই-কার" - rather than as two glyphs, one of which is a lone mark.
     pair.setAttribute("aria-label", name);
+    const shape = KAR_SHAPES[sign];
     pair.innerHTML = `<span class="pair-v bn" aria-hidden="true">${vowel}</span>`
-                   + `<span class="pair-k bn" aria-hidden="true">\u25CC${sign}</span>`;
+      + `<span class="pair-k">`
+      // Flipped, because font coordinates run up the page and SVG's run down it.
+      + `<svg viewBox="${shape.box}" aria-hidden="true" focusable="false">`
+      + `<g transform="scale(1,-1)" fill="currentColor">${shape.paths}</g></svg></span>`;
     box.appendChild(pair);
   });
 }

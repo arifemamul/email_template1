@@ -186,6 +186,21 @@
     padding: 12px 4px 14px;
     text-align: center;
   }
+
+  /* The sign half holds a drawn outline rather than text - see drawKarPairs. Sized to the
+     letter beside it and centred, and it takes its fill from `currentColor`, so the pair's
+     two halves stay one colour without the shape being told what that colour is. */
+  .pair-k { display: grid; place-items: center; }
+  .pair-k svg {
+    display: block;
+    /* Taller than the letter beside it on purpose. The box spans the whole vertical range the
+       ten signs cover - ী at the top to ৃ below the baseline - so the ink inside it is smaller
+       than the box: at the letter's own 27px, ু came out six pixels tall. */
+    height: 40px;
+    width: auto;
+    max-width: 100%;
+    overflow: visible;
+  }
   /* A hairline between the two halves, in the paper rather than in a new colour: the halves are
      one object seen twice, so a rule is enough and a second fill would split the pair in two. */
   .pair-k { box-shadow: inset 1px 0 0 rgba(255, 255, 255, .8); }

@@ -298,6 +298,86 @@ def kar_examples(levels):
     return {a: out[a] for a in sorted(out) if out[a]['en']}
 
 
+def kar_shapes():
+    """
+    Each কার sign as an outline taken from the embedded font.
+
+    A lone কার cannot be set as text. It is a combining mark, so it needs something to combine
+    with: on its own, three of the ten - ু ূ ৃ - have zero advance width and paint nothing, and
+    a plain space makes the shaper insert a dotted circle instead. The dotted circle is the
+    correct Unicode answer to "a mark with no base" and the wrong answer to "show me the sign",
+    which is what this chart is for.
+
+    So the sign is drawn rather than typed. Taken straight from the face the page already
+    embeds, so it is the same shape the game writes with - and being a path, it owes nothing to
+    a shaper, a fallback font, or a platform's idea of what to do with an orphan mark. The same
+    ten shapes on every device.
+
+    Each viewBox is the glyph's own bounding box with a little air, so a sign fills its swatch.
+    That normalises the size across the ten - ু is a small hook and া is a tall stroke - and
+    keeps each one's proportions, which is the half that carries the shape's identity.
+    """
+    from fontTools.ttLib import TTFont
+    from fontTools.pens.svgPathPen import SVGPathPen
+    from fontTools.pens.boundsPen import BoundsPen
+
+    face = TTFont(REPO / 'docs/fonts/noto-sans-bengali-bengali-700-normal.woff2')
+    cmap, glyphs = face.getBestCmap(), face.getGlyphSet()
+
+    # ো and ৌ have precomposed glyphs, and both are drawn with a dotted circle baked into the
+    # outline - the font means them for a character chart, where a mark is shown on its
+    # placeholder. Drawing those would put back the circle this whole function exists to avoid,
+    # so the two are built from their pieces instead: ো is ে then া, ৌ is ে then ৗ. Which is
+    # what they are - the canonical decompositions Unicode gives for both.
+    PIECES = {'\u09cb': ('\u09c7', '\u09be'), '\u09cc': ('\u09c7', '\u09d7')}
+
+    def piece(ch):
+        name = cmap.get(ord(ch))
+        if name is None:
+            raise SystemExit(f'kar_shapes: the font has no glyph for U+{ord(ch):04X}')
+        glyph = glyphs[name]
+        bounds = BoundsPen(glyphs)
+        glyph.draw(bounds)
+        if bounds.bounds is None:
+            raise SystemExit(f'kar_shapes: U+{ord(ch):04X} has an empty outline')
+        pen = SVGPathPen(glyphs)
+        glyph.draw(pen)
+        return pen.getCommands(), bounds.bounds, glyph.width
+
+    drawn = {}
+    for sign in KAR_SIGNS:
+        parts, x, box = [], 0, None
+        for ch in PIECES.get(sign, (sign,)):
+            d, (x0, y0, x1, y1), adv = piece(ch)
+            # Each piece is placed where the text engine would place it: one advance along from
+            # the last. The translate is on the piece rather than baked into its coordinates,
+            # which keeps the path exactly as the font drew it.
+            parts.append(f'<path d="{d}" transform="translate({x},0)"/>' if x else f'<path d="{d}"/>')
+            here = (x0 + x, y0, x1 + x, y1)
+            box = here if box is None else (min(box[0], here[0]), min(box[1], here[1]),
+                                            max(box[2], here[2]), max(box[3], here[3]))
+            x += adv
+        drawn[sign] = (parts, box)
+
+    # One vertical scale for all ten, so a small mark looks small. ু is a hook under the letter
+    # and া is a stroke as tall as the letter itself; fitting each to its own box made them the
+    # same size on screen, which is a chart that lies about two of them. Shared top and bottom,
+    # so they share a baseline too - ে sits on it, ু hangs below it, ী rises above it.
+    top = max(b[3] for _, b in drawn.values())
+    bottom = min(b[1] for _, b in drawn.values())
+
+    out = {}
+    for sign, (parts, (x0, _, x1, _)) in drawn.items():
+        pad = round((x1 - x0) * 0.10)
+        # Font coordinates run up, SVG's run down, so the path is flipped in the page and the
+        # box is expressed in flipped coordinates too: -top is the top edge.
+        out[sign] = {
+            'paths': ''.join(parts),
+            'box': f'{x0 - pad} {-top} {x1 - x0 + pad * 2} {top - bottom}',
+        }
+    return out
+
+
 def emit(levels):
     marks = milestones(levels)
     kt, js = [KOTLIN_HEADER], ['const LEVELS = [']
@@ -356,6 +436,14 @@ def emit(levels):
     # And the primer's own three tables. Emitted rather than written into the page by hand for
     # the same reason the level table is: they are checked by `primer()` on every build, and a
     # hand copy in the page would be a second, unchecked one.
+    # The কার signs as outlines. See kar_shapes for why a chart of them cannot be text.
+    js.append('')
+    js.append("/* Each কার sign's outline, taken from the embedded face - see tools/build.py. */")
+    js.append('const KAR_SHAPES = {')
+    for sign, shape in kar_shapes().items():
+        js.append(f'  "{sign}": {{ box: "{shape["box"]}", paths: \'{shape["paths"]}\' }},')
+    js.append('};')
+
     book = primer()
     js.append('')
     js.append('/* A printed primer\'s tables, transcribed and checked - see tools/primer.json. */')
