@@ -15,11 +15,9 @@
     grid-template-columns: 1fr 1fr;
     gap: 6px 18px;
     padding: 16px 16px 18px;
-    background: linear-gradient(180deg, #fff, var(--surface));
+    background: var(--surface);
     border-radius: var(--r-lg);
-    /* The same lip the bar wears, so the panel reads as the drawer that shelf pulls out
-       rather than as a floating tooltip that happens to be nearby. */
-    box-shadow: var(--lip) var(--surface-3), 0 18px 44px rgba(var(--shade), .2);
+    box-shadow: 0 18px 44px rgba(var(--shade), .22), 0 2px 0 var(--surface-3);
     animation: pop-in .18s cubic-bezier(.22, 1, .36, 1);
   }
   .menu-pop[hidden] { display: none; }
@@ -40,11 +38,7 @@
   .scrim {
     position: fixed;
     inset: 0;
-    /* Under the bar, over everything else. Above it, the scrim dimmed the shelf and the ✕ on
-       it - the one thing a child needs to see while the options are open. The drawer is out;
-       the lid it came from stays lit. A press on the dimmed shelf still closes the options,
-       because the handler asks what was pressed rather than what was covered. */
-    z-index: 45;
+    z-index: 55;
     background: transparent;
   }
   .scrim[hidden] { display: none; }
