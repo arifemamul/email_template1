@@ -14,8 +14,10 @@ half of it was already on a board - which is the answer to "are these in the gam
 These words need no picture rule and get none. The guide's words did, because they were chosen
 to illustrate a form and most of them cannot be drawn; this list was chosen for children by
 someone teaching them, and it reads that way - ঘোড়া, ঘড়ি, ব্যাঙ, চশমা, জাহাজ, ঝুড়ি, বিড়াল,
-ময়ূর, সিংহ, গাড়ি, পাহাড়. The handful that a picture cannot show are named in the output so a
-person can decide about them; see UNDRAWABLE below.
+ময়ূর, সিংহ, গাড়ি, পাহাড়. Ten of its words could not be drawn either - অনেক, ইচ্ছা,
+একতা, ঈশ্বর, ঈশান, মহৎ, যাদু, দুঃখ, নিঃস্ব, হঠাৎ - and they were set for one commit before
+going into REJECTED in tools/vocabulary.py, which is where a word goes to stop being a puzzle
+from any source at all. Nothing here has to know about them.
 
 It also picks up the leftovers. guide_levels.py places its words by first akshara and then by
 letter, and thirteen drawable ones still end up alone under their whole letter - গণ্ডার, চক্র,
@@ -39,20 +41,6 @@ from wordpool import zipf                                            # noqa: E40
 LIST = HERE / 'word-list-school.json'
 GUIDE_GLOSSES = HERE / 'guide-glosses.json'
 OUT = HERE / 'levels-vocab.json'
-
-# The words on this list that no picture can show. Not refused - the list was handed in to be
-# played and every one of these is a word a Bengali child hears - but named, because the game's
-# own rule in tools/vocabulary.py is that a board word is one a picture could replace, and a
-# board of abstractions is the thing that rule exists to prevent. Move any of these into
-# REJECTED in vocabulary.py and it stops being set.
-UNDRAWABLE = {
-    'অনেক': 'many', 'ইচ্ছা': 'a wish', 'একতা': 'unity', 'ঈশ্বর': 'God',
-    'ঈশান': 'the northeast', 'কারণ': 'a reason', 'যাদু': 'magic', 'দয়া': 'kindness',
-    'হঠাৎ': 'suddenly', 'মহৎ': 'noble', 'দুঃখ': 'sadness', 'নিঃস্ব': 'destitute',
-    'বঞ্চনা': 'deceit', 'চঞ্চল': 'restless', 'মিঞা': 'a form of address',
-    'রূঢ়': 'rude', 'গাঢ়': 'deep, dark',
-}
-
 
 def build():
     listed = json.loads(LIST.read_text(encoding='utf-8'))['words']
@@ -108,12 +96,6 @@ def main(argv):
     print('\nboard sizes:', dict(sorted(Counter(len(lv['words']) for lv in levels).items())))
     print('kinds:', dict(Counter(lv['type'] for lv in levels)))
 
-    flagged = [w for w in placed if w in UNDRAWABLE]
-    print(f'\nno picture can show these {len(flagged)}, and they are set anyway - the list was '
-          f'handed in to be played:')
-    for w in flagged:
-        print(f'        {w:12} {UNDRAWABLE[w]}')
-
     print(f'\nleft out: {len(left_out)} cannot be board words, {len(stranded)} have no partner')
     for why, n in Counter(left_out.values()).most_common(8):
         print(f'   {why[:44]:46} {n}')
@@ -130,9 +112,9 @@ def main(argv):
             'NO_PICTURE_RULE_HERE':
                 'guide_levels.py sets only words a picture can show, because the guide\'s words '
                 'were chosen to illustrate a form. This list was chosen for children and needs '
-                'no such filter - but the few abstractions on it are named in '
-                'vocab_levels.UNDRAWABLE and printed by the generator, for a person to decide '
-                'about.',
+                'no such filter. The ten abstractions it did contain - অনেক, ইচ্ছা, একতা, '
+                'ঈশ্বর, ঈশান, মহৎ, যাদু, দুঃখ, নিঃস্ব, হঠাৎ - are in REJECTED in '
+                'tools/vocabulary.py, which refuses a word from every source at once.',
             'counts': {'levels': len(levels), 'words': len(placed),
                        'already_a_puzzle': len(already),
                        'left_out': len(left_out) + len(stranded)},

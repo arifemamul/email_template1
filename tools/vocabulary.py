@@ -122,6 +122,20 @@ REJECTED = {
     'ঠাঁই': 'shelter, in the abstract sense - no picture',
     'থমকে': 'having stopped short - an inflected adverb',
     'ধরন': 'manner, way - abstract',
+    # From the school vocabulary list in tools/word-list-school.json. Every one is a word a
+    # Bengali child hears, and none of them is a word a picture can replace - which is this
+    # game's rule for a board word, because the reward for spelling one is recognising the
+    # thing. They were set for one commit and taken out again.
+    'অনেক': 'many - a quantity, nothing to picture',
+    'ইচ্ছা': 'a wish - abstract',
+    'একতা': 'unity - abstract',
+    'ঈশ্বর': 'God - and no picture of it belongs in a reading game',
+    'ঈশান': 'the northeast - a direction, and a rare one to say',
+    'মহৎ': 'noble - a judgement, not a thing',
+    'যাদু': 'magic - a picture of a wand is read as a wand',
+    'দুঃখ': 'sadness - a sad face is read as sad, not as the noun',
+    'নিঃস্ব': 'destitute - abstract, and a heavy sense for a child',
+    'হঠাৎ': 'suddenly - an adverb',
     # newspaper register: common in adult prose, meaningless to a child
     'প্রতিষ্ঠান': 'institution - adult register',
     'সংবাদপত্র': 'newspaper - adult register',
