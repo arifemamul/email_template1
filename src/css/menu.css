@@ -431,7 +431,11 @@
     .mk-w { grid-column: 2 / -1; grid-row: 2; }
   }
 
-  /* -- বারোখড়ি: the letter picker and one letter's twelve forms ---------------- */
+  /* A topic inside a section, with a rule and air above it. বর্ণমালা is one section holding
+     three of these - স্বরবর্ণ, ব্যঞ্জনবর্ণ, কার ও চিহ্ন - and the বারোখড়ি table is a fourth,
+     which is where this treatment started. Without the rule a long page reads as one
+     undifferentiated scroll and a child has nothing to stop at. */
+  .part-head,
   .baro-head { margin-top: 30px !important; padding-top: 22px;
                border-top: 1px solid var(--surface-3); }
 

@@ -60,17 +60,16 @@
   <div class="menu-pop" id="menuPop" role="menu" aria-label="মেনু" hidden>
     <div class="menu-group" data-block="1">
       <p class="menu-head bn">বর্ণমালা</p>
-      <button class="opt" type="button" role="menuitem" data-page="vowels">
-        <span class="opt-g bn" aria-hidden="true">স্ব</span>
-        <span class="opt-t"><b class="bn">স্বরবর্ণ</b><i class="bn">এগারোটি স্বরবর্ণ</i></span>
-      </button>
-      <button class="opt" type="button" role="menuitem" data-page="consonants">
-        <span class="opt-g bn" aria-hidden="true">ব্য</span>
-        <span class="opt-t"><b class="bn">ব্যঞ্জনবর্ণ</b><i class="bn">ক থেকে হ - বত্রিশটি ব্যঞ্জনবর্ণ</i></span>
-      </button>
-      <button class="opt" type="button" role="menuitem" data-page="marks">
-        <span class="opt-g bn" aria-hidden="true">কা</span>
-        <span class="opt-t"><b class="bn">কার ও চিহ্ন</b><i class="bn">বর্ণের সঙ্গে যে চিহ্নগুলো বসে</i></span>
+      <!-- One option, not three. স্বরবর্ণ, ব্যঞ্জনবর্ণ and কার ও চিহ্ন were three ways into
+           one thing: a child looking up a letter does not know in advance which of the three
+           holds it, and নয় is a vowel-sign word whose letter is a consonant, so the answer was
+           often "both". They are one section now, read top to bottom in the order a primer
+           teaches them. Named পুরো বর্ণমালা rather than বর্ণমালা because the group above it is
+           already called that, and a head and its only option saying the same word is the same
+           repeat this menu removed from the sheet's heading. -->
+      <button class="opt" type="button" role="menuitem" data-page="barnamala">
+        <span class="opt-g bn" aria-hidden="true">অ</span>
+        <span class="opt-t"><b class="bn">পুরো বর্ণমালা</b><i class="bn">স্বরবর্ণ, ব্যঞ্জনবর্ণ, আর কার ও চিহ্ন - এক জায়গায়</i></span>
       </button>
     </div>
 
@@ -217,21 +216,34 @@
       </div>
 
       <div class="pages">
-        <!-- The two halves of the বর্ণমালা, as a chart a child can read AND as the way into the
-             game: every letter that has levels is a button that opens its first one. Built in
-             js/10-menu.js from LEVELS, so the chart cannot claim a letter the game has lost. -->
-        <section class="page" id="page-vowels" role="region" aria-labelledby="opt-vowels">
-          <h3>স্বরবর্ণ</h3>
+        <!-- The whole বর্ণমালা, in one section: the eleven স্বরবর্ণ, the thirty-two
+             ব্যঞ্জনবর্ণ, then the কার and the signs that sit on them, and finally the বারোখড়ি
+             where the last two meet. Three separate sections once, which asked a child to know
+             which one held the letter they were looking for before they could look it up.
+             Order is a primer's order, and the page is read straight down. Both charts are
+             built in js/12-menu.js from LEVELS, so neither can claim a letter the game has
+             lost, and every letter with levels is a button that opens its first one. -->
+        <section class="page" id="page-barnamala" role="region" aria-labelledby="opt-barnamala">
+          <!-- Worded exactly as the option that opens it, so showPage's `dup` rule folds it away:
+               the sheet's head already says পুরো বর্ণমালা one line above. Kept in the markup
+               rather than deleted because it is still the section's heading for anything
+               reading the page rather than looking at it. -->
+          <h3>পুরো বর্ণমালা</h3>
+          <p class="deck">
+            বাংলা বর্ণমালার সবটুকু এক জায়গায় - প্রথমে এগারোটি স্বরবর্ণ, তারপর বত্রিশটি
+            ব্যঞ্জনবর্ণ, আর শেষে কার ও চিহ্ন, যেগুলো বর্ণের সঙ্গে বসে। এই পাতার যেকোনো বর্ণে
+            চাপ দিলে তার উচ্চারণ শোনা যায়।
+          </p>
+
+          <h3 class="part-head">স্বরবর্ণ</h3>
           <p class="deck">
             এগারোটি বর্ণ, আর প্রতিটি বাঙালি শিশু সবার আগে এই ক্রমেই মুখস্থ করে। খেলাটিও এই
             ক্রমেই চলে, তাই এগুলোই ১ থেকে শুরুর লেভেল। যেকোনো বর্ণে চাপ দিলে তার প্রথম লেভেল
             খুলে যায়। নিচের ছোট সংখ্যাটি বলে সেই বর্ণের কতটি লেভেল আছে।
           </p>
           <div class="chart" id="chartVowels"></div>
-        </section>
 
-        <section class="page" id="page-consonants" role="region" aria-labelledby="opt-consonants">
-          <h3>ব্যঞ্জনবর্ণ</h3>
+          <h3 class="part-head">ব্যঞ্জনবর্ণ</h3>
           <p class="deck">
             বত্রিশটি বর্ণ, ক থেকে হ। স্বরবর্ণের পরে খেলাটি এই ক্রমেই চলে - যেকোনো বর্ণে চাপ
             দিলে তার প্রথম লেভেল খুলে যায়। উনত্রিশটির লেভেল আছে; ঙ, ঞ আর ণ-এর নেই, আর থাকতেও
@@ -243,10 +255,8 @@
             দিয়ে শুরু হয় না, কিন্তু তিনটিই ছকে আছে - বাড়ি, গাঢ়, নয়।
           </p>
           <div class="chart" id="chartConsonants"></div>
-        </section>
 
-        <section class="page" id="page-marks" role="region" aria-labelledby="opt-marks">
-          <h3>কার ও চিহ্ন</h3>
+          <h3 class="part-head">কার ও চিহ্ন</h3>
           <p class="deck">
             বাংলা বর্ণ খুব কম সময়েই একা থাকে। একটি <b>কার</b> বর্ণের সঙ্গে বসে উচ্চারণ বদলে
             দেয়, কিন্তু নিজে আলাদা বর্ণ নয়: ক থেকে হয় কা, কি, কু, কে, কো। এই কারণেই খেলাটি

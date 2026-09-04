@@ -51,7 +51,7 @@ if (!(await p.evaluate(() => document.body.classList.contains('cansay'))))
 /* Counts, not exact numbers: the tables are built from the level list and the primer, and a
    test that hardcoded 43 letters would fail the next time a word was added. What matters is
    that no section is silent. */
-const SECTIONS = ['vowels', 'consonants', 'marks', 'gathon', 'phala', 'jukto', 'levels'];
+const SECTIONS = ['barnamala', 'gathon', 'phala', 'jukto', 'levels'];
 const counts = {};
 for (const key of SECTIONS) {
   await openSection(p, key);
@@ -63,10 +63,16 @@ console.log('marked to be heard: '
   + SECTIONS.map(k => `${k} ${counts[k]}`).join(', '));
 
 /* Both charts must be complete - eleven vowels and thirty-two consonants, including the three
-   with no level of their own. ঙ is exactly the letter a child will never reach by playing. */
-if (counts.vowels !== 11) problems.push(`${counts.vowels} vowels can be heard, expected 11`);
-if (counts.consonants !== 32)
-  problems.push(`${counts.consonants} consonants can be heard, expected 32`);
+   with no level of their own. ঙ is exactly the letter a child will never reach by playing. The
+   two charts are one section now, so they are counted by chart rather than by page. */
+await openSection(p, 'barnamala');
+const chart = await p.evaluate(() => ({
+  vowels: document.querySelectorAll('#chartVowels [data-say]').length,
+  consonants: document.querySelectorAll('#chartConsonants [data-say]').length,
+}));
+if (chart.vowels !== 11) problems.push(`${chart.vowels} vowels can be heard, expected 11`);
+if (chart.consonants !== 32)
+  problems.push(`${chart.consonants} consonants can be heard, expected 32`);
 
 /* -- what a marked thing says is its own text -------------------------------------------- */
 /*
@@ -75,9 +81,9 @@ if (counts.consonants !== 32)
  * something its own text contains, or contain what it says - the second case is the level grid,
  * where ম ২ is a button about the game and ম is the Bengali in it.
  */
-await openSection(p, 'marks');
+await openSection(p, 'barnamala');
 const mismatched = await p.evaluate(() =>
-  [...document.querySelectorAll('#page-marks [data-say], #page-levels [data-say]')]
+  [...document.querySelectorAll('#page-barnamala [data-say], #page-levels [data-say]')]
     .map(el => ({ say: el.dataset.say, text: el.textContent.trim() }))
     .filter(x => !x.text.includes(x.say) && !x.say.includes(x.text))
     .slice(0, 5));
@@ -93,7 +99,7 @@ if (pairs.some(v => !v || /[ঁ-ঃা-্]/.test(v)))
   problems.push(`a কার pair says a mark rather than its vowel: ${JSON.stringify(pairs)}`);
 
 /* -- pressing one says it, slowly, and lights up ----------------------------------------- */
-await openSection(p, 'consonants');
+await openSection(p, 'barnamala');
 const pressed = await p.evaluate(async () => {
   const tile = document.querySelector('#chartConsonants .ch');
   window.__said.length = 0;
@@ -117,12 +123,12 @@ if (!pressed.glow) problems.push('a letter said nothing visible - no .saying whi
 console.log(`pressed ${pressed.say}: said "${pressed.said[0]}" at ${pressed.rate}, and lit up`);
 
 /* -- a keyboard can reach the ones that are not buttons ---------------------------------- */
-await openSection(p, 'marks');
+await openSection(p, 'barnamala');
 const reach = await p.evaluate(() =>
-  [...document.querySelectorAll('#page-marks [data-say]')]
+  [...document.querySelectorAll('#page-barnamala [data-say]')]
     .filter(el => el.tagName !== 'BUTTON')
     .map(el => ({ tab: el.getAttribute('tabindex'), role: el.getAttribute('role') })));
-if (!reach.length) problems.push('the sign table has no marked spans, so this checked nothing');
+if (!reach.length) problems.push('the বর্ণমালা section has no marked spans, so this checked nothing');
 if (reach.some(x => x.tab !== '0' || x.role !== 'button'))
   problems.push('something that speaks cannot be reached or pressed from a keyboard');
 
@@ -135,8 +141,35 @@ if (reach.some(x => x.tab !== '0' || x.role !== 'button'))
 // Back to the board: the guide has been open since the first section, and the wheel is under it.
 if (await p.isVisible('#guideClose')) await p.click('#guideClose');
 await p.waitForSelector('.guide.open', { state: 'hidden' }).catch(() => {});
-await p.evaluate(() => loadLevel(0));
-await p.waitForTimeout(150);
+/*
+ * Back to the top of the document before aiming at the wheel.
+ *
+ * `page.click` scrolls its target into view, and this file opens eight sections before it gets
+ * here - বর্ণমালা alone is now three charts and the বারোখড়ি, so the guide column is several
+ * screens tall and the last of those clicks leaves the game scrolled off the top. The wheel was
+ * then at a negative y, where a real mouse cannot go: the press landed nowhere and the test
+ * reported that a tap says nothing.
+ */
+await p.evaluate(() => { window.scrollTo(0, 0); loadLevel(0); });
+
+/*
+ * Wait for the wheel to stop moving before aiming at it.
+ *
+ * Closing the guide re-lays out the screen, and a ResizeObserver redraws the wheel 60ms later.
+ * `tileAt` does not read the DOM - it matches a press against `tileCentres`, computed when the
+ * wheel was last drawn - so between the layout change and that redraw the tiles are on screen
+ * in one place and hit-tested in another, and a press lands on nothing. This test failed one
+ * run in two on exactly that, which is a flaky test rather than a flaky game. So: wait until
+ * the two agree, and then take the aim point from `tileCentres` itself.
+ */
+/* And wait until every tile is both on screen and hit-testable where it is drawn: closing the
+   guide re-lays out the screen, and a ResizeObserver redraws the wheel 60ms later, so for a
+   moment the tiles are painted in one place and matched against another. */
+await p.waitForFunction(() => [...document.querySelectorAll('.tile')].every((t, i) => {
+  const r = t.getBoundingClientRect();
+  const [x, y] = [r.left + r.width / 2, r.top + r.height / 2];
+  return x > 0 && y > 0 && x < innerWidth && y < innerHeight && tileAt(x, y) === i;
+}));
 
 /* Real mouse input, not synthesised events: `pointerdown` on the wheel calls
    `setPointerCapture`, and a PointerEvent built by hand carries a pointerId the browser has

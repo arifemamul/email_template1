@@ -27,7 +27,7 @@ const PAGES = await p.$$eval('#menuPop .opt', os => os.map(o => o.dataset.page))
 const SECTIONS = await p.$$eval('.pages .page', ss => ss.map(s => s.id.replace(/^page-/, '')));
 // The order here is the menu's, which is the teaching order a child meets them in: the letters,
 // then what the letters take, then how letters join into words, then the game, then the rest.
-const EXPECTED = ['vowels', 'consonants', 'marks', 'gathon', 'phala', 'jukto',
+const EXPECTED = ['barnamala', 'gathon', 'phala', 'jukto',
                   'levels', 'play', 'about', 'report'];
 if (PAGES.join() !== EXPECTED.join())
   problems.push(`options are [${PAGES}], expected [${EXPECTED}]`);
@@ -103,7 +103,7 @@ const dead = [...charts.vowels, ...charts.consonants].filter(t => !t.clickable).
 if (dead.join('') !== 'ঙঞণ') problems.push(`letters with no level: [${dead.join(' ')}], expected ঙ ঞ ণ`);
 
 // ---- tapping a letter opens that letter's first level ----------------------------------
-await openSection(p, 'consonants');
+await openSection(p, 'barnamala');
 const jumped = await p.evaluate(async () => {
   const tiles = [...document.querySelectorAll('#chartConsonants .ch')];
   const m = tiles.find(t => t.querySelector('.ch-l').textContent === 'ম');
@@ -117,7 +117,7 @@ if (jumped.index !== jumped.firstM)
   problems.push(`tapping ম opened level ${jumped.index + 1}, not its first (${jumped.firstM + 1})`);
 
 // ---- every কার row shows a real word that really carries the sign -----------------------
-await openSection(p, 'marks');
+await openSection(p, 'barnamala');
 const marks = await p.evaluate(() => [...document.querySelectorAll('#markTable .mk')].map(r => ({
   glyph: r.querySelector('.mk-g').textContent,
   eg: r.querySelector('.mk-eg').textContent,
