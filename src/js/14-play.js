@@ -54,7 +54,7 @@ function submitWord() {
 
     done.add(word);
     game.found[lv.id] = [...done];
-    // Every word found brings the next hint thirty seconds closer. Before `persist`, so the
+    // Every word found brings the next hint fifteen seconds closer. Before `persist`, so the
     // credit is saved with the word that earned it.
     creditHint();
 

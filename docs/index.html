@@ -2862,8 +2862,8 @@ const persist = () => store.write({
 found: game.found, hints: game.hints, completed: game.completed, hintAt: game.hintAt
 });
 
-const HINT_WAIT = 60000;
-const HINT_CREDIT = 30000;
+const HINT_WAIT = 30000;
+const HINT_CREDIT = 15000;
 
 function hintWait() {
 return Math.max(0, Math.ceil((game.hintAt - Date.now()) / 1000));
@@ -3159,7 +3159,7 @@ el.hint.disabled = clear || left > 0;
 el.hint.classList.toggle("cooling", !clear && left > 0);
 el.hint.querySelector(".bn").textContent = left > 0 ? `${bn(left)} সেকেন্ড` : "সংকেত";
 el.hint.title = left > 0
-? `আরও ${bn(left)} সেকেন্ড - একটি শব্দ পেলে ৩০ সেকেন্ড কমে যাবে`
+? `আরও ${bn(left)} সেকেন্ড - একটি শব্দ পেলে ১৫ সেকেন্ড কমে যাবে`
 : "একটি অক্ষর দেখিয়ে দেবে";
 }
 

@@ -32,8 +32,8 @@ const game = {
    * When the next hint may be taken, as a clock time.
    *
    * A hint used to be free and unlimited, and a child who found that out stopped playing: press
-   * it enough times and the board fills itself. So a hint now costs a minute of waiting, and
-   * the only way to buy that minute back is to find words - thirty seconds each, so two found
+   * it enough times and the board fills itself. So a hint now costs half a minute of waiting,
+   * and the only way to buy that back is to find words - fifteen seconds each, so two found
    * words pay for one hint exactly. The two numbers are multiples on purpose: a child can see
    * that two words earn a hint without being told.
    *
@@ -65,16 +65,18 @@ const persist = () => store.write({
 });
 
 /* -- what a hint costs ---------------------------------------------------------------------
-   A minute to wait, and half a minute back for every word found. Two words, one hint. */
-const HINT_WAIT = 60000;
-const HINT_CREDIT = 30000;
+   Half a minute to wait, and fifteen seconds back for every word found. Two words, one hint.
+   Long enough that a child stops pressing the button and looks at the board, short enough that
+   the wait is never the game. */
+const HINT_WAIT = 30000;
+const HINT_CREDIT = 15000;
 
 /** Seconds still to wait, rounded up. 0 means a hint can be taken now. */
 function hintWait() {
   return Math.max(0, Math.ceil((game.hintAt - Date.now()) / 1000));
 }
 
-/** A word was found: bring the next hint half a minute closer, but never into the past. */
+/** A word was found: bring the next hint fifteen seconds closer, but never into the past. */
 function creditHint() {
   game.hintAt = Math.max(Date.now(), game.hintAt - HINT_CREDIT);
 }

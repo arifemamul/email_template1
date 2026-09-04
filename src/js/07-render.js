@@ -73,7 +73,7 @@ function drawHint() {
   el.hint.classList.toggle("cooling", !clear && left > 0);
   el.hint.querySelector(".bn").textContent = left > 0 ? `${bn(left)} সেকেন্ড` : "সংকেত";
   el.hint.title = left > 0
-    ? `আরও ${bn(left)} সেকেন্ড - একটি শব্দ পেলে ৩০ সেকেন্ড কমে যাবে`
+    ? `আরও ${bn(left)} সেকেন্ড - একটি শব্দ পেলে ১৫ সেকেন্ড কমে যাবে`
     : "একটি অক্ষর দেখিয়ে দেবে";
 }
 

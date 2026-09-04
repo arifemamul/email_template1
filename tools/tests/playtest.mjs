@@ -125,7 +125,7 @@ await page.screenshot({ path: shot('shot-desktop-clear.png') });
  * solved one and a child read it as the game answering for them. `.cell.hinted` is the
  * measurement now, and `.cell.on` must not move at all.
  *
- * And a hint costs a minute. The second one has to be refused, and the clock reset by hand to
+ * And a hint costs half a minute. The second is refused, and the clock is reset by hand to
  * take it, which is the test for the wait rather than a way around it.
  */
 const beforeHint = await page.evaluate(() => ({
@@ -159,8 +159,8 @@ if (oneHint.hinted !== beforeHint.hinted + 1)
   problems.push('a hint did not show exactly one letter');
 if (oneHint.on !== beforeHint.on)
   problems.push(`a hint filled ${oneHint.on - beforeHint.on} cell(s) gold; only a found word does that`);
-if (oneHint.wait < 55 || oneHint.wait > 60)
-  problems.push(`a hint left ${oneHint.wait}s on the clock, expected about 60`);
+if (oneHint.wait < 26 || oneHint.wait > 30)
+  problems.push(`a hint left ${oneHint.wait}s on the clock, expected about 30`);
 if (!oneHint.disabled) problems.push('the hint button is still live while its clock runs');
 if (!/[০-৯]/.test(oneHint.label))
   problems.push(`the hint button says "${oneHint.label}" while waiting, with no count in it`);
@@ -170,8 +170,8 @@ if (twoHints.hinted !== beforeHint.hinted + 2)
 if (twoHints.on !== beforeHint.on) problems.push('two hints filled cells gold');
 if (twoHints.purse) problems.push('the coin counter is still in the page');
 
-// Finding a word buys the clock back: thirty seconds a word, so two words pay for a hint.
-await page.evaluate(() => { game.hintAt = Date.now() + 60000; drawHud(); });
+// Finding a word buys the clock back: fifteen seconds a word, so two words pay for a hint.
+await page.evaluate(() => { game.hintAt = Date.now() + 30000; drawHud(); });
 const credit = await page.evaluate(async () => {
   const before = hintWait();
   const words = LEVELS[game.index].words.filter(w => !(game.found[LEVELS[game.index].id] || []).includes(w));
@@ -187,8 +187,8 @@ const credit = await page.evaluate(async () => {
 console.log('credit ->', JSON.stringify(credit));
 if (credit.step.length < 2) problems.push('the level had too few words left to test the credit');
 else {
-  if (Math.abs((credit.before - credit.step[0]) - 30) > 2)
-    problems.push(`one word took ${credit.before - credit.step[0]}s off the clock, expected 30`);
+  if (Math.abs((credit.before - credit.step[0]) - 15) > 2)
+    problems.push(`one word took ${credit.before - credit.step[0]}s off the clock, expected 15`);
   if (credit.step[1] !== 0)
     problems.push(`two words left ${credit.step[1]}s on the clock; two words should pay for a hint`);
 }
