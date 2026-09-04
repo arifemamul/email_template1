@@ -246,3 +246,39 @@
   @media (prefers-reduced-motion: reduce) {
     body::before, body::after { animation: none; }
   }
+
+  /* -- Tap to hear ----------------------------------------------------------
+     Every Bengali letter and word in the app carries `data-say`, and pressing one says it.
+     The look is gated on `.cansay`, which the script puts on <body> once it knows a Bengali
+     voice exists - the guide is drawn before Chrome has filled its voice list, so a check made
+     at draw time would leave the charts looking dead on a phone that speaks fine a moment
+     later. Where nothing can be spoken, nothing looks pressable. */
+  .cansay [data-say] { cursor: pointer; }
+  .cansay [data-say]:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* The one pressed lights up while it is speaking, so the sound belongs to a shape and not to
+     the screen. Box-shadow and background rather than transform: half of these are spans inside
+     table rows, and a transform on a non-replaced inline box does nothing at all. */
+  /* No radius of its own: the ring follows whatever shape the thing already has - round on a
+     chart tile, square on a word in a table row - and a radius set here would flatten the
+     first to fit the second. */
+  .saying {
+    animation: saying 1.2s ease-out;
+  }
+  @keyframes saying {
+    0%   { background: rgba(var(--glow-accent), .55); box-shadow: 0 0 0 0 rgba(var(--glow-accent), .6); }
+    35%  { background: rgba(var(--glow-accent), .45); box-shadow: 0 0 0 9px rgba(var(--glow-accent), 0); }
+    100% { background: rgba(var(--glow-accent), 0);   box-shadow: 0 0 0 0 rgba(var(--glow-accent), 0); }
+  }
+  /* Still an answer, just not a moving one: the colour arrives and fades, the ring does not
+     travel. A child who needs the motion turned down still needs to know which one spoke. */
+  @media (prefers-reduced-motion: reduce) {
+    .saying { animation: saying-still 1.2s ease-out; }
+    @keyframes saying-still {
+      0%   { background: rgba(var(--glow-accent), .55); }
+      100% { background: rgba(var(--glow-accent), 0); }
+    }
+  }

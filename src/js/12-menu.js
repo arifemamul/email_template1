@@ -90,6 +90,9 @@ function letterTile(letter) {
   tile.className = "ch" + (levels.length ? "" : " ch-none");
   tile.innerHTML = `<span class="ch-l bn">${letter}</span>`
     + `<span class="ch-n">${levels.length ? bn(levels.length) : "\u2014"}</span>`;
+  // The letter is heard whether or not it has a level: the chart is a chart first, and ঙ is
+  // exactly the letter a child most needs to hear, since they will never reach it by playing.
+  Talk.mark(tile, letter);
   if (levels.length) {
     tile.type = "button";
     tile.title = `${letter} - ${levels.length} level${levels.length > 1 ? "s" : ""}, `
@@ -131,6 +134,9 @@ function drawKarPairs() {
     pair.dataset.block = (i % 5) + 1;
     // Read as one thing - "ই-কার" - rather than as two glyphs, one of which is a lone mark.
     pair.setAttribute("aria-label", name);
+    // The vowel, not the name: pressing ই-কার should give a child the sound the sign makes,
+    // which is ই, and not a reading of the label printed beside it.
+    Talk.mark(pair, vowel);
     const shape = KAR_SHAPES[sign];
     pair.innerHTML = `<span class="pair-v bn" aria-hidden="true">${vowel}</span>`
       + `<span class="pair-k">`
@@ -157,12 +163,14 @@ function drawCharts() {
     r.innerHTML = `<span class="mk-g bn">${glyph}</span>`
       + `<span class="mk-n bn">${name}</span>`
       + `<span class="mk-w">${note}</span>`;
+    Talk.mark(r.firstElementChild, glyph);
     if (example) {
       const b = document.createElement("button");
       b.className = "mk-eg bn";
       b.type = "button";
       b.textContent = example.word;
       b.title = `open level ${bn(example.level + 1)}`;
+      Talk.mark(b, example.word);
       b.addEventListener("click", () => { loadLevel(example.level); leaveMenu(); });
       r.appendChild(b);
     } else {
@@ -256,6 +264,7 @@ function drawBaro() {
       b.className = "bp bn";
       b.type = "button";
       b.textContent = letter;
+      Talk.mark(b, letter);
       b.addEventListener("click", () => { baroLetter = letter; drawBaro(); });
       pick.appendChild(b);
     }
@@ -269,6 +278,7 @@ function drawBaro() {
     const row = document.createElement("div");
     row.className = "br";
     row.innerHTML = `<span class="br-f bn">${akshara}</span><span class="br-n bn">${name}</span>`;
+    Talk.mark(row.firstElementChild, akshara);
 
     const lvl = LEVEL_FOR_AKSHARA[akshara];
     const eg = wordShowing(akshara);
@@ -281,6 +291,9 @@ function drawBaro() {
       go.type = "button";
       go.textContent = lvl !== undefined ? `${akshara} লেভেল` : eg.word;
       go.title = `লেভেল ${bn(open + 1)} খুলুন`;
+      // The word, or the form itself where the button only names a level - "কা লেভেল" is a
+      // label about the game, and the Bengali in it is কা.
+      Talk.mark(go, lvl !== undefined ? akshara : eg.word);
       go.addEventListener("click", () => { loadLevel(open); leaveMenu(); });
       row.appendChild(go);
     } else if (eg) {
@@ -290,6 +303,7 @@ function drawBaro() {
       out.className = "br-go br-out bn";
       out.textContent = eg.word;
       out.title = eg.gloss;
+      Talk.mark(out, eg.word);
       row.appendChild(out);
       const note = document.createElement("span");
       note.className = "br-gloss bn";

@@ -116,6 +116,17 @@ function tileAt(x, y) {
 
 let startPoint = null;
 
+/*
+ * The letter a plain tap put on the shelf, said when the tap finishes.
+ *
+ * Every letter in the game is on the wheel, so this is where a child meets them - but only a
+ * tap gets a voice, never a drag. A drag sweeps three or four tiles in half a second on the way
+ * to spelling a word, and each one cutting off the last is not four letters taught, it is a
+ * stutter; the word that lands at the end of the drag is what that gesture is for. A tap is the
+ * other thing a child does with a tile: put a finger on it and look at it.
+ */
+let tapped = null;
+
 el.wheel.addEventListener("pointerdown", e => {
   const i = tileAt(e.clientX, e.clientY);
   if (i === null) return;
@@ -125,10 +136,15 @@ el.wheel.addEventListener("pointerdown", e => {
   game.moved = false;
   startPoint = [e.clientX, e.clientY];
 
+  tapped = game.wheel[i];
   if (game.tapMode) {
     // click-by-click entry: same tile twice steps back, a new tile extends
-    if (game.picked.length && game.picked[game.picked.length - 1] === i) game.picked.pop();
-    else if (!game.picked.includes(i)) game.picked.push(i);
+    if (game.picked.length && game.picked[game.picked.length - 1] === i) {
+      game.picked.pop();
+      tapped = null;   // a step back is a letter taken off the shelf, not one to say
+    } else if (!game.picked.includes(i)) {
+      game.picked.push(i);
+    }
   } else {
     game.picked = [i];
   }
@@ -165,9 +181,11 @@ function endDrag() {
     submitWord();
   } else {
     game.tapMode = true;   // a plain click keeps the selection for more clicks
+    Speech.say(tapped, { rate: Speech.AGAIN });
     drawTrail();
     drawPreview();
   }
+  tapped = null;
 }
 
 el.wheel.addEventListener("pointerup", endDrag);
@@ -333,6 +351,7 @@ drawLevelCount();
 /* Pronunciation has no control, so there is nothing to wire up - just pick the voice. It is
    a no-op on a device with no Bengali voice, so nothing here needs to check first. */
 Speech.init();
+Talk.wire();
 
 el.guideOpen.addEventListener("click", () => (menuIsOpen() ? closeMenu() : openMenu()));
 el.guideClose.addEventListener("click", closeGuide);
@@ -395,6 +414,7 @@ function sayLevelLetter() {
   if (!Speech.available) return;
   Sfx.tap();
   Speech.say(level().name, { rate: Speech.AGAIN });
+  Talk.glow(el.levelName);
 }
 
 el.levelName.addEventListener("click", sayLevelLetter);
@@ -413,6 +433,7 @@ el.board.addEventListener("click", e => {
   if (!word || !Speech.available) return;
   Sfx.tap();
   Speech.say(word, { rate: Speech.AGAIN });
+  Talk.glow(cell);
 });
 el.board.addEventListener("keydown", e => {
   if (e.key !== "Enter" && e.key !== " ") return;

@@ -52,11 +52,27 @@ const Speech = {
 
   init() {
     this.voice = this.pickVoice();
-    // Chrome fills the voice list asynchronously, and can refill it later. Nothing on screen
-    // depends on the answer any more, so this just keeps the pick current.
+    this.announce();
+    // Chrome fills the voice list asynchronously, and can refill it later, so the answer at
+    // startup is not final and the page has to be able to change its mind about it.
     if ("speechSynthesis" in window) {
-      speechSynthesis.addEventListener("voiceschanged", () => { this.voice = this.pickVoice(); });
+      speechSynthesis.addEventListener("voiceschanged", () => {
+        this.voice = this.pickVoice();
+        this.announce();
+      });
     }
+  },
+
+  /*
+   * One class on <body> saying whether anything can be spoken at all.
+   *
+   * Everything marked with `data-say` gets its pressable look from this class rather than from
+   * a check made when it was drawn - the charts and the tables are built once at startup, which
+   * on Chrome is before the voice list exists, so a check made then would leave the whole guide
+   * looking dead on a device that speaks perfectly well a second later.
+   */
+  announce() {
+    document.body.classList.toggle("cansay", this.available);
   },
 
   stop() {
@@ -106,6 +122,92 @@ const Speech = {
     return true;
   },
 
+};
+
+/* ============================================================================
+   Tap to hear - every letter and every word on screen
+   ============================================================================ */
+/*
+ * The game speaks a word as it lands, and that is the moment it teaches. But the app is full
+ * of Bengali outside that moment: two alphabet charts, the বারোখড়ি, the কার pairs, the sign
+ * table, the primer's equations, every ফলা and যুক্তবর্ণ form, and a few hundred example words.
+ * A child looking at ক্ষ in a table has no way to know what it sounds like, and a chart of
+ * shapes a learner cannot pronounce is a chart of shapes.
+ *
+ * So the rule is the same everywhere: if it is a Bengali letter or a Bengali word and it is on
+ * screen, pressing it says it. `Talk.mark` is how a thing joins that rule, and there is one
+ * listener for all of them - delegated, because these tables are redrawn whenever the picker
+ * above them changes and a listener per cell would have to be rebuilt every time.
+ *
+ * Two things predate this and keep their own handlers: the letter chip at the top of the game
+ * screen and a word already found on the board. Those two are not marked, because what they say
+ * is not what they show - a cell shows one akshara and says the whole word it belongs to - and a
+ * rule that has to carry an exception per element is not a rule. They borrow `Talk.glow`, so the
+ * answer to a press looks the same wherever the press lands.
+ *
+ * Always at `Speech.AGAIN`, the slow rate. Nothing here is spoken in passing - each one was
+ * asked for, deliberately, by a finger put on it, and the answer to "what does this say" is a
+ * word said slowly enough to copy.
+ */
+const Talk = {
+  timer: null,
+
+  /** Mark an element as something that can be heard, and say what it will say. */
+  mark(el, text) {
+    if (!el || !text) return el;
+    el.dataset.say = text;
+    // A <button> is already reachable and already turns Enter and Space into a click. Anything
+    // else has to be told it is pressable, or it is pressable only with a mouse.
+    if (el.tagName !== "BUTTON") {
+      el.setAttribute("role", "button");
+      el.setAttribute("tabindex", "0");
+    }
+    if (!el.hasAttribute("aria-label")) el.setAttribute("aria-label", `${text} - উচ্চারণ শুনুন`);
+    return el;
+  },
+
+  /*
+   * The thing pressed lights up while it is being said.
+   *
+   * Sound alone leaves a child guessing which of forty letters on the screen just spoke -
+   * especially the second time, when they are hunting for the one they meant. The glow ties
+   * the sound to the shape, and it is also simply the app answering: something happened,
+   * you did that.
+   */
+  glow(el) {
+    if (!el) return;
+    for (const n of document.querySelectorAll(".saying")) n.classList.remove("saying");
+    // Restarted rather than merely re-added: without the reflow, pressing the same thing twice
+    // keeps the first animation running and the second press looks like nothing at all.
+    el.classList.remove("saying");
+    void el.offsetWidth;
+    el.classList.add("saying");
+    clearTimeout(this.timer);
+    this.timer = setTimeout(() => el.classList.remove("saying"), 1400);
+  },
+
+  say(el) {
+    const text = el && el.dataset ? el.dataset.say : null;
+    if (!text) return;
+    Sfx.tap();
+    // No glow when nothing was said. On a device with no Bengali voice this is the whole of
+    // the behaviour: a quiet tap tone, and no light that would promise a sound never coming.
+    if (Speech.say(text, { rate: Speech.AGAIN })) this.glow(el);
+  },
+
+  wire() {
+    document.addEventListener("click", e => {
+      const el = e.target.closest("[data-say]");
+      if (el) this.say(el);
+    });
+    document.addEventListener("keydown", e => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      const el = e.target.closest && e.target.closest("[data-say]");
+      if (!el || el.tagName === "BUTTON") return;   // a button makes its own click from these
+      e.preventDefault();
+      this.say(el);
+    });
+  }
 };
 
 /*

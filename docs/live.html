@@ -1634,6 +1634,28 @@ animation: drift-b 46s ease-in-out infinite;
 @media (prefers-reduced-motion: reduce) {
 body::before, body::after { animation: none; }
 }
+
+.cansay [data-say] { cursor: pointer; }
+.cansay [data-say]:focus-visible {
+outline: 3px solid var(--accent);
+outline-offset: 2px;
+}
+
+.saying {
+animation: saying 1.2s ease-out;
+}
+@keyframes saying {
+0%   { background: rgba(var(--glow-accent), .55); box-shadow: 0 0 0 0 rgba(var(--glow-accent), .6); }
+35%  { background: rgba(var(--glow-accent), .45); box-shadow: 0 0 0 9px rgba(var(--glow-accent), 0); }
+100% { background: rgba(var(--glow-accent), 0);   box-shadow: 0 0 0 0 rgba(var(--glow-accent), 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+.saying { animation: saying-still 1.2s ease-out; }
+@keyframes saying-still {
+0%   { background: rgba(var(--glow-accent), .55); }
+100% { background: rgba(var(--glow-accent), 0); }
+}
+}
 html { -webkit-text-size-adjust: 100%; }
 html, body { overscroll-behavior: none; }
 body { -webkit-tap-highlight-color: transparent; }
@@ -3297,6 +3319,8 @@ n.textContent = bn(lv.pass);
 b.appendChild(n);
 }
 b.title = lv.pass ? `${lv.name} ${bn(lv.pass)}` : lv.name;
+b.setAttribute("aria-label", `${b.title} - উচ্চারণ শুনুন`);
+Talk.mark(b, lv.name);
 const done = !!game.completed[lv.id];
 if (done) b.classList.add("done");
 if (i === game.index) b.classList.add("now");
@@ -3327,9 +3351,17 @@ return Object.keys(VOICE_CLIPS).length > 0 || this.voice !== null;
 
 init() {
 this.voice = this.pickVoice();
+this.announce();
 if ("speechSynthesis" in window) {
-speechSynthesis.addEventListener("voiceschanged", () => { this.voice = this.pickVoice(); });
+speechSynthesis.addEventListener("voiceschanged", () => {
+this.voice = this.pickVoice();
+this.announce();
+});
 }
+},
+
+announce() {
+document.body.classList.toggle("cansay", this.available);
 },
 
 stop() {
@@ -3366,6 +3398,52 @@ speechSynthesis.speak(utterance);
 return true;
 },
 
+};
+
+const Talk = {
+timer: null,
+
+mark(el, text) {
+if (!el || !text) return el;
+el.dataset.say = text;
+if (el.tagName !== "BUTTON") {
+el.setAttribute("role", "button");
+el.setAttribute("tabindex", "0");
+}
+if (!el.hasAttribute("aria-label")) el.setAttribute("aria-label", `${text} - উচ্চারণ শুনুন`);
+return el;
+},
+
+glow(el) {
+if (!el) return;
+for (const n of document.querySelectorAll(".saying")) n.classList.remove("saying");
+el.classList.remove("saying");
+void el.offsetWidth;
+el.classList.add("saying");
+clearTimeout(this.timer);
+this.timer = setTimeout(() => el.classList.remove("saying"), 1400);
+},
+
+say(el) {
+const text = el && el.dataset ? el.dataset.say : null;
+if (!text) return;
+Sfx.tap();
+if (Speech.say(text, { rate: Speech.AGAIN })) this.glow(el);
+},
+
+wire() {
+document.addEventListener("click", e => {
+const el = e.target.closest("[data-say]");
+if (el) this.say(el);
+});
+document.addEventListener("keydown", e => {
+if (e.key !== "Enter" && e.key !== " ") return;
+const el = e.target.closest && e.target.closest("[data-say]");
+if (!el || el.tagName === "BUTTON") return;   // a button makes its own click from these
+e.preventDefault();
+this.say(el);
+});
+}
 };
 
 const still = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -3841,6 +3919,7 @@ const tile = document.createElement(levels.length ? "button" : "div");
 tile.className = "ch" + (levels.length ? "" : " ch-none");
 tile.innerHTML = `<span class="ch-l bn">${letter}</span>`
 + `<span class="ch-n">${levels.length ? bn(levels.length) : "\u2014"}</span>`;
+Talk.mark(tile, letter);
 if (levels.length) {
 tile.type = "button";
 tile.title = `${letter} - ${levels.length} level${levels.length > 1 ? "s" : ""}, `
@@ -3861,6 +3940,7 @@ const pair = document.createElement("div");
 pair.className = "pair";
 pair.dataset.block = (i % 5) + 1;
 pair.setAttribute("aria-label", name);
+Talk.mark(pair, vowel);
 const shape = KAR_SHAPES[sign];
 pair.innerHTML = `<span class="pair-v bn" aria-hidden="true">${vowel}</span>`
 + `<span class="pair-k">`
@@ -3886,12 +3966,14 @@ r.className = "mk";
 r.innerHTML = `<span class="mk-g bn">${glyph}</span>`
 + `<span class="mk-n bn">${name}</span>`
 + `<span class="mk-w">${note}</span>`;
+Talk.mark(r.firstElementChild, glyph);
 if (example) {
 const b = document.createElement("button");
 b.className = "mk-eg bn";
 b.type = "button";
 b.textContent = example.word;
 b.title = `open level ${bn(example.level + 1)}`;
+Talk.mark(b, example.word);
 b.addEventListener("click", () => { loadLevel(example.level); leaveMenu(); });
 r.appendChild(b);
 } else {
@@ -3956,6 +4038,7 @@ const b = document.createElement("button");
 b.className = "bp bn";
 b.type = "button";
 b.textContent = letter;
+Talk.mark(b, letter);
 b.addEventListener("click", () => { baroLetter = letter; drawBaro(); });
 pick.appendChild(b);
 }
@@ -3969,6 +4052,7 @@ const akshara = baroLetter + sign;
 const row = document.createElement("div");
 row.className = "br";
 row.innerHTML = `<span class="br-f bn">${akshara}</span><span class="br-n bn">${name}</span>`;
+Talk.mark(row.firstElementChild, akshara);
 
 const lvl = LEVEL_FOR_AKSHARA[akshara];
 const eg = wordShowing(akshara);
@@ -3980,6 +4064,7 @@ go.className = "br-go bn" + (lvl !== undefined ? " br-lvl" : "");
 go.type = "button";
 go.textContent = lvl !== undefined ? `${akshara} লেভেল` : eg.word;
 go.title = `লেভেল ${bn(open + 1)} খুলুন`;
+Talk.mark(go, lvl !== undefined ? akshara : eg.word);
 go.addEventListener("click", () => { loadLevel(open); leaveMenu(); });
 row.appendChild(go);
 } else if (eg) {
@@ -3987,6 +4072,7 @@ const out = document.createElement("span");
 out.className = "br-go br-out bn";
 out.textContent = eg.word;
 out.title = eg.gloss;
+Talk.mark(out, eg.word);
 row.appendChild(out);
 const note = document.createElement("span");
 note.className = "br-gloss bn";
@@ -4083,7 +4169,7 @@ if (level === undefined) {
 const span = document.createElement("span");
 span.className = cls + " bn";
 span.textContent = word;
-return span;
+return Talk.mark(span, word);
 }
 const b = document.createElement("button");
 b.className = cls + " on bn";
@@ -4091,7 +4177,7 @@ b.type = "button";
 b.textContent = word;
 b.title = `লেভেল ${bn(level + 1)} খুলুন`;
 b.addEventListener("click", () => { loadLevel(level); leaveMenu(); });
-return b;
+return Talk.mark(b, word);
 }
 
 function drawEquations() {
@@ -4106,7 +4192,7 @@ if (i) eq.appendChild(op("+"));
 const s = document.createElement("span");
 s.className = "eq-l bn";
 s.textContent = part;
-eq.appendChild(s);
+eq.appendChild(Talk.mark(s, part));
 });
 eq.appendChild(op("="));
 eq.appendChild(wordChip(parts.join(""), "eq-w"));
@@ -4134,6 +4220,7 @@ b.className = "kp bn";
 b.type = "button";
 b.innerHTML = `<span class="kp-s bn">ক${sign}</span>`
 + `<span class="kp-n bn">${sign}-কার</span>`;
+Talk.mark(b, `ক${sign}`);
 b.addEventListener("click", () => { karShowing = sign; drawKarWords(); });
 pick.appendChild(b);
 }
@@ -4175,6 +4262,7 @@ const unused = p.unused.includes(f);
 s.className = "ph-f bn" + (unused ? " ph-f-none" : "");
 s.textContent = f;
 if (unused) s.title = "এই রূপে বাংলায় প্রচলিত কোনো শব্দ নেই";
+else Talk.mark(s, f);
 forms.appendChild(s);
 }
 card.appendChild(forms);
@@ -4221,6 +4309,7 @@ const b = document.createElement("button");
 b.className = "jp bn" + (head === JUKTO_ALL ? " jp-all" : "");
 b.type = "button";
 b.textContent = head;
+if (head !== JUKTO_ALL) Talk.mark(b, head);
 b.addEventListener("click", () => { juktoFirst = head; drawJukto(); });
 pick.appendChild(b);
 }
@@ -4244,6 +4333,7 @@ const row = document.createElement("div");
 row.className = "jr";
 row.innerHTML = `<span class="jr-f bn">${r.form}</span>`
 + `<span class="jr-p bn">${r.parts.join(" + ")}</span>`;
+Talk.mark(row.firstElementChild, r.form);
 if (r.phonetic) {
 const note = document.createElement("span");
 note.className = "jr-note bn";
@@ -4339,6 +4429,8 @@ return null;
 
 let startPoint = null;
 
+let tapped = null;
+
 el.wheel.addEventListener("pointerdown", e => {
 const i = tileAt(e.clientX, e.clientY);
 if (i === null) return;
@@ -4348,9 +4440,14 @@ game.dragging = true;
 game.moved = false;
 startPoint = [e.clientX, e.clientY];
 
+tapped = game.wheel[i];
 if (game.tapMode) {
-if (game.picked.length && game.picked[game.picked.length - 1] === i) game.picked.pop();
-else if (!game.picked.includes(i)) game.picked.push(i);
+if (game.picked.length && game.picked[game.picked.length - 1] === i) {
+game.picked.pop();
+tapped = null;   // a step back is a letter taken off the shelf, not one to say
+} else if (!game.picked.includes(i)) {
+game.picked.push(i);
+}
 } else {
 game.picked = [i];
 }
@@ -4387,9 +4484,11 @@ if (game.moved) {
 submitWord();
 } else {
 game.tapMode = true;   // a plain click keeps the selection for more clicks
+Speech.say(tapped, { rate: Speech.AGAIN });
 drawTrail();
 drawPreview();
 }
+tapped = null;
 }
 
 el.wheel.addEventListener("pointerup", endDrag);
@@ -4522,6 +4621,7 @@ if (deck) deck.textContent = `${bn(n)}টি লেভেল`;
 drawLevelCount();
 
 Speech.init();
+Talk.wire();
 
 el.guideOpen.addEventListener("click", () => (menuIsOpen() ? closeMenu() : openMenu()));
 el.guideClose.addEventListener("click", closeGuide);
@@ -4561,6 +4661,7 @@ function sayLevelLetter() {
 if (!Speech.available) return;
 Sfx.tap();
 Speech.say(level().name, { rate: Speech.AGAIN });
+Talk.glow(el.levelName);
 }
 
 el.levelName.addEventListener("click", sayLevelLetter);
@@ -4577,6 +4678,7 @@ const word = wordAt(cell.dataset.pos);
 if (!word || !Speech.available) return;
 Sfx.tap();
 Speech.say(word, { rate: Speech.AGAIN });
+Talk.glow(cell);
 });
 el.board.addEventListener("keydown", e => {
 if (e.key !== "Enter" && e.key !== " ") return;

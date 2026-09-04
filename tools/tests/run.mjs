@@ -42,6 +42,7 @@ const CHECKS = [
   ['primertest',  "the primer's sums, কার words, ফলা and যুক্তবর্ণ are drawn from PRIMER"],
   ['feeltest',     'sound, the bird, the mute switch, and the one-file palette'],
   ['quiettest',   'no sound button, no word counter, nothing to dismiss - and words are spoken'],
+  ['heartest',    'every letter and word on screen can be heard, and stays quiet without a voice'],
   ['wheeltest',   'the wheel is scrambled, stable between visits, and drawn as scrambled'],
   ['playtest',    'a level can be played through, by drag and by tap'],
   ['pathstest',   'every route back to a finished level finds it blank and playable'],

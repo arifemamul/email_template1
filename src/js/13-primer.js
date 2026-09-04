@@ -41,7 +41,7 @@ function wordChip(word, cls) {
     const span = document.createElement("span");
     span.className = cls + " bn";
     span.textContent = word;
-    return span;
+    return Talk.mark(span, word);
   }
   const b = document.createElement("button");
   b.className = cls + " on bn";
@@ -49,7 +49,7 @@ function wordChip(word, cls) {
   b.textContent = word;
   b.title = `লেভেল ${bn(level + 1)} খুলুন`;
   b.addEventListener("click", () => { loadLevel(level); leaveMenu(); });
-  return b;
+  return Talk.mark(b, word);
 }
 
 /* ---- কার চিহ্ন ছাড়া শব্দ গঠন ------------------------------------------------------------ */
@@ -68,7 +68,7 @@ function drawEquations() {
         const s = document.createElement("span");
         s.className = "eq-l bn";
         s.textContent = part;
-        eq.appendChild(s);
+        eq.appendChild(Talk.mark(s, part));
       });
       eq.appendChild(op("="));
       eq.appendChild(wordChip(parts.join(""), "eq-w"));
@@ -102,6 +102,7 @@ function drawKarWords() {
       // as specks a child cannot see, while কু and কূ and কৃ are exactly what they recite.
       b.innerHTML = `<span class="kp-s bn">ক${sign}</span>`
                   + `<span class="kp-n bn">${sign}-কার</span>`;
+      Talk.mark(b, `ক${sign}`);
       b.addEventListener("click", () => { karShowing = sign; drawKarWords(); });
       pick.appendChild(b);
     }
@@ -148,6 +149,7 @@ function drawPhala() {
       s.className = "ph-f bn" + (unused ? " ph-f-none" : "");
       s.textContent = f;
       if (unused) s.title = "এই রূপে বাংলায় প্রচলিত কোনো শব্দ নেই";
+      else Talk.mark(s, f);
       forms.appendChild(s);
     }
     card.appendChild(forms);
@@ -212,6 +214,8 @@ function drawJukto() {
       b.className = "jp bn" + (head === JUKTO_ALL ? " jp-all" : "");
       b.type = "button";
       b.textContent = head;
+      // "সব" is a word about the table, not a letter in it.
+      if (head !== JUKTO_ALL) Talk.mark(b, head);
       b.addEventListener("click", () => { juktoFirst = head; drawJukto(); });
       pick.appendChild(b);
     }
@@ -237,6 +241,7 @@ function drawJukto() {
     // order a child needs: they arrive here having seen the shape, not the parts.
     row.innerHTML = `<span class="jr-f bn">${r.form}</span>`
                   + `<span class="jr-p bn">${r.parts.join(" + ")}</span>`;
+    Talk.mark(row.firstElementChild, r.form);
     if (r.phonetic) {
       // হৃ and ত্রু, where the book's বিভাজন is how the letter sounds rather than how it is
       // written. Said out loud rather than left to look like an error in the table.

@@ -501,6 +501,11 @@ function drawLevelGrid() {
       b.appendChild(n);
     }
     b.title = lv.pass ? `${lv.name} ${bn(lv.pass)}` : lv.name;
+    // Named before it is marked, so the go number survives: `Talk.mark` writes an aria-label
+    // only where there is none, and the one it would write knows nothing about ম ২.
+    b.setAttribute("aria-label", `${b.title} - উচ্চারণ শুনুন`);
+    // The grid is 244 letters on one screen, which makes it the biggest chart in the app.
+    Talk.mark(b, lv.name);
     const done = !!game.completed[lv.id];
     if (done) b.classList.add("done");
     if (i === game.index) b.classList.add("now");
