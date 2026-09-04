@@ -436,16 +436,20 @@ transition: opacity .26s ease, transform .34s cubic-bezier(.2,1.6,.4,1);
 user-select: none;
 }
 
+.cell.hinted {
+background: var(--well);
+box-shadow: inset 0 0 0 2px var(--hint-lo), inset 0 2px 5px rgba(var(--glow-well), .28);
+outline: 2px dashed var(--hint-lo);
+outline-offset: -5px;
+}
+.cell.hinted span { opacity: .55; transform: scale(1); color: var(--ink-soft); }
+
 .cell.on {
 background: linear-gradient(180deg, var(--accent-hi), var(--accent));
 box-shadow: inset 0 2px 0 rgba(255,255,255,.6), var(--lip) var(--accent-lo);
+outline: none;                      /* clears the hint's dashed ring when the word lands */
 }
-.cell.on span { opacity: 1; transform: scale(1); }
-
-.cell.hinted {
-background: linear-gradient(180deg, var(--hint-hi), var(--hint));
-box-shadow: inset 0 2px 0 rgba(255,255,255,.7), var(--lip) var(--hint-lo);
-}
+.cell.on span { opacity: 1; transform: scale(1); color: var(--ink); }
 
 .preview { height: 52px; display: grid; place-items: center; flex: none; }
 
@@ -527,6 +531,15 @@ transform: translateY(4px);
 box-shadow: 0 0 0 1px rgba(var(--shade), .07);
 }
 .action:disabled { opacity: .42; cursor: not-allowed; box-shadow: none; }
+
+.action.cooling:disabled {
+opacity: 1;
+background: var(--surface-2);
+color: var(--ink-soft);
+box-shadow: 0 0 0 1px rgba(var(--shade), .07);
+font-variant-numeric: tabular-nums;
+}
+.action.cooling .glyph { color: var(--ink-faint); }
 .action .glyph { color: var(--accent-lo); font-size: 16px; }
 
 .wheel-area { flex: 1 1 auto; min-height: 0; display: grid; place-items: center; }
@@ -2813,6 +2826,7 @@ const game = {
 index: 0,
 found: saved.found || {},          // levelId -> [words] found on THIS attempt
 hints: saved.hints || {},          // levelId -> ["r,c"]
+hintAt: saved.hintAt || 0,
 completed: migrateCompleted(saved),
 puzzle: null,
 wheel: [],
@@ -2824,19 +2838,36 @@ verdict: null
 };
 
 const persist = () => store.write({
-found: game.found, hints: game.hints, completed: game.completed
+found: game.found, hints: game.hints, completed: game.completed, hintAt: game.hintAt
 });
+
+const HINT_WAIT = 60000;
+const HINT_CREDIT = 30000;
+
+function hintWait() {
+return Math.max(0, Math.ceil((game.hintAt - Date.now()) / 1000));
+}
+
+function creditHint() {
+game.hintAt = Math.max(Date.now(), game.hintAt - HINT_CREDIT);
+}
 
 const level = () => LEVELS[game.index];
 const foundSet = () => new Set(game.found[level().id] || []);
 const hintSet = () => new Set(game.hints[level().id] || []);
 
-function revealedCells() {
+function solvedCells() {
 const done = foundSet();
-const out = new Set(hintSet());
+const out = new Set();
 for (const w of game.puzzle.words) {
 if (done.has(w.word)) for (const [r, c] of w.cells) out.add(key(r, c));
 }
+return out;
+}
+
+function revealedCells() {
+const out = solvedCells();
+for (const k of hintSet()) out.add(k);
 return out;
 }
 
@@ -3100,8 +3131,19 @@ drawLevelGrid();
 drawSayAdds();
 }
 
+function drawHint() {
+const left = hintWait();
+const clear = isClear();
+el.hint.disabled = clear || left > 0;
+el.hint.classList.toggle("cooling", !clear && left > 0);
+el.hint.querySelector(".bn").textContent = left > 0 ? `${bn(left)} সেকেন্ড` : "সংকেত";
+el.hint.title = left > 0
+? `আরও ${bn(left)} সেকেন্ড - একটি শব্দ পেলে ৩০ সেকেন্ড কমে যাবে`
+: "একটি অক্ষর দেখিয়ে দেবে";
+}
+
 function drawHud() {
-el.hint.disabled = isClear();
+drawHint();
 const lv = level();
 el.levelGlyph.textContent = lv.name;
 el.levelPass.textContent = lv.pass ? bn(lv.pass) : "";
@@ -3197,7 +3239,7 @@ el.board.style.gridTemplateColumns = Array.from(
 el.board.style.gridAutoRows = cell + "px";
 el.board.innerHTML = "";
 
-const shown = revealedCells();
+const shown = solvedCells();
 const hinted = hintSet();
 
 for (let r = 0; r < p.rows; r++) {
@@ -3232,7 +3274,7 @@ drawWheel(alloc);
 }
 
 function refreshBoard() {
-const shown = revealedCells();
+const shown = solvedCells();
 const hinted = hintSet();
 for (const div of el.board.children) {
 if (div.classList.contains("blank")) continue;
@@ -4301,6 +4343,7 @@ return;
 
 done.add(word);
 game.found[lv.id] = [...done];
+creditHint();
 
 const cleared = done.size === lv.words.length;
 if (cleared) game.completed[lv.id] = true;
@@ -4416,6 +4459,7 @@ markTiles(); drawTrail(); drawPreview();
 });
 
 el.hint.addEventListener("click", () => {
+if (hintWait() > 0) return;          // the button is disabled, but a keyboard can still fire
 const lv = level();
 const done = foundSet();
 const shown = revealedCells();
@@ -4429,6 +4473,7 @@ if (target) break;
 }
 if (!target) return;
 game.hints[lv.id] = [...hintSet(), target];
+game.hintAt = Date.now() + HINT_WAIT;
 Sfx.hint();
 persist();
 refreshBoard();
@@ -4443,6 +4488,10 @@ el.hint.classList.remove('flash');
 void el.hint.offsetWidth;
 el.hint.classList.add('flash');
 });
+
+setInterval(() => {
+if (hintWait() > 0 || el.hint.classList.contains("cooling")) drawHint();
+}, 1000);
 
 el.shuffle.addEventListener("click", () => {
 Sfx.shuffle();

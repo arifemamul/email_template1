@@ -54,6 +54,9 @@ function submitWord() {
 
     done.add(word);
     game.found[lv.id] = [...done];
+    // Every word found brings the next hint thirty seconds closer. Before `persist`, so the
+    // credit is saved with the word that earned it.
+    creditHint();
 
     const cleared = done.size === lv.words.length;
     if (cleared) game.completed[lv.id] = true;
@@ -185,6 +188,7 @@ document.addEventListener("keydown", e => {
 
 /* controls */
 el.hint.addEventListener("click", () => {
+  if (hintWait() > 0) return;          // the button is disabled, but a keyboard can still fire
   const lv = level();
   const done = foundSet();
   const shown = revealedCells();
@@ -198,6 +202,7 @@ el.hint.addEventListener("click", () => {
   }
   if (!target) return;
   game.hints[lv.id] = [...hintSet(), target];
+  game.hintAt = Date.now() + HINT_WAIT;
   Sfx.hint();
   persist();
   refreshBoard();
@@ -212,6 +217,17 @@ el.hint.addEventListener("click", () => {
   void el.hint.offsetWidth;
   el.hint.classList.add('flash');
 });
+
+/*
+ * The countdown has to move by itself, or the button is a number that lies until something
+ * else happens to redraw the screen. One second is the resolution it shows, so one second is
+ * how often it is asked. It runs only while there is something to count: `drawHint` clears
+ * `cooling` when the wait reaches zero, and that same class is what stops this doing any work
+ * for the rest of the game.
+ */
+setInterval(() => {
+  if (hintWait() > 0 || el.hint.classList.contains("cooling")) drawHint();
+}, 1000);
 
 el.shuffle.addEventListener("click", () => {
   Sfx.shuffle();

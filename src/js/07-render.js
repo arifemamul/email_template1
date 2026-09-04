@@ -58,8 +58,27 @@ function loadLevel(i) {
   drawSayAdds();
 }
 
+/*
+ * The hint button, which is a clock as much as a button.
+ *
+ * While the wait is running it says how many seconds are left instead of সংকেত, in Bengali
+ * digits, and it is disabled. That is the whole explanation a child gets and it is enough:
+ * press it, watch it count, find a word, watch the count jump down by thirty. Nobody has to
+ * read a rule.
+ */
+function drawHint() {
+  const left = hintWait();
+  const clear = isClear();
+  el.hint.disabled = clear || left > 0;
+  el.hint.classList.toggle("cooling", !clear && left > 0);
+  el.hint.querySelector(".bn").textContent = left > 0 ? `${bn(left)} সেকেন্ড` : "সংকেত";
+  el.hint.title = left > 0
+    ? `আরও ${bn(left)} সেকেন্ড - একটি শব্দ পেলে ৩০ সেকেন্ড কমে যাবে`
+    : "একটি অক্ষর দেখিয়ে দেবে";
+}
+
 function drawHud() {
-  el.hint.disabled = isClear();
+  drawHint();
   // The letter, and which go at it. `pass` is 0 when the letter has only one level.
   const lv = level();
   el.levelGlyph.textContent = lv.name;
@@ -264,7 +283,8 @@ function drawBoard(alloc) {
   el.board.style.gridAutoRows = cell + "px";
   el.board.innerHTML = "";
 
-  const shown = revealedCells();
+  // Gold is for words actually found; a hint only shows its letter. See `solvedCells`.
+  const shown = solvedCells();
   const hinted = hintSet();
 
   for (let r = 0; r < p.rows; r++) {
@@ -304,7 +324,7 @@ function drawScreen() {
 }
 
 function refreshBoard() {
-  const shown = revealedCells();
+  const shown = solvedCells();
   const hinted = hintSet();
   for (const div of el.board.children) {
     if (div.classList.contains("blank")) continue;

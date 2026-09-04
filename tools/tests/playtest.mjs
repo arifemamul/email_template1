@@ -117,21 +117,81 @@ if (moved.lit !== 0) problems.push('the next level did not open blank');
 
 await page.screenshot({ path: shot('shot-desktop-clear.png') });
 
-// a hint on the level it moved us to. Free now, and repeatable, so take two.
-const beforeHint = await page.evaluate(() => document.querySelectorAll('.cell.on').length);
+/*
+ * A hint on the level it moved us to.
+ *
+ * A hint shows a letter and does NOT fill the cell: gold is for a word actually found. The two
+ * were one set once - `revealedCells` fed the `on` class - so a hinted board looked like a
+ * solved one and a child read it as the game answering for them. `.cell.hinted` is the
+ * measurement now, and `.cell.on` must not move at all.
+ *
+ * And a hint costs a minute. The second one has to be refused, and the clock reset by hand to
+ * take it, which is the test for the wait rather than a way around it.
+ */
+const beforeHint = await page.evaluate(() => ({
+  on: document.querySelectorAll('.cell.on').length,
+  hinted: document.querySelectorAll('.cell.hinted').length,
+}));
 await page.click('#hint');
 await page.waitForTimeout(400);
-const oneHint = await page.evaluate(() => document.querySelectorAll('.cell.on').length);
+const oneHint = await page.evaluate(() => ({
+  on: document.querySelectorAll('.cell.on').length,
+  hinted: document.querySelectorAll('.cell.hinted').length,
+  wait: hintWait(),
+  disabled: document.getElementById('hint').disabled,
+  label: document.getElementById('hint').querySelector('.bn').textContent,
+}));
+// Pressed while the clock is running: nothing may happen.
+await page.evaluate(() => document.getElementById('hint').click());
+await page.waitForTimeout(300);
+const refused = await page.evaluate(() => document.querySelectorAll('.cell.hinted').length);
+// Wound forward, and a second hint lands.
+await page.evaluate(() => { game.hintAt = 0; drawHud(); });
 await page.click('#hint');
 await page.waitForTimeout(400);
 const twoHints = await page.evaluate(() => ({
-  lit: document.querySelectorAll('.cell.on').length,
+  on: document.querySelectorAll('.cell.on').length,
+  hinted: document.querySelectorAll('.cell.hinted').length,
   purse: !!document.getElementById('coinCount')
 }));
-console.log('hints ->', JSON.stringify({ beforeHint, oneHint, twoHints }));
-if (oneHint !== beforeHint + 1) problems.push('a hint did not reveal exactly one letter');
-if (twoHints.lit !== beforeHint + 2) problems.push('a second hint was refused, but hints are free');
+console.log('hints ->', JSON.stringify({ beforeHint, oneHint, refused, twoHints }));
+if (oneHint.hinted !== beforeHint.hinted + 1)
+  problems.push('a hint did not show exactly one letter');
+if (oneHint.on !== beforeHint.on)
+  problems.push(`a hint filled ${oneHint.on - beforeHint.on} cell(s) gold; only a found word does that`);
+if (oneHint.wait < 55 || oneHint.wait > 60)
+  problems.push(`a hint left ${oneHint.wait}s on the clock, expected about 60`);
+if (!oneHint.disabled) problems.push('the hint button is still live while its clock runs');
+if (!/[০-৯]/.test(oneHint.label))
+  problems.push(`the hint button says "${oneHint.label}" while waiting, with no count in it`);
+if (refused !== oneHint.hinted) problems.push('a second hint was given while the clock was running');
+if (twoHints.hinted !== beforeHint.hinted + 2)
+  problems.push('a second hint was refused after the clock ran out');
+if (twoHints.on !== beforeHint.on) problems.push('two hints filled cells gold');
 if (twoHints.purse) problems.push('the coin counter is still in the page');
+
+// Finding a word buys the clock back: thirty seconds a word, so two words pay for a hint.
+await page.evaluate(() => { game.hintAt = Date.now() + 60000; drawHud(); });
+const credit = await page.evaluate(async () => {
+  const before = hintWait();
+  const words = LEVELS[game.index].words.filter(w => !(game.found[LEVELS[game.index].id] || []).includes(w));
+  const step = [];
+  for (const w of words.slice(0, 2)) {
+    game.picked = splitAksharas(w).map(a => game.wheel.indexOf(a));
+    submitWord();
+    await new Promise(r => setTimeout(r, 500));
+    step.push(hintWait());
+  }
+  return { before, step };
+});
+console.log('credit ->', JSON.stringify(credit));
+if (credit.step.length < 2) problems.push('the level had too few words left to test the credit');
+else {
+  if (Math.abs((credit.before - credit.step[0]) - 30) > 2)
+    problems.push(`one word took ${credit.before - credit.step[0]}s off the clock, expected 30`);
+  if (credit.step[1] !== 0)
+    problems.push(`two words left ${credit.step[1]}s on the clock; two words should pay for a hint`);
+}
 
 // click-by-click entry (no dragging) on the current level
 await page.keyboard.press('Escape');

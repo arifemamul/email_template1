@@ -148,21 +148,40 @@
   }
 
   /* A found cell is the opposite of a hole: raised, gold, lit from above. */
-  .cell.on {
-    background: linear-gradient(180deg, var(--accent-hi), var(--accent));
-    box-shadow: inset 0 2px 0 rgba(255,255,255,.6), var(--lip) var(--accent-lo);
-  }
-  .cell.on span { opacity: 1; transform: scale(1); }
 
   /* A cell that will say its word when pressed. The whole affordance is the cursor and the
      press: a speaker mark on every found letter would clutter a board a child is reading, and
      the cells that can be pressed are exactly the gold ones, which already stand out. */
 
-  /* A hint gives the letter away, so it is deliberately not the gold of a letter you found. */
+  /*
+   * A hinted cell is NOT a filled one, and has to look it.
+   *
+   * It used to be a paler gold tile with the same raised lip - and a board part-hinted read as
+   * a board part-solved, because the difference between #FFB300 and #FFE08A is a shade, not a
+   * state. A child looked at it and thought the game had answered for them.
+   *
+   * So a hint keeps the empty well it was and adds only the letter, ghosted, inside a dashed
+   * ring: the cell is still a hole in the board, and the letter is written on it in pencil.
+   * Nothing is raised, nothing is gold, and the moment the word is actually found the cell
+   * fills for real - `.cell.on` wins, because it comes later in this file.
+   */
   .cell.hinted {
-    background: linear-gradient(180deg, var(--hint-hi), var(--hint));
-    box-shadow: inset 0 2px 0 rgba(255,255,255,.7), var(--lip) var(--hint-lo);
+    background: var(--well);
+    box-shadow: inset 0 0 0 2px var(--hint-lo), inset 0 2px 5px rgba(var(--glow-well), .28);
+    /* The dash is the whole signal at a glance: a solid edge anywhere on this board means
+       solved. Drawn as an inset ring plus an outline so it survives the cell's border-radius. */
+    outline: 2px dashed var(--hint-lo);
+    outline-offset: -5px;
   }
+  .cell.hinted span { opacity: .55; transform: scale(1); color: var(--ink-soft); }
+
+  /* After the hint, deliberately: a cell can be both, and found wins. */
+  .cell.on {
+    background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.6), var(--lip) var(--accent-lo);
+    outline: none;                      /* clears the hint's dashed ring when the word lands */
+  }
+  .cell.on span { opacity: 1; transform: scale(1); color: var(--ink); }
 
   /* -- the word being traced -------------------------------------------------- */
   .preview { height: 52px; display: grid; place-items: center; flex: none; }
@@ -246,6 +265,18 @@
     box-shadow: 0 0 0 1px rgba(var(--shade), .07);
   }
   .action:disabled { opacity: .42; cursor: not-allowed; box-shadow: none; }
+
+  /* Counting down rather than switched off. A disabled button at .42 is a button a child stops
+     looking at, and this one is the only thing on screen saying how long is left and that
+     finding a word shortens it - so it keeps its ink and loses only its lift. */
+  .action.cooling:disabled {
+    opacity: 1;
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    box-shadow: 0 0 0 1px rgba(var(--shade), .07);
+    font-variant-numeric: tabular-nums;
+  }
+  .action.cooling .glyph { color: var(--ink-faint); }
   .action .glyph { color: var(--accent-lo); font-size: 16px; }
 
   /* -- wheel ------------------------------------------------------------------- */

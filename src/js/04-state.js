@@ -28,6 +28,20 @@ const game = {
   index: 0,
   found: saved.found || {},          // levelId -> [words] found on THIS attempt
   hints: saved.hints || {},          // levelId -> ["r,c"]
+  /*
+   * When the next hint may be taken, as a clock time.
+   *
+   * A hint used to be free and unlimited, and a child who found that out stopped playing: press
+   * it enough times and the board fills itself. So a hint now costs a minute of waiting, and
+   * the only way to buy that minute back is to find words - thirty seconds each, so two found
+   * words pay for one hint exactly. The two numbers are multiples on purpose: a child can see
+   * that two words earn a hint without being told.
+   *
+   * Kept as an absolute time and saved, so closing the page and coming back does not hand out
+   * a free one. Not per level: it is a limit on asking, and asking is the same act whichever
+   * board it happens on.
+   */
+  hintAt: saved.hintAt || 0,
   // Levels ever fully solved. Separate from `found`, which is wiped each time a cleared level
   // is revisited so it can be played again - a board sitting there fully lit with nothing left
   // to drag is not a level, it is a screenshot of one. `completed` is what remembers progress
@@ -47,19 +61,49 @@ const game = {
 };
 
 const persist = () => store.write({
-  found: game.found, hints: game.hints, completed: game.completed
+  found: game.found, hints: game.hints, completed: game.completed, hintAt: game.hintAt
 });
+
+/* -- what a hint costs ---------------------------------------------------------------------
+   A minute to wait, and half a minute back for every word found. Two words, one hint. */
+const HINT_WAIT = 60000;
+const HINT_CREDIT = 30000;
+
+/** Seconds still to wait, rounded up. 0 means a hint can be taken now. */
+function hintWait() {
+  return Math.max(0, Math.ceil((game.hintAt - Date.now()) / 1000));
+}
+
+/** A word was found: bring the next hint half a minute closer, but never into the past. */
+function creditHint() {
+  game.hintAt = Math.max(Date.now(), game.hintAt - HINT_CREDIT);
+}
 
 const level = () => LEVELS[game.index];
 const foundSet = () => new Set(game.found[level().id] || []);
 const hintSet = () => new Set(game.hints[level().id] || []);
 
-function revealedCells() {
+/**
+ * The cells of every word actually found. This is what makes a cell gold.
+ *
+ * Kept apart from `revealedCells` on purpose. A hinted cell has its letter showing but the
+ * word is still unsolved, and for a while both sets were the same set - so taking a hint lit
+ * the cell exactly like solving it, and a child looking at a part-hinted board saw a board the
+ * game had answered for them. A hint shows a letter; only finding the word fills the cell.
+ */
+function solvedCells() {
   const done = foundSet();
-  const out = new Set(hintSet());
+  const out = new Set();
   for (const w of game.puzzle.words) {
     if (done.has(w.word)) for (const [r, c] of w.cells) out.add(key(r, c));
   }
+  return out;
+}
+
+/** Everything a player can already see: solved cells plus hinted ones. What a hint may skip. */
+function revealedCells() {
+  const out = solvedCells();
+  for (const k of hintSet()) out.add(k);
   return out;
 }
 
