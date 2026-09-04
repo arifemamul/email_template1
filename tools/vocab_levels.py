@@ -19,7 +19,16 @@ someone teaching them, and it reads that way - ঘোড়া, ঘড়ি, �
 going into REJECTED in tools/vocabulary.py, which is where a word goes to stop being a puzzle
 from any source at all. Nothing here has to know about them.
 
-It also picks up the leftovers. guide_levels.py places its words by first akshara and then by
+It also draws on two other pools for partners.
+
+The first is the game's own. tools/vocabulary.py holds 145 words that satisfy every rule and
+have simply never been set, and a word from the school list is often stranded next to one of
+them: দোয়েল has no second দো word anywhere but দাঁত, দিন and দূর are all free under দ. Pool
+words are curated against the same picture rule as everything else - `check_pool` enforces it -
+so they need no judgement here, only a gloss, which tools/pool-glosses.json carries and which
+doubles as the allowlist.
+
+The second is the guide's leftovers. guide_levels.py places its words by first akshara and then by
 letter, and thirteen drawable ones still end up alone under their whole letter - গণ্ডার, চক্র,
 জীবাশ্ম, মুঠো, তীর. This list runs after it and reaches letters that one could not, so those
 thirteen are offered here too and most of them find a partner at last: গণ্ডার with গাড়ি, তীর
@@ -36,10 +45,12 @@ HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
 from levelgen import catalogue_without, place, unfit                 # noqa: E402
+from vocabulary import words as pool_words                           # noqa: E402
 from wordpool import zipf                                            # noqa: E402
 
 LIST = HERE / 'word-list-school.json'
 GUIDE_GLOSSES = HERE / 'guide-glosses.json'
+POOL_GLOSSES = HERE / 'pool-glosses.json'
 OUT = HERE / 'levels-vocab.json'
 
 def build():
@@ -59,11 +70,21 @@ def build():
             eligible[word] = en
             source[word] = 'school list'
 
-    # The drawable guide words guide_levels.py could not place, offered as spares: they may
-    # fill a gap the school list leaves but never take a slot from it. See levelgen.place.
-    spare = {}
-    for word in guide['pictures']:
+    # The spares: words that may fill a gap the school list leaves but never take a slot from
+    # it. See levelgen.place. Two pools, and a note of what the pool could have offered if
+    # someone wrote the gloss.
+    pool = json.loads(POOL_GLOSSES.read_text(encoding='utf-8'))['glosses']
+    spare, ungloss = {}, []
+    for word in pool_words():
         if word in on_board or word in eligible or unfit(word, on_board):
+            continue
+        if word not in pool:
+            ungloss.append(word)
+            continue
+        spare[word] = pool[word]
+        source[word] = 'pool'
+    for word in guide['pictures']:
+        if word in on_board or word in eligible or word in spare or unfit(word, on_board):
             continue
         spare[word] = guide['glosses'].get(word, '')
         source[word] = 'guide'
@@ -76,11 +97,11 @@ def build():
         return out
 
     levels, stranded = place(eligible, OUT, note, spare=sorted(spare))
-    return listed, already, eligible, levels, left_out, stranded, source
+    return listed, already, eligible, levels, left_out, stranded, source, ungloss
 
 
 def main(argv):
-    listed, already, eligible, levels, left_out, stranded, source = build()
+    listed, already, eligible, levels, left_out, stranded, source, ungloss = build()
     placed = [w['w'] for lv in levels for w in lv['words']]
 
     from collections import Counter
@@ -95,6 +116,11 @@ def main(argv):
 
     print('\nboard sizes:', dict(sorted(Counter(len(lv['words']) for lv in levels).items())))
     print('kinds:', dict(Counter(lv['type'] for lv in levels)))
+
+    print(f'\n{len(ungloss)} free pool words carry no gloss yet, so they are not offered as '
+          f'partners. If a word below is\nstranded for want of one, write its gloss into '
+          f'tools/pool-glosses.json:')
+    print('   ' + ' '.join(sorted(ungloss)[:24]) + (' ...' if len(ungloss) > 24 else ''))
 
     print(f'\nleft out: {len(left_out)} cannot be board words, {len(stranded)} have no partner')
     for why, n in Counter(left_out.values()).most_common(8):
