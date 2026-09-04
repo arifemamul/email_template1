@@ -15,7 +15,7 @@
  * keep the copy they already have - `build.py` stamps it from the level count and the page's
  * own length, so it changes on its own whenever the built page does.
  */
-const VERSION = 'shobdojot-277-340350';
+const VERSION = 'shobdojot-306-345621';
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-maskable.svg'];
 
 /*

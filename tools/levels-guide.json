@@ -19,8 +19,8 @@
       "অ",
       "গ্নি"
      ],
-     "en": "fire",
      "freq": 4.25,
+     "en": "fire",
      "flag": "a flame",
      "from": "ফলা"
     },
@@ -30,8 +30,8 @@
       "অ",
       "ঙ্ক"
      ],
-     "en": "a sum, arithmetic",
      "freq": 3.74,
+     "en": "a sum, arithmetic",
      "flag": "a sum worked out on a slate",
      "from": "যুক্তবর্ণ"
     },
@@ -41,8 +41,8 @@
       "অ",
       "ঙ্গ"
      ],
-     "en": "a limb, a body part",
      "freq": 4.59,
+     "en": "a limb, a body part",
      "flag": "an arm and a leg, drawn apart from a body",
      "from": "যুক্তবর্ণ"
     },
@@ -52,8 +52,8 @@
       "অ",
       "স্ত্র"
      ],
-     "en": "a weapon",
      "freq": 5.29,
+     "en": "a weapon",
      "flag": "a sword or spear on its own",
      "from": "যুক্তবর্ণ"
     }
@@ -71,8 +71,8 @@
       "ন",
       "ন্দ"
      ],
-     "en": "joy",
      "freq": 5.14,
+     "en": "joy",
      "flag": "a laughing face",
      "from": "যুক্তবর্ণ"
     },
@@ -82,8 +82,8 @@
       "আ",
       "ব্বা"
      ],
-     "en": "father, dad",
      "freq": 4.22,
+     "en": "father, dad",
      "flag": "a father",
      "from": "যুক্তবর্ণ"
     },
@@ -93,8 +93,8 @@
       "আ",
       "ম্মা"
      ],
-     "en": "mother, mum",
      "freq": 4.21,
+     "en": "mother, mum",
      "flag": "a mother",
      "from": "যুক্তবর্ণ"
     }
@@ -111,8 +111,8 @@
       "উ",
       "ড়ে"
      ],
-     "en": "flies",
      "freq": 4.66,
+     "en": "flies",
      "flag": "a bird in flight, wings out",
      "from": "কার"
     },
@@ -122,8 +122,8 @@
       "উ",
       "ল্কা"
      ],
-     "en": "a meteor",
      "freq": 3.18,
+     "en": "a meteor",
      "flag": "a meteor streaking down a night sky",
      "from": "যুক্তবর্ণ"
     }
@@ -140,8 +140,8 @@
       "ক",
       "ণ্ঠ"
      ],
-     "en": "the throat; a voice",
      "freq": 4.76,
+     "en": "the throat; a voice",
      "flag": "a throat, drawn on a neck",
      "from": "যুক্তবর্ণ"
     },
@@ -151,8 +151,8 @@
       "ক",
       "র্ণ"
      ],
-     "en": "an ear",
      "freq": 3.47,
+     "en": "an ear",
      "flag": "an ear",
      "from": "ফলা"
     }
@@ -169,8 +169,8 @@
       "কা",
       "ণ্ড"
      ],
-     "en": "a stem; an affair",
      "freq": 4.14,
+     "en": "a stem; an affair",
      "flag": "the stem of a plant, leaves cut away",
      "from": "যুক্তবর্ণ"
     },
@@ -180,8 +180,8 @@
       "কা",
       "ন্না"
      ],
-     "en": "crying, tears",
      "freq": 4.55,
+     "en": "crying, tears",
      "flag": "a crying child, tears on the cheek",
      "from": "যুক্তবর্ণ"
     },
@@ -191,8 +191,8 @@
       "কা",
       "লো"
      ],
-     "en": "black",
      "freq": 5.28,
+     "en": "black",
      "flag": "a black square, as a colour",
      "from": "কার"
     }
@@ -209,8 +209,8 @@
       "কূ",
       "প"
      ],
-     "en": "a well",
      "freq": 3.57,
+     "en": "a well",
      "flag": "a village well with a rope",
      "from": "কার"
     },
@@ -220,8 +220,8 @@
       "কূ",
       "ল"
      ],
-     "en": "a bank, a shore",
      "freq": 3.07,
+     "en": "a bank, a shore",
      "flag": "a river bank",
      "from": "কার"
     }
@@ -238,8 +238,8 @@
       "ক্লা",
       "ন্ত"
      ],
-     "en": "tired",
      "freq": 4.72,
+     "en": "tired",
      "flag": "a child slumped, eyes heavy",
      "from": "ফলা"
     },
@@ -249,8 +249,8 @@
       "ক্লা",
       "স"
      ],
-     "en": "a class at school",
      "freq": 4.83,
+     "en": "a class at school",
      "flag": "a classroom, children at desks",
      "from": "ফলা"
     }
@@ -267,8 +267,8 @@
       "ছো",
       "টো"
      ],
-     "en": "small",
      "freq": 4.46,
+     "en": "small",
      "flag": "a small ball beside a big one",
      "from": "কার"
     },
@@ -278,8 +278,8 @@
       "ছো",
       "ট্ট"
      ],
-     "en": "tiny",
      "freq": 5.01,
+     "en": "tiny",
      "flag": "a tiny bird in a cupped hand",
      "from": "যুক্তবর্ণ"
     }
@@ -297,8 +297,8 @@
       "ন",
       "নী"
      ],
-     "en": "a mother",
      "freq": 4.08,
+     "en": "a mother",
      "flag": "a mother holding a baby",
      "from": "কার"
     },
@@ -309,8 +309,8 @@
       "ম",
       "জ"
      ],
-     "en": "twins",
      "freq": 3.74,
+     "en": "twins",
      "flag": "two identical children side by side",
      "from": "শব্দ গড়া"
     }
@@ -328,8 +328,8 @@
       "ক্ট",
       "র"
      ],
-     "en": "a doctor",
      "freq": 4.36,
+     "en": "a doctor",
      "flag": "a doctor with a stethoscope",
      "from": "যুক্তবর্ণ"
     },
@@ -340,8 +340,8 @@
       "লা",
       "র"
      ],
-     "en": "a dollar",
      "freq": 5.27,
+     "en": "a dollar",
      "flag": "a dollar note",
      "from": "বারোখড়ি"
     }
@@ -359,8 +359,8 @@
       "ব্ব",
       "ই"
      ],
-     "en": "ninety",
      "freq": 3.87,
+     "en": "ninety",
      "flag": "ninety, as ৯০ and as counted things",
      "from": "যুক্তবর্ণ"
     },
@@ -371,8 +371,8 @@
       "য়",
       "ন"
      ],
-     "en": "an eye",
      "freq": 4.01,
+     "en": "an eye",
      "flag": "an eye",
      "from": "শব্দ গড়া"
     }
@@ -389,8 +389,8 @@
       "নি",
       "দ্রা"
      ],
-     "en": "sleep",
      "freq": 3.44,
+     "en": "sleep",
      "flag": "a child asleep",
      "from": "যুক্তবর্ণ"
     },
@@ -401,8 +401,8 @@
       "র্ঝ",
       "র"
      ],
-     "en": "a spring, a waterfall",
      "freq": 3.4,
+     "en": "a spring, a waterfall",
      "flag": "a waterfall down rock",
      "from": "ফলা"
     },
@@ -412,8 +412,8 @@
       "নি",
       "শি"
      ],
-     "en": "night",
      "freq": 3.61,
+     "en": "night",
      "flag": "a night sky with stars",
      "from": "কার"
     }
@@ -430,8 +430,8 @@
       "প",
       "দ্ম"
      ],
-     "en": "a lotus",
      "freq": 3.92,
+     "en": "a lotus",
      "flag": "a lotus on water",
      "from": "ফলা"
     },
@@ -442,8 +442,8 @@
       "ল্ল",
       "ব"
      ],
-     "en": "a young leaf",
      "freq": 3.3,
+     "en": "a young leaf",
      "flag": "a new leaf, pale and small",
      "from": "ফলা"
     }
@@ -461,8 +461,8 @@
       "উ",
       "ন্ড"
      ],
-     "en": "a pound",
      "freq": 4.43,
+     "en": "a pound",
      "flag": "a pound note",
      "from": "যুক্তবর্ণ"
     },
@@ -472,8 +472,8 @@
       "পা",
       "ত্র"
      ],
-     "en": "a vessel; a groom",
      "freq": 4.39,
+     "en": "a vessel; a groom",
      "flag": "a brass pot",
      "from": "ফলা"
     },
@@ -483,8 +483,8 @@
       "পা",
       "ল্লা"
      ],
-     "en": "a scale pan; a chase",
      "freq": 3.95,
+     "en": "a scale pan; a chase",
      "flag": "the two pans of a balance",
      "from": "ফলা"
     }
@@ -501,8 +501,8 @@
       "ব",
       "উ"
      ],
-     "en": "a bride, a wife",
      "freq": 4.64,
+     "en": "a bride, a wife",
      "flag": "a bride in a red sari",
      "from": "শব্দ গড়া"
     },
@@ -512,8 +512,8 @@
       "ব",
       "ড়ো"
      ],
-     "en": "big",
      "freq": 4.6,
+     "en": "big",
      "flag": "a big ball beside a small one",
      "from": "কার"
     },
@@ -523,8 +523,8 @@
       "ব",
       "ধূ"
      ],
-     "en": "a bride",
      "freq": 3.53,
+     "en": "a bride",
      "flag": "a bride at her wedding",
      "from": "কার"
     },
@@ -534,8 +534,8 @@
       "ব",
       "র্ণ"
      ],
-     "en": "a letter; a colour",
      "freq": 4.41,
+     "en": "a letter; a colour",
      "flag": "a letter of the alphabet, large and alone",
      "from": "ফলা"
     }
@@ -553,8 +553,8 @@
       "কু",
       "ল"
      ],
-     "en": "the bakul flower",
      "freq": 3.94,
+     "en": "the bakul flower",
      "flag": "a spray of bakul flowers",
      "from": "কার"
     },
@@ -565,8 +565,8 @@
       "স",
       "ন্ত"
      ],
-     "en": "spring",
      "freq": 4.46,
+     "en": "spring",
      "flag": "a tree in blossom",
      "from": "যুক্তবর্ণ"
     }
@@ -584,8 +584,8 @@
       "ষ",
       "ণ্ণ"
      ],
-     "en": "sad, gloomy",
      "freq": 3.6,
+     "en": "sad, gloomy",
      "flag": "a downcast face",
      "from": "যুক্তবর্ণ"
     },
@@ -596,8 +596,8 @@
       "স্ম",
       "য়"
      ],
-     "en": "wonder, surprise",
      "freq": 4.22,
+     "en": "wonder, surprise",
      "flag": "a face with wide eyes and open mouth",
      "from": "ফলা"
     }
@@ -614,8 +614,8 @@
       "বৃ",
       "দ্ধ"
      ],
-     "en": "old",
      "freq": 4.68,
+     "en": "old",
      "flag": "an old man with a stick",
      "from": "যুক্তবর্ণ"
     },
@@ -625,8 +625,8 @@
       "বৃ",
       "ষ্টি"
      ],
-     "en": "rain",
      "freq": 5.04,
+     "en": "rain",
      "flag": "rain falling, an umbrella under it",
      "from": "যুক্তবর্ণ"
     }
@@ -643,8 +643,8 @@
       "ভ",
       "গ্ন"
      ],
-     "en": "broken",
      "freq": 3.38,
+     "en": "broken",
      "flag": "a broken pot in pieces",
      "from": "ফলা"
     },
@@ -654,8 +654,8 @@
       "ভ",
       "স্ম"
      ],
-     "en": "ash",
      "freq": 3.21,
+     "en": "ash",
      "flag": "a heap of grey ash",
      "from": "ফলা"
     }
@@ -672,8 +672,8 @@
       "ভা",
       "রী"
      ],
-     "en": "heavy",
      "freq": 4.75,
+     "en": "heavy",
      "flag": "a figure straining under a load",
      "from": "কার"
     },
@@ -683,8 +683,8 @@
       "ভা",
       "সে"
      ],
-     "en": "floats",
      "freq": 3.56,
+     "en": "floats",
      "flag": "a leaf floating on water",
      "from": "কার"
     }
@@ -701,8 +701,8 @@
       "ভূ",
       "ত"
      ],
-     "en": "a ghost",
      "freq": 4.3,
+     "en": "a ghost",
      "flag": "a friendly cartoon ghost",
      "from": "কার"
     },
@@ -712,8 +712,8 @@
       "ভূ",
       "মি"
      ],
-     "en": "land",
      "freq": 5.03,
+     "en": "land",
      "flag": "an open field",
      "from": "কার"
     },
@@ -724,8 +724,8 @@
       "ষ",
       "ণ"
      ],
-     "en": "an ornament",
      "freq": 3.73,
+     "en": "an ornament",
      "flag": "a necklace and bangles",
      "from": "কার"
     }
@@ -742,8 +742,8 @@
       "ম",
       "গ"
      ],
-     "en": "a mug",
      "freq": 3.74,
+     "en": "a mug",
      "flag": "a mug with a handle",
      "from": "শব্দ গড়া"
     },
@@ -753,8 +753,8 @@
       "ম",
       "ণি"
      ],
-     "en": "a gem",
      "freq": 3.88,
+     "en": "a gem",
      "flag": "a cut gem, sparkling",
      "from": "কার"
     }
@@ -771,8 +771,8 @@
       "র",
       "ক্ত"
      ],
-     "en": "blood",
      "freq": 5.15,
+     "en": "blood",
      "flag": "a red drop",
      "from": "যুক্তবর্ণ"
     },
@@ -782,8 +782,8 @@
       "র",
       "ত্ন"
      ],
-     "en": "a jewel",
      "freq": 4.06,
+     "en": "a jewel",
      "flag": "a jewel",
      "from": "ফলা"
     },
@@ -793,8 +793,8 @@
       "র",
       "বি"
      ],
-     "en": "the sun; Sunday",
      "freq": 4.55,
+     "en": "the sun; Sunday",
      "flag": "the sun",
      "from": "কার"
     },
@@ -804,8 +804,8 @@
       "র",
       "শ্মি"
      ],
-     "en": "a ray",
      "freq": 3.93,
+     "en": "a ray",
      "flag": "rays coming off the sun",
      "from": "ফলা"
     }
@@ -822,8 +822,8 @@
       "রে",
       "খা"
      ],
-     "en": "a line",
      "freq": 4.32,
+     "en": "a line",
      "flag": "a single drawn line",
      "from": "কার"
     },
@@ -833,8 +833,8 @@
       "রে",
       "ল"
      ],
-     "en": "a railway",
      "freq": 4.77,
+     "en": "a railway",
      "flag": "a train on a track",
      "from": "কার"
     }
@@ -851,8 +851,8 @@
       "সং",
       "খ্যা"
      ],
-     "en": "a number",
      "freq": 5.58,
+     "en": "a number",
      "flag": "digits, ১ ২ ৩",
      "from": "বারোখড়ি"
     },
@@ -863,8 +863,8 @@
       "গী",
       "ত"
      ],
-     "en": "music",
      "freq": 4.57,
+     "en": "music",
      "flag": "a flute and a drum",
      "from": "বারোখড়ি"
     }
@@ -881,8 +881,8 @@
       "গ্র",
       "ন্থ"
      ],
-     "en": "a book, a volume",
      "freq": 4.34,
+     "en": "a book, a volume",
      "flag": "a thick book, closed",
      "from": "যুক্তবর্ণ"
     },
@@ -892,8 +892,8 @@
       "গ্লা",
       "স"
      ],
-     "en": "a glass",
      "freq": 4.33,
+     "en": "a glass",
      "flag": "a drinking glass",
      "from": "ফলা"
     }
@@ -910,8 +910,8 @@
       "দী",
       "ঘি"
      ],
-     "en": "a large pond",
      "freq": 3.23,
+     "en": "a large pond",
      "flag": "a large pond with steps down to it",
      "from": "বারোখড়ি"
     },
@@ -922,8 +922,8 @@
       "পু",
       "র"
      ],
-     "en": "midday, noon",
      "freq": 4.89,
+     "en": "midday, noon",
      "flag": "the sun straight overhead, short shadows",
      "from": "কার"
     }
@@ -940,8 +940,8 @@
       "পা",
       "ন্না"
      ],
-     "en": "an emerald",
      "freq": 3.43,
+     "en": "an emerald",
      "flag": "a green gem",
      "from": "যুক্তবর্ণ"
     },
@@ -952,8 +952,8 @@
       "থি",
       "বী"
      ],
-     "en": "the earth",
      "freq": 5.02,
+     "en": "the earth",
      "flag": "the earth as a globe",
      "from": "কার"
     }
@@ -970,8 +970,8 @@
       "বী",
       "জ"
      ],
-     "en": "a seed",
      "freq": 4.52,
+     "en": "a seed",
      "flag": "seeds in an open palm",
      "from": "কার"
     },
@@ -981,8 +981,8 @@
       "বৈ",
       "ঠা"
      ],
-     "en": "an oar",
      "freq": 3.19,
+     "en": "an oar",
      "flag": "an oar",
      "from": "কার"
     }
@@ -999,8 +999,8 @@
       "মা",
       "ঝি"
      ],
-     "en": "a boatman",
      "freq": 4.06,
+     "en": "a boatman",
      "flag": "a boatman poling a boat",
      "from": "বারোখড়ি"
     },
@@ -1010,8 +1010,8 @@
       "মূ",
       "ল"
      ],
-     "en": "a root; the main part",
      "freq": 5.51,
+     "en": "a root; the main part",
      "flag": "the roots of a plant under the soil line",
      "from": "কার"
     }
@@ -1028,8 +1028,8 @@
       "শৃ",
       "ঙ্গ"
      ],
-     "en": "a peak, a horn",
      "freq": 3.27,
+     "en": "a peak, a horn",
      "flag": "a mountain peak",
      "from": "বারোখড়ি"
     },
@@ -1040,8 +1040,8 @@
       "বা",
       "ল"
      ],
-     "en": "algae, waterweed",
      "freq": 3.28,
+     "en": "algae, waterweed",
      "flag": "green algae on a pond",
      "from": "কার"
     }
@@ -1058,8 +1058,8 @@
       "সে",
       "না"
      ],
-     "en": "an army",
      "freq": 5.16,
+     "en": "an army",
      "flag": "soldiers marching",
      "from": "কার"
     },
@@ -1069,8 +1069,8 @@
       "স্বা",
       "মী"
      ],
-     "en": "a husband",
      "freq": 5.21,
+     "en": "a husband",
      "flag": "a husband beside his wife",
      "from": "বারোখড়ি"
     }
@@ -1087,8 +1087,8 @@
       "স্না",
       "ন"
      ],
-     "en": "a bath",
      "freq": 4.0,
+     "en": "a bath",
      "flag": "a child bathing under a tap",
      "from": "ফলা"
     },
@@ -1098,8 +1098,8 @@
       "স্ব",
       "র্ণ"
      ],
-     "en": "gold",
      "freq": 4.59,
+     "en": "gold",
      "flag": "a gold bangle",
      "from": "যুক্তবর্ণ"
     }
@@ -1189,7 +1189,7 @@
   "কীট": "no picture can show it",
   "কুজ্ঝটিকা": "no picture can show it",
   "কুঞ্জ": "rarer than the floor of 3.0",
-  "কুসুম": "the only word left that a picture can show and that starts with ক",
+  "কুসুম": "the only word left in this batch that starts with ক",
   "কৃপণ": "no picture can show it",
   "কৃপা": "no picture can show it",
   "কৃশ": "rarer than the floor of 3.0",
@@ -1211,14 +1211,14 @@
   "খবর": "no picture can show it",
   "খাই": "no picture can show it",
   "খুব": "no picture can show it",
-  "খুশি": "the only word left that a picture can show and that starts with খ",
+  "খুশি": "the only word left in this batch that starts with খ",
   "খৈ": "no picture can show it",
   "খোকন": "no picture can show it",
   "খোল": "no picture can show it",
   "খ্যাতি": "no picture can show it",
   "গঙ্গা": "no picture can show it",
   "গঞ্জ": "no picture can show it",
-  "গণ্ডার": "the only word left that a picture can show and that starts with গ",
+  "গণ্ডার": "the only word left in this batch that starts with গ",
   "গভীর": "no picture can show it",
   "গম্বুজ": "no picture can show it",
   "গম্ভীর": "no picture can show it",
@@ -1235,7 +1235,7 @@
   "ঘৃত": "rarer than the floor of 3.0",
   "ঘেউ": "no picture can show it",
   "ঘ্রাণ": "no picture can show it",
-  "চক্র": "the only word left that a picture can show and that starts with চ",
+  "চক্র": "the only word left in this batch that starts with চ",
   "চট্টগ্রাম": "no picture can show it",
   "চপ্পল": "no picture can show it",
   "চর্চা": "no picture can show it",
@@ -1250,7 +1250,7 @@
   "চৈত্র": "no picture can show it",
   "চোর": "no picture can show it",
   "চৌধুরী": "no picture can show it",
-  "ছক্কা": "the only word left that a picture can show and that starts with ছ",
+  "ছক্কা": "the only word left in this batch that starts with ছ",
   "ছদ্ম": "no picture can show it",
   "ছদ্মবেশ": "no picture can show it",
   "ছল": "no picture can show it",
@@ -1262,7 +1262,7 @@
   "জব্দ": "no picture can show it",
   "জলোচ্ছ্বাস": "no picture can show it",
   "জীবন": "no picture can show it",
-  "জীবাশ্ম": "the only word left that a picture can show and that starts with জ",
+  "জীবাশ্ম": "the only word left in this batch that starts with জ",
   "জেদ": "no picture can show it",
   "জৈন": "no picture can show it",
   "জৈব": "no picture can show it",
@@ -1291,7 +1291,7 @@
   "তর্ক": "no picture can show it",
   "তিনি": "no picture can show it",
   "তীব্র": "no picture can show it",
-  "তীর": "the only word left that a picture can show and that starts with ত",
+  "তীর": "the only word left in this batch that starts with ত",
   "তুরস্ক": "no picture can show it",
   "তুলনা": "no picture can show it",
   "তৃণ": "no picture can show it",
@@ -1344,7 +1344,7 @@
   "ধারণা": "no picture can show it",
   "ধীরে": "no picture can show it",
   "ধূপ": "rarer than the floor of 3.0",
-  "ধূসর": "the only word left that a picture can show and that starts with ধ",
+  "ধূসর": "the only word left in this batch that starts with ধ",
   "ধৃত": "no picture can show it",
   "ধৈর্য": "no picture can show it",
   "ধোয়া": "no picture can show it",
@@ -1499,7 +1499,7 @@
   "মুখস্থ": "no picture can show it",
   "মুখ্য": "no picture can show it",
   "মুগ্ধ": "no picture can show it",
-  "মুঠো": "the only word left that a picture can show and that starts with ম",
+  "মুঠো": "the only word left in this batch that starts with ম",
   "মুহূর্ত": "no picture can show it",
   "মূর্খ": "no picture can show it",
   "মূর্খতা": "no picture can show it",
@@ -1520,7 +1520,7 @@
   "যিনি": "no picture can show it",
   "যুগ্ম": "no picture can show it",
   "যুদ্ধ": "no picture can show it",
-  "যুবক": "the only word left that a picture can show and that starts with য",
+  "যুবক": "the only word left in this batch that starts with য",
   "যেমন": "no picture can show it",
   "যোগ্য": "no picture can show it",
   "যৌগিক": "no picture can show it",
@@ -1531,7 +1531,7 @@
   "রাজত্ব": "no picture can show it",
   "রাজ্য": "no picture can show it",
   "রূপ": "no picture can show it",
-  "রূপা": "the only word left that a picture can show and that starts with র",
+  "রূপা": "the only word left in this batch that starts with র",
   "রোজা": "no picture can show it",
   "রৌদ্র": "no picture can show it",
   "লক্ষ": "no picture can show it",
@@ -1540,7 +1540,7 @@
   "লব্ধ": "no picture can show it",
   "লম্ফ": "no picture can show it",
   "লম্ব": "no picture can show it",
-  "লম্বা": "the only word left that a picture can show and that starts with ল",
+  "লম্বা": "the only word left in this batch that starts with ল",
   "লাঞ্ছনা": "no picture can show it",
   "লিখি": "no picture can show it",
   "লীলা": "no picture can show it",
@@ -1592,7 +1592,7 @@
   "সম্মুখ": "no picture can show it",
   "সস্তা": "no picture can show it",
   "সহপাঠী": "no picture can show it",
-  "সহস্র": "the only word left that a picture can show and that starts with স",
+  "সহস্র": "the only word left in this batch that starts with স",
   "সাউন্ড": "no picture can show it",
   "সাথী": "no picture can show it",
   "সামান্য": "no picture can show it",

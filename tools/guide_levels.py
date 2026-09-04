@@ -43,8 +43,6 @@ a game whose whole reward is recognising the thing you just spelled.
 The words that do not fit are left where they are. They stay in the guide, which is what they
 were for.
 """
-import collections
-import itertools
 import json
 import pathlib
 import sys
@@ -52,15 +50,8 @@ import sys
 HERE = pathlib.Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from bangla import split_aksharas, wheel_for                       # noqa: E402
-# The wheel is scrambled so no answer is spelled out in ring order, and on a small ring no
-# such arrangement may exist. That is a shipping constraint like any other - `check` refuses a
-# level that fails it - so it is asked here rather than discovered later: a three-tile level
-# holding ঝঞ্ঝা and ঝঞ্ঝাট was the one this caught.
-from build import ring_can_hide                                    # noqa: E402
-from catalogue import (ALL_LEVELS, MAX_TILES, MIN_TILES, MIN_WORDS,  # noqa: E402
-                       validate)
-from vocabulary import REJECTED                                    # noqa: E402
+# Every rule about what a level may be lives in levelgen.py, which both generators share.
+from levelgen import FLOOR, catalogue_without, place, unfit        # noqa: E402
 from wordpool import zipf                                          # noqa: E402
 
 OUT = HERE / 'levels-guide.json'
@@ -112,98 +103,15 @@ def guide_words():
 
 
 def refused(word, on_board, picture):
-    """Why this word cannot be a board word, or None."""
-    n = len(split_aksharas(word))
-    if word in on_board:
-        return 'already a puzzle'
-    if word not in picture:
+    """Why this word cannot be a board word, or None. The picture rule is the guide's own."""
+    if word not in picture and word not in on_board:
         return 'no picture can show it'
-    if n < 2:
-        return 'a single akshara'
-    if n > 3:
-        return f'{n} aksharas'
-    if word in REJECTED:
-        return f'rejected: {REJECTED[word]}'
-    if zipf(word) < FLOOR:
-        return f'rarer than the floor of {FLOOR}'
-    return None
-
-
-def twins_can_separate(tiles):
-    """
-    Can the ring be arranged with no repeated tile beside its own twin?
-
-    A word like থুথু needs two থু tiles, and the scrambler keeps them apart so the wheel does
-    not draw the answer. On a ring of n tiles a tile appearing k times can be spread out only
-    when k is at most n // 2 - so তু থু থু, three tiles with থু twice, has no arrangement at
-    all: every pair on a three-ring is adjacent. That level reached the built page and only
-    `wheeltest` caught it, which is a check that runs four minutes after this one could have.
-    """
-    counts = collections.Counter(tiles)
-    return max(counts.values()) <= len(tiles) // 2
-
-
-def score(words):
-    """A better level first: more words, commoner words, a smaller ring."""
-    return (len(words), sum(zipf(w) for w in words) / len(words), -len(wheel_for(words)))
-
-
-def levels_for(key, pool, kind='akshara'):
-    """
-    Every level one akshara's words can make, taking the best group each time.
-
-    Greedy, and re-scored after each take rather than partitioned once: the aim is to place as
-    many words as possible, and a word left over is a word that stays unplayable. Combinations
-    are capped at five from a pool that can run to thirty, which is what keeps this from
-    becoming a search - the ring cap rejects almost all of them anyway.
-    """
-    left, out = list(pool), []
-    while len(left) >= MIN_WORDS:
-        best = None
-        for size in range(min(MAX_WORDS, len(left)), MIN_WORDS - 1, -1):
-            for combo in itertools.combinations(left, size):
-                tiles = wheel_for(list(combo))
-                if not MIN_TILES <= len(tiles) <= MAX_TILES:
-                    continue
-                if best and score(combo) <= score(best):
-                    continue
-                if not ring_can_hide(tiles, list(combo)):
-                    continue
-                if not twins_can_separate(tiles):
-                    continue
-                _, problems = validate(list(combo), key=key, kind=kind)
-                if not problems:
-                    best = list(combo)
-            if best:
-                break            # a bigger board beats a commoner one; stop at the first size
-        if not best:
-            break
-        out.append(best)
-        left = [w for w in left if w not in best]
-    return out, left
-
-
-def existing():
-    """
-    The catalogue as it is without this file's own output.
-
-    `catalogue.ALL_LEVELS` includes levels-guide.json once it exists, so reading it whole makes
-    the generator see its own words as already set and produce nothing the second time. Its ids
-    are excluded too, or a re-run would number around itself and drift. Filtered from the
-    post-refit levels rather than from the JSON on disk, because refit can drop a word - and a
-    word refit dropped is free to be used here.
-    """
-    mine = set()
-    if OUT.exists():
-        mine = {lv['id'] for lv in json.loads(OUT.read_text(encoding='utf-8'))['levels']}
-    return [lv for lv in ALL_LEVELS if lv['id'] not in mine]
+    return unfit(word, on_board)
 
 
 def build():
     where, gloss, picture = guide_words()
-    others = existing()
-    on_board = {w['w'] for lv in others for w in lv['words']}
-    taken = {lv['id'] for lv in others}
+    on_board = {w['w'] for lv in catalogue_without(OUT) for w in lv['words']}
 
     eligible, left_out = {}, {}
     for word, section in where.items():
@@ -214,52 +122,9 @@ def build():
         else:
             eligible[word] = section
 
-    by_first = {}
-    for word in eligible:
-        by_first.setdefault(split_aksharas(word)[0], []).append(word)
-
-    def next_id(akshara):
-        if akshara not in taken:
-            taken.add(akshara)
-            return akshara
-        n = 2
-        while f'{akshara}·{n}' in taken:
-            n += 1
-        taken.add(f'{akshara}·{n}')
-        return f'{akshara}·{n}'
-
-    def entry(word):
-        return {'w': word, 'split': split_aksharas(word), 'en': gloss.get(word, ''),
-                'freq': round(zipf(word), 2), 'flag': picture[word], 'from': where[word]}
-
-    levels, over = [], {}
-    for akshara in sorted(by_first):
-        made, left = levels_for(akshara, sorted(by_first[akshara]))
-        for words in made:
-            levels.append({'id': next_id(akshara), 'type': 'akshara', 'key': akshara,
-                           'words': [entry(w) for w in words]})
-        for w in left:
-            over.setdefault(akshara[0], []).append(w)
-
-    # Second pass, over what the first left behind: same base letter, any vowel sign. বীজ is
-    # the only drawable বী word in the guide and would be stranded by itself; as a ব level it
-    # sits beside বৃষ্টি and বৈঠা.
-    def next_letter_id(letter):
-        n = 1
-        while f'{letter}-{n}' in taken:
-            n += 1
-        taken.add(f'{letter}-{n}')
-        return f'{letter}-{n}'
-
-    stranded = {}
-    for letter in sorted(over):
-        made, left = levels_for(letter, sorted(over[letter]), kind='letter')
-        for words in made:
-            levels.append({'id': next_letter_id(letter), 'type': 'letter', 'key': letter,
-                           'words': [entry(w) for w in words]})
-        for w in left:
-            stranded[w] = ('the only word left that a picture can show and that starts with '
-                           f'{letter}')
+    levels, stranded = place(
+        eligible, OUT,
+        lambda w: {'en': gloss.get(w, ''), 'flag': picture[w], 'from': where[w]})
     return levels, eligible, left_out, stranded, gloss
 
 
