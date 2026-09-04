@@ -27,6 +27,7 @@ invent a level the rest of the pipeline would refuse:
     a connected board        laid out by the same `cluster_layout` the game uses, inside
                              5 x 7, spelling nothing but its own words
     not already a puzzle     no word is set twice, which is checked for the whole catalogue
+    common enough to meet    at or above the corpus floor the game's own words sit at
 
 AND A PICTURE HAS TO BE ABLE TO SHOW IT. That is tools/vocabulary.py's rule for a board word -
 "a word a picture could replace - concrete, or a number or colour" - and it is the one the
@@ -70,10 +71,15 @@ GLOSSES = HERE / 'guide-glosses.json'
 # that reason. Five is where the ring cap bites anyway.
 MAX_WORDS = 5
 
-# Three is the game's own floor for a board word (`thin:` in the check report lists the three
-# authored words that sit under it). Nothing is dropped for being under it - a rare word is
-# still a real one - but the report leads with them.
-THIN = 3.0
+# The corpus floor. `check` reports three authored words that sit under it and lets them ship,
+# because each was chosen by hand for a reason written down beside it. Nothing here was chosen
+# by hand, so nothing here gets that benefit: a word under the floor is refused outright.
+#
+# It costs seven words, all of them genuinely drawable - বল্গা a rein, শৃগাল a jackal, বহ্নি
+# fire, মাণিক্য a ruby, কুঞ্জ a bower, পালঙ্ক a bedstead, ধূপ incense. Drawable is not the same
+# as met: a child who has never heard বল্গা learns nothing from spelling it, and the picture
+# only teaches them what a rein is, which is a vocabulary lesson this game is not for.
+FLOOR = 3.0
 
 
 def guide_words():
@@ -118,6 +124,8 @@ def refused(word, on_board, picture):
         return f'{n} aksharas'
     if word in REJECTED:
         return f'rejected: {REJECTED[word]}'
+    if zipf(word) < FLOOR:
+        return f'rarer than the floor of {FLOOR}'
     return None
 
 
@@ -267,13 +275,10 @@ def main(argv):
     print('board sizes:', dict(sorted(Counter(len(lv['words']) for lv in levels).items())))
     print(f'\nwithout a gloss: {sum(1 for w in placed if not gloss.get(w))} of {len(placed)}')
 
-    thin = sorted((w for w in placed if zipf(w) < THIN), key=zipf)
-    print(f'\nthin: {len(thin)} placed words are rarer than {THIN} in the corpus. A word that '
-          f'fits is not\n      the same as a word worth setting - read these before shipping:')
-    for w in thin[:20]:
+    rarest = sorted(placed, key=zipf)[:6]
+    print(f'\nfloor: nothing under {FLOOR}, and the rarest placed are')
+    for w in rarest:
         print(f'        {w:14} {zipf(w):.2f}')
-    if len(thin) > 20:
-        print(f'        ... and {len(thin) - 20} more')
 
     print(f'\nleft where they are: {len(left_out)} cannot be board words, '
           f'{len(stranded)} have no partner')
