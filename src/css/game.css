@@ -70,12 +70,6 @@
   /* The level's letter. Sized to the arrows so adding it cannot change the height of the row -
      the board and wheel are allocated what is left, and a taller topbar would take it from
      them on every level. */
-  /* Pressable when there is a voice to press it for - `markSayable`'s sibling decision lives in
-     the script, which adds `says` only when the device can actually speak. */
-  .now-letter.says { cursor: pointer; }
-  .now-letter.says:active .glyph { transform: translateY(3px); box-shadow: none; }
-  .now-letter.says:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 99px; }
-
   .now-letter {
     flex: 1 1 auto;
     min-width: 0;

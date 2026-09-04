@@ -65,20 +65,6 @@ function drawHud() {
   el.levelGlyph.textContent = lv.name;
   el.levelPass.textContent = lv.pass ? bn(lv.pass) : "";
 
-  // The chip says its own letter when pressed, on a device that can say anything at all.
-  // Marked here rather than once at startup because the voice list arrives asynchronously -
-  // `Speech.init` re-picks on `voiceschanged` - and this runs on every level.
-  const canSay = Speech.available;
-  el.levelName.classList.toggle("says", canSay);
-  if (canSay) {
-    el.levelName.setAttribute("role", "button");
-    el.levelName.setAttribute("tabindex", "0");
-    el.levelName.setAttribute("aria-label", `${lv.name} - উচ্চারণ শুনুন`);
-  } else {
-    el.levelName.removeAttribute("role");
-    el.levelName.removeAttribute("tabindex");
-    el.levelName.removeAttribute("aria-label");
-  }
 }
 
 /**
@@ -501,11 +487,6 @@ function drawLevelGrid() {
       b.appendChild(n);
     }
     b.title = lv.pass ? `${lv.name} ${bn(lv.pass)}` : lv.name;
-    // Named before it is marked, so the go number survives: `Talk.mark` writes an aria-label
-    // only where there is none, and the one it would write knows nothing about ম ২.
-    b.setAttribute("aria-label", `${b.title} - উচ্চারণ শুনুন`);
-    // The grid is 244 letters on one screen, which makes it the biggest chart in the app.
-    Talk.mark(b, lv.name);
     const done = !!game.completed[lv.id];
     if (done) b.classList.add("done");
     if (i === game.index) b.classList.add("now");

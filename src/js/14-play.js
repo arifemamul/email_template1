@@ -116,17 +116,6 @@ function tileAt(x, y) {
 
 let startPoint = null;
 
-/*
- * The letter a plain tap put on the shelf, said when the tap finishes.
- *
- * Every letter in the game is on the wheel, so this is where a child meets them - but only a
- * tap gets a voice, never a drag. A drag sweeps three or four tiles in half a second on the way
- * to spelling a word, and each one cutting off the last is not four letters taught, it is a
- * stutter; the word that lands at the end of the drag is what that gesture is for. A tap is the
- * other thing a child does with a tile: put a finger on it and look at it.
- */
-let tapped = null;
-
 el.wheel.addEventListener("pointerdown", e => {
   const i = tileAt(e.clientX, e.clientY);
   if (i === null) return;
@@ -136,15 +125,10 @@ el.wheel.addEventListener("pointerdown", e => {
   game.moved = false;
   startPoint = [e.clientX, e.clientY];
 
-  tapped = game.wheel[i];
   if (game.tapMode) {
     // click-by-click entry: same tile twice steps back, a new tile extends
-    if (game.picked.length && game.picked[game.picked.length - 1] === i) {
-      game.picked.pop();
-      tapped = null;   // a step back is a letter taken off the shelf, not one to say
-    } else if (!game.picked.includes(i)) {
-      game.picked.push(i);
-    }
+    if (game.picked.length && game.picked[game.picked.length - 1] === i) game.picked.pop();
+    else if (!game.picked.includes(i)) game.picked.push(i);
   } else {
     game.picked = [i];
   }
@@ -181,11 +165,9 @@ function endDrag() {
     submitWord();
   } else {
     game.tapMode = true;   // a plain click keeps the selection for more clicks
-    Speech.say(tapped, { rate: Speech.AGAIN });
     drawTrail();
     drawPreview();
   }
-  tapped = null;
 }
 
 el.wheel.addEventListener("pointerup", endDrag);
@@ -402,34 +384,27 @@ el.levelGrid.addEventListener("click", e => {
   if (e.target.closest(".lv") && guideIsOpen()) closeGuide();
 });
 
-/* -- Hearing it again ---------------------------------------------------------------------
+/* -- Hearing a word again -----------------------------------------------------------------
  *
  * A word is spoken once, as it lands. That is the moment it teaches - and it is also the moment
- * a child is watching letters fly onto the board rather than listening to them. So the two
- * things on screen that hold Bengali worth hearing can be pressed for it again: the letter this
- * level is about, and any word already found.
+ * a child is watching letters fly onto the board rather than listening to them. So any word
+ * already found can be pressed to hear it again.
  *
- * Both go quiet on a device with no Bengali voice and no recordings. `Speech.say` refuses to
- * read Bengali with an English voice - see the note at the top of 08-speech.js, it is the most
- * important line in there - so on such a phone these would be two things that look pressable
- * and do nothing, which is worse than not offering them.
+ * Words, and nothing but words. The letter chip at the top of the screen used to be pressable
+ * too, and so did every letter in the guide and every tile on the wheel; they are all quiet
+ * now. A synthesised voice reading a lone Bengali letter says the wrong thing often enough to
+ * teach the wrong thing - ই and উ come back as the names of the letters, a bare consonant comes
+ * back with a vowel nobody asked for - and an app that mispronounces the alphabet to a child
+ * learning it is worse than an app that says nothing. Words are what a Bengali voice gets
+ * right, so words are all this says.
+ *
+ * It goes quiet altogether on a device with no Bengali voice and no recordings. `Speech.say`
+ * refuses to read Bengali with an English voice - see the note at the top of 08-speech.js - so
+ * on such a phone a pressable word would be a promise the app cannot keep.
+ *
+ * Delegated, because the cells are rebuilt on every level and a listener per cell would have to
+ * be rebuilt with them. `wordAt` is what decides whether a cell has anything to say.
  */
-function sayLevelLetter() {
-  if (!Speech.available) return;
-  Sfx.tap();
-  Speech.say(level().name, { rate: Speech.AGAIN });
-  Talk.glow(el.levelName);
-}
-
-el.levelName.addEventListener("click", sayLevelLetter);
-el.levelName.addEventListener("keydown", e => {
-  if (e.key !== "Enter" && e.key !== " ") return;
-  e.preventDefault();
-  sayLevelLetter();
-});
-
-/* Delegated, because the cells are rebuilt on every level and a listener per cell would have to
-   be rebuilt with them. `wordAt` is what decides whether a cell has anything to say. */
 el.board.addEventListener("click", e => {
   const cell = e.target.closest(".cell");
   if (!cell || !cell.dataset.pos) return;

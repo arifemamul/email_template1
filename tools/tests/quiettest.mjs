@@ -150,12 +150,17 @@ if (said.length < words.length)
   if (spoke.length) problems.push(`spoke Bengali through an English voice: ${JSON.stringify(spoke)}`);
 }
 
-// ---- hearing it again --------------------------------------------------------------------
+// ---- hearing a word again ----------------------------------------------------------------
 // A word is spoken once, as it lands - which is also the moment a child is watching letters fly
-// rather than listening. So the letter this level is about and any word already found can be
-// pressed to hear again. Both are silent, and must not look pressable, on a device with no
-// Bengali voice and no recordings: something that invites a press and then says nothing teaches
-// a child that pressing things does nothing.
+// rather than listening. So any word already found can be pressed to hear it again. It is
+// silent, and must not look pressable, on a device with no Bengali voice and no recordings:
+// something that invites a press and then says nothing teaches a child that pressing things
+// does nothing.
+//
+// A word, and never a letter. The chip at the top of the screen was pressable once and is not
+// any more: a synthesised voice reading a lone Bengali letter is wrong too often to teach with,
+// and the mistakes land on exactly what the game is for. heartest owns that rule across the
+// whole app; what this file holds is that the chip itself stayed quiet.
 {
   const q = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
   await q.goto(PAGE);
@@ -174,6 +179,7 @@ if (said.length < words.length)
       available: Speech.available,
       found: (game.found[LEVELS[0].id] || []).length,
       chip: document.getElementById('levelName').classList.contains('says'),
+      chipRole: document.getElementById('levelName').getAttribute('role'),
       cells: document.querySelectorAll('.cell.says').length,
       gold: document.querySelectorAll('.cell.on').length,
     };
@@ -182,7 +188,7 @@ if (said.length < words.length)
   if (!mute.gold) problems.push('no cell was filled in, so there was nothing that could speak');
   if (mute.available)
     problems.push('this browser has a Bengali voice, so the silent case went untested');
-  if (mute.chip) problems.push('the letter chip invites a press on a device that cannot speak');
+  if (mute.chip) problems.push('the letter chip still invites a press');
   if (mute.cells) problems.push(`${mute.cells} cells invite a press on a device that cannot speak`);
 
   const heard = await q.evaluate(async () => {
@@ -193,42 +199,39 @@ if (said.length < words.length)
     Speech.say = (t, o = {}) => { said.push(t); rates.push(o.rate ?? Speech.RATE); return true; };
     loadLevel(0);
     drawHud();
-    const chipBefore = document.getElementById('levelName').classList.contains('says');
-
     const word = LEVELS[0].words[0];
     game.picked = splitAksharas(word).map(a => game.wheel.indexOf(a));
     submitWord();
     await new Promise(r => setTimeout(r, 600));
 
+    // Pressed with a voice present, and it must still say nothing.
     const chip = document.getElementById('levelName');
     chip.click();
-    const said1 = said.length;
+    const fromChip = said.length;
     // Every cell of the found word says that word, and no cell of an unfound one says anything.
     const saying = [...document.querySelectorAll('.cell.says')];
     saying.forEach(c => c.click());
     const unfound = [...document.querySelectorAll('.cell:not(.blank):not(.says)')].length;
 
     return {
-      chipBefore, chipAfter: chip.classList.contains('says'),
-      chipLabel: chip.getAttribute('aria-label'),
-      chipSaid: said[said1 - 1],
+      chipSays: chip.classList.contains('says'),
+      chipRole: chip.getAttribute('role'),
+      chipSaid: said.slice(1, fromChip),
       letter: LEVELS[0].name,
       word, cells: saying.length, aksharas: splitAksharas(word).length,
       cellLabels: [...new Set(saying.map(c => c.getAttribute('aria-label')))],
-      fromCells: said.slice(said1), unfound,
+      fromCells: said.slice(fromChip), unfound,
       focusable: saying.every(c => c.getAttribute('tabindex') === '0'),
       // Asking to hear something a second time is asking to hear it properly, so a press is
       // slower than the moment the word landed.
-      landedAt: rates[0], againAt: rates.slice(1), RATE: Speech.RATE, AGAIN: Speech.AGAIN,
+      landedAt: rates[0], againAt: rates.slice(fromChip), RATE: Speech.RATE, AGAIN: Speech.AGAIN,
     };
   });
 
-  if (!heard.chipBefore || !heard.chipAfter)
-    problems.push('the letter chip does not invite a press once there is a voice');
-  if (heard.chipSaid !== heard.letter)
-    problems.push(`pressing the chip said "${heard.chipSaid}", expected "${heard.letter}"`);
-  if (!heard.chipLabel || !heard.chipLabel.startsWith(heard.letter))
-    problems.push(`the chip is labelled "${heard.chipLabel}", which does not name its letter`);
+  if (heard.chipSays || heard.chipRole)
+    problems.push('the letter chip invites a press, and a lone letter is not spoken any more');
+  if (heard.chipSaid.length)
+    problems.push(`pressing the chip said ${JSON.stringify(heard.chipSaid)}, expected silence`);
   if (heard.cells !== heard.aksharas)
     problems.push(`${heard.cells} cells say the word, expected ${heard.aksharas} - one per akshara`);
   if (heard.cellLabels.length !== 1 || !heard.cellLabels[0].startsWith(heard.word))
@@ -249,8 +252,8 @@ if (said.length < words.length)
     problems.push(`${heard.AGAIN} is slow enough to distort the voice into a word nobody says`);
   if (heard.RATE > 0.6)
     problems.push(`${heard.RATE} is a native-speed run at a word, not a learner's pace`);
-  console.log(`again: the chip says "${heard.chipSaid}", and ${heard.cells} cells say `
-            + `"${heard.word}" - ${heard.unfound} cells of unfound words stay quiet; `
+  console.log(`again: ${heard.cells} cells say "${heard.word}" and the ${heard.letter} chip `
+            + `says nothing - ${heard.unfound} cells of unfound words stay quiet; `
             + `landing ${heard.RATE}, pressed ${heard.AGAIN}`);
   await q.close();
 }

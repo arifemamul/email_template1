@@ -385,10 +385,6 @@ display: flex; align-items: center; justify-content: space-between;
 gap: 10px; padding-top: 5px; flex: none;
 }
 
-.now-letter.says { cursor: pointer; }
-.now-letter.says:active .glyph { transform: translateY(3px); box-shadow: none; }
-.now-letter.says:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 99px; }
-
 .now-letter {
 flex: 1 1 auto;
 min-width: 0;
@@ -3073,17 +3069,6 @@ const lv = level();
 el.levelGlyph.textContent = lv.name;
 el.levelPass.textContent = lv.pass ? bn(lv.pass) : "";
 
-const canSay = Speech.available;
-el.levelName.classList.toggle("says", canSay);
-if (canSay) {
-el.levelName.setAttribute("role", "button");
-el.levelName.setAttribute("tabindex", "0");
-el.levelName.setAttribute("aria-label", `${lv.name} - উচ্চারণ শুনুন`);
-} else {
-el.levelName.removeAttribute("role");
-el.levelName.removeAttribute("tabindex");
-el.levelName.removeAttribute("aria-label");
-}
 }
 
 function allocateSpace() {
@@ -3351,8 +3336,6 @@ n.textContent = bn(lv.pass);
 b.appendChild(n);
 }
 b.title = lv.pass ? `${lv.name} ${bn(lv.pass)}` : lv.name;
-b.setAttribute("aria-label", `${b.title} - উচ্চারণ শুনুন`);
-Talk.mark(b, lv.name);
 const done = !!game.completed[lv.id];
 if (done) b.classList.add("done");
 if (i === game.index) b.classList.add("now");
@@ -3951,7 +3934,6 @@ const tile = document.createElement(levels.length ? "button" : "div");
 tile.className = "ch" + (levels.length ? "" : " ch-none");
 tile.innerHTML = `<span class="ch-l bn">${letter}</span>`
 + `<span class="ch-n">${levels.length ? bn(levels.length) : "\u2014"}</span>`;
-Talk.mark(tile, letter);
 if (levels.length) {
 tile.type = "button";
 tile.title = `${letter} - ${levels.length} level${levels.length > 1 ? "s" : ""}, `
@@ -3972,7 +3954,6 @@ const pair = document.createElement("div");
 pair.className = "pair";
 pair.dataset.block = (i % 5) + 1;
 pair.setAttribute("aria-label", name);
-Talk.mark(pair, vowel);
 const shape = KAR_SHAPES[sign];
 pair.innerHTML = `<span class="pair-v bn" aria-hidden="true">${vowel}</span>`
 + `<span class="pair-k">`
@@ -3998,7 +3979,6 @@ r.className = "mk";
 r.innerHTML = `<span class="mk-g bn">${glyph}</span>`
 + `<span class="mk-n bn">${name}</span>`
 + `<span class="mk-w">${note}</span>`;
-Talk.mark(r.firstElementChild, glyph);
 if (example) {
 const b = document.createElement("button");
 b.className = "mk-eg bn";
@@ -4070,7 +4050,6 @@ const b = document.createElement("button");
 b.className = "bp bn";
 b.type = "button";
 b.textContent = letter;
-Talk.mark(b, letter);
 b.addEventListener("click", () => { baroLetter = letter; drawBaro(); });
 pick.appendChild(b);
 }
@@ -4084,7 +4063,6 @@ const akshara = baroLetter + sign;
 const row = document.createElement("div");
 row.className = "br";
 row.innerHTML = `<span class="br-f bn">${akshara}</span><span class="br-n bn">${name}</span>`;
-Talk.mark(row.firstElementChild, akshara);
 
 const lvl = LEVEL_FOR_AKSHARA[akshara];
 const eg = wordShowing(akshara);
@@ -4096,7 +4074,7 @@ go.className = "br-go bn" + (lvl !== undefined ? " br-lvl" : "");
 go.type = "button";
 go.textContent = lvl !== undefined ? `${akshara} লেভেল` : eg.word;
 go.title = `লেভেল ${bn(open + 1)} খুলুন`;
-Talk.mark(go, lvl !== undefined ? akshara : eg.word);
+if (lvl === undefined) Talk.mark(go, eg.word);
 go.addEventListener("click", () => { loadLevel(open); leaveMenu(); });
 row.appendChild(go);
 } else if (eg) {
@@ -4246,7 +4224,7 @@ if (i) eq.appendChild(op("+"));
 const s = document.createElement("span");
 s.className = "eq-l bn";
 s.textContent = part;
-eq.appendChild(Talk.mark(s, part));
+eq.appendChild(s);
 });
 eq.appendChild(op("="));
 eq.appendChild(wordChip(parts.join(""), "eq-w"));
@@ -4274,7 +4252,6 @@ b.className = "kp bn";
 b.type = "button";
 b.innerHTML = `<span class="kp-s bn">ক${sign}</span>`
 + `<span class="kp-n bn">${sign}-কার</span>`;
-Talk.mark(b, `ক${sign}`);
 b.addEventListener("click", () => { karShowing = sign; drawKarWords(); });
 pick.appendChild(b);
 }
@@ -4316,7 +4293,6 @@ const unused = p.unused.includes(f);
 s.className = "ph-f bn" + (unused ? " ph-f-none" : "");
 s.textContent = f;
 if (unused) s.title = "এই রূপে বাংলায় প্রচলিত কোনো শব্দ নেই";
-else Talk.mark(s, f);
 forms.appendChild(s);
 }
 card.appendChild(forms);
@@ -4363,7 +4339,6 @@ const b = document.createElement("button");
 b.className = "jp bn" + (head === JUKTO_ALL ? " jp-all" : "");
 b.type = "button";
 b.textContent = head;
-if (head !== JUKTO_ALL) Talk.mark(b, head);
 b.addEventListener("click", () => { juktoFirst = head; drawJukto(); });
 pick.appendChild(b);
 }
@@ -4387,7 +4362,6 @@ const row = document.createElement("div");
 row.className = "jr";
 row.innerHTML = `<span class="jr-f bn">${r.form}</span>`
 + `<span class="jr-p bn">${r.parts.join(" + ")}</span>`;
-Talk.mark(row.firstElementChild, r.form);
 if (r.phonetic) {
 const note = document.createElement("span");
 note.className = "jr-note bn";
@@ -4483,8 +4457,6 @@ return null;
 
 let startPoint = null;
 
-let tapped = null;
-
 el.wheel.addEventListener("pointerdown", e => {
 const i = tileAt(e.clientX, e.clientY);
 if (i === null) return;
@@ -4494,14 +4466,9 @@ game.dragging = true;
 game.moved = false;
 startPoint = [e.clientX, e.clientY];
 
-tapped = game.wheel[i];
 if (game.tapMode) {
-if (game.picked.length && game.picked[game.picked.length - 1] === i) {
-game.picked.pop();
-tapped = null;   // a step back is a letter taken off the shelf, not one to say
-} else if (!game.picked.includes(i)) {
-game.picked.push(i);
-}
+if (game.picked.length && game.picked[game.picked.length - 1] === i) game.picked.pop();
+else if (!game.picked.includes(i)) game.picked.push(i);
 } else {
 game.picked = [i];
 }
@@ -4538,11 +4505,9 @@ if (game.moved) {
 submitWord();
 } else {
 game.tapMode = true;   // a plain click keeps the selection for more clicks
-Speech.say(tapped, { rate: Speech.AGAIN });
 drawTrail();
 drawPreview();
 }
-tapped = null;
 }
 
 el.wheel.addEventListener("pointerup", endDrag);
@@ -4710,20 +4675,6 @@ markBar();
 
 el.levelGrid.addEventListener("click", e => {
 if (e.target.closest(".lv") && guideIsOpen()) closeGuide();
-});
-
-function sayLevelLetter() {
-if (!Speech.available) return;
-Sfx.tap();
-Speech.say(level().name, { rate: Speech.AGAIN });
-Talk.glow(el.levelName);
-}
-
-el.levelName.addEventListener("click", sayLevelLetter);
-el.levelName.addEventListener("keydown", e => {
-if (e.key !== "Enter" && e.key !== " ") return;
-e.preventDefault();
-sayLevelLetter();
 });
 
 el.board.addEventListener("click", e => {

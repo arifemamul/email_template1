@@ -128,22 +128,28 @@ const Speech = {
    Tap to hear - every letter and every word on screen
    ============================================================================ */
 /*
- * The game speaks a word as it lands, and that is the moment it teaches. But the app is full
- * of Bengali outside that moment: two alphabet charts, the বারোখড়ি, the কার pairs, the sign
- * table, the primer's equations, every ফলা and যুক্তবর্ণ form, and a few hundred example words.
- * A child looking at ক্ষ in a table has no way to know what it sounds like, and a chart of
- * shapes a learner cannot pronounce is a chart of shapes.
+ * The game speaks a word as it lands, and that is the moment it teaches. But the app is full of
+ * Bengali outside that moment - a few hundred example words in the guide, one per row of the
+ * sign table, the বারোখড়ি, the কার lists, the ফলা and যুক্তবর্ণ tables - and a word a child
+ * cannot pronounce is a shape.
  *
- * So the rule is the same everywhere: if it is a Bengali letter or a Bengali word and it is on
- * screen, pressing it says it. `Talk.mark` is how a thing joins that rule, and there is one
- * listener for all of them - delegated, because these tables are redrawn whenever the picker
- * above them changes and a listener per cell would have to be rebuilt every time.
+ * So: if it is a Bengali WORD and it is on screen, pressing it says it. `Talk.mark` is how a
+ * thing joins that rule, and there is one listener for all of them - delegated, because these
+ * tables are redrawn whenever the picker above them changes and a listener per cell would have
+ * to be rebuilt every time.
  *
- * Two things predate this and keep their own handlers: the letter chip at the top of the game
- * screen and a word already found on the board. Those two are not marked, because what they say
- * is not what they show - a cell shows one akshara and says the whole word it belongs to - and a
- * rule that has to carry an exception per element is not a rule. They borrow `Talk.glow`, so the
- * answer to a press looks the same wherever the press lands.
+ * Words, and only words. Every letter, akshara and conjunct in the app was pressable once - the
+ * two alphabet charts, the বারোখড়ি forms, the কার pairs, every ফলা and যুক্তবর্ণ shape, the
+ * 244-letter level grid, the chip at the top of the screen and every tile on the wheel - and all
+ * of it is quiet now. A synthesised voice reading a lone Bengali letter is wrong too often to
+ * teach with: ই and উ come back as the letters' names, a bare consonant arrives with a vowel
+ * nobody asked for, and the mistakes land precisely on what the game is for. An app that
+ * mispronounces the alphabet to a child learning the alphabet is worse than one that says
+ * nothing there.
+ *
+ * A word already found on the board keeps its own handler rather than a mark, because what it
+ * says is not what it shows: a cell shows one akshara and says the whole word it belongs to. It
+ * borrows `Talk.glow`, so a press looks the same answered from either side.
  *
  * Always at `Speech.AGAIN`, the slow rate. Nothing here is spoken in passing - each one was
  * asked for, deliberately, by a finger put on it, and the answer to "what does this say" is a
