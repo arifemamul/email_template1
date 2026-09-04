@@ -288,7 +288,10 @@ function openMenu(block) {
   el.menuPop.hidden = false;
   el.scrim.hidden = false;
   el.guideOpen.setAttribute("aria-expanded", "true");
-  for (const tab of el.tabbar.querySelectorAll(".tb"))
+  // Only the tabs that actually raise the panel. A tab whose group holds one option goes
+  // straight to its section and carries no `aria-haspopup`, so an `aria-expanded` written here
+  // would put the attribute back on a control that has nothing to expand.
+  for (const tab of el.tabbar.querySelectorAll(".tb[aria-haspopup]"))
     tab.setAttribute("aria-expanded", tab.dataset.block === block ? "true" : "false");
   Sfx.page(true);
   // Focus the option you are on if it is in the group being shown, and the first one otherwise:
@@ -304,7 +307,8 @@ function closeMenu(giveFocusBack = true) {
   el.menuPop.hidden = true;
   el.scrim.hidden = true;
   el.guideOpen.setAttribute("aria-expanded", "false");
-  for (const tab of el.tabbar.querySelectorAll(".tb")) tab.setAttribute("aria-expanded", "false");
+  for (const tab of el.tabbar.querySelectorAll(".tb[aria-haspopup]"))
+    tab.setAttribute("aria-expanded", "false");
   // Back to whatever opened it, which on a phone is the tab rather than the top bar's button.
   if (!giveFocusBack) return;
   const tab = from && el.tabbar.querySelector(`.tb[data-block="${from}"]`);

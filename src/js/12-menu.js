@@ -360,11 +360,45 @@ function showPage(key, remember = true) {
  * The tab bar. Each tab opens one group, which is what makes four tabs four different things
  * rather than four ways to open the same list, and pressing the tab that is already open
  * closes it - the way every bar like this behaves.
+ *
+ * Except where the group holds one option. বর্ণমালা does, since its three sections became one,
+ * and a panel offering a single card is a tap that asks a child to confirm the thing they just
+ * asked for. Such a tab goes straight to its section: same press, one fewer step, and pressing
+ * it again closes what it opened, which is the behaviour a tab bar had anyway.
+ *
+ * Read off the DOM rather than listed here, so merging or splitting a group changes this on its
+ * own. The option is still reachable as a card - the sheet's ‹ মেনু opens all four groups - so
+ * nothing is lost from the menu, only from the route.
  */
 const tabs = [...document.querySelectorAll("#tabbar .tb")];
+
+/** The page a tab leads to when its group holds exactly one option, or null. */
+function loneSection(block) {
+  const group = document.querySelector(`#menuPop .menu-group[data-block="${block}"]`);
+  const only = group ? [...group.querySelectorAll(".opt")] : [];
+  return only.length === 1 ? only[0].dataset.page : null;
+}
+
 for (const tab of tabs) {
+  const lone = loneSection(tab.dataset.block);
+  if (lone) {
+    // It raises no menu, so it must not claim to. `aria-haspopup` on a control that goes
+    // somewhere tells a screen reader to expect a list that never comes.
+    tab.dataset.straight = lone;
+    tab.removeAttribute("aria-haspopup");
+    tab.removeAttribute("aria-expanded");
+  }
   tab.addEventListener("click", () => {
     const block = tab.dataset.block;
+    const straight = tab.dataset.straight;
+    if (straight) {
+      closeMenu(false);
+      const here = document.getElementById(`page-${straight}`);
+      if (guideIsOpen() && here && here.classList.contains("on")) { closeGuide(); return; }
+      showPage(straight);
+      chooseSection();
+      return;
+    }
     if (menuIsOpen() && el.menuPop.dataset.only === block) closeMenu();
     else openMenu(block);
   });

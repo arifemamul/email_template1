@@ -310,8 +310,82 @@ for (const t of tabs) {
 
 // Each tab opens its own group and nothing else - which is what makes four tabs four things
 // rather than four ways to open one list - and pressing the open one puts it away again.
+//
+// Unless the group holds one option, and then the tab is a way to that section rather than to a
+// list: a panel offering a single card asks a child to confirm the thing they just pressed.
+// Which tabs those are is read off the page, so merging or splitting a group moves this on its
+// own rather than failing.
 const reach = [];
+const lone = [];
 for (const t of tabs) {
+  const straight = await phone.evaluate(b => {
+    const tab = document.querySelector(`#tabbar .tb[data-block="${b}"]`);
+    const group = document.querySelector(`#menuPop .menu-group[data-block="${b}"]`);
+    const opts = group ? [...group.querySelectorAll('.opt')] : [];
+    return {
+      key: tab.dataset.straight || null,
+      only: opts.length === 1 ? opts[0].dataset.page : null,
+      haspopup: tab.hasAttribute('aria-haspopup'),
+    };
+  }, t.block);
+  if (straight.key !== straight.only)
+    problems.push(`tab "${t.label}" goes straight to ${straight.key}, but its group holds `
+                + (straight.only ? `only ${straight.only}` : 'more than one option'));
+  // A control that goes somewhere must not claim to raise a list that never comes.
+  if (straight.only && straight.haspopup)
+    problems.push(`tab "${t.label}" opens a section directly and still says aria-haspopup`);
+  if (!straight.only && !straight.haspopup)
+    problems.push(`tab "${t.label}" raises the options and does not say aria-haspopup`);
+
+  if (straight.only) {
+    lone.push(straight.only);
+    await phone.click(`#tabbar .tb[data-block="${t.block}"]`);
+    await phone.waitForFunction(k =>
+      document.getElementById('menuPop').hidden
+      && document.getElementById(`page-${k}`).classList.contains('on')
+      && document.querySelector('.guide').classList.contains('open'),
+      straight.only, { timeout: 5000 })
+      .catch(() => problems.push(`tab "${t.label}" did not open ${straight.only} directly`));
+    // Pressing it again puts away what it opened, the same as a tab that raises the panel.
+    await phone.click(`#tabbar .tb[data-block="${t.block}"]`);
+    await phone.waitForTimeout(220);
+    const shut = await phone.evaluate(() => ({
+      guide: document.querySelector('.guide').classList.contains('open'),
+      pop: !document.getElementById('menuPop').hidden,
+    }));
+    if (shut.guide) problems.push(`tab "${t.label}" did not close its section when pressed again`);
+    if (shut.pop) problems.push(`tab "${t.label}" raised the options when pressed again`);
+    // Its card is still reachable - the sheet's ‹ মেনু opens all four groups - so the 44px floor
+    // is measured there. Not the "past the bottom" check: that panel is one long scroll on
+    // purpose, and an option below the fold in it is not a mistake.
+    // Reported rather than thrown. A broken straight tab fails the check above and then leaves
+    // this route with nothing to press, and a test that dies there prints a stack trace instead
+    // of the sentence saying what is wrong.
+    await phone.click(`#tabbar .tb[data-block="${t.block}"]`);
+    const sheet = await phone.waitForSelector('.guide.open', { timeout: 5000 })
+      .then(() => true, () => false);
+    if (sheet) {
+      await phone.click('#guideBack');
+      const panel = await phone.waitForSelector('#menuPop', { state: 'visible', timeout: 5000 })
+        .then(() => true, () => false);
+      if (!panel) problems.push(`tab "${t.label}": ‹ মেনু did not bring the options back`);
+      else {
+        await phone.waitForTimeout(240);
+        const card = await phone.evaluate(k => {
+          const o = document.querySelector(`#opt-${k}`);
+          return o ? Math.round(o.getBoundingClientRect().height) : 0;
+        }, straight.only);
+        if (card < 44)
+          problems.push(`${straight.only}: the option is ${card}px tall, under the 44px floor`);
+      }
+    }
+    await phone.keyboard.press('Escape');
+    await phone.waitForTimeout(140);
+    await phone.keyboard.press('Escape');
+    await phone.waitForTimeout(140);
+    continue;
+  }
+
   await phone.click(`#tabbar .tb[data-block="${t.block}"]`);
   await phone.waitForSelector('#menuPop', { state: 'visible', timeout: 5000 })
     .catch(() => problems.push(`tab "${t.label}" opened nothing`));
@@ -340,11 +414,14 @@ for (const o of reach) {
   if (o.tall < 44) problems.push(`${o.key}: the option is ${o.tall}px tall, under the 44px floor`);
   if (o.below > 1) problems.push(`${o.key}: the option is ${o.below}px past the bottom of the screen`);
 }
-if (reach.length !== PAGES.length)
-  problems.push(`${reach.length} options across the tabs, expected ${PAGES.length}`);
+// Every option is reached by some tab: the ones behind a panel, plus the ones a tab goes
+// straight to. Counted rather than written down, so this keeps meaning the same thing.
+if (reach.length + lone.length !== PAGES.length)
+  problems.push(`${reach.length + lone.length} options across the tabs, expected ${PAGES.length}`);
 console.log(`tab bar: ${tabs.length} tabs, ${Math.min(...tabs.map(t => t.tall))}px shortest; `
           + `${reach.length} options behind them, ${Math.min(...reach.map(o => o.tall))}px `
-          + `shortest, none off the screen`);
+          + `shortest, none off the screen`
+          + (lone.length ? `; ${lone.length} tab(s) straight to a section (${lone.join(' ')})` : ''));
 
 for (const key of PAGES) {
   await openSection(phone, key).catch(() => problems.push(`${key}: option not tappable on a phone`));

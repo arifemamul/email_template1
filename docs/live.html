@@ -4122,9 +4122,31 @@ if (remember) { try { localStorage.setItem(MENU_KEY, key); } catch {} }
 }
 
 const tabs = [...document.querySelectorAll("#tabbar .tb")];
+
+function loneSection(block) {
+const group = document.querySelector(`#menuPop .menu-group[data-block="${block}"]`);
+const only = group ? [...group.querySelectorAll(".opt")] : [];
+return only.length === 1 ? only[0].dataset.page : null;
+}
+
 for (const tab of tabs) {
+const lone = loneSection(tab.dataset.block);
+if (lone) {
+tab.dataset.straight = lone;
+tab.removeAttribute("aria-haspopup");
+tab.removeAttribute("aria-expanded");
+}
 tab.addEventListener("click", () => {
 const block = tab.dataset.block;
+const straight = tab.dataset.straight;
+if (straight) {
+closeMenu(false);
+const here = document.getElementById(`page-${straight}`);
+if (guideIsOpen() && here && here.classList.contains("on")) { closeGuide(); return; }
+showPage(straight);
+chooseSection();
+return;
+}
 if (menuIsOpen() && el.menuPop.dataset.only === block) closeMenu();
 else openMenu(block);
 });
@@ -4583,7 +4605,7 @@ else delete el.menuPop.dataset.only;
 el.menuPop.hidden = false;
 el.scrim.hidden = false;
 el.guideOpen.setAttribute("aria-expanded", "true");
-for (const tab of el.tabbar.querySelectorAll(".tb"))
+for (const tab of el.tabbar.querySelectorAll(".tb[aria-haspopup]"))
 tab.setAttribute("aria-expanded", tab.dataset.block === block ? "true" : "false");
 Sfx.page(true);
 const shown = [...el.menuPop.querySelectorAll(".opt")].filter(o => o.offsetParent !== null);
@@ -4597,7 +4619,8 @@ const from = el.menuPop.dataset.only;
 el.menuPop.hidden = true;
 el.scrim.hidden = true;
 el.guideOpen.setAttribute("aria-expanded", "false");
-for (const tab of el.tabbar.querySelectorAll(".tb")) tab.setAttribute("aria-expanded", "false");
+for (const tab of el.tabbar.querySelectorAll(".tb[aria-haspopup]"))
+tab.setAttribute("aria-expanded", "false");
 if (!giveFocusBack) return;
 const tab = from && el.tabbar.querySelector(`.tb[data-block="${from}"]`);
 (tab && tab.offsetParent !== null ? tab : el.guideOpen).focus();

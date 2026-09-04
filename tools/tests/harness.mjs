@@ -141,14 +141,36 @@ export async function openSection(page, key) {
       // Neither, which means an open sheet is covering the bar: its own ‹ মেনু goes back.
       return '#guideBack';
     }, key);
+    // A straight tab toggles: pressing it while its own section is the one on screen closes it
+    // again. So when the section is already open, that route has nothing left to do.
+    const already = route.startsWith('#tabbar') && await page.evaluate(k => {
+      const tab = document.querySelector(`#tabbar .tb[data-straight="${k}"]`);
+      const pg = document.getElementById(`page-${k}`);
+      return !!tab && !!pg && pg.classList.contains('on')
+          && document.querySelector('.guide').classList.contains('open');
+    }, key);
+    if (already) return waitReadable(page, key);
     await page.click(route);
+    // A tab whose group holds one option goes straight to the section - there is no card to
+    // press, and waiting for one is a 30-second timeout on a route that already worked.
+    const landed = await page.evaluate(k =>
+      document.getElementById('menuPop').hidden
+      && !!document.getElementById(`page-${k}`)
+      && document.getElementById(`page-${k}`).classList.contains('on'), key);
+    if (landed) return waitReadable(page, key);
   }
   await page.waitForSelector(opt, { state: 'visible' });
   await page.click(opt);
-  // Wait for the section to be readable, not merely selected. On a narrow screen choosing an
-  // option also opens the sheet, and the sheet slides - a test that read the page the moment
-  // the class flipped was looking at it mid-slide, still off the bottom of the screen.
-  await page.waitForFunction(k => {
+  return waitReadable(page, key);
+}
+
+/*
+ * Wait for the section to be readable, not merely selected. On a narrow screen choosing an
+ * option also opens the sheet, and the sheet slides - a test that read the page the moment the
+ * class flipped was looking at it mid-slide, still off the bottom of the screen.
+ */
+function waitReadable(page, key) {
+  return page.waitForFunction(k => {
     const pg = document.getElementById(`page-${k}`);
     if (!pg || !pg.classList.contains('on')) return false;
     const guide = document.querySelector('.guide');
