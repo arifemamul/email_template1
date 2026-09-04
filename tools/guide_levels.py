@@ -18,19 +18,26 @@ invent a level the rest of the pipeline would refuse:
     three to five tiles      MIN_TILES to MAX_TILES - the ring is the difficulty
     two or three aksharas    a single-akshara word is not a puzzle; four is too long a queue
     all from one akshara     an akshara level's whole teaching claim is that its words share
-                             their first akshara, so grouping is by first akshara and nothing
-                             else
+                             their first akshara. Where that strands a word - বীজ is the only
+                             drawable বী word in the guide - the catalogue's other kind of
+                             level takes it: `type: letter` makes the weaker claim of the same
+                             base letter under any vowel sign, which is how levels-oi.json
+                             reaches তৈরি beside তাঁতি. So: akshara levels first, then a
+                             letter level over whatever they left
     a connected board        laid out by the same `cluster_layout` the game uses, inside
                              5 x 7, spelling nothing but its own words
     not already a puzzle     no word is set twice, which is checked for the whole catalogue
 
-A WORD THAT FITS IS NOT THE SAME AS A WORD WORTH SETTING, and this file cannot tell the
-difference. The guide's words were chosen to ILLUSTRATE A FORM - the যুক্তবর্ণ table needs an
-example of ম্ল whether or not a five-year-old has any use for অম্ল - while a board word has to
-be worth a child's time. So the output is ranked by corpus frequency and the report prints the
-rarest of what it placed, for a person to read before it ships. tools/vocabulary.py keeps a
-REJECTED list for exactly this and it is honoured here; it simply has not been asked about
-these words yet.
+AND A PICTURE HAS TO BE ABLE TO SHOW IT. That is tools/vocabulary.py's rule for a board word -
+"a word a picture could replace - concrete, or a number or colour" - and it is the one the
+guide's words fail, because they were chosen to ILLUSTRATE A FORM instead: the যুক্তবর্ণ table
+needs an example of ম্ল whether or not anything can be drawn for অম্ল. So a word is set only
+if guide-glosses.json names the picture for it, and that string ships as the level's `flag`,
+which is what an illustrator reads. Of the 587 words that fit mechanically, 102 pass this.
+
+It is the strictest of the filters by a long way and it is the right one: without it the game
+gains 419 words of which two thirds are অবস্থা, নিষ্ঠা, বিভাজ্য and স্নাতক - real Bengali, in
+a game whose whole reward is recognising the thing you just spelled.
 
 The words that do not fit are left where they are. They stay in the guide, which is what they
 were for.
@@ -78,8 +85,9 @@ def guide_words():
     # because it is what an illustrator draws from. primer.json has none at all, and
     # kar-words.json glosses in Bengali because the table it feeds is Bengali - so neither can
     # supply this. See guide-glosses.json.
-    gloss = json.loads(GLOSSES.read_text(encoding='utf-8'))['glosses'] \
-        if GLOSSES.exists() else {}
+    written = (json.loads(GLOSSES.read_text(encoding='utf-8'))
+               if GLOSSES.exists() else {'glosses': {}, 'pictures': {}})
+    gloss, picture = written['glosses'], written.get('pictures', {})
     where = {}
     for parts in primer['no_kar']['two'] + primer['no_kar']['three']:
         where.setdefault(''.join(parts), 'শব্দ গড়া')
@@ -94,14 +102,16 @@ def guide_words():
             where.setdefault(w, 'যুক্তবর্ণ')
     for entry in kar['words'].values():
         where.setdefault(entry['w'], 'বারোখড়ি')
-    return where, gloss
+    return where, gloss, picture
 
 
-def refused(word, on_board):
+def refused(word, on_board, picture):
     """Why this word cannot be a board word, or None."""
     n = len(split_aksharas(word))
     if word in on_board:
         return 'already a puzzle'
+    if word not in picture:
+        return 'no picture can show it'
     if n < 2:
         return 'a single akshara'
     if n > 3:
@@ -130,7 +140,7 @@ def score(words):
     return (len(words), sum(zipf(w) for w in words) / len(words), -len(wheel_for(words)))
 
 
-def levels_for(akshara, pool):
+def levels_for(key, pool, kind='akshara'):
     """
     Every level one akshara's words can make, taking the best group each time.
 
@@ -153,7 +163,7 @@ def levels_for(akshara, pool):
                     continue
                 if not twins_can_separate(tiles):
                     continue
-                _, problems = validate(list(combo), key=akshara, kind='akshara')
+                _, problems = validate(list(combo), key=key, kind=kind)
                 if not problems:
                     best = list(combo)
             if best:
@@ -182,14 +192,14 @@ def existing():
 
 
 def build():
-    where, gloss = guide_words()
+    where, gloss, picture = guide_words()
     others = existing()
     on_board = {w['w'] for lv in others for w in lv['words']}
     taken = {lv['id'] for lv in others}
 
     eligible, left_out = {}, {}
     for word, section in where.items():
-        why = refused(word, on_board)
+        why = refused(word, on_board, picture)
         if why:
             if word not in on_board:
                 left_out[word] = why
@@ -210,26 +220,43 @@ def build():
         taken.add(f'{akshara}·{n}')
         return f'{akshara}·{n}'
 
-    levels, stranded = [], {}
+    def entry(word):
+        return {'w': word, 'split': split_aksharas(word), 'en': gloss.get(word, ''),
+                'freq': round(zipf(word), 2), 'flag': picture[word], 'from': where[word]}
+
+    levels, over = [], {}
     for akshara in sorted(by_first):
         made, left = levels_for(akshara, sorted(by_first[akshara]))
         for words in made:
-            levels.append({
-                'id': next_id(akshara),
-                'type': 'akshara',
-                'key': akshara,
-                'words': [{'w': w, 'split': split_aksharas(w),
-                           'en': gloss.get(w, ''), 'freq': round(zipf(w), 2),
-                           'from': where[w]} for w in words],
-            })
+            levels.append({'id': next_id(akshara), 'type': 'akshara', 'key': akshara,
+                           'words': [entry(w) for w in words]})
         for w in left:
-            stranded[w] = ('no other word from the guide starts with '
-                           f'{akshara} that it can share a board with')
+            over.setdefault(akshara[0], []).append(w)
+
+    # Second pass, over what the first left behind: same base letter, any vowel sign. বীজ is
+    # the only drawable বী word in the guide and would be stranded by itself; as a ব level it
+    # sits beside বৃষ্টি and বৈঠা.
+    def next_letter_id(letter):
+        n = 1
+        while f'{letter}-{n}' in taken:
+            n += 1
+        taken.add(f'{letter}-{n}')
+        return f'{letter}-{n}'
+
+    stranded = {}
+    for letter in sorted(over):
+        made, left = levels_for(letter, sorted(over[letter]), kind='letter')
+        for words in made:
+            levels.append({'id': next_letter_id(letter), 'type': 'letter', 'key': letter,
+                           'words': [entry(w) for w in words]})
+        for w in left:
+            stranded[w] = ('the only word left that a picture can show and that starts with '
+                           f'{letter}')
     return levels, eligible, left_out, stranded, gloss
 
 
 def main(argv):
-    levels, eligible, left_out, stranded, gloss = build()
+    levels, eligible, left_out, stranded, gloss = build()  # noqa: F841
     placed = [w['w'] for lv in levels for w in lv['words']]
 
     print(f'{len(eligible)} of the guide\'s words could be board words; '
