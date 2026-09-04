@@ -41,7 +41,7 @@ function wordChip(word, cls) {
     const span = document.createElement("span");
     span.className = cls + " bn";
     span.textContent = word;
-    return Talk.mark(span, word);
+    return span;
   }
   const b = document.createElement("button");
   b.className = cls + " on bn";
@@ -49,7 +49,7 @@ function wordChip(word, cls) {
   b.textContent = word;
   b.title = `লেভেল ${bn(level + 1)} খুলুন`;
   b.addEventListener("click", () => { loadLevel(level); leaveMenu(); });
-  return Talk.mark(b, word);
+  return b;
 }
 
 /* ---- কার চিহ্ন ছাড়া শব্দ গঠন ------------------------------------------------------------ */

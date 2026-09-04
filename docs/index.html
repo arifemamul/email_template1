@@ -461,10 +461,6 @@ box-shadow: inset 0 2px 0 rgba(255,255,255,.6), var(--lip) var(--accent-lo);
 }
 .cell.on span { opacity: 1; transform: scale(1); }
 
-.cell.says { cursor: pointer; }
-.cell.says:active { transform: translateY(2px); }
-.cell.says:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
-
 .cell.hinted {
 background: linear-gradient(180deg, var(--hint-hi), var(--hint));
 box-shadow: inset 0 2px 0 rgba(255,255,255,.7), var(--lip) var(--hint-lo);
@@ -1650,28 +1646,6 @@ animation: drift-b 46s ease-in-out infinite;
 @media (prefers-reduced-motion: reduce) {
 body::before, body::after { animation: none; }
 }
-
-.cansay [data-say] { cursor: pointer; }
-.cansay [data-say]:focus-visible {
-outline: 3px solid var(--accent);
-outline-offset: 2px;
-}
-
-.saying {
-animation: saying 1.2s ease-out;
-}
-@keyframes saying {
-0%   { background: rgba(var(--glow-accent), .55); box-shadow: 0 0 0 0 rgba(var(--glow-accent), .6); }
-35%  { background: rgba(var(--glow-accent), .45); box-shadow: 0 0 0 9px rgba(var(--glow-accent), 0); }
-100% { background: rgba(var(--glow-accent), 0);   box-shadow: 0 0 0 0 rgba(var(--glow-accent), 0); }
-}
-@media (prefers-reduced-motion: reduce) {
-.saying { animation: saying-still 1.2s ease-out; }
-@keyframes saying-still {
-0%   { background: rgba(var(--glow-accent), .55); }
-100% { background: rgba(var(--glow-accent), 0); }
-}
-}
 html { -webkit-text-size-adjust: 100%; }
 html, body { overscroll-behavior: none; }
 body { -webkit-tap-highlight-color: transparent; }
@@ -1920,8 +1894,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
           <h3>পুরো বর্ণমালা</h3>
           <p class="deck">
             বাংলা বর্ণমালার সবটুকু এক জায়গায় - প্রথমে এগারোটি স্বরবর্ণ, তারপর বত্রিশটি
-            ব্যঞ্জনবর্ণ, আর শেষে কার ও চিহ্ন, যেগুলো বর্ণের সঙ্গে বসে। এই পাতার যেকোনো বর্ণে
-            চাপ দিলে তার উচ্চারণ শোনা যায়।
+            ব্যঞ্জনবর্ণ, আর শেষে কার ও চিহ্ন, যেগুলো বর্ণের সঙ্গে বসে।
           </p>
 
           <h3 class="part-head">স্বরবর্ণ</h3>
@@ -2112,7 +2085,6 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
           <li><span class="k bn">ছোঁয়া</span><span>টানার বদলে ছুঁয়ে খেলতে চাও? এক এক করে অক্ষর ছোঁও, তারপর শব্দের পাশে <b>✓</b> চাপো - বা কীবোর্ডে <b>Enter</b>। <b>Esc</b> দিলে সব মুছে যায়।</span></li>
           <li><span class="k bn">শেষ</span><span>লেভেল শেষ হলে সোজা পরেরটিতে চলে যায় - কোনো বোতাম নেই, অপেক্ষাও নেই। বদলের সঙ্গেই কনফেটি ঝরে।</span></li>
           <li><span class="k">&lsaquo; &rsaquo;</span><span>তীর দুটি আগের বা পরের লেভেলে নিয়ে যায়, আর দুই প্রান্তে গিয়ে ঘুরে আবার শুরুতে ফেরে। তীরের মাঝের অক্ষরটিই লেভেলের নাম: কা, আর সেই বর্ণের একের বেশি লেভেল থাকলে পাশে একটি সংখ্যা। মেনুর লেভেল তালিকা থেকে যেকোনো লেভেলে সোজা যাওয়া যায়; সেটিও খেলার মতো বর্ণমালার ক্রমে চলে, আর প্রতিটি বর্ণ আলাদা রঙ পায়। যে লেভেলই খোলা হয়, সেটি খালি ছক থেকেই শুরু হয় - তাই পুরোনো লেভেল আবার খেলা যায়।</span></li>
-          <li><span class="k">♪</span><span>প্রতিটি শব্দ পাওয়ার সঙ্গে সঙ্গেই তার উচ্চারণ শোনা যায়, আর এর কোনো বোতাম নেই - শব্দটি শোনাই আসল কথা, এটি কোনো সেটিং নয়। বাংলা বানানে উচ্চারণ লুকিয়ে থাকে: ব আর ভ, কিংবা শ, ষ আর স - উচ্চারণ এক, বর্ণ আলাদা। যে ডিভাইসে বাংলা কণ্ঠ নেই, সেখানে খেলাটি চুপ থাকে - ইংরেজি কণ্ঠে বাংলা পড়ে শোনায় না।</span></li>
           <li><span class="k">◈</span><span>সংকেত না-মেলানো কোনো শব্দের একটি অক্ষর দেখিয়ে দেয়। বিনামূল্যে, যত খুশি - গোনার কিছু নেই, খরচেরও কিছু নেই।</span></li>
         </ul>
       </section>
@@ -3177,33 +3149,9 @@ span.style.fontSize = GLYPH + "px";
 div.appendChild(span);
 if (shown.has(k)) div.classList.add("on");
 if (hinted.has(k) && !div.classList.contains("blank")) div.classList.add("hinted");
-markSayable(div);
 }
 el.board.appendChild(div);
 }
-}
-}
-
-function wordAt(pos) {
-const done = foundSet();
-const holds = game.puzzle.words.filter(
-w => done.has(w.word) && w.cells.some(([r, c]) => key(r, c) === pos));
-if (!holds.length) return null;
-const starts = holds.find(w => key(w.cells[0][0], w.cells[0][1]) === pos);
-return (starts || holds[0]).word;
-}
-
-function markSayable(div) {
-const word = Speech.available ? wordAt(div.dataset.pos) : null;
-div.classList.toggle("says", !!word);
-if (word) {
-div.setAttribute("role", "button");
-div.setAttribute("tabindex", "0");
-div.setAttribute("aria-label", `${word} - আবার শুনুন`);
-} else {
-div.removeAttribute("role");
-div.removeAttribute("tabindex");
-div.removeAttribute("aria-label");
 }
 }
 
@@ -3225,7 +3173,6 @@ for (const div of el.board.children) {
 if (div.classList.contains("blank")) continue;
 div.classList.toggle("on", shown.has(div.dataset.pos));
 div.classList.toggle("hinted", hinted.has(div.dataset.pos));
-markSayable(div);
 }
 }
 
@@ -3343,124 +3290,6 @@ b.addEventListener("click", () => loadLevel(i));
 el.levelGrid.appendChild(b);
 });
 }
-const VOICE_CLIPS = {};      // word -> audio src, filled in when recordings exist
-
-const Speech = {
-voice: null,
-clips: new Map(),
-playing: null,
-
-pickVoice() {
-if (!("speechSynthesis" in window)) return null;
-const voices = speechSynthesis.getVoices() || [];
-const bengali = voices.filter(v => /^bn(\b|[-_])/i.test(v.lang || ""));
-return bengali.find(v => /BD/i.test(v.lang))
-|| bengali.find(v => /IN/i.test(v.lang))
-|| bengali[0]
-|| null;
-},
-
-get available() {
-return Object.keys(VOICE_CLIPS).length > 0 || this.voice !== null;
-},
-
-init() {
-this.voice = this.pickVoice();
-this.announce();
-if ("speechSynthesis" in window) {
-speechSynthesis.addEventListener("voiceschanged", () => {
-this.voice = this.pickVoice();
-this.announce();
-});
-}
-},
-
-announce() {
-document.body.classList.toggle("cansay", this.available);
-},
-
-stop() {
-if (this.playing) { this.playing.pause(); this.playing = null; }
-if ("speechSynthesis" in window) speechSynthesis.cancel();
-},
-
-RATE: 0.5,
-AGAIN: 0.4,
-
-say(text, { rate = 0.5 } = {}) {
-if (!text) return false;
-
-const clip = VOICE_CLIPS[text];
-if (clip) {
-this.stop();
-let audio = this.clips.get(text);
-if (!audio) { audio = new Audio(clip); this.clips.set(text, audio); }
-audio.currentTime = 0;
-audio.playbackRate = rate < 1 ? 0.75 : 1;  // recordings are already paced for a child
-this.playing = audio;
-audio.play().catch(() => {});              // a blocked autoplay is not worth an error
-return true;
-}
-
-if (!this.voice) return false;               // no Bengali voice: say nothing at all
-this.stop();
-const utterance = new SpeechSynthesisUtterance(text);
-utterance.voice = this.voice;
-utterance.lang = this.voice.lang;
-utterance.rate = rate;
-utterance.pitch = 1;
-speechSynthesis.speak(utterance);
-return true;
-},
-
-};
-
-const Talk = {
-timer: null,
-
-mark(el, text) {
-if (!el || !text) return el;
-el.dataset.say = text;
-if (el.tagName !== "BUTTON") {
-el.setAttribute("role", "button");
-el.setAttribute("tabindex", "0");
-}
-if (!el.hasAttribute("aria-label")) el.setAttribute("aria-label", `${text} - উচ্চারণ শুনুন`);
-return el;
-},
-
-glow(el) {
-if (!el) return;
-for (const n of document.querySelectorAll(".saying")) n.classList.remove("saying");
-el.classList.remove("saying");
-void el.offsetWidth;
-el.classList.add("saying");
-clearTimeout(this.timer);
-this.timer = setTimeout(() => el.classList.remove("saying"), 1400);
-},
-
-say(el) {
-const text = el && el.dataset ? el.dataset.say : null;
-if (!text) return;
-Sfx.tap();
-if (Speech.say(text, { rate: Speech.AGAIN })) this.glow(el);
-},
-
-wire() {
-document.addEventListener("click", e => {
-const el = e.target.closest("[data-say]");
-if (el) this.say(el);
-});
-document.addEventListener("keydown", e => {
-if (e.key !== "Enter" && e.key !== " ") return;
-const el = e.target.closest && e.target.closest("[data-say]");
-if (!el || el.tagName === "BUTTON") return;   // a button makes its own click from these
-e.preventDefault();
-this.say(el);
-});
-}
-};
-
 const still = window.matchMedia('(prefers-reduced-motion: reduce)');
 const reduced = () => still.matches;
 
@@ -3985,7 +3814,6 @@ b.className = "mk-eg bn";
 b.type = "button";
 b.textContent = example.word;
 b.title = `open level ${bn(example.level + 1)}`;
-Talk.mark(b, example.word);
 b.addEventListener("click", () => { loadLevel(example.level); leaveMenu(); });
 r.appendChild(b);
 } else {
@@ -4074,7 +3902,6 @@ go.className = "br-go bn" + (lvl !== undefined ? " br-lvl" : "");
 go.type = "button";
 go.textContent = lvl !== undefined ? `${akshara} লেভেল` : eg.word;
 go.title = `লেভেল ${bn(open + 1)} খুলুন`;
-if (lvl === undefined) Talk.mark(go, eg.word);
 go.addEventListener("click", () => { loadLevel(open); leaveMenu(); });
 row.appendChild(go);
 } else if (eg) {
@@ -4082,7 +3909,6 @@ const out = document.createElement("span");
 out.className = "br-go br-out bn";
 out.textContent = eg.word;
 out.title = eg.gloss;
-Talk.mark(out, eg.word);
 row.appendChild(out);
 const note = document.createElement("span");
 note.className = "br-gloss bn";
@@ -4201,7 +4027,7 @@ if (level === undefined) {
 const span = document.createElement("span");
 span.className = cls + " bn";
 span.textContent = word;
-return Talk.mark(span, word);
+return span;
 }
 const b = document.createElement("button");
 b.className = cls + " on bn";
@@ -4209,7 +4035,7 @@ b.type = "button";
 b.textContent = word;
 b.title = `লেভেল ${bn(level + 1)} খুলুন`;
 b.addEventListener("click", () => { loadLevel(level); leaveMenu(); });
-return Talk.mark(b, word);
+return b;
 }
 
 function drawEquations() {
@@ -4417,7 +4243,6 @@ persist();
 
 showVerdict(word, "correct", cleared ? SHOW_CLEARED + 400 : undefined);
 if (!cleared) { Sfx.good(); Bird.say("cheer", 700); }
-Speech.say(word);
 const placed = game.puzzle.words.find(w => w.word === word);
 let settle = 0;
 try {
@@ -4640,9 +4465,6 @@ if (deck) deck.textContent = `${bn(n)}টি লেভেল`;
 }
 drawLevelCount();
 
-Speech.init();
-Talk.wire();
-
 el.guideOpen.addEventListener("click", () => (menuIsOpen() ? closeMenu() : openMenu()));
 el.guideClose.addEventListener("click", closeGuide);
 
@@ -4675,23 +4497,6 @@ markBar();
 
 el.levelGrid.addEventListener("click", e => {
 if (e.target.closest(".lv") && guideIsOpen()) closeGuide();
-});
-
-el.board.addEventListener("click", e => {
-const cell = e.target.closest(".cell");
-if (!cell || !cell.dataset.pos) return;
-const word = wordAt(cell.dataset.pos);
-if (!word || !Speech.available) return;
-Sfx.tap();
-Speech.say(word, { rate: Speech.AGAIN });
-Talk.glow(cell);
-});
-el.board.addEventListener("keydown", e => {
-if (e.key !== "Enter" && e.key !== " ") return;
-const cell = e.target.closest(".cell");
-if (!cell || !cell.dataset.pos || !wordAt(cell.dataset.pos)) return;
-e.preventDefault();
-cell.click();
 });
 
 el.prev.addEventListener("click", () => { Sfx.page(false); loadLevel(game.index - 1); });

@@ -49,8 +49,7 @@ If you find yourself typing a number from the game into a test, read it from the
 | `rowcheck` | the actions row fits everywhere |
 | `guidetest` | the guide opens, closes, and holds the cards it should |
 | `menutest` | six menu sections, the alphabet charts counted from the game, letters open their levels |
-| `quiettest` | no sound button, no word counter, no pause — and every word is spoken |
-| `heartest` | every letter and word on screen can be heard, and nothing looks pressable without a voice |
+| `quiettest` | no sound button, no word counter, no pause — and the game never speaks |
 | `wheeltest` | the wheel is scrambled, stable between visits, and drawn as scrambled |
 | `playtest` | a level plays through, by drag and by tap |
 | `pathstest` | every route back to a finished level finds it blank and playable |

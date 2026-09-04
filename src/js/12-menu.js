@@ -163,7 +163,6 @@ function drawCharts() {
       b.type = "button";
       b.textContent = example.word;
       b.title = `open level ${bn(example.level + 1)}`;
-      Talk.mark(b, example.word);
       b.addEventListener("click", () => { loadLevel(example.level); leaveMenu(); });
       r.appendChild(b);
     } else {
@@ -282,9 +281,6 @@ function drawBaro() {
       go.type = "button";
       go.textContent = lvl !== undefined ? `${akshara} লেভেল` : eg.word;
       go.title = `লেভেল ${bn(open + 1)} খুলুন`;
-      // Only when the button carries a word. Where it reads "কা লেভেল" it names a level, and
-      // the Bengali in it is a single akshara, which is not something this says any more.
-      if (lvl === undefined) Talk.mark(go, eg.word);
       go.addEventListener("click", () => { loadLevel(open); leaveMenu(); });
       row.appendChild(go);
     } else if (eg) {
@@ -294,7 +290,6 @@ function drawBaro() {
       out.className = "br-go br-out bn";
       out.textContent = eg.word;
       out.title = eg.gloss;
-      Talk.mark(out, eg.word);
       row.appendChild(out);
       const note = document.createElement("span");
       note.className = "br-gloss bn";

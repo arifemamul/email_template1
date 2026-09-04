@@ -62,10 +62,8 @@ function submitWord() {
     // The verdict chip is held as long as the board is, so the word a child just found is
     // still named on screen while they look at where it landed.
     showVerdict(word, "correct", cleared ? SHOW_CLEARED + 400 : undefined);
-    // The reward, in this order: the tone first because it is instant, then the bird, then the
-    // spoken word - which arrives while the letters are still flying to the board.
+    // The reward, in this order: the tone first because it is instant, then the bird.
     if (!cleared) { Sfx.good(); Bird.say("cheer", 700); }
-    Speech.say(word);
     const placed = game.puzzle.words.find(w => w.word === word);
     // A backstop, not a substitute for the guards inside. Everything below this line is the
     // game working; everything in `flyLettersToBoard` is the game looking nice. If some engine
@@ -334,11 +332,6 @@ function drawLevelCount() {
 }
 drawLevelCount();
 
-/* Pronunciation has no control, so there is nothing to wire up - just pick the voice. It is
-   a no-op on a device with no Bengali voice, so nothing here needs to check first. */
-Speech.init();
-Talk.wire();
-
 el.guideOpen.addEventListener("click", () => (menuIsOpen() ? closeMenu() : openMenu()));
 el.guideClose.addEventListener("click", closeGuide);
 
@@ -382,44 +375,6 @@ markBar();
 // Picking a level from inside the sheet means the player wants to play it, so get out of the way.
 el.levelGrid.addEventListener("click", e => {
   if (e.target.closest(".lv") && guideIsOpen()) closeGuide();
-});
-
-/* -- Hearing a word again -----------------------------------------------------------------
- *
- * A word is spoken once, as it lands. That is the moment it teaches - and it is also the moment
- * a child is watching letters fly onto the board rather than listening to them. So any word
- * already found can be pressed to hear it again.
- *
- * Words, and nothing but words. The letter chip at the top of the screen used to be pressable
- * too, and so did every letter in the guide and every tile on the wheel; they are all quiet
- * now. A synthesised voice reading a lone Bengali letter says the wrong thing often enough to
- * teach the wrong thing - ই and উ come back as the names of the letters, a bare consonant comes
- * back with a vowel nobody asked for - and an app that mispronounces the alphabet to a child
- * learning it is worse than an app that says nothing. Words are what a Bengali voice gets
- * right, so words are all this says.
- *
- * It goes quiet altogether on a device with no Bengali voice and no recordings. `Speech.say`
- * refuses to read Bengali with an English voice - see the note at the top of 08-speech.js - so
- * on such a phone a pressable word would be a promise the app cannot keep.
- *
- * Delegated, because the cells are rebuilt on every level and a listener per cell would have to
- * be rebuilt with them. `wordAt` is what decides whether a cell has anything to say.
- */
-el.board.addEventListener("click", e => {
-  const cell = e.target.closest(".cell");
-  if (!cell || !cell.dataset.pos) return;
-  const word = wordAt(cell.dataset.pos);
-  if (!word || !Speech.available) return;
-  Sfx.tap();
-  Speech.say(word, { rate: Speech.AGAIN });
-  Talk.glow(cell);
-});
-el.board.addEventListener("keydown", e => {
-  if (e.key !== "Enter" && e.key !== " ") return;
-  const cell = e.target.closest(".cell");
-  if (!cell || !cell.dataset.pos || !wordAt(cell.dataset.pos)) return;
-  e.preventDefault();
-  cell.click();
 });
 
 el.prev.addEventListener("click", () => { Sfx.page(false); loadLevel(game.index - 1); });

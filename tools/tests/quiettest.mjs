@@ -1,6 +1,23 @@
-// Guards the cuts to the game screen: no sound BUTTON, no word counter, and nothing between
-// levels that has to be dismissed - while checking that the pronunciation those cuts nearly
-// took with them is intact, and that every word found is still spoken aloud.
+/*
+ * Guards the cuts to the game screen: no sound button, no word counter, and nothing between
+ * levels that has to be dismissed - and now the biggest cut of all, which is that the game
+ * does not speak.
+ *
+ * There was a pronunciation layer here: every word spoken as it landed, any found word or
+ * guide word pressable to hear again, through the device's own Bengali voice. It is gone. The
+ * voices available on a phone say Bengali wrongly often enough that a child copying them would
+ * learn the wrong sounds from the app meant to teach them, and there is no way to check from
+ * inside the app which voice a device will hand over. Recordings by a person will replace it;
+ * until they exist the game is silent about words.
+ *
+ * The game's own SOUNDS stay - the tone as a word lands, the bird, the confetti, the page
+ * turn. Those are synthesised in 06-sound.js, they say nothing in any language, and they are
+ * what makes a five-year-old want the next board. `feeltest` owns them.
+ *
+ * So the check here is a spy rather than a search: `speechSynthesis` and `Audio` are replaced
+ * with recorders, a whole level is played through by dragging real words out of the wheel, and
+ * nothing may reach either of them.
+ */
 import { launch, PAGE, BUILT } from './harness.mjs';
 import { readFileSync } from 'fs';
 const problems = [];
@@ -9,9 +26,16 @@ const src = readFileSync(BUILT, 'utf8');
 for (const [needle, what] of [
   ['id="sound"', 'the sound button'],
   ['drawSound', 'the sound button state function'],
-  ['Speech.toggle', 'a mute toggle'],
   ['shobdojot.sound', 'a stored sound preference'],
   ['levelSub', 'the word counter element'],
+  // The pronunciation layer, by every name it had. Left in as a search as well as a spy: a
+  // half-removed Speech object that nothing calls yet is how this comes back by accident.
+  ['const Speech', 'the pronunciation engine'],
+  ['VOICE_CLIPS', 'the recorded-clip table'],
+  ['SpeechSynthesisUtterance', 'a call into the browser\'s speech engine'],
+  ['speechSynthesis', 'the browser\'s speech engine'],
+  ['const Talk', 'the press-to-hear layer'],
+  ['data-say', 'a word marked to be spoken'],
 ]) if (src.includes(needle)) problems.push(`page still contains ${what} ("${needle}")`);
 
 // CLEAR_BEAT used to be forbidden here: the between-level pause was cut on the grounds that a
@@ -24,36 +48,36 @@ for (const [needle, what] of [
   ['SHOW_CLEARED', 'the hold that lets a finished board be seen'],
 ]) if (!src.includes(needle)) problems.push(`page is missing ${what} ("${needle}")`);
 
-// The pronunciation itself stays - only its button went. These must be present.
-for (const [needle, what] of [
-  ['const Speech', 'the pronunciation engine'],
-  ['Speech.say(word)', 'the call that speaks a word as it lands'],
-  ['Speech.init()', 'the voice pick at startup'],
-  ['VOICE_CLIPS', 'the recorded-clip table'],
-]) if (!src.includes(needle)) problems.push(`page is missing ${what} ("${needle}")`);
-
 const b = await launch();
 const ctx = await b.newContext({ viewport: { width: 360, height: 640 } });
 const p = await ctx.newPage();
 p.on('pageerror', e => problems.push('page error: ' + e.message));
-// If anything still tries to speak, fail loudly rather than silently.
-// A fake Bengali voice, so the real refusal path (no bn voice -> silence) does not hide
-// whether the game tried to speak at all. Records every utterance.
+/*
+ * The spy. A Bengali voice is offered, so a page that still wanted to speak would find one -
+ * silence here has to be the page's choice and not the browser's refusal. Every utterance and
+ * every audio file is recorded instead of played.
+ *
+ * `speechSynthesis` is a read-only accessor on window, so plain assignment is silently dropped;
+ * that is exactly how an earlier version of this check passed while testing nothing.
+ */
 await p.addInitScript(() => {
   window.__said = [];
+  window.__played = [];
   const voice = { lang: 'bn-BD', name: 'Test Bengali', default: true };
   const fake = {
     getVoices: () => [voice],
-    speak(u) { window.__said.push(u.text); },
+    speak(u) { window.__said.push(u && u.text); },
     cancel() {},
     addEventListener() {},
   };
-  // speechSynthesis is a read-only accessor on window, so plain assignment is silently
-  // dropped - which is exactly how this check passed while testing nothing.
   Object.defineProperty(window, 'speechSynthesis',
     { configurable: true, get: () => fake });
   Object.defineProperty(window, 'SpeechSynthesisUtterance',
     { configurable: true, writable: true, value: function (text) { this.text = text; } });
+  // Recordings would arrive through Audio rather than through the speech engine, so it is
+  // watched too - a clip table pasted back in has to fail here as loudly as a voice call.
+  const RealAudio = window.Audio;
+  window.Audio = function (src) { window.__played.push(src); return new RealAudio(); };
 });
 await p.goto(PAGE);
 await p.waitForFunction(() => document.querySelector('.tile'));
@@ -117,147 +141,61 @@ const now = await p.evaluate(() => ({ index: game.index, blank: (game.found[LEVE
 if (now.index !== wasOn + 1) problems.push(`did not advance: still on level ${now.index + 1} after 3s`);
 if (now.blank !== 0) problems.push(`next level did not arrive blank (${now.blank} words already found)`);
 
-// Every word found should have been spoken, at the rate meant for a learner.
-const said = await p.evaluate(() => window.__said);
-for (const w of words) if (!said.includes(w)) problems.push(`"${w}" was found but never spoken`);
-if (said.length < words.length)
-  problems.push(`only ${said.length} of ${words.length} words were spoken`);
+/*
+ * A whole level played through, and neither recorder caught anything.
+ *
+ * This is the check that matters. A Bengali voice was on offer the entire time, six words were
+ * dragged out of the wheel and landed on the board, one of them cleared the level - every
+ * moment the game used to speak at - and the page never asked to say a word or play a file.
+ */
+const heard = await p.evaluate(() => ({ said: window.__said, played: window.__played }));
+if (heard.said.length)
+  problems.push(`the game spoke ${heard.said.length} time(s): ${JSON.stringify(heard.said)}`);
+if (heard.played.length)
+  problems.push(`the game played ${heard.played.length} audio file(s): `
+              + JSON.stringify(heard.played.map(x => String(x).slice(0, 40))));
 
-// -- and the refusal: an English-only device says nothing at all --------------------------
-// This is the line that matters most. speechSynthesis will read Bengali text in an English
-// voice without complaining, and a child copying that learns the wrong sounds.
-{
-  const ctx2 = await b.newContext({ viewport: { width: 360, height: 640 } });
-  const q = await ctx2.newPage();
-  await q.addInitScript(() => {
-    window.__said = [];
-    const fake = {
-      getVoices: () => [{ lang: 'en-US', name: 'English', default: true }],
-      speak(u) { window.__said.push(u.text); },
-      cancel() {}, addEventListener() {},
-    };
-    Object.defineProperty(window, 'speechSynthesis', { configurable: true, get: () => fake });
-    Object.defineProperty(window, 'SpeechSynthesisUtterance',
-      { configurable: true, writable: true, value: function (text) { this.text = text; } });
-  });
-  await q.goto(PAGE);
-  await q.waitForFunction(() => document.querySelector('.tile'));
-  const spoke = await q.evaluate(() => {
-    const w = game.puzzle.words[0].word;
-    Speech.say(w);
-    return window.__said;
-  });
-  if (spoke.length) problems.push(`spoke Bengali through an English voice: ${JSON.stringify(spoke)}`);
-}
+/*
+ * Nor is there anything left on the board inviting a press to hear it: every cell of every
+ * found word used to be a button, with a role, a tabindex and a label saying আবার শুনুন.
+ *
+ * Asked with a found word actually on the board. Clearing the level advanced the game to the
+ * next one, whose board is blank - so asking here without going back would be asking about a
+ * board with no found words on it, which is a check that passes against anything. An earlier
+ * version of this file made exactly that mistake and a deliberate sabotage walked straight
+ * past it.
+ */
+await p.evaluate(() => loadLevel(0));
+await p.waitForTimeout(80);
+const firstWord = await p.evaluate(() => game.puzzle.words[0].word);
+await trace(firstWord);
+await p.waitForTimeout(700);
+const inviting = await p.evaluate(w => ({
+  found: (game.found[LEVELS[game.index].id] || []).length,
+  lit: document.querySelectorAll('.cell.on').length,
+  cells: document.querySelectorAll('.cell[role="button"], .cell[tabindex]').length,
+  chip: document.getElementById('levelName').getAttribute('role'),
+  anywhere: document.querySelectorAll('[data-say]').length,
+}), firstWord);
+if (!inviting.found || !inviting.lit)
+  problems.push('no word was found on the board, so nothing could have invited a press');
+if (inviting.cells) problems.push(`${inviting.cells} board cells still invite a press to hear`);
+if (inviting.chip) problems.push("the level's letter chip still invites a press");
+if (inviting.anywhere) problems.push(`${inviting.anywhere} things are still marked to be spoken`);
 
-// ---- hearing a word again ----------------------------------------------------------------
-// A word is spoken once, as it lands - which is also the moment a child is watching letters fly
-// rather than listening. So any word already found can be pressed to hear it again. It is
-// silent, and must not look pressable, on a device with no Bengali voice and no recordings:
-// something that invites a press and then says nothing teaches a child that pressing things
-// does nothing.
-//
-// A word, and never a letter. The chip at the top of the screen was pressable once and is not
-// any more: a synthesised voice reading a lone Bengali letter is wrong too often to teach with,
-// and the mistakes land on exactly what the game is for. heartest owns that rule across the
-// whole app; what this file holds is that the chip itself stayed quiet.
-{
-  const q = await (await b.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
-  await q.goto(PAGE);
-  await q.waitForFunction(() => document.querySelector('.tile'));
-
-  // A word has to be found before any cell could invite a press, so find one first. Asking at
-  // load time asked nothing: there were no candidate cells yet, and the check passed against a
-  // build that marked every found cell whether the device could speak or not.
-  const mute = await q.evaluate(async () => {
-    const word = LEVELS[0].words[0];
-    loadLevel(0);
-    game.picked = splitAksharas(word).map(a => game.wheel.indexOf(a));
-    submitWord();
-    await new Promise(r => setTimeout(r, 600));
-    return {
-      available: Speech.available,
-      found: (game.found[LEVELS[0].id] || []).length,
-      chip: document.getElementById('levelName').classList.contains('says'),
-      chipRole: document.getElementById('levelName').getAttribute('role'),
-      cells: document.querySelectorAll('.cell.says').length,
-      gold: document.querySelectorAll('.cell.on').length,
-    };
-  });
-  if (!mute.found) problems.push('the silent case never found a word, so it tested nothing');
-  if (!mute.gold) problems.push('no cell was filled in, so there was nothing that could speak');
-  if (mute.available)
-    problems.push('this browser has a Bengali voice, so the silent case went untested');
-  if (mute.chip) problems.push('the letter chip still invites a press');
-  if (mute.cells) problems.push(`${mute.cells} cells invite a press on a device that cannot speak`);
-
-  const heard = await q.evaluate(async () => {
-    // A voice, and a `say` that records instead of speaking.
-    Speech.voice = { lang: 'bn-BD', name: 'test' };
-    const said = [];
-    const rates = [];
-    Speech.say = (t, o = {}) => { said.push(t); rates.push(o.rate ?? Speech.RATE); return true; };
-    loadLevel(0);
-    drawHud();
-    const word = LEVELS[0].words[0];
-    game.picked = splitAksharas(word).map(a => game.wheel.indexOf(a));
-    submitWord();
-    await new Promise(r => setTimeout(r, 600));
-
-    // Pressed with a voice present, and it must still say nothing.
-    const chip = document.getElementById('levelName');
-    chip.click();
-    const fromChip = said.length;
-    // Every cell of the found word says that word, and no cell of an unfound one says anything.
-    const saying = [...document.querySelectorAll('.cell.says')];
-    saying.forEach(c => c.click());
-    const unfound = [...document.querySelectorAll('.cell:not(.blank):not(.says)')].length;
-
-    return {
-      chipSays: chip.classList.contains('says'),
-      chipRole: chip.getAttribute('role'),
-      chipSaid: said.slice(1, fromChip),
-      letter: LEVELS[0].name,
-      word, cells: saying.length, aksharas: splitAksharas(word).length,
-      cellLabels: [...new Set(saying.map(c => c.getAttribute('aria-label')))],
-      fromCells: said.slice(fromChip), unfound,
-      focusable: saying.every(c => c.getAttribute('tabindex') === '0'),
-      // Asking to hear something a second time is asking to hear it properly, so a press is
-      // slower than the moment the word landed.
-      landedAt: rates[0], againAt: rates.slice(fromChip), RATE: Speech.RATE, AGAIN: Speech.AGAIN,
-    };
-  });
-
-  if (heard.chipSays || heard.chipRole)
-    problems.push('the letter chip invites a press, and a lone letter is not spoken any more');
-  if (heard.chipSaid.length)
-    problems.push(`pressing the chip said ${JSON.stringify(heard.chipSaid)}, expected silence`);
-  if (heard.cells !== heard.aksharas)
-    problems.push(`${heard.cells} cells say the word, expected ${heard.aksharas} - one per akshara`);
-  if (heard.cellLabels.length !== 1 || !heard.cellLabels[0].startsWith(heard.word))
-    problems.push(`the found word's cells are labelled ${JSON.stringify(heard.cellLabels)}`);
-  if (heard.fromCells.some(x => x !== heard.word))
-    problems.push(`a cell of "${heard.word}" said something else: ${JSON.stringify(heard.fromCells)}`);
-  if (!heard.unfound)
-    problems.push('every cell on the board says something; an unfound word must stay quiet');
-  if (!heard.focusable) problems.push('a cell that speaks cannot be reached from a keyboard');
-  if (heard.landedAt !== heard.RATE)
-    problems.push(`a word landed at rate ${heard.landedAt}, expected ${heard.RATE}`);
-  if (heard.againAt.some(r => r !== heard.AGAIN))
-    problems.push(`a replayed press used ${JSON.stringify(heard.againAt)}, expected ${heard.AGAIN}`);
-  if (!(heard.AGAIN < heard.RATE))
-    problems.push(`pressing to hear again (${heard.AGAIN}) is not slower than landing (${heard.RATE})`);
-  // Below about 0.4 a speechSynthesis voice stops sounding slow and starts sounding broken.
-  if (heard.AGAIN < 0.4)
-    problems.push(`${heard.AGAIN} is slow enough to distort the voice into a word nobody says`);
-  if (heard.RATE > 0.6)
-    problems.push(`${heard.RATE} is a native-speed run at a word, not a learner's pace`);
-  console.log(`again: ${heard.cells} cells say "${heard.word}" and the ${heard.letter} chip `
-            + `says nothing - ${heard.unfound} cells of unfound words stay quiet; `
-            + `landing ${heard.RATE}, pressed ${heard.AGAIN}`);
-  await q.close();
-}
+// And the game's own sounds are still there - they are not what went. Synthesised, so nothing
+// reaches Audio; what proves they exist is the audio graph 06-sound.js builds on first use.
+const noise = await p.evaluate(() => ({
+  sfx: typeof Sfx === 'object' && typeof Sfx.good === 'function',
+  bird: typeof Bird === 'object',
+  ctx: !!(Sfx && Sfx.ctx),
+}));
+if (!noise.sfx) problems.push('the game lost its sound effects along with the voice');
+if (!noise.bird) problems.push('the bird is gone');
+if (!noise.ctx) problems.push('nothing ever opened an audio context, so no sound was made');
+console.log(`silent about words: ${words.length} words found and cleared, `
+          + `0 spoken, 0 audio files - and the game's own sounds still play`);
 
 await b.close();
 if (problems.length) { console.log('PROBLEMS:'); problems.forEach(x => console.log(' - ' + x)); process.exitCode = 1; }
-else console.log(`QUIET: no sound button, no word counter, no pause - and all ${words.length} words spoken`);
+else console.log('QUIET: no sound button, no word counter, no pause, and not one word spoken');
