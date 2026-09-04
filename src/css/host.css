@@ -39,7 +39,7 @@
     .notch { display: none; }
     .screen .topbar { padding-top: 0; }
     h1 { font-size: clamp(32px, 11vw, 44px); }
-    .deck { font-size: 14.5px; }
+    .deck { font-size: 16px; }
   }
 
   /* -- Short windows (laptops, landscape phones): let the phone shrink ------- */

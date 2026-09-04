@@ -59,10 +59,24 @@
      one a child points at. */
   @media (max-width: 620px) { .eyebrow { display: none; } }
 
+  /*
+   * Body copy for everything outside the game: the alphabet charts, the বারোখড়ি, the primer's
+   * tables, খেলার নিয়ম, পরিচিতি. One step larger than it was, along with every heading, glyph
+   * and table cell in those sections.
+   *
+   * The game screen is deliberately untouched. Its letters are sized by the layout budget in
+   * 07-render.js - the board and wheel divide the height between them and glyphcheck holds the
+   * floor - so a size typed here would either be ignored there or fight it.
+   *
+   * Bengali needs the extra step more than Latin does at the same nominal size: a matra cluster
+   * carries its meaning above and below the letter, and at 15px the parts that distinguish কি
+   * from কী are a pixel or two. This is read by a child who is learning to tell them apart, and
+   * by a parent reading over their shoulder.
+   */
   .deck {
     margin: 0;
     color: var(--ink-soft);
-    font-size: 15px;
+    font-size: 16.5px;
     line-height: 1.62;
   }
 

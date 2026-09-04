@@ -130,7 +130,7 @@
      caseless script and pull matra clusters apart. Told apart by a coloured rule instead. */
   .menu-head {
     font-family: var(--bn);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--ink-faint);
     margin: 6px 0 6px 2px;
@@ -173,7 +173,7 @@
     border-radius: 11px;
     background: var(--block-1);
     color: var(--ink);
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 700;
     box-shadow: 0 2px 0 rgba(var(--shade), .10);
   }
@@ -184,7 +184,7 @@
   .opt-t { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
   .opt-t b {
     font-family: var(--bn);
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--ink);
     line-height: 1.25;
@@ -192,7 +192,7 @@
   .opt-t i {
     font-family: var(--bn);
     font-style: normal;
-    font-size: 12.5px;
+    font-size: 13.5px;
     color: var(--ink-faint);
     line-height: 1.35;
   }
@@ -251,7 +251,7 @@
        identifying the pair among all ten, and no two neighbours share one. */
   .pairs {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(104px, 100%), 1fr));
     gap: 8px;
     margin-bottom: 20px;
   }
@@ -277,7 +277,7 @@
 
   .pair-v, .pair-k {
     font-family: var(--bn);
-    font-size: 27px;
+    font-size: 30px;
     font-weight: 700;
     color: color-mix(in srgb, var(--hue) 76%, var(--ink));
     line-height: 1;
@@ -314,7 +314,7 @@
      the row is sized for the Bengali and the English half is shrunk back down inside it. */
   .page > h3, .page .card > h3:first-child {
     margin: 0 0 12px;
-    font-size: 21px;
+    font-size: 23px;
     font-family: var(--bn);
     font-weight: 800;
     color: var(--ink);
@@ -345,7 +345,7 @@
      they inherited from `.card h3` has to come off there as well. */
   .page .card h3 {
     font-family: var(--bn);
-    font-size: 14px;
+    font-size: 15.5px;
     letter-spacing: 0;
     text-transform: none;
   }
@@ -353,7 +353,7 @@
   /* -- The alphabet charts --------------------------------------------------- */
   .chart {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(64px, 100%), 1fr));
     gap: 8px;
     margin-top: 16px;
   }
@@ -371,10 +371,10 @@
   }
   .ch:hover { transform: translateY(-2px); background: var(--accent-hi); }
   .ch:active { transform: scale(.95); }
-  .ch-l { font-size: 25px; font-weight: 700; color: var(--ink); line-height: 1.1; }
+  .ch-l { font-size: 28px; font-weight: 700; color: var(--ink); line-height: 1.1; }
   /* How many levels this letter has. Counted from the game, never typed in. */
   .ch-n {
-    font-size: 10.5px;
+    font-size: 11.5px;
     font-variant-numeric: tabular-nums;
     color: var(--ink-soft);
   }
@@ -393,16 +393,16 @@
 
   .mk {
     display: grid;
-    grid-template-columns: 46px minmax(88px, auto) 1fr auto;
+    grid-template-columns: 50px minmax(96px, auto) 1fr auto;
     align-items: center;
     gap: 10px;
     padding: 9px 4px;
     border-bottom: 1px solid var(--surface-3);
-    font-size: 12.5px;
+    font-size: 13.5px;
   }
   .mk:last-child { border-bottom: 0; }
-  .mk-g { font-size: 22px; color: var(--ink); line-height: 1.2; }
-  .mk-n { color: var(--ink); font-size: 13px; }
+  .mk-g { font-size: 24px; color: var(--ink); line-height: 1.2; }
+  .mk-n { color: var(--ink); font-size: 14px; }
   .mk-w { color: var(--ink-soft); line-height: 1.45; }
 
   /* The example word, which opens the level it sits on. */
@@ -412,7 +412,7 @@
     padding: 4px 9px;
     background: color-mix(in srgb, var(--accent) 10%, transparent);
     color: var(--accent);
-    font-size: 15px;
+    font-size: 16.5px;
     cursor: pointer;
     white-space: nowrap;
   }
@@ -421,7 +421,7 @@
     border-style: dashed;
     background: transparent;
     color: var(--ink-faint);
-    font-size: 11.5px;
+    font-size: 12.5px;
     cursor: default;
   }
 
@@ -442,7 +442,7 @@
   /* Thirty-two letters, tight enough to sit above the table without scrolling past it. */
   .baro-pick {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(38px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(42px, 100%), 1fr));
     gap: 5px;
     margin: 14px 0 18px;
   }
@@ -452,7 +452,7 @@
     border-radius: 10px;
     background: var(--surface-2);
     color: var(--accent-lo);
-    font-size: 17px;
+    font-size: 19px;
     font-weight: 700;
     cursor: pointer;
     transition: background-color .14s ease, transform .14s ease;
@@ -472,8 +472,8 @@
   }
   .br:last-child { border-bottom: 0; }
   /* The form itself, big - this is the thing being learned, not a label about it. */
-  .br-f { font-size: 27px; font-weight: 700; color: var(--ink); line-height: 1.25; }
-  .br-n { font-size: 12.5px; color: var(--ink-soft); }
+  .br-f { font-size: 30px; font-weight: 700; color: var(--ink); line-height: 1.25; }
+  .br-n { font-size: 13.5px; color: var(--ink-soft); }
 
   .br-go {
     border: 1px solid var(--surface-3);
@@ -481,7 +481,7 @@
     padding: 4px 10px;
     background: transparent;
     color: var(--ink-soft);
-    font-size: 14px;
+    font-size: 15.5px;
     cursor: pointer;
     white-space: nowrap;
   }
@@ -497,7 +497,7 @@
   .br-none {
     border-style: dashed;
     color: var(--ink-faint);
-    font-size: 12px;
+    font-size: 13px;
     cursor: default;
   }
 
@@ -509,7 +509,7 @@
     cursor: default;
   }
   .br-gloss {
-    font-size: 11px;
+    font-size: 12px;
     text-align: right;
     color: var(--ink-faint);
     line-height: 1.35;
@@ -524,10 +524,15 @@
   /* ---- শব্দ গঠন: the equations -------------------------------------------------------- */
 
   /* A grid of small sums rather than a list, because the whole point is that they are short
-     and alike: a child reads two or three before noticing they are all the same shape. */
+     and alike: a child reads two or three before noticing they are all the same shape.
+     The track is set from the widest sum the primer holds, which is জ+ম+জ=জমজ at 180px once the
+     type went up a step. It was 160, and at 360px that fitted two columns of 163 side by side -
+     seven pixels short of the content, so the section scrolled sideways and primertest said so.
+     Sized to the content rather than to a round number, and every auto-fill grid in here is
+     wrapped in `min(…, 100%)` so a track can never be wider than what holds it. */
   .eqs {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(184px, 100%), 1fr));
     gap: 6px;
     margin: 12px 0 4px;
   }
@@ -541,7 +546,7 @@
     background: var(--surface-2);
   }
   .eq-l {
-    font-size: 17px;
+    font-size: 19px;
     font-weight: 700;
     color: var(--ink);
   }
@@ -549,7 +554,7 @@
      letters and then on the answer, which is the order the sum is meant to be read in. */
   .eq-op {
     font-family: var(--ui);
-    font-size: 12px;
+    font-size: 13px;
     color: var(--ink-faint);
   }
   .eq-w {
@@ -557,7 +562,7 @@
     padding: 3px 8px;
     border: 1px solid var(--surface-3);
     border-radius: 8px;
-    font-size: 16px;
+    font-size: 17.5px;
     font-weight: 700;
     color: var(--ink-soft);
     background: none;
@@ -574,7 +579,7 @@
   .eq-w.on:hover { background: var(--accent); color: var(--ink); }
   .eq-head, .kw-head { margin: 18px 0 0; }
   .eq-head {
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--ink-soft);
   }
@@ -583,7 +588,7 @@
 
   .kw-pick {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(66px, 100%), 1fr));
     gap: 5px;
     margin: 14px 0 16px;
   }
@@ -600,20 +605,20 @@
   .kp:hover { background: var(--accent-hi); }
   .kp:active { transform: scale(.94); }
   .kp-s {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     color: var(--accent-lo);
   }
   /* The sign's name, under the letter carrying it - see the comment in drawKarWords. */
   .kp-n {
-    font-size: 10px;
+    font-size: 11px;
     color: var(--ink-faint);
   }
   .kp.on { background: var(--accent); border-color: var(--accent); }
   .kp.on .kp-s, .kp.on .kp-n { color: var(--ink); }
   .kw-count {
     margin: 0 0 8px;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--ink-soft);
   }
   .kw-words, .ph-words, .ph-forms { display: flex; flex-wrap: wrap; gap: 5px; }
@@ -622,7 +627,7 @@
     border: 1px solid var(--surface-3);
     border-radius: 8px;
     background: var(--surface-2);
-    font-size: 15px;
+    font-size: 16.5px;
     color: var(--ink-soft);
     cursor: default;
   }
@@ -649,7 +654,7 @@
     align-items: center;
     gap: 8px;
     margin: 0 0 5px;
-    font-size: 15px;
+    font-size: 16.5px;
     color: var(--ink);
   }
   /* The mark itself, large enough to see the shape of - which is the whole lesson. */
@@ -658,19 +663,19 @@
     border-radius: 7px;
     background: color-mix(in srgb, var(--accent) 20%, transparent);
     color: var(--accent);
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
   }
   .ph-note {
     margin: 0 0 9px;
-    font-size: 12.5px;
+    font-size: 13.5px;
     line-height: 1.55;
     color: var(--ink-soft);
   }
   /* The forms are the mark on every letter it takes - a reference row, not words, so they are
      set apart from the word list below by weight rather than by another box. */
   .ph-f {
-    font-size: 14px;
+    font-size: 15.5px;
     font-weight: 700;
     color: var(--accent-lo);
     background: none;
@@ -685,7 +690,7 @@
   }
   .ph-gap {
     margin: 0 0 9px;
-    font-size: 11.5px;
+    font-size: 12.5px;
     line-height: 1.5;
     color: var(--ink-faint);
   }
@@ -705,7 +710,7 @@
     border-radius: 9px;
     background: var(--surface-2);
     color: var(--accent-lo);
-    font-size: 15px;
+    font-size: 16.5px;
     font-weight: 700;
     cursor: pointer;
     transition: background-color .14s ease, transform .14s ease;
@@ -713,10 +718,10 @@
   .jp:hover { background: var(--accent-hi); }
   .jp:active { transform: scale(.94); }
   .jp.on { background: var(--accent); border-color: var(--accent); color: var(--ink); }
-  .jp-all { font-size: 13px; }
+  .jp-all { font-size: 14px; }
   .jk-count {
     margin: 0 0 9px;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--ink-soft);
   }
   .jk { display: grid; gap: 5px; }
@@ -733,12 +738,12 @@
     background: var(--surface-2);
   }
   .jr-f {
-    font-size: 19px;
+    font-size: 21px;
     font-weight: 700;
     color: var(--accent-lo);
   }
   .jr-p {
-    font-size: 13px;
+    font-size: 14px;
     color: var(--ink-soft);
   }
   .jr-words { display: flex; flex-wrap: wrap; gap: 4px; }
@@ -747,7 +752,7 @@
     border: 1px solid var(--surface-3);
     border-radius: 7px;
     background: none;
-    font-size: 14px;
+    font-size: 15.5px;
     color: var(--ink-soft);
     cursor: default;
   }
@@ -763,7 +768,7 @@
   .jr-note {
     grid-column: 2 / -1;
     grid-row: 2;
-    font-size: 11.5px;
+    font-size: 12.5px;
     line-height: 1.45;
     color: var(--ink-faint);
   }
