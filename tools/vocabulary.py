@@ -195,6 +195,7 @@ REJECTED = {
     'যক্ষ্মা': 'tuberculosis',
     'নিরস্ত্র': 'disarmed - the weapon is still the subject',
     'ব্লেড': 'a razor blade',
+    'উন্মাদ': 'insane - a word used to mock, and ম-ফলা has twenty other examples',
     # grammar, not vocabulary
     'করেছেন': 'verb inflection',
     'হয়ত': 'particle',
