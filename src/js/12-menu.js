@@ -296,11 +296,14 @@ function drawBaro() {
       note.textContent = eg.gloss;
       row.insertBefore(note, out);
     } else {
-      // Not a gap: this consonant and this sign do not meet in everyday Bengali at all - no
-      // word in 120,000 attested ones carries it. Said rather than left blank.
+      // Not a gap: no everyday word puts this consonant under this sign. Usually nothing in
+      // 120,000 attested words carries it at all; sometimes the only things that do are a
+      // place name, a misspelling, or a word this game will not set a child (see `refused`
+      // in tools/kar-words.json). Said rather than left blank, and said as "not in everyday
+      // Bengali" rather than "not in Bengali", which would not be true of all of them.
       const none = document.createElement("span");
       none.className = "br-go br-none bn";
-      none.textContent = "বাংলায় নেই";
+      none.textContent = "চলিত বাংলায় নেই";
       row.appendChild(none);
     }
     table.appendChild(row);

@@ -998,7 +998,7 @@
     "রত্নাকার": "in the ন-ফলা list, but absent from 120,000 attested words - too literary for a child's page",
     "সন্নিধান": "in the ন-ফলা list, but absent from 120,000 attested words - too literary for a child's page",
     "ভস্ম": "printed in the ষ্ম row, but ভস্ম carries স্ম. Moved to স্ম",
-    "পক্ক": "the ক্ক row prints পক্ব, which is ক্ব. পক্ব is the standard spelling, so it sits in the ক্ব row and the ক্ক row got মক্কা, ধাক্কা, ছক্কা instead",
+    "পক্ক": "the ক্ক row prints পক্ব, which is ক্ব. পক্ব is the standard spelling, so it sits in the ক্ব row and the ক্ক row got মক্কা আর ধাক্কা instead",
     "ব্রেড": "printed in the ল-ফলা list, but ব্রেড carries র-ফলা. The word is almost certainly ব্লেড, so ব্লেড is what is here",
     "অল্প, কল্পনা, সংকল্প": "printed in the ল-ফলা list, but these carry ল্প - ল first, প second. That is not a ফলা, so they are left out",
     "গুম্ফিত": "in the ম-ফলা list, but no corpus attests it",
@@ -1015,8 +1015,7 @@
         ],
         "words": [
           "মক্কা",
-          "ধাক্কা",
-          "ছক্কা"
+          "ধাক্কা"
         ]
       },
       {

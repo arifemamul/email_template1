@@ -196,6 +196,11 @@ REJECTED = {
     'নিরস্ত্র': 'disarmed - the weapon is still the subject',
     'ব্লেড': 'a razor blade',
     'উন্মাদ': 'insane - a word used to mock, and ম-ফলা has twenty other examples',
+    'ছক্কা': 'a six at cricket in Bengali, but a slur for a trans person in Hindi and Urdu, '
+              'and a board word is read by whoever picks the game up',
+    'ভৃত্য': 'a household servant - not a word to teach a child as a category of person, and '
+              'the বারোখড়ি ভৃ row was dropped rather than filled, ভৃগু and ভৃত being a name '
+              'and a scripture word and ভৃঙ্গ scoring 0.0 in the corpus',
     # grammar, not vocabulary
     'করেছেন': 'verb inflection',
     'হয়ত': 'particle',

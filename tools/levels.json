@@ -6,7 +6,7 @@
   "levels": 118,
   "akshara_keyed": 80,
   "letter_packed": 38,
-  "words": 470
+  "words": 471
  },
  "HOW_TO_READ_THIS": [
   "An AKSHARA is one game tile: a consonant cluster plus its vowel sign, or an independent vowel.",
@@ -5201,7 +5201,9 @@
     "না",
     "ই",
     "তা",
-    "দ"
+    "দ",
+    "ছু",
+    "টি"
    ],
    "words": [
     {
@@ -5258,6 +5260,15 @@
      ],
      "en": "roof",
      "freq": 53
+    },
+    {
+     "w": "ছুটি",
+     "split": [
+      "ছু",
+      "টি"
+     ],
+     "en": "a holiday, time off",
+     "freq": 4.89
     }
    ]
   },
