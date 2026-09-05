@@ -1,0 +1,290 @@
+  /* -- The bar ---------------------------------------------------------------
+       One bar at every width, holding the name and the way into everything else. It replaces
+       two things that used to disagree: a 68px gold masthead on wide screens, and a separate
+       strip with the menu button on phones. Sticky, because a child who has scrolled down a
+       chart of the বর্ণমালা should not have to scroll back up to leave it. */
+  .bar {
+    position: sticky;
+    top: 0;
+    isolation: isolate;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 clamp(12px, 1.8vw, 20px);
+    padding: 10px 0 12px;
+  }
+
+  /* The bar has to be readable once content scrolls under it, and the page behind it is a
+     painted gradient rather than a flat colour - so a wash of paper is the only thing that
+     works. But painted always, that wash is a cream rectangle sitting on a pink gradient at
+     the top of the page, which reads as a stray box rather than as a bar. So it is painted
+     only once there is something underneath it to hide. */
+  .bar::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(var(--bg) 64%, rgba(var(--shade), 0));
+    opacity: 0;
+    transition: opacity .2s ease;
+  }
+  .bar.stuck::after { opacity: 1; }
+
+  .bar-name { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+  /* Still stamped on the lid, just at a size that leaves room for the game. The hard shadow is
+     what made the old masthead read as a toy rather than a title, so it stays. */
+  .mark {
+    font-family: var(--bn);
+    font-size: clamp(26px, 3.4vw, 38px);
+    line-height: 1.06;
+    font-weight: 700;
+    color: var(--accent);
+    text-shadow: 0 2px 0 var(--accent-lo), 0 4px 10px rgba(var(--glow-accent), .34);
+  }
+
+  /* This line is Bengali. It carried letter-spacing and text-transform: uppercase, which is a
+     no-op on a caseless script and pulls matra clusters apart at 11px - মে নু rather than মেনু.
+     Sized up and left alone instead. */
+  .eyebrow {
+    font-family: var(--bn);
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 0;
+    font-weight: 600;
+  }
+  /* On a phone the bar has room for the name or the strapline, not both, and the name is the
+     one a child points at. */
+  @media (max-width: 620px) { .eyebrow { display: none; } }
+
+  /*
+   * Body copy for everything outside the game: the alphabet charts, the বারোখড়ি, the primer's
+   * tables, খেলার নিয়ম, পরিচিতি. One step larger than it was, along with every heading, glyph
+   * and table cell in those sections.
+   *
+   * The game screen is deliberately untouched. Its letters are sized by the layout budget in
+   * 07-render.js - the board and wheel divide the height between them and glyphcheck holds the
+   * floor - so a size typed here would either be ignored there or fight it.
+   *
+   * Bengali needs the extra step more than Latin does at the same nominal size: a matra cluster
+   * carries its meaning above and below the letter, and at 15px the parts that distinguish কি
+   * from কী are a pixel or two. This is read by a child who is learning to tell them apart, and
+   * by a parent reading over their shoulder.
+   */
+  .deck {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 16.5px;
+    line-height: 1.62;
+  }
+
+  .deck b { color: var(--ink); font-weight: 600; }
+
+  /* Inside a card the deck is body copy under a heading; it only needs room below it when
+     something else follows. */
+  .card .deck:not(:last-child) { margin-bottom: 16px; }
+
+  /* The button that opens the options. Shaped like every other button in the game - a pill with
+     a hard bottom lip that vanishes when pressed - and big enough to be a target rather than a
+     detail, because on a phone it is the only way to anything that is not the board. */
+  .bar-menu {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    flex: none;
+    border: 0;
+    background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+    box-shadow: var(--lip) var(--accent-lo);
+    color: var(--ink);
+    border-radius: 99px;
+    padding: 10px 18px 12px 15px;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: filter .16s ease, transform .12s ease, box-shadow .12s ease;
+  }
+  .bar-menu:hover { filter: brightness(1.04); }
+  .bar-menu:active { transform: translateY(4px); box-shadow: none; }
+
+  /* Three lines drawn rather than typed, so it never depends on a glyph being present. They
+     become an X while the options are open, so the button says what pressing it will do. */
+  .bar-menu .bars {
+    width: 16px; height: 12px;
+    border-top: 2.5px solid currentColor;
+    border-bottom: 2.5px solid currentColor;
+    position: relative;
+    transition: border-color .18s ease;
+  }
+  /* Two strokes lying on top of each other: one middle line while closed, an X once they turn
+     apart. Drawing only one of them left the button showing a single slash. */
+  .bar-menu .bars::before,
+  .bar-menu .bars::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 50%;
+    border-top: 2.5px solid currentColor;
+    transform: translateY(-1.5px);
+    transition: transform .18s ease;
+  }
+  .bar-menu[aria-expanded="true"] .bars {
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+  }
+  .bar-menu[aria-expanded="true"] .bars::before { transform: translateY(-1.5px) rotate(45deg); }
+  .bar-menu[aria-expanded="true"] .bars::after  { transform: translateY(-1.5px) rotate(-45deg); }
+
+  /* -- Two-up: the game on the left, the menu on the right --------------------
+       The level picker used to have a column of its own under the phone. It is one section of
+       the menu now - six named places behind a menu bar - so there is nothing to put there and
+       the menu takes the whole right-hand side.
+
+       `.guide` groups the menu so a phone or tablet can put all of it behind one button. On a
+       wide screen it is display: contents, which dissolves the wrapper and lets its children
+       take their own places in this grid as if it were not there. */
+  .stage {
+    display: grid;
+    grid-template-columns: minmax(0, 510px) minmax(300px, 460px);
+    grid-template-areas: "game notes";
+    grid-template-rows: auto;
+    gap: clamp(20px, 3vw, 44px);
+    align-items: start;
+    justify-content: center;
+  }
+
+  .device { grid-area: game; }
+
+  /* The menu is one column now, so it can be the grid item itself. It used to be
+     `display: contents` - the wrapper dissolving so the level picker and the notes could take
+     two different areas - which there is no longer anything to do. */
+  .guide { grid-area: notes; min-width: 0; }
+
+  /* The head names the section you are reading. On a wide screen there is nothing to close -
+     the panel is simply part of the page - so only the way back to the options shows. */
+  .guide-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .guide-close { display: none; }
+
+  .guide-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: 0;
+    background: var(--surface);
+    box-shadow: var(--lip) var(--surface-3);
+    color: var(--ink-soft);
+    border-radius: 99px;
+    padding: 7px 15px 9px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .guide-back:hover { color: var(--ink); background: var(--accent-hi); }
+  .guide-back:active { transform: translateY(4px); box-shadow: none; }
+
+  .guide-title {
+    font-family: var(--bn);
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  @media (max-width: 860px) {
+    .stage {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "game" "notes";
+      grid-template-rows: auto auto;
+    }
+  }
+
+  /* -- Phones and tablets: the game owns the first screen ----------------------
+       On a touch-sized screen the prose pushed the board halfway down the page, so a player had
+       to scroll before they could play. The game fills the viewport and everything written
+       about it is a sheet over the top. Width-gated rather than pointer-gated: a narrow desktop
+       window gets the same treatment, which is no loss, and it stays testable. */
+  @media (max-width: 1024px) {
+    /* The top bar goes. Its button has moved to the foot of the screen, which leaves it
+       holding a name - decoration on a phone, where the game should own the screen - and the
+       height it was taking is very nearly the height the tab bar needs. Taking it back is what
+       keeps the board the size it was: without this a 360x640 phone lost its cells from 47px
+       to the 30px floor, which is a worse trade than the reach the bar buys. */
+    .bar {
+      /* Above the sheet, which is z-index 60. The options panel is a child of this header and
+         so paints at the header's level whatever its own z-index says - at 50 it opened behind
+         an open sheet, so switching section from a tab showed nothing at all. The tab bar
+         itself is higher again, at 70, because it has to stay reachable over both. */
+      z-index: 65;
+      /* Emptied rather than removed. The options panel is a child of this header - that is how
+         it anchors under the button on a wide screen - and `display: none` here takes the panel
+         with it, so on a phone the tab bar opened nothing at all. Zero height gives the frame
+         the space back without taking the panel off the page. */
+      height: 0;
+      margin: 0;
+      padding: 0;
+      overflow: visible;
+    }
+    .bar-name, .bar-menu, .bar::after { display: none; }
+
+    /* The stage is only the game here; the rest is a sheet over it. */
+    .stage {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "game";
+      grid-template-rows: auto;
+      gap: 0;
+    }
+
+    .guide {
+      /* Not a grid item here. Leaving the desktop's `grid-area: notes` on it made the grid
+         invent a column for a name it no longer had, which crushed the game to 1px cells. */
+      grid-area: auto;
+      display: block;
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      background: var(--surface-3);
+      /* The tab bar stays on top of the sheet - it is how you switch section without closing
+         anything - so the sheet has to keep its last lines clear of it. */
+      padding: 14px 14px calc(34px + var(--tabbar-h, 72px) + env(safe-area-inset-bottom));
+      transform: translateY(100%);
+      visibility: hidden;
+      transition: transform .26s cubic-bezier(.22, 1, .36, 1), visibility .26s;
+    }
+    .guide.open { transform: translateY(0); visibility: visible; }
+    body.guide-open { overflow: hidden; }
+
+    .guide-head {
+      justify-content: space-between;
+      position: sticky;
+      top: -14px;
+      margin: -14px -14px 14px;
+      padding: 16px 14px 12px;
+      background: linear-gradient(var(--surface-3) 78%, transparent);
+      z-index: 1;
+    }
+
+    /* Here the sheet covers everything, so there is something to close. */
+    .guide-close {
+      display: inline-block;
+      border: 0;
+      background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+      box-shadow: var(--lip) var(--accent-lo);
+      color: var(--ink);
+      border-radius: 99px;
+      padding: 8px 18px 10px;
+      font: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .guide-close:active { transform: translateY(4px); box-shadow: none; }
+  }

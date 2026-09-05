@@ -1,0 +1,851 @@
+  /* -- The options -----------------------------------------------------------
+       A panel that drops out of the bar, holding ten options in four named groups. It replaces
+       a flat row of ten identical pills that wrapped into four ragged lines: same shape, same
+       colour, same size, whether it led to a chart to read or to the level you play next.
+
+       Anchored to the bar on a wide screen and a full sheet on a phone, which is the same
+       decision the game itself makes about the notes - there is no room beside a phone. */
+  .menu-pop {
+    position: absolute;
+    top: calc(100% - 4px);
+    right: 0;
+    z-index: 60;
+    width: min(560px, calc(100vw - 28px));
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 18px;
+    padding: 16px 16px 18px;
+    background: var(--surface);
+    border-radius: var(--r-lg);
+    box-shadow: 0 18px 44px rgba(var(--shade), .22), 0 2px 0 var(--surface-3);
+    animation: pop-in .18s cubic-bezier(.22, 1, .36, 1);
+  }
+  .menu-pop[hidden] { display: none; }
+
+  @keyframes pop-in {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: none; }
+  }
+  /* A drop is movement, and someone who has asked for less of it still needs the menu. It
+     appears instead of arriving. */
+  @media (prefers-reduced-motion: reduce) {
+    .menu-pop { animation: none; }
+  }
+
+  /* -- The bar at the foot of the screen ----------------------------------------
+       Phones and tablets only. On a wide screen the options hang off a button in the top bar,
+       which is where a pointer already is; on a phone the thumb is at the bottom and the top
+       corner of a six-inch screen is a two-handed reach. One tab per group, so the four names
+       a child navigates by are on screen the whole time instead of behind a button.
+
+       Hidden above the touch breakpoint, where `.bar` keeps its button. */
+  .tabbar { display: none; }
+
+  @media (max-width: 1024px) {
+    .tabbar {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      z-index: 70;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      padding: 7px 8px calc(8px + env(safe-area-inset-bottom));
+      background: linear-gradient(180deg, #fff, var(--surface));
+      box-shadow: 0 -6px 20px rgba(var(--shade), .12), inset 0 2px 0 var(--surface-3);
+    }
+
+    .tb {
+      display: grid;
+      justify-items: center;
+      gap: 5px;
+      border: 0;
+      background: transparent;
+      padding: 5px 2px 3px;
+      border-radius: var(--r-md);
+      font: inherit;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* The same tinted tile the level grid and the option list use, so a tab belongs to the
+       group it opens by colour before it is read. */
+    .tb-g {
+      display: grid;
+      place-items: center;
+      width: 34px; height: 34px;
+      border-radius: 11px;
+      --hue: var(--block-1);
+      color: color-mix(in srgb, var(--hue) 78%, var(--ink));
+      background: color-mix(in srgb, var(--hue) 22%, #fff);
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .tb-g svg { width: 20px; height: 20px; display: block; }
+    .tb[data-block="2"] .tb-g { --hue: var(--block-2); }
+    .tb[data-block="3"] .tb-g { --hue: var(--block-3); }
+    .tb[data-block="4"] .tb-g { --hue: var(--block-4); }
+
+    .tb-l {
+      font-family: var(--bn);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink-faint);
+      line-height: 1;
+    }
+
+    /* Open, or holding the section you are reading: the game's own gold, and pressed down like
+       every other button here. */
+    .tb[aria-expanded="true"] .tb-g,
+    .tb[aria-current="true"] .tb-g {
+      background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+      box-shadow: 0 3px 0 var(--accent-lo);
+      color: var(--ink);
+    }
+    .tb[aria-expanded="true"] .tb-l,
+    .tb[aria-current="true"] .tb-l { color: var(--ink); }
+    .tb:active .tb-g { transform: translateY(3px); box-shadow: none; }
+  }
+
+  /* Invisible by default: on a wide screen its whole job is to catch a press that lands
+     anywhere but the options. Over a phone it dims the game as well, because there the options
+     are a sheet and the game behind them should read as put away rather than merely covered. */
+  .scrim {
+    position: fixed;
+    inset: 0;
+    /* Under the bar, and therefore under the options panel, which is a child of the bar and so
+       stacks at the bar's level whatever its own z-index says. Above the bar, the scrim painted
+       over the panel and swallowed every tap meant for an option - the menu closed instead of
+       choosing. Under it, a press on the dimmed game still closes, because the handler asks
+       what was pressed rather than what was covered. */
+    z-index: 45;
+    background: transparent;
+  }
+  .scrim[hidden] { display: none; }
+  @media (max-width: 620px) {
+    .scrim { background: rgba(var(--shade), .34); }
+  }
+
+  .menu-group { min-width: 0; }
+
+  /* The group name. Bengali, so no letter-spacing and no uppercase - both are wrong for a
+     caseless script and pull matra clusters apart. Told apart by a coloured rule instead. */
+  .menu-head {
+    font-family: var(--bn);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink-faint);
+    margin: 6px 0 6px 2px;
+    padding-left: 8px;
+    border-left: 3px solid var(--block-1);
+  }
+  .menu-group[data-block="2"] .menu-head { border-left-color: var(--block-2); }
+  .menu-group[data-block="3"] .menu-head { border-left-color: var(--block-3); }
+  .menu-group[data-block="4"] .menu-head { border-left-color: var(--block-4); }
+
+  /* One option: a tile, its name, and the sentence that used to be a `title` attribute - which
+     is to say a sentence nobody on a phone has ever seen. Laid out as a row so the tap target
+     is the whole width rather than the few characters of the label. */
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    border: 0;
+    border-radius: var(--r-md);
+    padding: 8px 10px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+    transition: background-color .14s ease;
+  }
+  .opt:hover { background: var(--surface-2); }
+  .opt:active { background: var(--surface-3); }
+
+  /* The tile carries the option's own first letter, in the group's colour, so the options are
+     told apart by shape and colour before they are read - which matters when the reader is
+     five and the labels are all the same length. */
+  .opt-g {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 38px; height: 38px;
+    border-radius: 11px;
+    background: var(--block-1);
+    color: var(--ink);
+    font-size: 19px;
+    font-weight: 700;
+    box-shadow: 0 2px 0 rgba(var(--shade), .10);
+  }
+  .menu-group[data-block="2"] .opt-g { background: var(--block-2); }
+  .menu-group[data-block="3"] .opt-g { background: var(--block-3); }
+  .menu-group[data-block="4"] .opt-g { background: var(--block-4); }
+
+  .opt-t { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+  .opt-t b {
+    font-family: var(--bn);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.25;
+  }
+  .opt-t i {
+    font-family: var(--bn);
+    font-style: normal;
+    font-size: 13.5px;
+    color: var(--ink-faint);
+    line-height: 1.35;
+  }
+
+  /* Where you are. A child should be able to see it without reading, so it is the game's own
+     gold rather than a grey - the same signal the level tile on the board uses. */
+  .opt.on { background: var(--accent-hi); }
+  .opt.on .opt-g {
+    background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+    box-shadow: 0 2px 0 var(--accent-lo);
+  }
+  .opt.on .opt-t b { color: var(--ink); }
+
+  /* One column on a phone, and the panel becomes a sheet under the bar rather than a card
+     hanging off it: at 390px a two-column card would be two 170px columns of clipped Bengali. */
+  /* On a phone the options come up out of the tab that opened them, so they sit above the bar
+     rather than dropping from a button at the top that is no longer there. One group at a
+     time - the tab chose it - which is what makes four tabs four different things rather than
+     four ways to open the same list. */
+  @media (max-width: 1024px) {
+    .menu-pop {
+      position: fixed;
+      inset: auto 0 var(--tabbar-h, 72px);
+      top: auto;
+      width: auto;
+      max-height: 62vh;
+      grid-template-columns: 1fr;
+      gap: 2px;
+      border-radius: var(--r-lg) var(--r-lg) 0 0;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding-bottom: 16px;
+      animation: rise-in .18s cubic-bezier(.22, 1, .36, 1);
+    }
+    .opt { padding: 10px; }
+
+    /* Only the group whose tab was pressed. */
+    .menu-pop[data-only="1"] .menu-group:not([data-block="1"]),
+    .menu-pop[data-only="2"] .menu-group:not([data-block="2"]),
+    .menu-pop[data-only="3"] .menu-group:not([data-block="3"]),
+    .menu-pop[data-only="4"] .menu-group:not([data-block="4"]) { display: none; }
+  }
+
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .menu-pop { animation: none; }
+  }
+
+  /* -- Each vowel beside its own কার --------------------------------------------
+       One pair per swatch, letter on the left and the sign it becomes on the right, sharing a
+       colour so the pairing is visible before any of it is read. Ten pairs, five block
+       colours, cycling - the colour binds a letter to its sign inside one pair rather than
+       identifying the pair among all ten, and no two neighbours share one. */
+  .pairs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(104px, 100%), 1fr));
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  /* Tinted the way the level grid tints these same five colours - mixed into paper rather than
+     used raw. Raw, they are five saturated blocks that belong to some other game; the grid's
+     recipe is what makes them read as this one's. A touch stronger than the grid's 15%, because
+     a tile there is one of 244 and these are ten things a child is asked to compare. */
+  .pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+    border-radius: var(--r-md);
+    overflow: hidden;
+    --hue: var(--block-1);
+    background: color-mix(in srgb, var(--hue) 22%, #fff);
+    box-shadow: var(--lip) color-mix(in srgb, var(--hue) 30%, #fff);
+  }
+  .pair[data-block="2"] { --hue: var(--block-2); }
+  .pair[data-block="3"] { --hue: var(--block-3); }
+  .pair[data-block="4"] { --hue: var(--block-4); }
+  .pair[data-block="5"] { --hue: var(--block-5); }
+
+  .pair-v, .pair-k {
+    font-family: var(--bn);
+    font-size: 30px;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--hue) 76%, var(--ink));
+    line-height: 1;
+    padding: 12px 4px 14px;
+    text-align: center;
+  }
+
+  /* The sign half holds a drawn outline rather than text - see drawKarPairs. Sized to the
+     letter beside it and centred, and it takes its fill from `currentColor`, so the pair's
+     two halves stay one colour without the shape being told what that colour is. */
+  .pair-k { display: grid; place-items: center; }
+  .pair-k svg {
+    display: block;
+    /* Taller than the letter beside it on purpose. The box spans the whole vertical range the
+       ten signs cover - ী at the top to ৃ below the baseline - so the ink inside it is smaller
+       than the box: at the letter's own 27px, ু came out six pixels tall. */
+    height: 40px;
+    width: auto;
+    max-width: 100%;
+    overflow: visible;
+  }
+  /* A hairline between the two halves, in the paper rather than in a new colour: the halves are
+     one object seen twice, so a rule is enough and a second fill would split the pair in two. */
+  .pair-k { box-shadow: inset 1px 0 0 rgba(255, 255, 255, .8); }
+
+  .page { display: none; }
+  .page.on { display: block; }
+  /* Two cards in one section (About holds the notes and the feedback card) need the gap the
+     panel used to give them. */
+  .page > .card + .card { margin-top: 22px; }
+  /* A heading is Bengali then English - স্বরবর্ণ / the vowels - and the two halves want
+     opposite typography. The English reads as a label at 11px with wide letter-spacing; that
+     same spacing pulls Bengali matra clusters apart, and 11px is unreadable in the script. So
+     the row is sized for the Bengali and the English half is shrunk back down inside it. */
+  .page > h3, .page .card > h3:first-child {
+    margin: 0 0 12px;
+    font-size: 23px;
+    font-family: var(--bn);
+    font-weight: 800;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  /* A heading that says exactly what the panel's head says one line above it. Seven of the ten
+     sections open with their own name - "কার ও চিহ্ন" under a head reading কার ও চিহ্ন - and
+     three do not: শব্দ গঠন opens on "কার চিহ্ন ছাড়া শব্দ গঠন", which is a different sentence
+     and earns its line. So this is decided by the words rather than by the markup, in
+     `showPage`, and a heading that stops being a repeat starts showing again on its own.
+
+     Hidden from the screen, not from the page: `display: none` would take it out of the
+     accessibility tree too and leave the panel with no heading to navigate by. */
+  .page h3.dup {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Cards inside a section carry a Bengali heading too, so the small-caps English treatment
+     they inherited from `.card h3` has to come off there as well. */
+  .page .card h3 {
+    font-family: var(--bn);
+    font-size: 15.5px;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  /* -- The alphabet charts --------------------------------------------------- */
+  .chart {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(64px, 100%), 1fr));
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .ch {
+    aspect-ratio: 1;
+    border: 1px solid var(--surface-3);
+    border-radius: 13px;
+    background: var(--surface-2);
+    display: grid;
+    place-content: center;
+    gap: 1px;
+    cursor: pointer;
+    transition: transform .18s cubic-bezier(.2,1.5,.4,1), background-color .18s ease;
+  }
+  .ch:hover { transform: translateY(-2px); background: var(--accent-hi); }
+  .ch:active { transform: scale(.95); }
+  .ch-l { font-size: 28px; font-weight: 700; color: var(--ink); line-height: 1.1; }
+  /* How many levels this letter has. Counted from the game, never typed in. */
+  .ch-n {
+    font-size: 11.5px;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-soft);
+  }
+  /* ঙ, ঞ and ণ. Dimmed and not a button, because there is nothing to open - no Bengali word
+     begins with them. Shown rather than omitted: a gap in a chart of the alphabet reads as a
+     mistake, and this is not one. */
+  .ch-none {
+    cursor: default;
+    border-style: dashed;
+    background: transparent;
+  }
+  .ch-none .ch-l { color: var(--ink-faint); }
+
+  /* -- The কার and চিহ্ন table ----------------------------------------------- */
+  .marks { margin-top: 16px; display: flex; flex-direction: column; gap: 2px; }
+
+  .mk {
+    display: grid;
+    grid-template-columns: 50px minmax(96px, auto) 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 4px;
+    border-bottom: 1px solid var(--surface-3);
+    font-size: 13.5px;
+  }
+  .mk:last-child { border-bottom: 0; }
+  .mk-g { font-size: 24px; color: var(--ink); line-height: 1.2; }
+  .mk-n { color: var(--ink); font-size: 14px; }
+  .mk-w { color: var(--ink-soft); line-height: 1.45; }
+
+  /* The example word, which opens the level it sits on. */
+  .mk-eg {
+    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    border-radius: 9px;
+    padding: 4px 9px;
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--accent);
+    font-size: 16.5px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .mk-eg:hover { background: var(--accent); color: var(--ink); }
+  .mk-gone {
+    border-style: dashed;
+    background: transparent;
+    color: var(--ink-faint);
+    font-size: 12.5px;
+    cursor: default;
+  }
+
+  /* On a narrow sheet the note has nowhere to go, so it drops under the name. */
+  @media (max-width: 460px) {
+    .mk { grid-template-columns: 40px 1fr auto; }
+    .mk-w { grid-column: 2 / -1; grid-row: 2; }
+  }
+
+  /* A topic inside a section, with a rule and air above it. বর্ণমালা is one section holding
+     three of these - স্বরবর্ণ, ব্যঞ্জনবর্ণ, কার ও চিহ্ন - and the বারোখড়ি table is a fourth,
+     which is where this treatment started. Without the rule a long page reads as one
+     undifferentiated scroll and a child has nothing to stop at. */
+  .part-head,
+  .baro-head { margin-top: 30px !important; padding-top: 22px;
+               border-top: 1px solid var(--surface-3); }
+
+  /* Thirty-two letters, tight enough to sit above the table without scrolling past it. */
+  .baro-pick {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(42px, 100%), 1fr));
+    gap: 5px;
+    margin: 14px 0 18px;
+  }
+  .bp {
+    aspect-ratio: 1;
+    border: 1px solid var(--surface-3);
+    border-radius: 10px;
+    background: var(--surface-2);
+    color: var(--accent-lo);
+    font-size: 19px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .14s ease, transform .14s ease;
+  }
+  .bp:hover { background: var(--accent-hi); }
+  .bp:active { transform: scale(.94); }
+  .bp.on { background: var(--accent); border-color: var(--accent); color: var(--ink); }
+
+  .baro { display: flex; flex-direction: column; gap: 2px; }
+  .br {
+    display: grid;
+    grid-template-columns: 62px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 4px;
+    border-bottom: 1px solid var(--surface-3);
+  }
+  .br:last-child { border-bottom: 0; }
+  /* The form itself, big - this is the thing being learned, not a label about it. */
+  .br-f { font-size: 30px; font-weight: 700; color: var(--ink); line-height: 1.25; }
+  .br-n { font-size: 13.5px; color: var(--ink-soft); }
+
+  .br-go {
+    border: 1px solid var(--surface-3);
+    border-radius: 9px;
+    padding: 4px 10px;
+    background: transparent;
+    color: var(--ink-soft);
+    font-size: 15.5px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .br-go:hover { background: var(--accent-hi); color: var(--ink); }
+  /* A form with a level of its own reads differently from one that only has a word. */
+  .br-lvl {
+    border-color: color-mix(in srgb, var(--accent) 34%, transparent);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .br-lvl:hover { background: var(--accent); color: var(--ink); }
+  .br-none {
+    border-style: dashed;
+    color: var(--ink-faint);
+    font-size: 13px;
+    cursor: default;
+  }
+
+  /* A word that shows the form but is not in the game - no level to open, so not a button. */
+  .br-out {
+    border-style: dashed;
+    border-color: var(--surface-3);
+    color: var(--ink-soft);
+    cursor: default;
+  }
+  .br-gloss {
+    font-size: 12px;
+    text-align: right;
+    color: var(--ink-faint);
+    line-height: 1.35;
+  }
+  /* The row grows a column for that meaning; on a narrow sheet it drops under the name. */
+  .br:has(.br-gloss) { grid-template-columns: 62px 1fr auto auto; }
+  @media (max-width: 460px) {
+    .br:has(.br-gloss) { grid-template-columns: 54px 1fr auto; }
+    .br-gloss { grid-column: 2 / -1; grid-row: 2; text-align: left; }
+  }
+
+  /* ---- শব্দ গঠন: the equations -------------------------------------------------------- */
+
+  /* A grid of small sums rather than a list, because the whole point is that they are short
+     and alike: a child reads two or three before noticing they are all the same shape.
+     The track is set from the widest sum the primer holds, which is জ+ম+জ=জমজ at 180px once the
+     type went up a step. It was 160, and at 360px that fitted two columns of 163 side by side -
+     seven pixels short of the content, so the section scrolled sideways and primertest said so.
+     Sized to the content rather than to a round number, and every auto-fill grid in here is
+     wrapped in `min(…, 100%)` so a track can never be wider than what holds it. */
+  .eqs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(184px, 100%), 1fr));
+    gap: 6px;
+    margin: 12px 0 4px;
+  }
+  .eq {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 9px;
+    border: 1px solid var(--surface-3);
+    border-radius: 10px;
+    background: var(--surface-2);
+  }
+  .eq-l {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  /* The + and = are scaffolding, not letters. Kept small and grey so the eye lands on the
+     letters and then on the answer, which is the order the sum is meant to be read in. */
+  .eq-op {
+    font-family: var(--ui);
+    font-size: 13px;
+    color: var(--ink-faint);
+  }
+  .eq-w {
+    margin-left: auto;
+    padding: 3px 8px;
+    border: 1px solid var(--surface-3);
+    border-radius: 8px;
+    font-size: 17.5px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    background: none;
+    cursor: default;
+  }
+  /* The answer is playable, so it looks like the thing it is: the same gold every other
+     playable thing in the game uses. */
+  .eq-w.on {
+    border-color: color-mix(in srgb, var(--accent) 55%, transparent);
+    color: var(--accent);
+    cursor: pointer;
+    transition: background-color .14s ease, color .14s ease;
+  }
+  .eq-w.on:hover { background: var(--accent); color: var(--ink); }
+  .eq-head, .kw-head { margin: 18px 0 0; }
+  .eq-head {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+
+  /* ---- শব্দ গঠন: a কার, and its words ------------------------------------------------ */
+
+  .kw-pick {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(66px, 100%), 1fr));
+    gap: 5px;
+    margin: 14px 0 16px;
+  }
+  .kp {
+    display: grid;
+    gap: 1px;
+    padding: 7px 4px;
+    border: 1px solid var(--surface-3);
+    border-radius: 10px;
+    background: var(--surface-2);
+    cursor: pointer;
+    transition: background-color .14s ease, transform .14s ease;
+  }
+  .kp:hover { background: var(--accent-hi); }
+  .kp:active { transform: scale(.94); }
+  .kp-s {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent-lo);
+  }
+  /* The sign's name, under the letter carrying it - see the comment in drawKarWords. */
+  .kp-n {
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+  .kp.on { background: var(--accent); border-color: var(--accent); }
+  .kp.on .kp-s, .kp.on .kp-n { color: var(--ink); }
+  .kw-count {
+    margin: 0 0 8px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .kw-words, .ph-words, .ph-forms { display: flex; flex-wrap: wrap; gap: 5px; }
+  .kw, .ph-w, .ph-f {
+    padding: 4px 9px;
+    border: 1px solid var(--surface-3);
+    border-radius: 8px;
+    background: var(--surface-2);
+    font-size: 16.5px;
+    color: var(--ink-soft);
+    cursor: default;
+  }
+  .kw.on, .ph-w.on {
+    border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+    color: var(--accent);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .14s ease, color .14s ease;
+  }
+  .kw.on:hover, .ph-w.on:hover { background: var(--accent); color: var(--ink); }
+
+  /* ---- ফলা ---------------------------------------------------------------------------- */
+
+  .phala { display: grid; gap: 10px; margin-top: 14px; }
+  .ph {
+    padding: 11px 12px 12px;
+    border: 1px solid var(--surface-3);
+    border-radius: 12px;
+    background: var(--surface-2);
+  }
+  .ph-h {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 5px;
+    font-size: 16.5px;
+    color: var(--ink);
+  }
+  /* The mark itself, large enough to see the shape of - which is the whole lesson. */
+  .ph-m {
+    padding: 1px 8px;
+    border-radius: 7px;
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+    color: var(--accent);
+    font-size: 20px;
+    font-weight: 700;
+  }
+  .ph-note {
+    margin: 0 0 9px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--ink-soft);
+  }
+  /* The forms are the mark on every letter it takes - a reference row, not words, so they are
+     set apart from the word list below by weight rather than by another box. */
+  .ph-f {
+    font-size: 15.5px;
+    font-weight: 700;
+    color: var(--accent-lo);
+    background: none;
+  }
+  .ph-forms { margin-bottom: 9px; }
+
+  /* A ফলা form the language does not use. Dimmed and struck, not hidden - see drawPhala. */
+  .ph-f-none {
+    color: var(--ink-faint);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+  }
+  .ph-gap {
+    margin: 0 0 9px;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--ink-faint);
+  }
+
+  /* ---- যুক্তবর্ণ ------------------------------------------------------------------------ */
+
+  .jk-pick {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 14px 0 14px;
+  }
+  .jp {
+    min-width: 30px;
+    padding: 5px 7px;
+    border: 1px solid var(--surface-3);
+    border-radius: 9px;
+    background: var(--surface-2);
+    color: var(--accent-lo);
+    font-size: 16.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .14s ease, transform .14s ease;
+  }
+  .jp:hover { background: var(--accent-hi); }
+  .jp:active { transform: scale(.94); }
+  .jp.on { background: var(--accent); border-color: var(--accent); color: var(--ink); }
+  .jp-all { font-size: 14px; }
+  .jk-count {
+    margin: 0 0 9px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .jk { display: grid; gap: 5px; }
+  /* The letter, its parts, then the words - the three columns the book prints. The words get
+     whatever is left, because that is the column that varies in length. */
+  .jr {
+    display: grid;
+    grid-template-columns: 46px 92px 1fr;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 9px;
+    border: 1px solid var(--surface-3);
+    border-radius: 10px;
+    background: var(--surface-2);
+  }
+  .jr-f {
+    font-size: 21px;
+    font-weight: 700;
+    color: var(--accent-lo);
+  }
+  .jr-p {
+    font-size: 14px;
+    color: var(--ink-soft);
+  }
+  .jr-words { display: flex; flex-wrap: wrap; gap: 4px; }
+  .jr-w {
+    padding: 3px 8px;
+    border: 1px solid var(--surface-3);
+    border-radius: 7px;
+    background: none;
+    font-size: 15.5px;
+    color: var(--ink-soft);
+    cursor: default;
+  }
+  .jr-w.on {
+    border-color: color-mix(in srgb, var(--accent) 50%, transparent);
+    color: var(--accent);
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color .14s ease, color .14s ease;
+  }
+  .jr-w.on:hover { background: var(--accent); color: var(--ink); }
+  /* হৃ and ত্রু, whose printed বিভাজন is phonetic. The note takes the whole width under them. */
+  .jr-note {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: var(--ink-faint);
+  }
+  .jr:has(.jr-note) .jr-words { grid-column: 2 / -1; grid-row: 3; }
+  @media (max-width: 460px) {
+    .jr { grid-template-columns: 40px 1fr; }
+    .jr-words { grid-column: 1 / -1; }
+  }
+
+  /* -- Keeping the game -------------------------------------------------------
+       The block in অ্যাপ হিসেবে রাখুন that tells this browser how. `08-install.js` picks
+       which of the six things it says; this only has to hold any of them, because a
+       browser it guesses wrong about still gets a heading and a list.
+
+       Written as a panel rather than as more essay because a parent following steps on a
+       phone is looking away from the screen and back at it, and the numbers have to be
+       findable each time they look back. */
+  .ins {
+    margin: 14px 0 4px;
+    padding: 14px 16px 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--surface-3);
+    border-radius: var(--r-md);
+  }
+  /* Nothing left to do: the same panel, said quietly rather than with a fresh accent. */
+  .ins-done { background: var(--well); border-color: var(--good-lo); }
+  .ins-h {
+    margin: 0 0 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .ins-p { margin: 0; font-size: 15px; line-height: 1.65; color: var(--ink-soft); }
+  .ins-p + .ins-p { margin-top: 10px; }
+  .ins-steps {
+    margin: 0;
+    padding-left: 22px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+  }
+  .ins-steps li { margin: 0 0 6px; }
+  .ins-steps li:last-child { margin-bottom: 0; }
+  .ins-steps b { color: var(--ink); font-weight: 700; }
+  .ins-steps + .ins-p { margin-top: 10px; }
+  /* The share glyph inline in the sentence that names it, because "the share button" is not
+     a thing a parent can find and this shape is. Sized to the line rather than to a box. */
+  .ins-ic {
+    width: 1.05em;
+    height: 1.05em;
+    vertical-align: -.18em;
+    margin: 0 .1em;
+    color: var(--accent-deep);
+  }
+  /* Only ever drawn where the browser handed over a real prompt, so it is never a button
+     that opens instructions - it installs. */
+  .ins-go {
+    margin-top: 12px;
+    padding: 11px 20px;
+    font-family: var(--bn);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--accent);
+    border: none;
+    border-radius: var(--r-sm);
+    box-shadow: 0 2px 0 var(--accent-deep);
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .ins-go:hover { transform: translateY(-1px); box-shadow: 0 3px 0 var(--accent-deep); }
+  .ins-go:active { transform: translateY(1px); box-shadow: none; }
+  .ins-go:disabled { opacity: .55; cursor: default; transform: none; box-shadow: none; }
+  .ins-why {
+    margin: 14px 0 0;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--ink-faint);
+  }
+  .ins-why b { color: var(--ink-soft); }

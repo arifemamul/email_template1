@@ -1,0 +1,60 @@
+{
+ "name": "The ৈ levels - the last sign of the alphabet the game did not teach",
+ "WHY_THIS_FILE_EXISTS": [
+  "Of the alphabet's 57 teaching units the game taught 56. The one it never reached was ৈ,",
+  "the sign that writes ঐ onto a consonant - কৈ, তৈ, বৈ, সৈ. No word on any of the 253 boards",
+  "carried it, so a child could finish the whole game and never meet it.",
+  "",
+  "tools/vocabulary.py holds exactly four words with ৈ in them, and no more exist in the pool:",
+  "বৈশাখ, বৈঠক, তৈরি, সৈনিক. Only বৈশাখ and বৈঠক share an akshara, so only one akshara-keyed",
+  "level is possible; তৈরি and সৈনিক each stand alone under their sign and go on `letter` levels",
+  "instead, beside another word of the same consonant.",
+  "",
+  "Every level here is inside the same rules as the rest: two words or more, a ring of three to",
+  "five letters, a board within 5 by 7, and an arrangement of the ring that does not spell the",
+  "answer out. Kept in its own file so it stays clear that these three levels exist to close a",
+  "gap in the alphabet rather than because the vocabulary asked for them.",
+  "",
+  "The two `letter` levels are ত-1 and স-2 rather than তৈ and সৈ because a `letter` level's id",
+  "names the consonant it claims - validate() reads the part before the dash and requires every",
+  "word to start with it. They show as ত and স in the game, numbered among that letter's other",
+  "levels, which is how ক-1 has always shown."
+ ],
+ "FLAG_NOTES": [
+  "Two of the four ৈ words fail the curriculum's own test - that a picture could replace the",
+  "gloss - and are flagged rather than quietly included. They are the only ৈ words the language",
+  "offers in this pool, so the choice was these or no ৈ at all."
+ ],
+ "levels": [
+  {
+   "id": "ত-1",
+   "type": "letter",
+   "key": "ত",
+   "words": [
+    { "w": "তৈরি", "split": ["তৈ", "রি"], "en": "made, ready",
+      "flag": "abstract: draw a finished thing beside the parts it was made from. The only তৈ word in the pool", "freq": 0 },
+    { "w": "তাঁতি", "split": ["তাঁ", "তি"], "en": "a weaver", "freq": 0 }
+   ]
+  },
+  {
+   "id": "বৈ",
+   "type": "akshara",
+   "key": "বৈ",
+   "words": [
+    { "w": "বৈশাখ", "split": ["বৈ", "শা", "খ"], "en": "Boishakh, the first month of the Bengali year",
+      "flag": "draw পহেলা বৈশাখ - the new-year fair, and not a calendar page", "freq": 0 },
+    { "w": "বৈঠক", "split": ["বৈ", "ঠ", "ক"], "en": "a meeting, a sitting",
+      "flag": "abstract: draw people sitting together on a mat. The only other বৈ word in the pool", "freq": 0 }
+   ]
+  },
+  {
+   "id": "স-2",
+   "type": "letter",
+   "key": "স",
+   "words": [
+    { "w": "সৈনিক", "split": ["সৈ", "নি", "ক"], "en": "a soldier", "freq": 0 },
+    { "w": "সূর্য", "split": ["সূ", "র্য"], "en": "the sun", "freq": 0 }
+   ]
+  }
+ ]
+}

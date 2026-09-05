@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- "Shobdojot" - a tangle of words. Shown under the launcher icon. -->
+    <string name="app_name">শব্দজট</string>
+</resources>

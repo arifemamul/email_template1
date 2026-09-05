@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>শব্দজট Shobdojot - Bengali Word Puzzle</title>
+<meta name="description" content="শব্দজট - a Bengali word-cross puzzle. Drag across the letters to spell words and fill the crossword. Levels in a teaching order, free, works offline, no ads.">
+<meta name="theme-color" content="#FFE9C7">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231B1035'/%3E%3Cpath d='M32 36 L68 36 L50 68 Z' fill='none' stroke='%23FFB020' stroke-width='7' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='36' r='11' fill='%23FFB020'/%3E%3Ccircle cx='68' cy='36' r='11' fill='%23FFB020'/%3E%3Ccircle cx='50' cy='68' r='11' fill='%2335C08A'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%231B1035'/%3E%3Cpath d='M32 36 L68 36 L50 68 Z' fill='none' stroke='%23FFB020' stroke-width='7' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='36' r='11' fill='%23FFB020'/%3E%3Ccircle cx='68' cy='36' r='11' fill='%23FFB020'/%3E%3Ccircle cx='50' cy='68' r='11' fill='%2335C08A'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="শব্দজট">
+<meta property="og:type" content="website">
+<meta property="og:title" content="শব্দজট Shobdojot - Bengali Word Puzzle">
+<meta property="og:description" content="শব্দজট - a Bengali word-cross puzzle. Drag across the letters to spell words and fill the crossword. Levels in a teaching order, free, works offline, no ads.">
+<meta property="og:locale" content="bn_BD">
+<meta name="twitter:card" content="summary">
+<style>
+/* include css/fonts.css    the Bengali face itself - 104 KB of base64, nothing to read */
+/* include css/theme.css    the colours, and the one wrapper the page hangs off */
+/* include css/layout.css   masthead, the two-up desktop grid, the phone/tablet stack */
+/* include css/game.css     the phone screen: board, wheel, tiles, buttons */
+/* include css/panel.css    the guide and the level picker beside the game */
+/* include css/menu.css     the menu bar, the alphabet charts, the marks table */
+/* include css/effects.css  the layer flying tiles and confetti are drawn on */
+/* include css/host.css     what the page needs as a whole document, and the size overrides */
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- One bar, at every size. There used to be two: a tall gold masthead on wide screens and a
+       separate strip on phones, so the way in was in a different place depending on the screen.
+       One bar means one place to look, and it puts the board on the first screen everywhere
+       rather than only on a phone. -->
+  <header class="bar">
+    <div class="bar-name">
+      <span class="mark bn">শব্দজট</span>
+      <span class="eyebrow bn">বাংলা শব্দ খেলা · <span id="eyebrowCount" class="lv-count">লেভেল</span> · ব্রাউজারেই চলে</span>
+    </div>
+
+    <button class="bar-menu" id="guideOpen" type="button"
+            aria-haspopup="true" aria-expanded="false" aria-controls="menuPop">
+      <span class="bars" aria-hidden="true"></span>
+      <span class="label bn">মেনু</span>
+    </button>
+
+  <!-- The options. Ten of them used to sit in one flat row of identical pills that wrapped into
+       four ragged lines, which gave a child no way to tell লেভেল - where you play - from ফলা,
+       something to read: every one was the same shape in the same colour. Four groups in
+       teaching order now, each option carrying its own tile and the sentence that used to be a
+       `title` attribute - a tooltip no touch device has ever shown anyone. -->
+  <!-- Something to press that is not the menu. On a wide screen the options are a small card
+       and everything around them is already "outside", but on a phone they are a sheet running
+       from the bar to the bottom edge, so there was nothing left to tap: the only ways out were
+       the button and a keyboard, and a child has neither in mind. Dimmed where it covers the
+       game, invisible where it is only catching stray presses. -->
+  <div class="menu-pop" id="menuPop" role="menu" aria-label="মেনু" hidden>
+    <div class="menu-group" data-block="1">
+      <p class="menu-head bn">বর্ণমালা</p>
+      <!-- One option, not three. স্বরবর্ণ, ব্যঞ্জনবর্ণ and কার ও চিহ্ন were three ways into
+           one thing: a child looking up a letter does not know in advance which of the three
+           holds it, and নয় is a vowel-sign word whose letter is a consonant, so the answer was
+           often "both". They are one section now, read top to bottom in the order a primer
+           teaches them. Named পুরো বর্ণমালা rather than বর্ণমালা because the group above it is
+           already called that, and a head and its only option saying the same word is the same
+           repeat this menu removed from the sheet's heading. -->
+      <button class="opt" type="button" role="menuitem" data-page="barnamala">
+        <span class="opt-g bn" aria-hidden="true">অ</span>
+        <span class="opt-t"><b class="bn">পুরো বর্ণমালা</b><i class="bn">স্বরবর্ণ, ব্যঞ্জনবর্ণ, আর কার ও চিহ্ন - এক জায়গায়</i></span>
+      </button>
+    </div>
+
+    <div class="menu-group" data-block="2">
+      <p class="menu-head bn">শব্দ গড়া</p>
+      <button class="opt" type="button" role="menuitem" data-page="gathon">
+        <span class="opt-g bn" aria-hidden="true">শ</span>
+        <span class="opt-t"><b class="bn">শব্দ গঠন</b><i class="bn">বর্ণ জুড়ে শব্দ বানানো</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="phala">
+        <span class="opt-g bn" aria-hidden="true">ফ</span>
+        <span class="opt-t"><b class="bn">ফলা</b><i class="bn">ব্যঞ্জনবর্ণের সংক্ষিপ্ত রূপ</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="jukto">
+        <span class="opt-g bn" aria-hidden="true">যু</span>
+        <span class="opt-t"><b class="bn">যুক্তবর্ণ</b><i class="bn">দুই বর্ণ মিলে এক বর্ণ</i></span>
+      </button>
+    </div>
+
+    <div class="menu-group" data-block="3">
+      <p class="menu-head bn">খেলা</p>
+      <button class="opt" type="button" role="menuitem" data-page="levels">
+        <span class="opt-g bn" aria-hidden="true">লে</span>
+        <span class="opt-t"><b class="bn">লেভেল</b><i class="bn">বর্ণ অনুসারে সব লেভেল</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="play">
+        <span class="opt-g bn" aria-hidden="true">খে</span>
+        <span class="opt-t"><b class="bn">খেলার নিয়ম</b><i class="bn">কীভাবে খেলবে</i></span>
+      </button>
+    </div>
+
+    <div class="menu-group" data-block="4">
+      <p class="menu-head bn">আরও</p>
+      <button class="opt" type="button" role="menuitem" data-page="install">
+        <span class="opt-g bn" aria-hidden="true">অ্যা</span>
+        <span class="opt-t"><b class="bn">অ্যাপ হিসেবে রাখুন</b><i class="bn">হোম স্ক্রিনে, ইন্টারনেট ছাড়াই</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="about">
+        <span class="opt-g bn" aria-hidden="true">প</span>
+        <span class="opt-t"><b class="bn">পরিচিতি</b><i class="bn">খেলাটি কী</i></span>
+      </button>
+      <button class="opt" type="button" role="menuitem" data-page="report">
+        <span class="opt-g bn" aria-hidden="true">ভু</span>
+        <span class="opt-t"><b class="bn">ভুল পেয়েছেন?</b><i class="bn">ভুল বা মতামত জানান</i></span>
+      </button>
+    </div>
+  </div>
+  </header>
+
+  <!-- The way in on a phone: a bar at the foot of the screen, where a thumb already is, with
+       one tab per group of options. It replaces the button in the top bar on narrow screens -
+       reaching the far top corner of a 6-inch phone is a stretch a child makes with two hands.
+       The top bar goes with it, because the name is decoration on a phone and the height it
+       took is the height this needs.
+
+       The icons are drawn rather than typed. An icon font or a symbol like ▦ is a box on a
+       phone that has no glyph for it, and this game is played on phones nobody here can test;
+       a path is a path everywhere. Four different silhouettes on purpose - a first pass drew
+       বর্ণমালা as a book and শব্দ গড়া as two blocks, and at 20px both read as "two shapes
+       side by side", which is a bar where half the tabs look alike. -->
+  <nav class="tabbar" id="tabbar" aria-label="মেনু">
+    <button class="tb" type="button" data-block="1" aria-haspopup="true" aria-expanded="false">
+      <span class="tb-g" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor">
+        <rect x="3.5" y="3.5" width="17" height="17" rx="3"/>
+        <rect x="6.8" y="7.4" width="10.4" height="2" rx="1" fill="#fff"/>
+        <rect x="6.8" y="11" width="7" height="2" rx="1" fill="#fff"/>
+        <rect x="6.8" y="14.6" width="9" height="2" rx="1" fill="#fff"/>
+      </svg></span>
+      <span class="tb-l bn">বর্ণমালা</span>
+    </button>
+    <button class="tb" type="button" data-block="2" aria-haspopup="true" aria-expanded="false">
+      <span class="tb-g" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor">
+        <rect x="1.8" y="7.8" width="7.4" height="8.4" rx="2.2"/>
+        <rect x="14.8" y="7.8" width="7.4" height="8.4" rx="2.2"/>
+        <rect x="11.2" y="8.9" width="1.6" height="6.2" rx=".8"/>
+        <rect x="8.9" y="11.2" width="6.2" height="1.6" rx=".8"/>
+      </svg></span>
+      <span class="tb-l bn">শব্দ গড়া</span>
+    </button>
+    <button class="tb" type="button" data-block="3" aria-haspopup="true" aria-expanded="false">
+      <span class="tb-g" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor">
+        <rect x="3.4" y="3.4" width="7.6" height="7.6" rx="2.2"/>
+        <rect x="13" y="3.4" width="7.6" height="7.6" rx="2.2"/>
+        <rect x="3.4" y="13" width="7.6" height="7.6" rx="2.2"/>
+        <rect x="13" y="13" width="7.6" height="7.6" rx="2.2"/>
+      </svg></span>
+      <span class="tb-l bn">খেলা</span>
+    </button>
+    <button class="tb" type="button" data-block="4" aria-haspopup="true" aria-expanded="false">
+      <span class="tb-g" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor">
+        <circle cx="4.4" cy="12" r="2.3"/><circle cx="12" cy="12" r="2.3"/>
+        <circle cx="19.6" cy="12" r="2.3"/>
+      </svg></span>
+      <span class="tb-l bn">আরও</span>
+    </button>
+  </nav>
+
+  <div class="scrim" id="scrim" hidden></div>
+
+  <div class="stage">
+    <div class="device">
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="topbar">
+          <button class="icon-btn" id="prev" title="আগের লেভেল" aria-label="Previous level">‹</button>
+          <!-- The letter this level is about. A player arriving mid-alphabet should be able to
+               see which one they are on without opening the guide, and a number cannot tell
+               them: level ২১ says nothing, কা says everything. -->
+          <h2 class="now-letter" id="levelName" aria-live="polite">
+            <span class="bn glyph" id="levelGlyph"></span><span class="pass" id="levelPass"></span>
+          </h2>
+          <button class="icon-btn" id="next" title="পরের লেভেল" aria-label="Next level">›</button>
+        </div>
+
+        <div class="board-area"><div class="board" id="board"></div></div>
+
+        <div class="preview" id="preview"></div>
+
+        <div class="actions">
+          <button class="action" id="hint"><span class="glyph">◈</span><span class="bn">সংকেত</span></button>
+          <button class="action" id="shuffle"><span class="glyph">⟳</span><span class="bn">এলোমেলো</span></button>
+        </div>
+
+        <div class="wheel-area"><div class="wheel" id="wheel"><svg id="trail"></svg></div></div>
+
+        <div id="fx"></div>
+
+        <!-- Sound on or off, remembered per device. Deliberately not in the top bar or the
+             action row: those hold exactly what a child needs and a test holds them to it.
+             This is a thing a parent reaches for once, so it sits small in the corner. -->
+        <button class="mute" id="mute" type="button" aria-pressed="false"
+                title="শব্দ বন্ধ করুন" aria-label="শব্দ চালু বা বন্ধ">🔊</button>
+
+      </div>
+    </div>
+
+    <div class="guide" id="guide" aria-label="Alphabet, levels and how this game works">
+      <!-- The head names what you are reading. It used to say only "মেনু", above a bar of ten
+           pills, on a sheet you had already opened from a button marked মেনু - three chances to
+           say the same word and none to say which section you were in. The title is set from
+           whichever option was chosen, and ‹ goes back to the options rather than shutting the
+           whole thing. -->
+      <div class="guide-head">
+        <button class="guide-back bn" id="guideBack" type="button"
+                aria-label="মেনুতে ফিরুন">‹ <span class="bn">মেনু</span></button>
+        <span class="guide-title bn" id="guideTitle">মেনু</span>
+        <button class="guide-close bn" id="guideClose" aria-label="বন্ধ করুন">বন্ধ</button>
+      </div>
+
+      <div class="pages">
+        <!-- The whole বর্ণমালা, in one section: the eleven স্বরবর্ণ, the thirty-two
+             ব্যঞ্জনবর্ণ, then the কার and the signs that sit on them, and finally the বারোখড়ি
+             where the last two meet. Three separate sections once, which asked a child to know
+             which one held the letter they were looking for before they could look it up.
+             Order is a primer's order, and the page is read straight down. Both charts are
+             built in js/12-menu.js from LEVELS, so neither can claim a letter the game has
+             lost, and every letter with levels is a button that opens its first one. -->
+        <section class="page" id="page-barnamala" role="region" aria-labelledby="opt-barnamala">
+          <!-- Worded exactly as the option that opens it, so showPage's `dup` rule folds it away:
+               the sheet's head already says পুরো বর্ণমালা one line above. Kept in the markup
+               rather than deleted because it is still the section's heading for anything
+               reading the page rather than looking at it. -->
+          <h3>পুরো বর্ণমালা</h3>
+          <p class="deck">
+            বাংলা বর্ণমালার সবটুকু এক জায়গায় - প্রথমে এগারোটি স্বরবর্ণ, তারপর বত্রিশটি
+            ব্যঞ্জনবর্ণ, আর শেষে কার ও চিহ্ন, যেগুলো বর্ণের সঙ্গে বসে।
+          </p>
+
+          <h3 class="part-head">স্বরবর্ণ</h3>
+          <p class="deck">
+            এগারোটি বর্ণ, আর প্রতিটি বাঙালি শিশু সবার আগে এই ক্রমেই মুখস্থ করে। খেলাটিও এই
+            ক্রমেই চলে, তাই এগুলোই ১ থেকে শুরুর লেভেল। যেকোনো বর্ণে চাপ দিলে তার প্রথম লেভেল
+            খুলে যায়। নিচের ছোট সংখ্যাটি বলে সেই বর্ণের কতটি লেভেল আছে।
+          </p>
+          <div class="chart" id="chartVowels"></div>
+
+          <h3 class="part-head">ব্যঞ্জনবর্ণ</h3>
+          <p class="deck">
+            বত্রিশটি বর্ণ, ক থেকে হ। স্বরবর্ণের পরে খেলাটি এই ক্রমেই চলে - যেকোনো বর্ণে চাপ
+            দিলে তার প্রথম লেভেল খুলে যায়। উনত্রিশটির লেভেল আছে; ঙ, ঞ আর ণ-এর নেই, আর থাকতেও
+            পারে না - বাংলায় কোনো শব্দ এই তিনটি দিয়ে শুরু হয় না। তবু শব্দের ভিতরে এরা আসে, তাই
+            শিশু এদের দেখে - শুধু শব্দের শুরুতে নয়, আর লেভেলের নাম আসে শব্দের শুরু থেকেই। এই
+            তিনটি তাই কাটা-দাগের ঘরে, সংখ্যার বদলে একটি দাগ নিয়ে।
+            <br><br>
+            ড়, ঢ় আর য়-কেও সাধারণত এই তালিকায় গোনা হয়, আর এদের বেলায়ও একই কথা: কোনো শব্দ এদের
+            দিয়ে শুরু হয় না, কিন্তু তিনটিই ছকে আছে - বাড়ি, গাঢ়, নয়।
+          </p>
+          <div class="chart" id="chartConsonants"></div>
+
+          <h3 class="part-head">কার ও চিহ্ন</h3>
+          <p class="deck">
+            বাংলা বর্ণ খুব কম সময়েই একা থাকে। একটি <b>কার</b> বর্ণের সঙ্গে বসে উচ্চারণ বদলে
+            দেয়, কিন্তু নিজে আলাদা বর্ণ নয়: ক থেকে হয় কা, কি, কু, কে, কো। এই কারণেই খেলাটি
+            সংকেত ধরে নয়, অক্ষর ধরে গোনে - আর কা একটি ঘর, দুটি নয়।
+            <br><br>
+            নিচের প্রতিটি সারিতে আছে একটি চিহ্ন, সেটি কোন স্বর লেখে, আর খেলার একটি শব্দ যেখানে
+            সেটি ব্যবহার হয়েছে। শব্দে চাপ দিলে তার লেভেল খুলে যায়।
+          </p>
+          <!-- Each vowel beside the sign it becomes, in one colour per pair. The table below
+               names the sign - "ই-কার" - but never shows ই and ি together, so the child has to
+               take the naming on trust. Here the pair is the picture: same colour, left is the
+               letter, right is what it turns into when it joins another letter. -->
+          <p class="deck">
+            প্রতিটি স্বরবর্ণের নিজের একটি কার আছে। নিচে একই রঙে জোড়া দেওয়া - বাঁয়ে বর্ণ,
+            ডানে সেই বর্ণের কার।
+          </p>
+          <div class="pairs" id="karPairs"></div>
+
+          <div class="marks" id="markTable"></div>
+
+          <!-- The বারোখড়ি: one consonant under every কার. Built in js/10-menu.js, one letter
+               at a time - thirty-two letters by twelve forms is 384 rows, and a primer does it
+               one page per letter for the same reason. -->
+          <h3 class="baro-head">বারোখড়ি - প্রতিটি বর্ণের সব রূপ</h3>
+          <p class="deck">
+            একটি বর্ণ, তারপর সেই বর্ণই এক এক করে প্রতিটি কার নিয়ে - ক কা কি কী কু কূ কৃ কে কৈ
+            কো কৌ কং। বারোটি রূপ, আর এই বারো থেকেই নাম বারোখড়ি।
+            <br><br>
+            নিচে যে বর্ণে চাপ দেবেন, তার পুরো তালিকা দেখা যাবে। যে রূপের নিজের লেভেল আছে, সেটির
+            পাশে লেভেলের নাম - চাপ দিলে সোজা সেখানে যাওয়া যায়। যার নেই, তার পাশে খেলার একটি শব্দ
+            যেখানে সেই রূপটি আছে। ৩৮৪টি রূপের মধ্যে ৯১টির নিজের লেভেল আছে; বাকিগুলোর জন্য এই খেলায় শিশুর উপযোগী শব্দ নেই - যেমন বেশির ভাগ বর্ণের কৈ রূপ।
+          </p>
+          <div class="baro-pick" id="baroPick"></div>
+          <div class="baro" id="baroTable"></div>
+        </section>
+
+        <!-- শব্দ গঠন and ফলা: three tables out of a printed primer, transcribed in
+             tools/primer.json and drawn by js/11-primer.js. They are here because a chart of
+             the বর্ণমালা tells a child what the letters are and the বারোখড়ি tells them what
+             each letter becomes, but neither shows the step between - that two letters put
+             side by side make a word. A primer teaches that with equations, so this does. -->
+        <section class="page" id="page-gathon" role="region" aria-labelledby="opt-gathon">
+          <h3>কার চিহ্ন ছাড়া শব্দ গঠন</h3>
+          <p class="deck">
+            কোনো কার নেই, কোনো চিহ্ন নেই - শুধু বর্ণের পর বর্ণ। এভাবেই শিশু প্রথম শব্দ পড়ে:
+            ব আর ক পাশে বসলে বক, ক ল ম পাশে বসলে কলম। যে শব্দ এই খেলায় আছে, তাতে চাপ দিলে
+            তার লেভেল খুলে যায়।
+          </p>
+          <div class="eqs" id="eqTwo"></div>
+          <h4 class="eq-head bn">তিন বর্ণে</h4>
+          <div class="eqs" id="eqThree"></div>
+
+          <h3 class="kw-head">কার চিহ্ন যোগে বানান শেখা</h3>
+          <p class="deck">
+            এবার কার যোগ হলো। নিচের যেকোনো কারে চাপ দিলে সেই কার দিয়ে লেখা শব্দগুলো দেখা যাবে -
+            একটি কার, একগুচ্ছ শব্দ, আর প্রতিটিতেই সেই কারটি খুঁজে পাওয়া যাবে।
+          </p>
+          <div class="kw-pick" id="karPick"></div>
+          <div class="kw-list" id="karList"></div>
+        </section>
+
+        <section class="page" id="page-phala" role="region" aria-labelledby="opt-phala">
+          <h3>ফলা চিহ্নের পরিচয়</h3>
+          <p class="deck" id="phalaNote"></p>
+          <div class="phala" id="phalaTable"></div>
+        </section>
+
+        <!-- যুক্তবর্ণ. This is the section that explains the game's own rule: the wheel hands a
+             child ক্ষ as one tile because ক্ষ is one letter, and this is the table that says
+             so. Every row is checked by tools/build.py - the parts really do join into the
+             form, and the form really is a single akshara by the same splitter the board
+             uses. -->
+        <section class="page" id="page-jukto" role="region" aria-labelledby="opt-jukto">
+          <h3>যুক্তবর্ণ বা যুক্তাক্ষর</h3>
+          <p class="deck" id="juktoNote"></p>
+          <p class="deck">
+            নিচের ছকে তিনটি ঘর - যুক্তবর্ণ, তার বিভাজন, আর শব্দ। খেলায় আছে যে শব্দ, তাতে চাপ
+            দিলে লেভেল খুলে যায়। উপরের ঘরে চাপ দিয়ে খোঁজা যায়: কোন বর্ণ দিয়ে যুক্তবর্ণটি শুরু।
+          </p>
+          <div class="jk-pick" id="juktoPick"></div>
+          <div class="jk" id="juktoTable"></div>
+        </section>
+
+        <section class="page" id="page-levels" role="region" aria-labelledby="opt-levels">
+<section class="card levels-card">
+        <h3>লেভেল</h3>
+        <div class="levels" id="levelGrid"></div>
+      </section>
+        </section>
+
+        <section class="page" id="page-install" role="region" aria-labelledby="opt-install">
+<section class="card">
+        <h3>অ্যাপ হিসেবে রাখুন</h3>
+        <p class="deck bn">
+          একবার হোম স্ক্রিনে যোগ করলে খেলাটি অ্যাপের মতোই খোলে - ঠিকানা লেখার ঘর থাকে না,
+          ইন্টারনেট লাগে না, আর <b>অগ্রগতি হারায় না</b>। ডাউনলোড করার কিছু নেই, দোকানে
+          যেতে হয় না; যে পাতাটি এখন খোলা আছে, সেটিই থেকে যায়।
+        </p>
+        <div class="ins" id="installWays"></div>
+        <p class="ins-why bn">
+          <b>কেন করবেন।</b> ব্রাউজারের ট্যাবে ফেলে রাখলে কিছুদিন না খেললে ফোন জমানো
+          হিসাব মুছে দিতে পারে - আইফোনে সাত দিন না খুললে সাফারি নিজেই মুছে ফেলে, আর তখন
+          শিশুটি যতগুলো লেভেল শেষ করেছিল সব আবার শূন্য থেকে শুরু। হোম স্ক্রিনে যোগ করা
+          থাকলে সেটি হয় না। এটিই এখানে ইনস্টল করার আসল কারণ।
+        </p>
+      </section>
+        </section>
+
+        <section class="page" id="page-about" role="region" aria-labelledby="opt-about">
+<section class="card">
+        <h3>পরিচিতি</h3>
+        <p class="deck">
+            বাংলা শব্দের খেলা, একবারে একটি অক্ষর। অক্ষরের উপর আঙুল টেনে শব্দ বানাও; যে শব্দ
+            পাওয়া যায়, সেটি নিজেই উপরের ছকে বসে যায়। <b><span id="deckCount" class="lv-count">লেভেল</span></b>,
+            আর প্রতিটি লেভেল একটি অক্ষর নিয়ে: কা লেভেলের প্রথম ছকে থাকে কাক, কাঠ, কান, কাচ -
+            চারটি শব্দ, সবগুলোই কা দিয়ে শুরু, আর পাঁচটি অক্ষরের চাকা থেকে বানানো।
+            <br><br>
+            <b>চাকায় থাকে তিন থেকে পাঁচটি অক্ষর, বেশি নয়।</b> এটাই খেলার কঠিনতা ঠিক করে। যে
+            শিশু সদ্য বর্ণমালা শিখেছে, তার জন্য চাকার প্রতিটি বাড়তি অক্ষর মানে প্রথম অক্ষরটি
+            বেছে নেওয়ার আগে আরও একটি বাদ দেওয়ার কাজ - আটটি অক্ষর খোঁজাখুঁজি, পাঁচটি বেছে নেওয়া।
+            বেশির ভাগ লেভেলে দুটি শব্দ, আর সেটিও পুরো একটি ছোট শব্দছক: দুটি শব্দ তাদের ভাগ করা
+            অক্ষরে গিয়ে মেলে।
+            <br><br>
+            এটাই খেলার আসল কথা। বাংলা শেখানো হয় একটি বর্ণ দিয়ে, তারপর সেই বর্ণকেই এক এক করে
+            কার-সহ - ক, কা, কি, কু, কে, কো, কাঁ - আর প্রতি অক্ষরে একটি লেভেল মানে সেই সারির
+            প্রতি ধাপে একটি লেভেল। যে শিশু কাক পড়তে পারে, সে কাঠ আর কান-ও পড়তে পারে, আলাদা করে
+            শেখানো ছাড়াই - লেভেলেই সেটি ধরা পড়ে।
+            <br><br>
+            লেভেলগুলো চলে বর্ণমালার ক্রমে, সোজা শুরু থেকে শেষ। আগে স্বরবর্ণ - অ আ ই ঈ উ ঊ ঋ এ ঐ
+            ও ঔ - তারপর ব্যঞ্জনবর্ণ, ক থেকে হ। কোনো বর্ণের যত অক্ষরের পেছনে শব্দ আছে, তার তত
+            লেভেল: ক-এর ষোলোটি, ঋ-এর একটি। এক বর্ণের ভিতরে আগে খালি রূপ, তারপর বারোখড়ি -
+            ক কা কি কী কু কূ কৃ কে কৈ কো কৌ - তাই ম খুঁজতে গেলে ম যেখানে থাকার কথা, সেখানেই
+            পাওয়া যায়। ঙ, ঞ আর ণ কোনো লেভেলের নাম নয়, কারণ বাংলায় কোনো শব্দ এদের দিয়ে শুরু হয়
+            না; ড়, ঢ় আর য়-ও নয়। ছয়টিই শব্দের ভিতরে আসে, শুধু শুরুতে নয় - আর লেভেলের নাম আসে
+            শব্দের শুরু থেকেই।
+            <br><br>
+            <b>বর্ণমালার প্রতিটি চিহ্নই কোথাও শেখানো হয়।</b> সাতান্নটি অংশ - এগারোটি স্বরবর্ণ,
+            ক থেকে হ বত্রিশটি ব্যঞ্জনবর্ণ, কারগুলো আর যুক্তবর্ণের দলগুলো। সবার শেষে যোগ হলো ৈ,
+            যেটি ব্যঞ্জনবর্ণের উপর ঐ লেখে। বাংলায় এই চিহ্ন নিয়ে শব্দ আছে মাত্র চারটি, তাই তিনটি
+            ছোট লেভেলে চারটিই ধরানো হয়েছে: তৈরি, বৈশাখ, বৈঠক আর সৈনিক।
+            <br><br>
+            বর্ণমালার ক্রমে চলার একটি খরচ আছে, আর সেটি পড়ে প্রথম পনেরো মিনিটেই। ১২ আর ১৪ নম্বর
+            লেভেল ঐ আর ঔ, আর বাংলায় ঐ বা ঔ দিয়ে শুরু হওয়া শব্দ প্রায় সবই ভারী যুক্তবর্ণের ভাবগত
+            শব্দ - ঐক্য, ঐতিহ্য, ঔদ্ধত্য, ঔজ্জ্বল্য। এই দুটি লেভেল বর্ণ শেখায়, কিন্তু শিশুর ছবিতে
+            আনার কিছু দেয় না - আর ভাষায় এদের বদলে বসানোর মতো সহজ কোনো শব্দ নেই। খেলাটি শুরুতেই
+            সবচেয়ে কঠিন, তারপর সমান চলে, চড়াই হয় না। এটাই বর্ণমালার ক্রমে থাকার দাম, আর খেলাটি
+            সেই ক্রমের জন্যই।
+            <br><br>
+            ছক সব সময় একটিই জোড়া শব্দছক নয়। শব্দ সেখানেই মেলে যেখানে তারা একটি অক্ষর ভাগ করে,
+            কিন্তু যে লেভেলের সব শব্দ একই অক্ষর দিয়ে শুরু, সেখানে দুটি শব্দ কেবল সেই একটি ঘরই
+            ভাগ করতে পারে - আর একটি ঘরে দুটি শব্দ বসে, চারটি নয়। তাই ছক এক টুকরো বা দুই টুকরো
+            হয়, আর প্রতি টুকরোর শব্দগুলো তবুও মেলে।
+            <br><br>
+            কিছু অক্ষর দুবার আসে - কা, তারপর একটু পরেই আবার কা - সেটি নতুন ধাপ নয়, একই ধাপে আরও
+            অভ্যাস। প্রতিটি শব্দই এমন কিছু যা ছবিতে দেখানো যায়, নয়তো একটি সংখ্যা, একটি রং বা
+            রোজকার কোনো কাজ; যে অল্প কয়েকটি নয়, সেগুলোর সঙ্গে কীভাবে আঁকতে হবে তার নোট আছে।
+            <br><br>
+            পুরোটাই বাংলাদেশের বাংলা: জল নয়, পানি; কাকা আর পিসি নয়, চাচা আর ফুফু। কোনো শব্দ
+            দুবার ধাঁধা হিসেবে আসে না।
+            <br><br>
+            <b>ইন্টারনেট ছাড়াই চলে।</b> একবার খুললেই পুরো খেলা ডিভাইসে থেকে যায় - <span class="lv-count">লেভেল</span>,
+            শব্দ, বর্ণের ফন্ট, সব। হোম স্ক্রিনে যোগ করে নিলে এটি অ্যাপের মতো খোলে আর
+            নেটওয়ার্ক আর কখনো চায় না - কোন ব্রাউজারে কীভাবে, তা
+            <b>অ্যাপ হিসেবে রাখুন</b> অংশে লেখা আছে। এটি বাড়তি সুবিধা নয়, এটাই মূল কথা:
+            ইন্টারনেট এমন জিনিস যা মাঝে মাঝে থাকে। কোনো সাইন-আপ নেই, বিজ্ঞাপন নেই, দাম নেই -
+            আপনার অগ্রগতি এই ব্রাউজারেই জমা থাকে।
+          </p>
+      </section>
+          <footer>
+          প্রতিটি ছক খেলা তৈরি হওয়ার সময়েই সাজানো হয় - হাতে আঁকা নয়, খেলার সময়েও নয়: একটি
+          লেভেলের শব্দগুলোর সব সাজানো ক্রম পরীক্ষা করে সবচেয়ে ছোট ছকটি বেছে নেওয়া হয়, তাই ছকে
+          কখনো নিজে থেকে অন্য কোনো শব্দ তৈরি হয় না। কোনো শব্দে একই অক্ষর দুবার লাগলে চাকায় সেটি
+          দুবার থাকে - যেমন ঘুঘু আর বাবা - আর দুটিকে চাকার দুই দিকে রাখা হয়, যাতে একটি থেকে
+          অন্যটিতে টানতে গিয়ে জোড়ার উপর দিয়ে না যায়। প্রতিটি লেভেল যাচাই করা হয় সেটি নিজের
+          অক্ষর নিয়েই কিনা: কা লেভেলের সব শব্দ কা দিয়ে শুরু, না হলে বিল্ড ব্যর্থ হয়।
+          </footer>
+        </section>
+        <section class="page" id="page-play" role="region" aria-labelledby="opt-play">
+<section class="card">
+        <h3>খেলার নিয়ম</h3>
+        <ul class="how">
+          <li><span class="k bn">টানা</span><span>একটি অক্ষরে চাপ দিয়ে বাকিগুলোর উপর আঙুল টেনে নাও। আগের অক্ষরে ফিরে গেলে সেটি বাদ পড়ে যায়।</span></li>
+          <li><span class="k bn">ছোঁয়া</span><span>টানার বদলে ছুঁয়ে খেলতে চাও? এক এক করে অক্ষর ছোঁও, তারপর শব্দের পাশে <b>✓</b> চাপো - বা কীবোর্ডে <b>Enter</b>। <b>Esc</b> দিলে সব মুছে যায়।</span></li>
+          <li><span class="k bn">শেষ</span><span>লেভেল শেষ হলে সোজা পরেরটিতে চলে যায় - কোনো বোতাম নেই, অপেক্ষাও নেই। বদলের সঙ্গেই কনফেটি ঝরে।</span></li>
+          <li><span class="k">&lsaquo; &rsaquo;</span><span>তীর দুটি আগের বা পরের লেভেলে নিয়ে যায়, আর দুই প্রান্তে গিয়ে ঘুরে আবার শুরুতে ফেরে। তীরের মাঝের অক্ষরটিই লেভেলের নাম: কা, আর সেই বর্ণের একের বেশি লেভেল থাকলে পাশে একটি সংখ্যা। মেনুর লেভেল তালিকা থেকে যেকোনো লেভেলে সোজা যাওয়া যায়; সেটিও খেলার মতো বর্ণমালার ক্রমে চলে, আর প্রতিটি বর্ণ আলাদা রঙ পায়। যে লেভেলই খোলা হয়, সেটি খালি ছক থেকেই শুরু হয় - তাই পুরোনো লেভেল আবার খেলা যায়।</span></li>
+          <li><span class="k">◈</span><span>সংকেত না-মেলানো কোনো শব্দের একটি অক্ষর দেখিয়ে দেয়। বিনামূল্যে, যত খুশি - গোনার কিছু নেই, খরচেরও কিছু নেই।</span></li>
+        </ul>
+      </section>
+<section class="card">
+        <h3>এক ঘর, এক অক্ষর</h3>
+        <table class="akshara-table">
+          <tbody>
+            <tr><td class="w">মাছ</td><td class="a">মা + ছ</td><td class="n bn">কার</td></tr>
+            <tr><td class="w">বন্ধু</td><td class="a">ব + ন্ধু</td><td class="n bn">যুক্তবর্ণ</td></tr>
+            <tr><td class="w">বাড়ি</td><td class="a">বা + ড়ি</td><td class="n bn">নুক্তা + কার</td></tr>
+          </tbody>
+        </table>
+        <p style="margin:12px 0 0;font-size:12.5px;line-height:1.55;color:var(--ink-soft)">
+          বাংলায় এক সংকেত মানে এক অক্ষর নয় - মাছ লেখা হয় তিনটি সংকেতে, কিন্তু পড়ার সময় চোখে
+          পড়ে দুটি অক্ষর। খেলাটি এই অক্ষর ধরেই ভাগ করে, তাই প্রতিটি ঘরে যা বসে তা পাঠক চিনতে পারে।
+        </p>
+      </section>
+        </section>
+
+        <!-- Reporting a mistake is a parent's job, not a child's, so it gets its own
+             named place rather than living at the bottom of পরিচিতি where it had to be
+             scrolled to and found. -->
+        <section class="page" id="page-report" role="region" aria-labelledby="opt-report">
+<section class="card">
+        <h3>ভুল পেয়েছেন?</h3>
+        <p class="deck">
+          বানান ভুল, ঘরে যে বাংলা বলা হয় সেটি নয় এমন কোনো শব্দ, বা কোনো লেভেল শেষ হচ্ছে না -
+          এসব কাউকে জানানো দরকার, আর সাধারণত শিশুর অভিভাবকের চোখেই আগে পড়ে।
+          <br><br>
+          এই খেলার পেছনে কোনো সার্ভার নেই, লগইনও নেই - এটি ইচ্ছে করেই। তাই পাতাটি নিজে থেকে
+          কিছু পাঠায় না; আপনার নিজের মেইল অ্যাপে লেখাটি তৈরি করে দেয়, <b>পাঠান</b> বোতামটি
+          আপনিই চাপবেন। যতক্ষণ না চাপছেন, কিছুই ডিভাইস ছেড়ে যায় না।
+          <br><br>
+          <b>ইমেইলে পাঠান</b> - মেইল অ্যাপ খুলে যাবে, ঠিকানা আর পুরো লেখাটি বসানো অবস্থায়।
+          একবার দেখে নিয়ে পাঠিয়ে দিন।
+          <br><br>
+          <b>রেখে দিন</b> - এখন সময় না থাকলে লেখাটি এই ডিভাইসেই জমা থাকে, সঙ্গে আপনি কোন
+          লেভেলে ছিলেন তা জুড়ে দিয়ে। পরে নিচের তালিকা থেকে ইমেইল বা কপি করা যাবে। রাতে চোখে
+          পড়া ভুলটা সকালে মনে না-ও থাকতে পারে; এটি তার জন্য।
+          <br><br>
+          <b>কপি করুন</b> - মেইলের বদলে হোয়াটসঅ্যাপ বা মেসেঞ্জারে পাঠাতে চাইলে।
+        </p>
+        <textarea class="say" id="sayNote" rows="3" maxlength="1200"
+                  placeholder="কী ভুল আছে, বা কী হলে আরও ভালো হতো?"></textarea>
+        <p class="say-adds bn">আপনার লেখার সঙ্গে যা যাবে: <span id="sayAdds"></span></p>
+        <div class="say-row">
+          <!-- Three different intentions, so three buttons: send it now, keep it for later, or
+               take it somewhere else. Folding them into one leaves a player unsure which just
+               happened - and with a mail app involved, unsure whether anything was sent. -->
+          <button class="say-copy say-mail" id="sayMail">
+            <span class="glyph" aria-hidden="true">&#9993;</span>
+            <span class="bn">ইমেইলে পাঠান</span>
+          </button>
+          <button class="say-copy say-ghost" id="saySave">
+            <span class="glyph" aria-hidden="true">&#128190;</span>
+            <span class="bn">রেখে দিন</span>
+          </button>
+          <button class="say-copy say-ghost" id="sayCopy">
+            <span class="glyph" aria-hidden="true">&#10697;</span>
+            <span class="bn">কপি করুন</span>
+          </button>
+        </div>
+        <!-- What just happened, beside the buttons rather than inside them: these messages are
+             sentences, and a button that grows to hold one moves everything under it. -->
+        <p class="say-said bn" id="saySaid" role="status" aria-live="polite"></p>
+
+        <p class="say-adds bn">
+          <b>রেখে দিন</b> চাপলে লেখাটি এই ব্রাউজারেই জমা থাকে - কোনো সার্ভারে যায় না, আর
+          নিজে না পাঠানো পর্যন্ত ডিভাইস ছাড়ে না।
+        </p>
+      </section>
+        </section>
+      </div>
+
+    </div>
+    </div>
+  </div>
+</div>
+<script>
+"use strict";
+
+/* include js/01-bangla.js    splitting Bengali into aksharas - one tile, one akshara */
+/* include js/02-levels.js    GENERATED by tools/build.py - do not edit */
+/* include js/03-boards.js    reading a board back out of the level table */
+/* include js/04-state.js     what the player has done, and what is saved */
+/* include js/05-scramble.js  arranging a wheel so it does not give the board away */
+/* include js/06-sound.js     every sound the game makes, synthesised - no audio files */
+/* include js/07-render.js    drawing the screen and sizing it to the device */
+/* include js/08-install.js   asking each browser to put the game on the home screen */
+/* include js/09-animate.js   the movement that answers every action */
+/* include js/10-celebrate.js the mascot, and what happens when a board is finished */
+/* include js/11-feedback.js  a note a player can copy and send on, no server behind it */
+/* include js/12-menu.js      the alphabet charts, the marks table, the menu bar */
+/* include js/13-primer.js    a printed primer's tables - word building and ফলা */
+/* include js/14-play.js      picking letters, judging a word, finishing a level */
+</script>
+</body>
+</html>

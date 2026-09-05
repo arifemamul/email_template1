@@ -1,0 +1,164 @@
+  /* -- The reports page ------------------------------------------------------ */
+  /*
+   * A reader, not part of the game. It shares the game's palette so it does not feel like a
+   * different product, and nothing else: no device frame, no bird, no wheel. One column of
+   * notes, widest sensible measure, and room to read them.
+   */
+  .rpage {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: clamp(18px, 4vw, 46px) clamp(14px, 4vw, 28px) 60px;
+  }
+
+  .rpage h1 {
+    font-family: var(--bn);
+    font-size: clamp(30px, 6vw, 46px);
+    line-height: 1.15;
+    margin: 0 0 6px;
+    color: var(--accent);
+    text-shadow: 0 2px 0 var(--accent-lo), 0 3px 0 var(--accent-lo),
+                 0 6px 12px rgba(var(--glow-accent), .3);
+  }
+
+  .rpage .sub {
+    font-family: var(--bn);
+    margin: 0 0 22px;
+    font-size: 14.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  .rp-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--surface-3);
+  }
+  .rp-total {
+    font-family: var(--bn);
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--ink);
+    margin-right: auto;
+  }
+
+  /* The empty state carries the whole explanation, because an empty page here almost always
+     means "wrong device" rather than "nothing was ever written". */
+  .rp-empty {
+    background: var(--surface);
+    border-radius: var(--r-lg);
+    padding: 26px 24px 28px;
+    box-shadow: 0 0 0 1px rgba(var(--shade), .05), var(--lift);
+  }
+  .rp-empty h2 {
+    font-family: var(--bn);
+    margin: 0 0 10px;
+    font-size: 19px;
+    color: var(--ink);
+  }
+  .rp-empty p {
+    font-family: var(--bn);
+    margin: 0 0 10px;
+    font-size: 14.5px;
+    line-height: 1.65;
+    color: var(--ink-soft);
+  }
+  .rp-empty p:last-child { margin-bottom: 0; }
+
+  /* Cards, roomier than the ones inside the game: this is a page for reading rather than a
+     list glanced at between levels. */
+  .rpage .rp {
+    background: var(--surface);
+    border-radius: var(--r-md);
+    padding: 15px 17px 16px;
+    box-shadow: 0 0 0 1px rgba(var(--shade), .05), var(--lift);
+    margin-bottom: 11px;
+  }
+  .rpage .rp-when { font-size: 12.5px; margin-bottom: 8px; }
+  .rpage .rp-text { font-size: 15.5px; line-height: 1.6; margin-bottom: 12px; }
+
+  /* The machine details, folded away. They are why a report is actionable and they are not
+     what anyone wants to read first. */
+  .rp-meta {
+    margin: 0 0 11px;
+    font-size: 12.5px;
+    color: var(--ink-faint);
+  }
+  .rp-meta summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--ink-soft);
+    font-family: var(--bn);
+  }
+  .rp-meta pre {
+    margin: 8px 0 0;
+    padding: 9px 11px;
+    background: var(--surface-2);
+    border-radius: 10px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    color: var(--ink-soft);
+  }
+
+  /* -- One report, shared with nothing: the game no longer draws a list --------- */  .rp-list { display: flex; flex-direction: column; gap: 9px; margin-top: 12px; }
+  .rp-none { margin: 0; font-size: 13px; color: var(--ink-faint); }
+  .rp {
+    background: var(--surface-2);
+    border-radius: var(--r-sm);
+    padding: 11px 13px 12px;
+    box-shadow: 0 0 0 1px rgba(var(--shade), .06);
+  }
+  .rp-when {
+    margin: 0 0 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--ink-faint);
+  }
+  /* The player's own words, wrapped as they typed them - a note with line breaks in it should
+     come back with them. */
+  .rp-text {
+    margin: 0 0 9px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .rp-tools { display: flex; gap: 7px; }
+  .rp-btn {
+    border: 0;
+    border-radius: 9px;
+    padding: 5px 11px 7px;
+    background: #fff;
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--lip) var(--surface-3);
+    transition: transform .12s ease, box-shadow .12s ease, color .16s ease;
+  }
+  .rp-btn:hover { color: var(--ink); }
+  .rp-btn:active { transform: translateY(4px); box-shadow: none; }
+  /* Armed for deletion: the second press is the one that does it, and it should look like it. */
+  .rp-btn.armed {
+    background: linear-gradient(180deg, var(--bad-hi), var(--bad));
+    color: var(--bad-ink);
+    box-shadow: var(--lip) var(--bad-lo);
+  }
+  /* The status line under the two buttons. Empty most of the time, so it reserves its own
+     height - a line that appears and pushes the report list down is its own small annoyance. */
+  .say-said {
+    margin: 9px 0 0;
+    min-height: 1.4em;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-soft);
+  }
+  .say-said.ok { color: var(--good-lo); }
+

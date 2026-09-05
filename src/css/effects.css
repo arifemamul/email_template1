@@ -1,0 +1,248 @@
+  /* -- Animation layer: flying tiles and confetti ---------------------------- */
+  #fx {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 8;
+  }
+
+  .fly {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    font-family: var(--bn);
+    font-weight: 700;
+    border-radius: 22%;
+    background: var(--accent);
+    color: var(--ink);
+    will-change: transform, opacity;
+  }
+
+  /* Confetti. A child reads colour as "well done", so the celebration throws paper in the
+     five block colours. */
+  .fly.confetti {
+    border-radius: 2px;
+    background: var(--conf, var(--accent));
+  }
+  .fly.confetti.round { border-radius: 50%; }
+  .fly.confetti.tall { border-radius: 2px; }
+
+  .fly.word {
+    border-radius: 99px;
+    background: var(--good);
+    padding: 4px 14px;
+    white-space: nowrap;
+  }
+
+  /* revealed cells arrive with a flip rather than a fade */
+  .cell.on.arrive { animation: cell-arrive .42s cubic-bezier(.2,1.4,.4,1) backwards; }
+  @keyframes cell-arrive {
+    0%   { transform: scale(.5) rotateY(-70deg); }
+    60%  { transform: scale(1.08) rotateY(0deg); }
+    100% { transform: scale(1) rotateY(0); }
+  }
+
+  .cell.knock { animation: knock .4s ease; }
+  @keyframes knock {
+    0%,100% { transform: translateY(0); }
+    30%     { transform: translateY(-7px); }
+    60%     { transform: translateY(2px); }
+  }
+
+  .tile.reject { animation: tile-reject .36s ease; }
+  @keyframes tile-reject {
+    0%,100% { transform: translateX(0); }
+    25%     { transform: translateX(-4px) rotate(-3deg); }
+    75%     { transform: translateX(4px) rotate(3deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #fx { display: none; }
+  }
+
+
+  /* -- টিয়া ------------------------------------------------------------------ */
+  /*
+   * Bottom-left of the screen, small, and behind everything it might overlap. It is company,
+   * not furniture: it must never be the reason a tile cannot be reached.
+   */
+  .bird {
+    position: absolute;
+    left: 8px; bottom: 4px;
+    width: 66px; height: 66px;
+    pointer-events: auto;
+    cursor: pointer;
+    z-index: 6;
+    opacity: .96;
+    filter: drop-shadow(0 6px 10px rgba(var(--shade), .22));
+  }
+  .bird svg { width: 100%; height: 100%; overflow: visible; }
+  .bird g { transform-box: fill-box; transform-origin: center; }
+
+  /* idle: breathing, and a blink every few seconds. Nothing else on screen moves at rest, so
+     this is what keeps the game from looking switched off while a child thinks. */
+  .bird.idle .bd-body,
+  .bird.idle .bd-head { animation: bd-breathe 3.4s ease-in-out infinite; }
+  .bird.idle .bd-eye  { animation: bd-blink 5.2s steps(1, end) infinite; }
+  .bird.idle .bd-tail { animation: bd-tail 4.6s ease-in-out infinite; }
+
+  @keyframes bd-breathe {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-1.5px) scale(1.02); }
+  }
+  @keyframes bd-blink {
+    0%, 92%   { transform: scaleY(1); }
+    94%, 97%  { transform: scaleY(.1); }
+    100%      { transform: scaleY(1); }
+  }
+  @keyframes bd-tail {
+    0%, 100% { transform: rotate(0deg); }
+    50%      { transform: rotate(-7deg); }
+  }
+
+  /* think: head tilted, one eye narrowed. A child tracing a word gets a companion doing the
+     same thing, which is a nicer signal than a spinner. */
+  .bird.think .bd-head { transform: rotate(-11deg) translateY(-1px); }
+  .bird.think .bd-wing { animation: bd-tap 0.7s ease-in-out infinite; }
+  @keyframes bd-tap {
+    0%, 100% { transform: rotate(0deg); }
+    50%      { transform: rotate(-14deg); }
+  }
+
+  /* cheer: a hop, wings out. Every word found. */
+  .bird.cheer { animation: bd-hop .5s cubic-bezier(.3,1.6,.4,1); }
+  .bird.cheer .bd-wing     { transform: rotate(-38deg) translate(-3px, -5px); }
+  .bird.cheer .bd-wing-far { transform: rotate(38deg) translate(3px, -5px); }
+  .bird.cheer .bd-beak     { transform: rotate(8deg) translateY(1px); }
+  @keyframes bd-hop {
+    0%   { transform: translateY(0) scale(1); }
+    38%  { transform: translateY(-16px) scale(1.1, .94); }
+    70%  { transform: translateY(0) scale(.94, 1.06); }
+    100% { transform: translateY(0) scale(1); }
+  }
+
+  /* party: the board is done. Bigger, spinning wings, three hops. */
+  .bird.party { animation: bd-party 1.6s cubic-bezier(.3,1.4,.4,1); z-index: 12; }
+  .bird.party .bd-wing     { animation: bd-flap .26s ease-in-out infinite; }
+  .bird.party .bd-wing-far { animation: bd-flap .26s ease-in-out infinite reverse; }
+  .bird.party .bd-cheek    { opacity: .9; }
+  @keyframes bd-party {
+    0%   { transform: translateY(0) scale(1) rotate(0deg); }
+    18%  { transform: translateY(-30px) scale(1.32) rotate(-8deg); }
+    36%  { transform: translateY(0) scale(1.1) rotate(6deg); }
+    54%  { transform: translateY(-22px) scale(1.26) rotate(-6deg); }
+    72%  { transform: translateY(0) scale(1.08) rotate(4deg); }
+    86%  { transform: translateY(-10px) scale(1.16) rotate(0deg); }
+    100% { transform: translateY(0) scale(1) rotate(0deg); }
+  }
+  @keyframes bd-flap {
+    0%, 100% { transform: rotate(-40deg) translate(-3px, -6px); }
+    50%      { transform: rotate(-6deg) translate(0, 0); }
+  }
+
+  /* -- stars, for finishing a board ------------------------------------------ */
+  .star {
+    position: absolute;
+    width: 32px; height: 32px;
+    display: grid; place-items: center;
+    font-size: 30px;
+    line-height: 1;
+    color: var(--accent);
+    text-shadow: 0 0 14px rgba(var(--glow-accent), .7), 0 3px 0 var(--accent-lo);
+    animation: star-up 1.4s cubic-bezier(.2, .9, .3, 1) forwards;
+    will-change: transform, opacity;
+  }
+  /* Up and out, then down past the bottom - thrown, not faded. The horizontal travel is a
+     custom property so the three stars share one keyframe and differ only in --dx. */
+  @keyframes star-up {
+    0%   { transform: translate(0, 0) scale(.2) rotate(0deg); opacity: 0; }
+    22%  { transform: translate(calc(var(--dx) * .55), -76px) scale(1.25) rotate(140deg); opacity: 1; }
+    55%  { transform: translate(var(--dx), -104px) scale(1) rotate(280deg); opacity: 1; }
+    100% { transform: translate(calc(var(--dx) * 1.2), 46px) scale(.7) rotate(420deg); opacity: 0; }
+  }
+
+  /* -- the wheel at rest ------------------------------------------------------ */
+  /*
+   * The wheel breathes with light, not with movement.
+   *
+   * This was a 3px vertical float, offset per tile so the ring rippled, and it looked lovely.
+   * It was also wrong: a tap target that never holds still is a target a five-year-old has to
+   * chase, and it is worse for anyone whose aim is already unsteady. Every tile in the game was
+   * permanently in motion, which is a thing you notice with a finger rather than an eye.
+   *
+   * So the same aliveness is drawn with a shadow that swells and fades instead. The tile does
+   * not move a pixel, the hit area is exactly where it looks, and the ring still reads as lit
+   * rather than painted on.
+   */
+  .tile { animation: tile-glow 4.2s ease-in-out infinite; animation-delay: calc(var(--i, 0) * .34s); }
+  @keyframes tile-glow {
+    0%, 100% { box-shadow: var(--lip) var(--tile-lo), 0 10px 20px -10px var(--tile-lo); }
+    50%      { box-shadow: var(--lip) var(--tile-lo), 0 14px 26px -10px var(--tile-lo); }
+  }
+  /* A chosen tile has its own shadow and its own scale; it must not be overridden by this. */
+  .tile.sel { animation: none; }
+
+  /* A cell that has just been filled flashes a ring outward, so the eye is pulled to the
+     board rather than left on the wheel. */
+  .cell.on.arrive::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: 0 0 0 3px var(--accent);
+    animation: cell-ring .58s ease-out forwards;
+    pointer-events: none;
+  }
+  .cell { position: relative; }
+  @keyframes cell-ring {
+    0%   { transform: scale(1); opacity: .9; }
+    100% { transform: scale(1.7); opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #fx { display: none; }
+    /* The bird stays - it is a character, not an effect - but it stops moving. */
+    .bird, .bird * { animation: none !important; transition: none !important; }
+    .tile { animation: none; }
+  }
+
+  /* -- the sky behind the toy -------------------------------------------------- */
+  /*
+   * Three soft shapes drifting behind everything, very slowly and very faintly. The page is one
+   * flat wash otherwise, and a completely static background makes a bright screen look printed.
+   * Painted on ::before/::after of the body so they cost no markup, and fixed so they drift
+   * behind the menu rather than scrolling with it.
+   */
+  body::before, body::after {
+    content: "";
+    position: fixed;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: -1;
+    filter: blur(2px);
+    opacity: .5;
+  }
+  body::before {
+    width: 220px; height: 220px;
+    left: -60px; top: 18%;
+    background: radial-gradient(circle at 34% 32%, #fff 0%, transparent 66%);
+    animation: drift-a 34s ease-in-out infinite;
+  }
+  body::after {
+    width: 300px; height: 300px;
+    right: -90px; top: 52%;
+    background: radial-gradient(circle at 62% 38%, #fff 0%, transparent 62%);
+    animation: drift-b 46s ease-in-out infinite;
+  }
+  @keyframes drift-a {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(46px, -34px) scale(1.14); }
+  }
+  @keyframes drift-b {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(-54px, 40px) scale(.9); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    body::before, body::after { animation: none; }
+  }

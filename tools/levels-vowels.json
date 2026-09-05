@@ -1,0 +1,209 @@
+{
+ "name": "The four vowels the rest of the game could not reach",
+ "WHY_THIS_FILE_EXISTS": [
+  "ঈ ঊ ঐ ঔ had no level anywhere: not in the uploaded curriculum, and not buildable from the",
+  "curated pool, which held only ঈগল ঈদ ঊনিশ ঊষা ঐক্য ঔষধ between them - two words a letter at",
+  "best, where a level needs three. These levels use words sourced for the purpose and checked",
+  "against corpus frequency, the lowest being ঊরু at zipf 2.31.",
+  "",
+  "ঔষধ is not here even though it is the obvious ঔ word. It is the same word as ওষুধ, spelled",
+  "the other way, and ওষুধ is already on the ও level - no word goes on two boards."
+ ],
+ "READ_THIS_BEFORE_SHIPPING_ঐ_AND_ঔ": [
+  "ঈ and ঊ are honest levels. ঈগল is an eagle, ঈদ is Eid, ঈদগাহ is the ground Eid prayers are",
+  "held on, ঊরু is a thigh, ঊষা is dawn, ঊনিশ is nineteen. A child meets all of those.",
+  "",
+  "ঐ and ঔ are not, and the reason is the language rather than the curation: word-initial ঐ and",
+  "ঔ in Bengali are almost entirely abstract Sanskritic nouns carrying heavy conjuncts - ক্য,",
+  "তিহ্য, চ্ছি, জ্জ্ব, দ্ধ, ত্য. There is no concrete alternative to choose instead. ঐরাবত, the",
+  "white elephant of the myths, would have been drawable and is a real word, but the corpus puts",
+  "it at zipf 1.75, under the floor everything else here clears.",
+  "",
+  "So these two levels teach the letter and nothing a seven-year-old can picture. That may still",
+  "be worth it - the letters are in the alphabet the game claims to cover - but it is a",
+  "deliberate trade, not an oversight, and they are the two levels to cut first."
+ ],
+ "levels": [
+  {
+   "id": "ঈ",
+   "type": "akshara",
+   "key": "ঈ",
+   "words": [
+    {
+     "w": "ঈগল",
+     "split": [
+      "ঈ",
+      "গ",
+      "ল"
+     ],
+     "en": "eagle",
+     "freq": 0
+    },
+    {
+     "w": "ঈদ",
+     "split": [
+      "ঈ",
+      "দ"
+     ],
+     "en": "Eid",
+     "freq": 0
+    },
+    {
+     "w": "ঈদগাহ",
+     "split": [
+      "ঈ",
+      "দ",
+      "গা",
+      "হ"
+     ],
+     "en": "the open ground where Eid prayers are held",
+     "freq": 0
+    },
+    {
+     "w": "ঈমান",
+     "split": [
+      "ঈ",
+      "মা",
+      "ন"
+     ],
+     "en": "faith",
+     "freq": 0,
+     "flag": "abstract: no picture shows it, but every child in a Bangladeshi household knows the word"
+    }
+   ]
+  },
+  {
+   "id": "ঊ",
+   "type": "akshara",
+   "key": "ঊ",
+   "words": [
+    {
+     "w": "ঊনিশ",
+     "split": [
+      "ঊ",
+      "নি",
+      "শ"
+     ],
+     "en": "nineteen",
+     "freq": 0
+    },
+    {
+     "w": "ঊষা",
+     "split": [
+      "ঊ",
+      "ষা"
+     ],
+     "en": "dawn, first light",
+     "freq": 0
+    },
+    {
+     "w": "ঊরু",
+     "split": [
+      "ঊ",
+      "রু"
+     ],
+     "en": "thigh",
+     "freq": 0
+    },
+    {
+     "w": "ঊর্ধ্ব",
+     "split": [
+      "ঊ",
+      "র্ধ্ব"
+     ],
+     "en": "above, upward",
+     "freq": 0,
+     "flag": "draw an arrow pointing up"
+    }
+   ]
+  },
+  {
+   "id": "ঐ",
+   "type": "akshara",
+   "key": "ঐ",
+   "words": [
+    {
+     "w": "ঐক্য",
+     "split": [
+      "ঐ",
+      "ক্য"
+     ],
+     "en": "unity",
+     "freq": 0,
+     "flag": "abstract: hands joined, or figures standing together"
+    },
+    {
+     "w": "ঐতিহ্য",
+     "split": [
+      "ঐ",
+      "তি",
+      "হ্য"
+     ],
+     "en": "heritage, tradition",
+     "freq": 0,
+     "flag": "abstract: draw something old and kept - a monument, an heirloom"
+    },
+    {
+     "w": "ঐশী",
+     "split": [
+      "ঐ",
+      "শী"
+     ],
+     "en": "divine",
+     "freq": 0,
+     "flag": "abstract: an adjective, and no picture shows it"
+    },
+    {
+     "w": "ঐচ্ছিক",
+     "split": [
+      "ঐ",
+      "চ্ছি",
+      "ক"
+     ],
+     "en": "optional",
+     "freq": 0,
+     "flag": "abstract: an adjective, and no picture shows it"
+    }
+   ]
+  },
+  {
+   "id": "ঔ",
+   "type": "akshara",
+   "key": "ঔ",
+   "words": [
+    {
+     "w": "ঔষধি",
+     "split": [
+      "ঔ",
+      "ষ",
+      "ধি"
+     ],
+     "en": "a medicinal plant",
+     "freq": 0
+    },
+    {
+     "w": "ঔদ্ধত্য",
+     "split": [
+      "ঔ",
+      "দ্ধ",
+      "ত্য"
+     ],
+     "en": "arrogance",
+     "freq": 0,
+     "flag": "abstract: a proud, chin-up figure. An adult word"
+    },
+    {
+     "w": "ঔজ্জ্বল্য",
+     "split": [
+      "ঔ",
+      "জ্জ্ব",
+      "ল্য"
+     ],
+     "en": "brilliance, brightness",
+     "freq": 0,
+     "flag": "abstract: a blaze of light. An adult word"
+    }
+   ]
+  }
+ ]
+}

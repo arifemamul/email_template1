@@ -1,0 +1,204 @@
+  /* -- Side panel ------------------------------------------------------------ */
+  .panel { display: flex; flex-direction: column; gap: 22px; }
+
+  /* Cards are paper on paper: raised a little, never outlined. A border around a light card on
+     a light ground is a box; a soft shadow is an object. */
+  .card {
+    background: var(--surface);
+    border-radius: var(--r-lg);
+    padding: 20px 20px 22px;
+    box-shadow: 0 0 0 1px rgba(var(--shade), .05), var(--lift);
+  }
+
+  /* No letter-spacing and no uppercase: these headings are Bengali, uppercase is a no-op on a
+     caseless script, and tracking pulls matra clusters apart. */
+  .card h3 {
+    margin: 0 0 14px;
+    font-size: 23px;
+    color: var(--ink);
+    font-weight: 800;
+  }
+
+  /* -- the level picker ------------------------------------------------------- */
+  .levels { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 9px; }
+
+  /* Each level is a button you can feel: its block colour, pale until finished, with the same
+     bottom lip every pressable thing in the game has. */
+  .lv {
+    aspect-ratio: 1;
+    border: 0;
+    border-radius: var(--r-sm);
+    background: color-mix(in srgb, var(--hue, var(--tile)) 15%, #fff);
+    color: color-mix(in srgb, var(--hue, var(--tile)) 76%, var(--ink));
+    font-family: var(--bn);
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-variant-numeric: tabular-nums;
+    padding: 0 1px;
+    overflow: hidden;
+    text-overflow: clip;
+    white-space: nowrap;
+    position: relative;
+    box-shadow: var(--lip) color-mix(in srgb, var(--hue, var(--tile)) 26%, #fff);
+    transition: transform .16s cubic-bezier(.2,1.5,.4,1), background-color .18s ease,
+                color .18s ease, box-shadow .16s ease;
+  }
+  /* The chip holds an akshara, which can be two glyphs wide - কাঁ - where a numeral was always
+     one or two digits. Shrink to fit rather than overflow the square. */
+  .lv sup { font-size: 8px; font-weight: 700; opacity: .72; margin-left: 1px; vertical-align: super; }
+  .lv:hover { transform: translateY(-2px); }
+  .lv:active { transform: translateY(4px); box-shadow: none; }
+
+  /* Finished: the block colour at full strength. */
+  .lv.done {
+    background: linear-gradient(180deg,
+      color-mix(in srgb, var(--hue, var(--good)) 76%, #fff),
+      var(--hue, var(--good)));
+    color: #fff;
+    box-shadow: var(--lip) color-mix(in srgb, var(--hue, var(--good)) 62%, var(--ink));
+  }
+  /* A tick in the corner, so "finished" survives colour-blindness and a small screen. */
+  .lv.done::after {
+    content: "";
+    position: absolute;
+    right: 16%; top: 40%;
+    width: 26%; height: 13%;
+    border-left: 2.5px solid #fff;
+    border-bottom: 2.5px solid #fff;
+    transform: rotate(-45deg);
+    opacity: .85;
+  }
+  /* Where you are now. A gold ring, the same gold as the letter badge on the game screen. */
+  .lv.now { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  .lv-1 { --hue: var(--block-1); }
+  .lv-2 { --hue: var(--block-2); }
+  .lv-3 { --hue: var(--block-3); }
+  .lv-4 { --hue: var(--block-4); }
+  .lv-5 { --hue: var(--block-5); }
+
+  /* -- how to play ------------------------------------------------------------ */
+  .how { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+  .how li { display: flex; gap: 11px; font-size: 15.5px; line-height: 1.6; color: var(--ink-soft); }
+  .how .k {
+    flex: none;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent-lo);
+    background: color-mix(in srgb, var(--accent) 20%, #fff);
+    border-radius: 8px;
+    padding: 3px 8px;
+    height: fit-content;
+    font-weight: 700;
+  }
+  /* The key pills are Bengali words - টানা, ছোঁয়া, শেষ - so they get the Bengali face and no
+     tracking. The symbol pills (♪ ◈ ‹ ›) keep the monospace. */
+  .how .k.bn {
+    font-family: var(--bn);
+    font-size: 14px;
+    padding: 3px 9px;
+  }
+  .how b { color: var(--ink); font-weight: 700; }
+  .bn { font-family: var(--bn); }
+
+  .akshara-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .akshara-table td {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--surface-3);
+    vertical-align: middle;
+  }
+  .akshara-table tr:last-child td { border-bottom: 0; }
+  .akshara-table .w { font-family: var(--bn); font-size: 23px; color: var(--ink); width: 4.5em; }
+  .akshara-table .a { font-family: var(--bn); font-size: 17.5px; color: var(--accent-lo); font-weight: 700; }
+  .akshara-table .n { color: var(--ink-faint); font-size: 13px; text-align: right; }
+
+  /* -- The feedback card: a note the player copies out and sends on themselves --- */
+  .say {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 14px 0 0;
+    padding: 12px 13px;
+    background: var(--surface-2);
+    border: 2px solid var(--surface-3);
+    border-radius: var(--r-sm);
+    color: var(--ink);
+    font: inherit;
+    font-size: 15.5px;
+    line-height: 1.5;
+    /* Bengali and English both go in here, and a parent will type either. */
+    font-family: var(--bn);
+    resize: vertical;
+    min-height: 76px;
+  }
+  .say::placeholder { color: var(--ink-faint); }
+  .say:focus { border-color: var(--accent); outline: none; background: #fff; }
+
+  .say-adds {
+    margin: 9px 0 13px;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--ink-faint);
+  }
+  .say-adds span { color: var(--accent-lo); font-weight: 700; }
+
+  .say-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    border: 0;
+    border-radius: var(--r-sm);
+    padding: 11px 17px 13px;
+    background: linear-gradient(180deg, var(--tile-hi), var(--tile));
+    color: #fff;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--lip) var(--tile-lo);
+    transition: transform .12s ease, box-shadow .12s ease, filter .18s ease;
+  }
+  .say-copy:hover { filter: brightness(1.06); }
+  .say-copy:active { transform: translateY(4px); box-shadow: none; }
+  /* Green on success, because "did that work?" should not need reading. */
+  .say-copy.ok {
+    background: linear-gradient(180deg, var(--good-hi), var(--good));
+    box-shadow: var(--lip) var(--good-lo);
+    color: var(--good-ink);
+  }
+  .say-copy .glyph { font-size: 16px; opacity: .9; }
+  .say-copy .bn { font-family: var(--bn); font-size: 15.5px; }
+  .say-copy .say-en { font-weight: 600; opacity: .85; }
+
+  footer {
+    margin-top: 34px;
+    padding-top: 18px;
+    border-top: 1px solid var(--surface-3);
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--ink-faint);
+    max-width: 74ch;
+  }
+  footer code { font-family: var(--mono); color: var(--accent-lo); font-size: 13px; }
+
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+  }
+
+  /* -- the three buttons under the note box ----------------------------------- */
+  .say-row { display: flex; flex-wrap: wrap; gap: 9px; }
+
+  /* Copy and keep are the quieter two; sending is what the card is for. */
+  .say-ghost {
+    background: linear-gradient(180deg, #fff, var(--surface-2));
+    color: var(--ink);
+    box-shadow: var(--lip) var(--surface-3), 0 0 0 1px rgba(var(--shade), .07);
+  }
+
+  /* Sending is the main thing this card is for, so it is the only coloured button on it. */
+  .say-mail {
+    background: linear-gradient(180deg, var(--good-hi), var(--good));
+    color: var(--good-ink);
+    box-shadow: var(--lip) var(--good-lo);
+  }

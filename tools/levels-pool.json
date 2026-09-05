@@ -1,0 +1,1335 @@
+{
+ "name": "Levels built from the curated pool that the uploaded curriculum leaves unused",
+ "WHY_THIS_FILE_EXISTS": [
+  "tools/vocabulary.py holds 541 words curated for a learner, from the letter-per-level game",
+  "that the akshara curriculum replaced. The uploaded curriculum uses none of them, so 320 sat",
+  "idle. These 27 levels use 114 of them.",
+  "",
+  "Same rules as everywhere else: every word starts with the level’s akshara, three words or",
+  "more, a wheel of at most 8 tiles, a board inside 5 rows by 7 columns, and no word on a",
+  "second board. Every word here also clears the corpus frequency floor, since that is what",
+  "vocabulary.py was filtered on.",
+  "",
+  "Ten of these are aksharas with no level at all before now: গ গা চ চা ছা জ মৌ র রা ল.",
+  "The other seventeen are a second level for an akshara that already had one, marked with",
+  "·2 - more practice on the same step of the কার series, ordered straight after it."
+ ],
+ "WHAT_WAS_LEFT_OUT": [
+  "জল and মাসি: West Bengal forms. The uploaded curriculum is explicit that a Bangladeshi",
+  "   audience gets পানি and খালা, and vocabulary.py predates that rule.",
+  "কর: reads as the imperative of করা, which is on the same level.",
+  "বর্ষাকাল: means what বর্ষা means, and বর্ষা is on the same level.",
+  "Every word in the `describing` theme was set aside before choosing - they are adjectives",
+  "   and abstractions, and a level built only of those fails the picture test outright. A few",
+  "   are still here where a level needed a third word, each flagged with how to draw it."
+ ],
+ "levels": [
+  {
+   "id": "আ·2",
+   "type": "akshara",
+   "key": "আ",
+   "words": [
+    {
+     "w": "আজ",
+     "split": [
+      "আ",
+      "জ"
+     ],
+     "en": "today",
+     "freq": 0,
+     "flag": "a day on a calendar, ringed"
+    },
+    {
+     "w": "আদা",
+     "split": [
+      "আ",
+      "দা"
+     ],
+     "en": "ginger",
+     "freq": 0
+    },
+    {
+     "w": "আনা",
+     "split": [
+      "আ",
+      "না"
+     ],
+     "en": "to bring",
+     "freq": 0
+    },
+    {
+     "w": "আয়না",
+     "split": [
+      "আ",
+      "য়",
+      "না"
+     ],
+     "en": "mirror",
+     "freq": 0
+    },
+    {
+     "w": "আলু",
+     "split": [
+      "আ",
+      "লু"
+     ],
+     "en": "potato",
+     "freq": 0
+    },
+    {
+     "w": "আলো",
+     "split": [
+      "আ",
+      "লো"
+     ],
+     "en": "light",
+     "freq": 0
+    },
+    {
+     "w": "আসা",
+     "split": [
+      "আ",
+      "সা"
+     ],
+     "en": "to come",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "ক·2",
+   "type": "akshara",
+   "key": "ক",
+   "words": [
+    {
+     "w": "কচু",
+     "split": [
+      "ক",
+      "চু"
+     ],
+     "en": "taro root",
+     "freq": 0
+    },
+    {
+     "w": "কদম",
+     "split": [
+      "ক",
+      "দ",
+      "ম"
+     ],
+     "en": "kadam flower",
+     "freq": 0
+    },
+    {
+     "w": "কফি",
+     "split": [
+      "ক",
+      "ফি"
+     ],
+     "en": "coffee",
+     "freq": 0
+    },
+    {
+     "w": "কমল",
+     "split": [
+      "ক",
+      "ম",
+      "ল"
+     ],
+     "en": "lotus",
+     "freq": 0
+    },
+    {
+     "w": "করা",
+     "split": [
+      "ক",
+      "রা"
+     ],
+     "en": "to do",
+     "freq": 0,
+     "flag": "abstract: no picture shows it, the plainest verb in Bengali"
+    },
+    {
+     "w": "কল",
+     "split": [
+      "ক",
+      "ল"
+     ],
+     "en": "tap, water pump",
+     "freq": 0
+    },
+    {
+     "w": "কলস",
+     "split": [
+      "ক",
+      "ল",
+      "স"
+     ],
+     "en": "water pitcher",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "কা·2",
+   "type": "akshara",
+   "key": "কা",
+   "words": [
+    {
+     "w": "কাটা",
+     "split": [
+      "কা",
+      "টা"
+     ],
+     "en": "to cut",
+     "freq": 0
+    },
+    {
+     "w": "কাঠবিড়ালি",
+     "split": [
+      "কা",
+      "ঠ",
+      "বি",
+      "ড়া",
+      "লি"
+     ],
+     "en": "squirrel",
+     "freq": 0
+    },
+    {
+     "w": "কাদা",
+     "split": [
+      "কা",
+      "দা"
+     ],
+     "en": "mud",
+     "freq": 0
+    },
+    {
+     "w": "কাল",
+     "split": [
+      "কা",
+      "ল"
+     ],
+     "en": "tomorrow",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "গ",
+   "type": "akshara",
+   "key": "গ",
+   "words": [
+    {
+     "w": "গড়া",
+     "split": [
+      "গ",
+      "ড়া"
+     ],
+     "en": "to build, to make",
+     "freq": 0,
+     "flag": "hands shaping clay"
+    },
+    {
+     "w": "গণিত",
+     "split": [
+      "গ",
+      "ণি",
+      "ত"
+     ],
+     "en": "mathematics",
+     "freq": 0
+    },
+    {
+     "w": "গতকাল",
+     "split": [
+      "গ",
+      "ত",
+      "কা",
+      "ল"
+     ],
+     "en": "yesterday",
+     "freq": 0,
+     "flag": "the day before today on a calendar"
+    },
+    {
+     "w": "গল্প",
+     "split": [
+      "গ",
+      "ল্প"
+     ],
+     "en": "a story",
+     "freq": 0,
+     "flag": "an open storybook"
+    }
+   ]
+  },
+  {
+   "id": "গা",
+   "type": "akshara",
+   "key": "গা",
+   "words": [
+    {
+     "w": "গাওয়া",
+     "split": [
+      "গা",
+      "ও",
+      "য়া"
+     ],
+     "en": "to sing",
+     "freq": 0
+    },
+    {
+     "w": "গাজর",
+     "split": [
+      "গা",
+      "জ",
+      "র"
+     ],
+     "en": "carrot",
+     "freq": 0
+    },
+    {
+     "w": "গাঢ়",
+     "split": [
+      "গা",
+      "ঢ়"
+     ],
+     "en": "deep, dark (of a colour)",
+     "freq": 0
+    },
+    {
+     "w": "গান",
+     "split": [
+      "গা",
+      "ন"
+     ],
+     "en": "a song",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "ঘ·2",
+   "type": "akshara",
+   "key": "ঘ",
+   "words": [
+    {
+     "w": "ঘট",
+     "split": [
+      "ঘ",
+      "ট"
+     ],
+     "en": "clay water pot",
+     "freq": 0
+    },
+    {
+     "w": "ঘণ্টা",
+     "split": [
+      "ঘ",
+      "ণ্টা"
+     ],
+     "en": "bell; an hour",
+     "freq": 0
+    },
+    {
+     "w": "ঘরবাড়ি",
+     "split": [
+      "ঘ",
+      "র",
+      "বা",
+      "ড়ি"
+     ],
+     "en": "home, house and yard",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "চ",
+   "type": "akshara",
+   "key": "চ",
+   "words": [
+    {
+     "w": "চন্দ্র",
+     "split": [
+      "চ",
+      "ন্দ্র"
+     ],
+     "en": "the moon",
+     "freq": 0
+    },
+    {
+     "w": "চমক",
+     "split": [
+      "চ",
+      "ম",
+      "ক"
+     ],
+     "en": "a flash, a sparkle",
+     "freq": 0,
+     "flag": "a spark or a lightning flash"
+    },
+    {
+     "w": "চলা",
+     "split": [
+      "চ",
+      "লা"
+     ],
+     "en": "to walk, to move",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "চা",
+   "type": "akshara",
+   "key": "চা",
+   "words": [
+    {
+     "w": "চাদর",
+     "split": [
+      "চা",
+      "দ",
+      "র"
+     ],
+     "en": "bedsheet",
+     "freq": 0
+    },
+    {
+     "w": "চামচ",
+     "split": [
+      "চা",
+      "ম",
+      "চ"
+     ],
+     "en": "spoon",
+     "freq": 0
+    },
+    {
+     "w": "চালক",
+     "split": [
+      "চা",
+      "ল",
+      "ক"
+     ],
+     "en": "driver",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "ছা",
+   "type": "akshara",
+   "key": "ছা",
+   "words": [
+    {
+     "w": "ছাড়া",
+     "split": [
+      "ছা",
+      "ড়া"
+     ],
+     "en": "to let go",
+     "freq": 0
+    },
+    {
+     "w": "ছাত্র",
+     "split": [
+      "ছা",
+      "ত্র"
+     ],
+     "en": "schoolboy",
+     "freq": 0
+    },
+    {
+     "w": "ছাত্রী",
+     "split": [
+      "ছা",
+      "ত্রী"
+     ],
+     "en": "schoolgirl",
+     "freq": 0
+    },
+    {
+     "w": "ছায়া",
+     "split": [
+      "ছা",
+      "য়া"
+     ],
+     "en": "shadow",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "জ",
+   "type": "akshara",
+   "key": "জ",
+   "words": [
+    {
+     "w": "জগত",
+     "split": [
+      "জ",
+      "গ",
+      "ত"
+     ],
+     "en": "the world",
+     "freq": 0,
+     "flag": "abstract: draw the globe"
+    },
+    {
+     "w": "জন",
+     "split": [
+      "জ",
+      "ন"
+     ],
+     "en": "a person",
+     "freq": 0,
+     "flag": "a counting word for people: draw one figure"
+    },
+    {
+     "w": "জন্মদিন",
+     "split": [
+      "জ",
+      "ন্ম",
+      "দি",
+      "ন"
+     ],
+     "en": "birthday",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "দ·2",
+   "type": "akshara",
+   "key": "দ",
+   "words": [
+    {
+     "w": "দক্ষিণ",
+     "split": [
+      "দ",
+      "ক্ষি",
+      "ণ"
+     ],
+     "en": "south",
+     "freq": 0,
+     "flag": "a compass needle"
+    },
+    {
+     "w": "দম",
+     "split": [
+      "দ",
+      "ম"
+     ],
+     "en": "breath",
+     "freq": 0,
+     "flag": "abstract: a breath, cheeks puffed out"
+    },
+    {
+     "w": "দল",
+     "split": [
+      "দ",
+      "ল"
+     ],
+     "en": "a team",
+     "freq": 0,
+     "flag": "abstract: several figures together"
+    },
+    {
+     "w": "দশ",
+     "split": [
+      "দ",
+      "শ"
+     ],
+     "en": "ten",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "ন·2",
+   "type": "akshara",
+   "key": "ন",
+   "words": [
+    {
+     "w": "নকল",
+     "split": [
+      "ন",
+      "ক",
+      "ল"
+     ],
+     "en": "a copy",
+     "freq": 0
+    },
+    {
+     "w": "নগর",
+     "split": [
+      "ন",
+      "গ",
+      "র"
+     ],
+     "en": "city",
+     "freq": 0
+    },
+    {
+     "w": "নজর",
+     "split": [
+      "ন",
+      "জ",
+      "র"
+     ],
+     "en": "a glance",
+     "freq": 0,
+     "flag": "abstract: an eye looking sideways"
+    },
+    {
+     "w": "নদ",
+     "split": [
+      "ন",
+      "দ"
+     ],
+     "en": "river",
+     "freq": 0
+    },
+    {
+     "w": "নম্বর",
+     "split": [
+      "ন",
+      "ম্ব",
+      "র"
+     ],
+     "en": "number",
+     "freq": 0
+    },
+    {
+     "w": "নল",
+     "split": [
+      "ন",
+      "ল"
+     ],
+     "en": "pipe",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "না·2",
+   "type": "akshara",
+   "key": "না",
+   "words": [
+    {
+     "w": "নাচা",
+     "split": [
+      "না",
+      "চা"
+     ],
+     "en": "to dance",
+     "freq": 0
+    },
+    {
+     "w": "নাটক",
+     "split": [
+      "না",
+      "ট",
+      "ক"
+     ],
+     "en": "a play",
+     "freq": 0
+    },
+    {
+     "w": "নারকেল",
+     "split": [
+      "না",
+      "র",
+      "কে",
+      "ল"
+     ],
+     "en": "coconut",
+     "freq": 0
+    },
+    {
+     "w": "নার্স",
+     "split": [
+      "না",
+      "র্স"
+     ],
+     "en": "nurse",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "প·2",
+   "type": "akshara",
+   "key": "প",
+   "words": [
+    {
+     "w": "পটল",
+     "split": [
+      "প",
+      "ট",
+      "ল"
+     ],
+     "en": "pointed gourd",
+     "freq": 0
+    },
+    {
+     "w": "পরীক্ষা",
+     "split": [
+      "প",
+      "রী",
+      "ক্ষা"
+     ],
+     "en": "an exam",
+     "freq": 0,
+     "flag": "a desk with a paper and pencil"
+    },
+    {
+     "w": "পলক",
+     "split": [
+      "প",
+      "ল",
+      "ক"
+     ],
+     "en": "eyelid",
+     "freq": 0
+    },
+    {
+     "w": "পশম",
+     "split": [
+      "প",
+      "শ",
+      "ম"
+     ],
+     "en": "wool",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "পা·2",
+   "type": "akshara",
+   "key": "পা",
+   "words": [
+    {
+     "w": "পাঠ",
+     "split": [
+      "পা",
+      "ঠ"
+     ],
+     "en": "a lesson",
+     "freq": 0,
+     "flag": "a child reading aloud from a book"
+    },
+    {
+     "w": "পাঠশালা",
+     "split": [
+      "পা",
+      "ঠ",
+      "শা",
+      "লা"
+     ],
+     "en": "village school",
+     "freq": 0
+    },
+    {
+     "w": "পাথর",
+     "split": [
+      "পা",
+      "থ",
+      "র"
+     ],
+     "en": "stone",
+     "freq": 0
+    },
+    {
+     "w": "পায়রা",
+     "split": [
+      "পা",
+      "য়",
+      "রা"
+     ],
+     "en": "pigeon",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "ব·2",
+   "type": "akshara",
+   "key": "ব",
+   "words": [
+    {
+     "w": "বগল",
+     "split": [
+      "ব",
+      "গ",
+      "ল"
+     ],
+     "en": "armpit",
+     "freq": 0
+    },
+    {
+     "w": "বদল",
+     "split": [
+      "ব",
+      "দ",
+      "ল"
+     ],
+     "en": "a change",
+     "freq": 0,
+     "flag": "abstract: two things swapping places"
+    },
+    {
+     "w": "বন্ধ",
+     "split": [
+      "ব",
+      "ন্ধ"
+     ],
+     "en": "closed, shut",
+     "freq": 0,
+     "flag": "a shut door"
+    },
+    {
+     "w": "বন্ধু",
+     "split": [
+      "ব",
+      "ন্ধু"
+     ],
+     "en": "friend",
+     "freq": 0
+    },
+    {
+     "w": "বর্ষা",
+     "split": [
+      "ব",
+      "র্ষা"
+     ],
+     "en": "the rainy season",
+     "freq": 0
+    },
+    {
+     "w": "বলা",
+     "split": [
+      "ব",
+      "লা"
+     ],
+     "en": "to say",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "বা·2",
+   "type": "akshara",
+   "key": "বা",
+   "words": [
+    {
+     "w": "বাক্য",
+     "split": [
+      "বা",
+      "ক্য"
+     ],
+     "en": "a sentence",
+     "freq": 0,
+     "flag": "a line of writing ending in a full stop"
+    },
+    {
+     "w": "বাছুর",
+     "split": [
+      "বা",
+      "ছু",
+      "র"
+     ],
+     "en": "calf",
+     "freq": 0
+    },
+    {
+     "w": "বাজার",
+     "split": [
+      "বা",
+      "জা",
+      "র"
+     ],
+     "en": "market",
+     "freq": 0
+    },
+    {
+     "w": "বাটি",
+     "split": [
+      "বা",
+      "টি"
+     ],
+     "en": "bowl",
+     "freq": 0
+    },
+    {
+     "w": "বাড়ি",
+     "split": [
+      "বা",
+      "ড়ি"
+     ],
+     "en": "house",
+     "freq": 0
+    },
+    {
+     "w": "বানর",
+     "split": [
+      "বা",
+      "ন",
+      "র"
+     ],
+     "en": "monkey",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "বি·2",
+   "type": "akshara",
+   "key": "বি",
+   "words": [
+    {
+     "w": "বিকাল",
+     "split": [
+      "বি",
+      "কা",
+      "ল"
+     ],
+     "en": "afternoon",
+     "freq": 0
+    },
+    {
+     "w": "বিছানা",
+     "split": [
+      "বি",
+      "ছা",
+      "না"
+     ],
+     "en": "bed",
+     "freq": 0
+    },
+    {
+     "w": "বিজ্ঞান",
+     "split": [
+      "বি",
+      "জ্ঞা",
+      "ন"
+     ],
+     "en": "science",
+     "freq": 0,
+     "flag": "draw a flask or a magnifier"
+    },
+    {
+     "w": "বিমান",
+     "split": [
+      "বি",
+      "মা",
+      "ন"
+     ],
+     "en": "aeroplane",
+     "freq": 0
+    },
+    {
+     "w": "বিল",
+     "split": [
+      "বি",
+      "ল"
+     ],
+     "en": "marsh, wetland",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "ম·2",
+   "type": "akshara",
+   "key": "ম",
+   "words": [
+    {
+     "w": "মটর",
+     "split": [
+      "ম",
+      "ট",
+      "র"
+     ],
+     "en": "peas",
+     "freq": 0
+    },
+    {
+     "w": "ময়ূর",
+     "split": [
+      "ম",
+      "য়ূ",
+      "র"
+     ],
+     "en": "peacock",
+     "freq": 0
+    },
+    {
+     "w": "মরু",
+     "split": [
+      "ম",
+      "রু"
+     ],
+     "en": "desert",
+     "freq": 0
+    },
+    {
+     "w": "মহল",
+     "split": [
+      "ম",
+      "হ",
+      "ল"
+     ],
+     "en": "palace quarters",
+     "freq": 0,
+     "flag": "a palace - a word a child may not know"
+    }
+   ]
+  },
+  {
+   "id": "মা·2",
+   "type": "akshara",
+   "key": "মা",
+   "words": [
+    {
+     "w": "মাকড়সা",
+     "split": [
+      "মা",
+      "ক",
+      "ড়",
+      "সা"
+     ],
+     "en": "spider",
+     "freq": 0
+    },
+    {
+     "w": "মাখন",
+     "split": [
+      "মা",
+      "খ",
+      "ন"
+     ],
+     "en": "butter",
+     "freq": 0
+    },
+    {
+     "w": "মালি",
+     "split": [
+      "মা",
+      "লি"
+     ],
+     "en": "gardener",
+     "freq": 0
+    },
+    {
+     "w": "মাস",
+     "split": [
+      "মা",
+      "স"
+     ],
+     "en": "month",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "মৌ",
+   "type": "akshara",
+   "key": "মৌ",
+   "words": [
+    {
+     "w": "মৌচাক",
+     "split": [
+      "মৌ",
+      "চা",
+      "ক"
+     ],
+     "en": "beehive",
+     "freq": 0
+    },
+    {
+     "w": "মৌমাছি",
+     "split": [
+      "মৌ",
+      "মা",
+      "ছি"
+     ],
+     "en": "honeybee",
+     "freq": 0
+    },
+    {
+     "w": "মৌসুম",
+     "split": [
+      "মৌ",
+      "সু",
+      "ম"
+     ],
+     "en": "season",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "র",
+   "type": "akshara",
+   "key": "র",
+   "words": [
+    {
+     "w": "রতন",
+     "split": [
+      "র",
+      "ত",
+      "ন"
+     ],
+     "en": "a jewel",
+     "freq": 0
+    },
+    {
+     "w": "রথ",
+     "split": [
+      "র",
+      "থ"
+     ],
+     "en": "chariot",
+     "freq": 0
+    },
+    {
+     "w": "রসগোল্লা",
+     "split": [
+      "র",
+      "স",
+      "গো",
+      "ল্লা"
+     ],
+     "en": "rosogolla, a sweet",
+     "freq": 0
+    },
+    {
+     "w": "রসুন",
+     "split": [
+      "র",
+      "সু",
+      "ন"
+     ],
+     "en": "garlic",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "রা",
+   "type": "akshara",
+   "key": "রা",
+   "words": [
+    {
+     "w": "রাখা",
+     "split": [
+      "রা",
+      "খা"
+     ],
+     "en": "to keep, to put",
+     "freq": 0
+    },
+    {
+     "w": "রাখাল",
+     "split": [
+      "রা",
+      "খা",
+      "ল"
+     ],
+     "en": "cowherd",
+     "freq": 0
+    },
+    {
+     "w": "রাগ",
+     "split": [
+      "রা",
+      "গ"
+     ],
+     "en": "anger",
+     "freq": 0,
+     "flag": "a cross face"
+    },
+    {
+     "w": "রানি",
+     "split": [
+      "রা",
+      "নি"
+     ],
+     "en": "queen",
+     "freq": 0
+    },
+    {
+     "w": "রান্নাঘর",
+     "split": [
+      "রা",
+      "ন্না",
+      "ঘ",
+      "র"
+     ],
+     "en": "kitchen",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "ল",
+   "type": "akshara",
+   "key": "ল",
+   "words": [
+    {
+     "w": "লঞ্চ",
+     "split": [
+      "ল",
+      "ঞ্চ"
+     ],
+     "en": "river launch boat",
+     "freq": 0
+    },
+    {
+     "w": "লতা",
+     "split": [
+      "ল",
+      "তা"
+     ],
+     "en": "creeper vine",
+     "freq": 0
+    },
+    {
+     "w": "লবণ",
+     "split": [
+      "ল",
+      "ব",
+      "ণ"
+     ],
+     "en": "salt",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "শি·2",
+   "type": "akshara",
+   "key": "শি",
+   "words": [
+    {
+     "w": "শিকড়",
+     "split": [
+      "শি",
+      "ক",
+      "ড়"
+     ],
+     "en": "root",
+     "freq": 0
+    },
+    {
+     "w": "শিক্ষক",
+     "split": [
+      "শি",
+      "ক্ষ",
+      "ক"
+     ],
+     "en": "teacher",
+     "freq": 0
+    },
+    {
+     "w": "শিল্পী",
+     "split": [
+      "শি",
+      "ল্পী"
+     ],
+     "en": "artist",
+     "freq": 0
+    }
+   ]
+  },
+  {
+   "id": "স·2",
+   "type": "akshara",
+   "key": "স",
+   "words": [
+    {
+     "w": "সকাল",
+     "split": [
+      "স",
+      "কা",
+      "ল"
+     ],
+     "en": "morning",
+     "freq": 0
+    },
+    {
+     "w": "সড়ক",
+     "split": [
+      "স",
+      "ড়",
+      "ক"
+     ],
+     "en": "road",
+     "freq": 0
+    },
+    {
+     "w": "সন্ধ্যা",
+     "split": [
+      "স",
+      "ন্ধ্যা"
+     ],
+     "en": "evening",
+     "freq": 0
+    },
+    {
+     "w": "সপ্তাহ",
+     "split": [
+      "স",
+      "প্তা",
+      "হ"
+     ],
+     "en": "week",
+     "freq": 0,
+     "flag": "seven days ringed on a calendar"
+    }
+   ]
+  },
+  {
+   "id": "সা·2",
+   "type": "akshara",
+   "key": "সা",
+   "words": [
+    {
+     "w": "সাইকেল",
+     "split": [
+      "সা",
+      "ই",
+      "কে",
+      "ল"
+     ],
+     "en": "bicycle",
+     "freq": 0
+    },
+    {
+     "w": "সাধু",
+     "split": [
+      "সা",
+      "ধু"
+     ],
+     "en": "holy man",
+     "freq": 0
+    },
+    {
+     "w": "সাবান",
+     "split": [
+      "সা",
+      "বা",
+      "ন"
+     ],
+     "en": "soap",
+     "freq": 0
+    }
+   ]
+  }
+ ]
+}

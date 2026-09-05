@@ -1,0 +1,344 @@
+  /* -- The toy ---------------------------------------------------------------- */
+
+  /*
+   * A thing on a table, not a window into an app. The frame is thick and soft-cornered like
+   * moulded plastic, the screen inside it is warm paper, and everything a child can press has
+   * a hard bottom edge that vanishes when pressed - which is the whole trick behind making a
+   * flat screen feel like it has buttons on it.
+   */
+  .device {
+    position: relative;
+    /* 410px before. The board's cells are sized for the widest level in the game - seven
+       columns - so they are limited by this width and nothing else: at 410px seven columns
+       came to 44px a cell against 60px wheel tiles. 510px gives them the 60px the tiles have.
+       `max-width: 100%` still applies, so a phone is unaffected: there the screen's own width
+       is the limit and no frame can invent more of it. */
+    width: 510px;
+    max-width: 100%;
+    /* 176px is what the page around the game takes on a wide screen: the bar above it and the
+       margins either side of that. On a phone the bar is gone and a tab bar is at the foot
+       instead, so the sum is different - see the touch rules below. */
+    height: min(770px, calc(100vh - 176px));
+    height: min(770px, calc(100dvh - 176px));
+    min-height: 540px;
+    margin: 0 auto;
+    padding: 14px;
+    border-radius: var(--r-xl);
+    background: linear-gradient(168deg, #FFFFFF 0%, var(--surface-2) 42%, var(--surface-3) 100%);
+    box-shadow:
+      inset 0 2px 0 #fff,                       /* the light along the top edge of the shell */
+      inset 0 -3px 0 rgba(var(--shade), .10),     /* and the shadow under its bottom lip */
+      0 0 0 1px rgba(var(--shade), .07),
+      var(--lift-lg);
+  }
+
+  .screen {
+    position: relative;
+    height: 100%;
+    border-radius: 30px;
+    background:
+      radial-gradient(120% 60% at 50% -10%, #FFFFFF 0%, transparent 62%),
+      var(--surface);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding: 15px 15px 13px;
+    gap: 8px;
+    box-shadow: inset 0 0 0 1px rgba(var(--shade), .06);
+  }
+
+  /* The speaker grille of the toy. Decoration, and the only thing on screen that is. */
+  .notch {
+    position: absolute;
+    top: 9px; left: 50%;
+    transform: translateX(-50%);
+    width: 66px; height: 5px;
+    border-radius: 99px;
+    background: var(--surface-3);
+    z-index: 5;
+  }
+
+  /* -- top bar: two arrows and the letter between them ------------------------ */
+  /* A word counter used to sit between them - "০ / ৪ শব্দ" - and it was cut: the board already
+     says how much is left, cell by cell, and a fraction ticking up turns finding a word into
+     progress against a quota. */
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; padding-top: 5px; flex: none;
+  }
+
+  /* The level's letter. Sized to the arrows so adding it cannot change the height of the row -
+     the board and wheel are allocated what is left, and a taller topbar would take it from
+     them on every level. */
+  .now-letter {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    overflow: hidden;
+  }
+  /* The letter sits in its own gold badge. A child arriving mid-alphabet reads কা here and
+     knows where they are; a number could not tell them that. */
+  .now-letter .glyph {
+    font-size: 25px;
+    font-weight: 700;
+    color: var(--ink);
+    white-space: nowrap;
+    background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+    border-radius: 99px;
+    padding: 2px 18px 4px;
+    box-shadow: var(--lip) var(--accent-lo), 0 6px 14px -8px var(--accent-lo);
+  }
+  .now-letter .pass {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+  .now-letter .pass:empty { display: none; }
+
+  .icon-btn {
+    width: 42px; height: 42px;
+    flex: none;
+    border: 0;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #fff, var(--surface-2));
+    color: var(--tile);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    box-shadow: var(--lip) var(--surface-3), 0 0 0 1px rgba(var(--shade), .07);
+    transition: transform .12s ease, box-shadow .12s ease, background-color .16s ease;
+  }
+  .icon-btn:hover { background: linear-gradient(180deg, #fff, var(--accent-hi)); }
+  /* Pressed: the button travels down by exactly the height of its own lip, so the lip
+     disappears rather than the button shrinking. That is what reads as a real key. */
+  .icon-btn:active { transform: translateY(4px); box-shadow: 0 0 0 1px rgba(var(--shade), .07); }
+
+  /* -- board ------------------------------------------------------------------ */
+  /* Height is assigned in JS, since how much a board needs depends on its rows. */
+  .board-area { flex: 0 0 auto; min-height: 0; display: grid; place-items: center; }
+  .board { display: grid; gap: var(--gap); }
+
+  /* An empty cell is a hole in the paper: recessed, cool, obviously waiting for something. */
+  .cell {
+    border-radius: 28%;
+    background: var(--well);
+    display: grid;
+    place-items: center;
+    box-shadow: inset 0 2px 5px rgba(var(--glow-well), .28), inset 0 -1px 0 #fff;
+    transition: background-color .2s ease, box-shadow .2s ease;
+  }
+  .cell.blank { background: transparent; box-shadow: none; }
+
+  .cell span {
+    font-family: var(--bn);
+    font-weight: 700;
+    color: var(--ink);
+    opacity: 0;
+    transform: scale(.55);
+    transition: opacity .26s ease, transform .34s cubic-bezier(.2,1.6,.4,1);
+    user-select: none;
+  }
+
+  /* A found cell is the opposite of a hole: raised, gold, lit from above. */
+
+  /* A cell that will say its word when pressed. The whole affordance is the cursor and the
+     press: a speaker mark on every found letter would clutter a board a child is reading, and
+     the cells that can be pressed are exactly the gold ones, which already stand out. */
+
+  /*
+   * A hinted cell is NOT a filled one, and has to look it.
+   *
+   * It used to be a paler gold tile with the same raised lip - and a board part-hinted read as
+   * a board part-solved, because the difference between #FFB300 and #FFE08A is a shade, not a
+   * state. A child looked at it and thought the game had answered for them.
+   *
+   * So a hint keeps the empty well it was and adds only the letter, ghosted, inside a dashed
+   * ring: the cell is still a hole in the board, and the letter is written on it in pencil.
+   * Nothing is raised, nothing is gold, and the moment the word is actually found the cell
+   * fills for real - `.cell.on` wins, because it comes later in this file.
+   */
+  .cell.hinted {
+    background: var(--well);
+    box-shadow: inset 0 0 0 2px var(--hint-lo), inset 0 2px 5px rgba(var(--glow-well), .28);
+    /* The dash is the whole signal at a glance: a solid edge anywhere on this board means
+       solved. Drawn as an inset ring plus an outline so it survives the cell's border-radius. */
+    outline: 2px dashed var(--hint-lo);
+    outline-offset: -5px;
+  }
+  .cell.hinted span { opacity: .55; transform: scale(1); color: var(--ink-soft); }
+
+  /* After the hint, deliberately: a cell can be both, and found wins. */
+  .cell.on {
+    background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+    box-shadow: inset 0 2px 0 rgba(255,255,255,.6), var(--lip) var(--accent-lo);
+    outline: none;                      /* clears the hint's dashed ring when the word lands */
+  }
+  .cell.on span { opacity: 1; transform: scale(1); color: var(--ink); }
+
+  /* -- the word being traced -------------------------------------------------- */
+  .preview { height: 52px; display: grid; place-items: center; flex: none; }
+
+  .preview .hint-text {
+    font-family: var(--bn);
+    font-size: 14.5px;
+    color: var(--ink-faint);
+  }
+
+  .chip {
+    font-family: var(--bn);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--ink);
+    background: linear-gradient(180deg, var(--accent-hi), var(--accent));
+    border-radius: 99px;
+    padding: 4px 22px 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+    box-shadow: var(--lip) var(--accent-lo), var(--lift);
+  }
+  .chip.good {
+    background: linear-gradient(180deg, var(--good-hi), var(--good));
+    box-shadow: var(--lip) var(--good-lo), var(--lift);
+    color: var(--good-ink);
+  }
+  .chip.bad {
+    background: linear-gradient(180deg, var(--bad-hi), var(--bad));
+    box-shadow: var(--lip) var(--bad-lo), var(--lift);
+    color: var(--bad-ink);
+  }
+  .chip.dup {
+    background: linear-gradient(180deg, var(--hint-hi), var(--accent-lo));
+    box-shadow: var(--lip) var(--accent-deep), var(--lift);
+  }
+  .chip.shake { animation: shake .34s ease; }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    18% { transform: translateX(13px); }
+    38% { transform: translateX(-11px); }
+    60% { transform: translateX(8px); }
+    82% { transform: translateX(-4px); }
+  }
+
+  .chip .go {
+    border: 0;
+    background: rgba(var(--shade), .16);
+    color: inherit;
+    font-size: 15px;
+    border-radius: 99px;
+    width: 28px; height: 28px;
+    cursor: pointer;
+    display: grid; place-items: center;
+  }
+  .chip .go:hover { background: rgba(var(--shade), .3); }
+
+  /* -- action row -------------------------------------------------------------- */
+  .actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; flex: none; }
+
+  .action {
+    display: flex; align-items: center; gap: 7px;
+    background: linear-gradient(180deg, #fff, var(--surface-2));
+    border: 0;
+    border-radius: 99px;
+    padding: 9px 17px 11px;
+    color: var(--ink);
+    font-family: var(--bn);
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--lip) var(--surface-3), 0 0 0 1px rgba(var(--shade), .07);
+    transition: transform .12s ease, box-shadow .12s ease, background-color .16s ease;
+  }
+  .action:hover:not(:disabled) { background: linear-gradient(180deg, #fff, var(--accent-hi)); }
+  .action:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 1px rgba(var(--shade), .07);
+  }
+  .action:disabled { opacity: .42; cursor: not-allowed; box-shadow: none; }
+
+  /* Counting down rather than switched off. A disabled button at .42 is a button a child stops
+     looking at, and this one is the only thing on screen saying how long is left and that
+     finding a word shortens it - so it keeps its ink and loses only its lift. */
+  .action.cooling:disabled {
+    opacity: 1;
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    box-shadow: 0 0 0 1px rgba(var(--shade), .07);
+    font-variant-numeric: tabular-nums;
+  }
+  .action.cooling .glyph { color: var(--ink-faint); }
+  .action .glyph { color: var(--accent-lo); font-size: 16px; }
+
+  /* -- wheel ------------------------------------------------------------------- */
+  .wheel-area { flex: 1 1 auto; min-height: 0; display: grid; place-items: center; }
+
+  .wheel { position: relative; touch-action: none; }
+  .wheel svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+
+  /* The tiles. Berry rather than gold: gold already means "you found this", and a tile must
+     not look found before it has been used. */
+  .tile {
+    position: absolute;
+    border: 0;
+    border-radius: 50%;
+    background: radial-gradient(120% 120% at 30% 22%, var(--tile-hi), var(--tile) 62%);
+    color: #fff;
+    font-family: var(--bn);
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    padding: 0;
+    box-shadow: var(--lip) var(--tile-lo), 0 10px 20px -10px var(--tile-lo);
+    transition: background-color .14s ease, color .14s ease,
+                transform .22s cubic-bezier(.2,1.7,.4,1), box-shadow .18s ease;
+    user-select: none;
+    touch-action: none;
+    will-change: transform;
+  }
+  .tile:active { transform: translateY(3px) scale(.97); }
+
+  /* Chosen: gold, bigger, and haloed - the same gold it will become on the board, so a child
+     can see where the letter is going before it goes. */
+  .tile.sel {
+    background: radial-gradient(120% 120% at 30% 22%, var(--hint-hi), var(--accent) 62%);
+    color: var(--ink);
+    transform: scale(1.14);
+    box-shadow: var(--lip) var(--accent-lo), 0 0 0 8px rgba(var(--glow-accent), .26);
+  }
+
+  /* -- the mute switch --------------------------------------------------------- */
+  /* Not in the top bar and not in the action row: both of those are exactly what a child
+     needs and nothing else, and a test holds them to it. This lives in the screen's corner,
+     small and out of the way, because it is a thing a parent reaches for once.  */
+  .mute {
+    position: absolute;
+    right: 12px; bottom: 10px;
+    width: 34px; height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height: 1;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    opacity: .72;
+    z-index: 9;
+    box-shadow: 0 0 0 1px rgba(var(--shade), .07);
+    transition: opacity .16s ease, transform .12s ease, background-color .16s ease;
+  }
+  .mute:hover { opacity: 1; background: var(--accent-hi); }
+  .mute:active { transform: scale(.92); }
+  .mute[aria-pressed="true"] { opacity: .85; color: var(--bad); }
