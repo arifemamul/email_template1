@@ -27,8 +27,10 @@ const PAGES = await p.$$eval('#menuPop .opt', os => os.map(o => o.dataset.page))
 const SECTIONS = await p.$$eval('.pages .page', ss => ss.map(s => s.id.replace(/^page-/, '')));
 // The order here is the menu's, which is the teaching order a child meets them in: the letters,
 // then what the letters take, then how letters join into words, then the game, then the rest.
+// `install` sits at the head of that last group rather than at the end of it, because it is the
+// only one addressed to the adult holding the phone and the only one with something to do.
 const EXPECTED = ['barnamala', 'gathon', 'phala', 'jukto',
-                  'levels', 'play', 'about', 'report'];
+                  'levels', 'play', 'install', 'about', 'report'];
 if (PAGES.join() !== EXPECTED.join())
   problems.push(`options are [${PAGES}], expected [${EXPECTED}]`);
 // Compared as sets, not as sequences. They used to have to be in the same order because the

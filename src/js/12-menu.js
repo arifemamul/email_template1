@@ -339,6 +339,9 @@ function showPage(key, remember = true) {
     if (first) first.classList.toggle("dup", first.textContent.trim() === title);
   }
   if (el.guideTitle) el.guideTitle.textContent = title;
+  // The only section whose answer can go stale while the page is open: install it from the
+  // browser's own menu and what this says stops being true until it is asked again.
+  if (key === "install") Install.draw();
   markTab(key);
   // Which section you were reading is a per-device convenience, so it goes in localStorage and
   // is allowed to fail: a private window or blocked site data must not break the menu.

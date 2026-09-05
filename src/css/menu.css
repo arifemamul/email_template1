@@ -777,3 +777,75 @@
     .jr { grid-template-columns: 40px 1fr; }
     .jr-words { grid-column: 1 / -1; }
   }
+
+  /* -- Keeping the game -------------------------------------------------------
+       The block in অ্যাপ হিসেবে রাখুন that tells this browser how. `08-install.js` picks
+       which of the six things it says; this only has to hold any of them, because a
+       browser it guesses wrong about still gets a heading and a list.
+
+       Written as a panel rather than as more essay because a parent following steps on a
+       phone is looking away from the screen and back at it, and the numbers have to be
+       findable each time they look back. */
+  .ins {
+    margin: 14px 0 4px;
+    padding: 14px 16px 16px;
+    background: var(--surface-2);
+    border: 1px solid var(--surface-3);
+    border-radius: var(--r-md);
+  }
+  /* Nothing left to do: the same panel, said quietly rather than with a fresh accent. */
+  .ins-done { background: var(--well); border-color: var(--good-lo); }
+  .ins-h {
+    margin: 0 0 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .ins-p { margin: 0; font-size: 15px; line-height: 1.65; color: var(--ink-soft); }
+  .ins-p + .ins-p { margin-top: 10px; }
+  .ins-steps {
+    margin: 0;
+    padding-left: 22px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--ink-soft);
+  }
+  .ins-steps li { margin: 0 0 6px; }
+  .ins-steps li:last-child { margin-bottom: 0; }
+  .ins-steps b { color: var(--ink); font-weight: 700; }
+  .ins-steps + .ins-p { margin-top: 10px; }
+  /* The share glyph inline in the sentence that names it, because "the share button" is not
+     a thing a parent can find and this shape is. Sized to the line rather than to a box. */
+  .ins-ic {
+    width: 1.05em;
+    height: 1.05em;
+    vertical-align: -.18em;
+    margin: 0 .1em;
+    color: var(--accent-deep);
+  }
+  /* Only ever drawn where the browser handed over a real prompt, so it is never a button
+     that opens instructions - it installs. */
+  .ins-go {
+    margin-top: 12px;
+    padding: 11px 20px;
+    font-family: var(--bn);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--ink);
+    background: var(--accent);
+    border: none;
+    border-radius: var(--r-sm);
+    box-shadow: 0 2px 0 var(--accent-deep);
+    cursor: pointer;
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+  .ins-go:hover { transform: translateY(-1px); box-shadow: 0 3px 0 var(--accent-deep); }
+  .ins-go:active { transform: translateY(1px); box-shadow: none; }
+  .ins-go:disabled { opacity: .55; cursor: default; transform: none; box-shadow: none; }
+  .ins-why {
+    margin: 14px 0 0;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: var(--ink-faint);
+  }
+  .ins-why b { color: var(--ink-soft); }

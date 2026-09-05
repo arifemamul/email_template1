@@ -1454,6 +1454,65 @@ color: var(--ink-faint);
 .jr { grid-template-columns: 40px 1fr; }
 .jr-words { grid-column: 1 / -1; }
 }
+
+.ins {
+margin: 14px 0 4px;
+padding: 14px 16px 16px;
+background: var(--surface-2);
+border: 1px solid var(--surface-3);
+border-radius: var(--r-md);
+}
+.ins-done { background: var(--well); border-color: var(--good-lo); }
+.ins-h {
+margin: 0 0 8px;
+font-size: 16px;
+font-weight: 700;
+color: var(--ink);
+}
+.ins-p { margin: 0; font-size: 15px; line-height: 1.65; color: var(--ink-soft); }
+.ins-p + .ins-p { margin-top: 10px; }
+.ins-steps {
+margin: 0;
+padding-left: 22px;
+font-size: 15px;
+line-height: 1.7;
+color: var(--ink-soft);
+}
+.ins-steps li { margin: 0 0 6px; }
+.ins-steps li:last-child { margin-bottom: 0; }
+.ins-steps b { color: var(--ink); font-weight: 700; }
+.ins-steps + .ins-p { margin-top: 10px; }
+.ins-ic {
+width: 1.05em;
+height: 1.05em;
+vertical-align: -.18em;
+margin: 0 .1em;
+color: var(--accent-deep);
+}
+.ins-go {
+margin-top: 12px;
+padding: 11px 20px;
+font-family: var(--bn);
+font-size: 16px;
+font-weight: 700;
+color: var(--ink);
+background: var(--accent);
+border: none;
+border-radius: var(--r-sm);
+box-shadow: 0 2px 0 var(--accent-deep);
+cursor: pointer;
+transition: transform .12s ease, box-shadow .12s ease;
+}
+.ins-go:hover { transform: translateY(-1px); box-shadow: 0 3px 0 var(--accent-deep); }
+.ins-go:active { transform: translateY(1px); box-shadow: none; }
+.ins-go:disabled { opacity: .55; cursor: default; transform: none; box-shadow: none; }
+.ins-why {
+margin: 14px 0 0;
+font-size: 14.5px;
+line-height: 1.7;
+color: var(--ink-faint);
+}
+.ins-why b { color: var(--ink-soft); }
 #fx {
 position: absolute;
 inset: 0;
@@ -1714,7 +1773,7 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
   <header class="bar">
     <div class="bar-name">
       <span class="mark bn">শব্দজট</span>
-      <span class="eyebrow bn">বাংলা শব্দ খেলা · <span id="eyebrowCount">লেভেল</span> · ব্রাউজারেই চলে</span>
+      <span class="eyebrow bn">বাংলা শব্দ খেলা · <span id="eyebrowCount" class="lv-count">লেভেল</span> · ব্রাউজারেই চলে</span>
     </div>
 
     <button class="bar-menu" id="guideOpen" type="button"
@@ -1779,6 +1838,10 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
 
     <div class="menu-group" data-block="4">
       <p class="menu-head bn">আরও</p>
+      <button class="opt" type="button" role="menuitem" data-page="install">
+        <span class="opt-g bn" aria-hidden="true">অ্যা</span>
+        <span class="opt-t"><b class="bn">অ্যাপ হিসেবে রাখুন</b><i class="bn">হোম স্ক্রিনে, ইন্টারনেট ছাড়াই</i></span>
+      </button>
       <button class="opt" type="button" role="menuitem" data-page="about">
         <span class="opt-g bn" aria-hidden="true">প</span>
         <span class="opt-t"><b class="bn">পরিচিতি</b><i class="bn">খেলাটি কী</i></span>
@@ -2022,12 +2085,30 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
       </section>
         </section>
 
+        <section class="page" id="page-install" role="region" aria-labelledby="opt-install">
+<section class="card">
+        <h3>অ্যাপ হিসেবে রাখুন</h3>
+        <p class="deck bn">
+          একবার হোম স্ক্রিনে যোগ করলে খেলাটি অ্যাপের মতোই খোলে - ঠিকানা লেখার ঘর থাকে না,
+          ইন্টারনেট লাগে না, আর <b>অগ্রগতি হারায় না</b>। ডাউনলোড করার কিছু নেই, দোকানে
+          যেতে হয় না; যে পাতাটি এখন খোলা আছে, সেটিই থেকে যায়।
+        </p>
+        <div class="ins" id="installWays"></div>
+        <p class="ins-why bn">
+          <b>কেন করবেন।</b> ব্রাউজারের ট্যাবে ফেলে রাখলে কিছুদিন না খেললে ফোন জমানো
+          হিসাব মুছে দিতে পারে - আইফোনে সাত দিন না খুললে সাফারি নিজেই মুছে ফেলে, আর তখন
+          শিশুটি যতগুলো লেভেল শেষ করেছিল সব আবার শূন্য থেকে শুরু। হোম স্ক্রিনে যোগ করা
+          থাকলে সেটি হয় না। এটিই এখানে ইনস্টল করার আসল কারণ।
+        </p>
+      </section>
+        </section>
+
         <section class="page" id="page-about" role="region" aria-labelledby="opt-about">
 <section class="card">
         <h3>পরিচিতি</h3>
         <p class="deck">
             বাংলা শব্দের খেলা, একবারে একটি অক্ষর। অক্ষরের উপর আঙুল টেনে শব্দ বানাও; যে শব্দ
-            পাওয়া যায়, সেটি নিজেই উপরের ছকে বসে যায়। <b><span id="deckCount">লেভেল</span></b>,
+            পাওয়া যায়, সেটি নিজেই উপরের ছকে বসে যায়। <b><span id="deckCount" class="lv-count">লেভেল</span></b>,
             আর প্রতিটি লেভেল একটি অক্ষর নিয়ে: কা লেভেলের প্রথম ছকে থাকে কাক, কাঠ, কান, কাচ -
             চারটি শব্দ, সবগুলোই কা দিয়ে শুরু, আর পাঁচটি অক্ষরের চাকা থেকে বানানো।
             <br><br>
@@ -2074,9 +2155,10 @@ h1 { font-size: clamp(32px, 11vw, 44px); }
             পুরোটাই বাংলাদেশের বাংলা: জল নয়, পানি; কাকা আর পিসি নয়, চাচা আর ফুফু। কোনো শব্দ
             দুবার ধাঁধা হিসেবে আসে না।
             <br><br>
-            <b>ইন্টারনেট ছাড়াই চলে।</b> একবার খুললেই পুরো খেলা ডিভাইসে থেকে যায় - ২৪৪টি লেভেল,
-            শব্দ, বর্ণের ফন্ট, সব। ব্রাউজার হোম স্ক্রিনে যোগ করার কথা বলবে; সেখান থেকে এটি
-            অ্যাপের মতো খোলে আর নেটওয়ার্ক আর কখনো চায় না। এটি বাড়তি সুবিধা নয়, এটাই মূল কথা:
+            <b>ইন্টারনেট ছাড়াই চলে।</b> একবার খুললেই পুরো খেলা ডিভাইসে থেকে যায় - <span class="lv-count">লেভেল</span>,
+            শব্দ, বর্ণের ফন্ট, সব। হোম স্ক্রিনে যোগ করে নিলে এটি অ্যাপের মতো খোলে আর
+            নেটওয়ার্ক আর কখনো চায় না - কোন ব্রাউজারে কীভাবে, তা
+            <b>অ্যাপ হিসেবে রাখুন</b> অংশে লেখা আছে। এটি বাড়তি সুবিধা নয়, এটাই মূল কথা:
             ইন্টারনেট এমন জিনিস যা মাঝে মাঝে থাকে। কোনো সাইন-আপ নেই, বিজ্ঞাপন নেই, দাম নেই -
             আপনার অগ্রগতি এই ব্রাউজারেই জমা থাকে।
           </p>
@@ -3421,6 +3503,111 @@ b.addEventListener("click", () => loadLevel(i));
 el.levelGrid.appendChild(b);
 });
 }
+const Install = (() => {
+const ua = navigator.userAgent;
+
+const touchMac = /Mac/.test(ua) && navigator.maxTouchPoints > 1;
+const ios = /iPad|iPhone|iPod/.test(ua) || touchMac;
+
+const iosOther = ios && /CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+const firefox = /Firefox\/|FxiOS/.test(ua);
+const macSafari = /Mac/.test(ua) && !touchMac
+&& /Safari\//.test(ua) && !/Chrome|Chromium|Edg\//.test(ua);
+
+const installed = () => window.matchMedia("(display-mode: standalone)").matches
+|| window.navigator.standalone === true;
+
+let offer = null;
+window.addEventListener("beforeinstallprompt", e => {
+e.preventDefault();          // its own banner would cover the game
+offer = e;
+draw();
+});
+window.addEventListener("appinstalled", () => { offer = null; draw(); });
+
+const SHARE = `<svg class="ins-ic" viewBox="0 0 24 24" aria-hidden="true">
+<path d="M12 3v12M12 3l-4 4M12 3l4 4" fill="none" stroke="currentColor"
+stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M6 11H4.5v9h15v-9H18" fill="none" stroke="currentColor"
+stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+
+const steps = list => `<ol class="ins-steps bn">${list.map(s => `<li>${s}</li>`).join("")}</ol>`;
+
+function advice() {
+if (installed()) {
+return { done: true,
+head: "এটি এখন অ্যাপ হিসেবেই চলছে",
+body: `<p class="ins-p bn">হোম স্ক্রিন থেকে খোলা হয়েছে, তাই ইন্টারনেট ছাড়াই
+চলবে আর অগ্রগতিও থেকে যাবে। আর কিছু করার নেই।</p>` };
+}
+if (offer) {
+return { button: "হোম স্ক্রিনে যোগ করুন",
+head: "এক চাপেই হয়ে যাবে",
+body: `<p class="ins-p bn">নিচের বোতামে চাপ দিলে আপনার ব্রাউজার নিজেই
+জিজ্ঞেস করবে।</p>` };
+}
+if (ios) {
+return { head: "আইফোন বা আইপ্যাডে",
+body: steps([
+`শেয়ার বোতামে চাপুন ${SHARE} - উপরের দিকে তির চিহ্নসহ বর্গাকার বোতামটি,
+পর্দার নিচে বা উপরে থাকে।`,
+`তালিকা নিচে নামিয়ে <b>Add to Home Screen</b> (হোম স্ক্রিনে যোগ করুন)
+বেছে নিন।`,
+`উপরের ডান কোণে <b>Add</b> চাপুন।`,
+]) + (iosOther
+? `<p class="ins-p bn">এই ব্রাউজারে না পেলে সাফারি দিয়ে পাতাটি খুলে আবার
+দেখুন - সাফারিতে এটি সব সময়ই থাকে।</p>`
+: "") };
+}
+if (firefox) {
+return { head: "ফায়ারফক্সে",
+body: steps([
+`উপরের বা নিচের কোণে <b>⋮</b> মেনুতে চাপুন।`,
+`<b>ইনস্টল</b> বা <b>হোম স্ক্রিনে যোগ করুন</b> বেছে নিন।`,
+]) };
+}
+if (macSafari) {
+return { head: "ম্যাকের সাফারিতে",
+body: steps([
+`উপরের <b>File</b> মেনুতে যান।`,
+`<b>Add to Dock</b> বেছে নিন।`,
+]) };
+}
+return { head: "আপনার ব্রাউজারে",
+body: steps([
+`ব্রাউজারের মেনু খুলুন - সাধারণত <b>⋮</b> বা <b>⋯</b> চিহ্ন।`,
+`<b>অ্যাপ ইনস্টল করুন</b> বা <b>হোম স্ক্রিনে যোগ করুন</b> খুঁজে নিন।`,
+]) };
+}
+
+function draw() {
+const box = document.getElementById("installWays");
+if (!box) return;
+const a = advice();
+box.className = "ins" + (a.done ? " ins-done" : "");
+box.innerHTML = `<h4 class="ins-h bn">${a.head}</h4>${a.body}`;
+if (!a.button) return;
+
+const b = document.createElement("button");
+b.className = "ins-go bn";
+b.type = "button";
+b.textContent = a.button;
+b.addEventListener("click", async () => {
+if (!offer) return;
+b.disabled = true;
+offer.prompt();
+await offer.userChoice.catch(() => {});
+offer = null;
+draw();
+});
+box.appendChild(b);
+}
+
+return { draw };
+})();
+
+Install.draw();
 const still = window.matchMedia('(prefers-reduced-motion: reduce)');
 const reduced = () => still.matches;
 
@@ -4073,6 +4260,7 @@ const first = page.querySelector("h3");
 if (first) first.classList.toggle("dup", first.textContent.trim() === title);
 }
 if (el.guideTitle) el.guideTitle.textContent = title;
+if (key === "install") Install.draw();
 markTab(key);
 if (remember) { try { localStorage.setItem(MENU_KEY, key); } catch {} }
 }
@@ -4590,11 +4778,8 @@ el.guideOpen.focus();
 }
 
 function drawLevelCount() {
-const n = LEVELS.length;
-const eyebrow = document.getElementById("eyebrowCount");
-const deck = document.getElementById("deckCount");
-if (eyebrow) eyebrow.textContent = `${bn(n)}টি লেভেল`;
-if (deck) deck.textContent = `${bn(n)}টি লেভেল`;
+const said = `${bn(LEVELS.length)}টি লেভেল`;
+for (const n of document.querySelectorAll(".lv-count")) n.textContent = said;
 }
 drawLevelCount();
 

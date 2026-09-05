@@ -51,6 +51,7 @@ const CHECKS = [
   ['saytest',     'the report card mails, keeps and copies - with the right report in it'],
   ['reportspage', 'the unlinked reports page reads what the game kept, and only there'],
   ['pwatest',     'installs, and plays with the network cut'],
+  ['installtest', 'every device is told how to keep it, and the level count is the real one'],
 ];
 
 /** The slow one: opens every level and solves each. Opt in with --sweep. */

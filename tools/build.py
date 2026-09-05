@@ -1007,6 +1007,18 @@ def main(argv):
             print('\ncheck FAILED: no wheel arrangement hides every answer on '
                   + '; '.join(undrawable))
             return 1
+        # A number typed into the prose is a number that goes stale, and one did: the
+        # পরিচিতি essay said ২৪৪টি লেভেল while the game shipped over three hundred, because
+        # the sentence was written by hand and nothing tied it to the table. The two counts
+        # that were wired had been fine the whole time. So the rule is that the page may not
+        # state a level count in Bengali digits at all - every mention is a `.lv-count` span
+        # that `drawLevelCount` fills from LEVELS.
+        typed = re.findall(r'[০-৯]+\s*টি লেভেল', assemble())
+        if typed:
+            print('\ncheck FAILED: the page types a level count into its prose instead of '
+                  'marking it .lv-count: ' + '; '.join(sorted(set(typed))))
+            return 1
+
         # A part nobody includes is dead weight that still looks live. Catching it here means
         # you find out when you add the file, not when you wonder why the change did nothing.
         stray = orphans()

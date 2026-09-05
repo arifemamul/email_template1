@@ -333,18 +333,21 @@ function closeGuide() {
   el.guideOpen.focus();
 }
 
-/* The level count is stated twice in the prose. Both come from the table rather than from a
-   number typed into the copy, because the catalogue ships a slice of itself while the game is
-   being reworked and a hardcoded count would be wrong the moment that slice changes. */
+/* Every place the prose states the level count, filled from the table rather than from a
+   number typed into the copy - because the catalogue ships a slice of itself while the game is
+   being reworked, and a hardcoded count is wrong the moment that slice changes.
+
+   By class rather than by id, which is the repair. This used to name two ids, and a third
+   mention was later written into the পরিচিতি essay with the number typed in. It said ২৪৪ for
+   as long as it took someone to read that far: the game had grown past three hundred levels
+   and nothing connected the sentence to the table. A class means the next mention only has to
+   be marked, not wired, and `build.py check` fails if one carries a digit of its own. */
 function drawLevelCount() {
   // Bengali, and in Bengali digits, because the sentence around it is Bengali. There is no
   // plural to agree with - বাংলায় একটি আর অনেকগুলো লেভেল একই শব্দ - which removes the
   // spelled-out-number table this used to carry for the English.
-  const n = LEVELS.length;
-  const eyebrow = document.getElementById("eyebrowCount");
-  const deck = document.getElementById("deckCount");
-  if (eyebrow) eyebrow.textContent = `${bn(n)}টি লেভেল`;
-  if (deck) deck.textContent = `${bn(n)}টি লেভেল`;
+  const said = `${bn(LEVELS.length)}টি লেভেল`;
+  for (const n of document.querySelectorAll(".lv-count")) n.textContent = said;
 }
 drawLevelCount();
 

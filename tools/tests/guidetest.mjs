@@ -168,9 +168,9 @@ for (const [viewport, name, sheet] of sizes) {
       visible: getComputedStyle(document.querySelector('.guide')).visibility,
       bodyLocked: getComputedStyle(document.body).overflow,
       optionsGone: document.getElementById('menuPop').hidden,
-      // Five cards across the ten sections - levels, what-this-is, how-to-play,
-      // one-tile-one-akshara and the feedback card. They are in the DOM whichever section is
-      // open, so this counts the markup rather than what is on screen.
+      // Six cards across the sections - levels, keep-it-as-an-app, what-this-is,
+      // how-to-play, one-tile-one-akshara and the feedback card. They are in the DOM whichever
+      // section is open, so this counts the markup rather than what is on screen.
       cards: document.querySelectorAll('.guide .card').length,
       hasFooter: !!document.querySelector('.guide footer'),
       levels: document.querySelectorAll('.guide #levelGrid .lv').length,
@@ -181,7 +181,7 @@ for (const [viewport, name, sheet] of sizes) {
     if (open.visible !== 'visible') problems.push(`${name}: the sheet did not open`);
     if (open.bodyLocked !== 'hidden') problems.push(`${name}: body not scroll-locked`);
     if (!open.optionsGone) problems.push(`${name}: the options stayed open behind the sheet`);
-    if (open.cards !== 5) problems.push(`${name}: the sheet has ${open.cards} cards, expected 5`);
+    if (open.cards !== 6) problems.push(`${name}: the sheet has ${open.cards} cards, expected 6`);
     if (!open.hasFooter) problems.push(`${name}: footer missing from the sheet`);
     if (open.head !== 'লেভেল') problems.push(`${name}: the head says "${open.head}", not লেভেল`);
     if (!open.canGoBack) problems.push(`${name}: no way back to the options from the sheet`);

@@ -38,7 +38,7 @@
   <header class="bar">
     <div class="bar-name">
       <span class="mark bn">শব্দজট</span>
-      <span class="eyebrow bn">বাংলা শব্দ খেলা · <span id="eyebrowCount">লেভেল</span> · ব্রাউজারেই চলে</span>
+      <span class="eyebrow bn">বাংলা শব্দ খেলা · <span id="eyebrowCount" class="lv-count">লেভেল</span> · ব্রাউজারেই চলে</span>
     </div>
 
     <button class="bar-menu" id="guideOpen" type="button"
@@ -103,6 +103,10 @@
 
     <div class="menu-group" data-block="4">
       <p class="menu-head bn">আরও</p>
+      <button class="opt" type="button" role="menuitem" data-page="install">
+        <span class="opt-g bn" aria-hidden="true">অ্যা</span>
+        <span class="opt-t"><b class="bn">অ্যাপ হিসেবে রাখুন</b><i class="bn">হোম স্ক্রিনে, ইন্টারনেট ছাড়াই</i></span>
+      </button>
       <button class="opt" type="button" role="menuitem" data-page="about">
         <span class="opt-g bn" aria-hidden="true">প</span>
         <span class="opt-t"><b class="bn">পরিচিতি</b><i class="bn">খেলাটি কী</i></span>
@@ -346,12 +350,30 @@
       </section>
         </section>
 
+        <section class="page" id="page-install" role="region" aria-labelledby="opt-install">
+<section class="card">
+        <h3>অ্যাপ হিসেবে রাখুন</h3>
+        <p class="deck bn">
+          একবার হোম স্ক্রিনে যোগ করলে খেলাটি অ্যাপের মতোই খোলে - ঠিকানা লেখার ঘর থাকে না,
+          ইন্টারনেট লাগে না, আর <b>অগ্রগতি হারায় না</b>। ডাউনলোড করার কিছু নেই, দোকানে
+          যেতে হয় না; যে পাতাটি এখন খোলা আছে, সেটিই থেকে যায়।
+        </p>
+        <div class="ins" id="installWays"></div>
+        <p class="ins-why bn">
+          <b>কেন করবেন।</b> ব্রাউজারের ট্যাবে ফেলে রাখলে কিছুদিন না খেললে ফোন জমানো
+          হিসাব মুছে দিতে পারে - আইফোনে সাত দিন না খুললে সাফারি নিজেই মুছে ফেলে, আর তখন
+          শিশুটি যতগুলো লেভেল শেষ করেছিল সব আবার শূন্য থেকে শুরু। হোম স্ক্রিনে যোগ করা
+          থাকলে সেটি হয় না। এটিই এখানে ইনস্টল করার আসল কারণ।
+        </p>
+      </section>
+        </section>
+
         <section class="page" id="page-about" role="region" aria-labelledby="opt-about">
 <section class="card">
         <h3>পরিচিতি</h3>
         <p class="deck">
             বাংলা শব্দের খেলা, একবারে একটি অক্ষর। অক্ষরের উপর আঙুল টেনে শব্দ বানাও; যে শব্দ
-            পাওয়া যায়, সেটি নিজেই উপরের ছকে বসে যায়। <b><span id="deckCount">লেভেল</span></b>,
+            পাওয়া যায়, সেটি নিজেই উপরের ছকে বসে যায়। <b><span id="deckCount" class="lv-count">লেভেল</span></b>,
             আর প্রতিটি লেভেল একটি অক্ষর নিয়ে: কা লেভেলের প্রথম ছকে থাকে কাক, কাঠ, কান, কাচ -
             চারটি শব্দ, সবগুলোই কা দিয়ে শুরু, আর পাঁচটি অক্ষরের চাকা থেকে বানানো।
             <br><br>
@@ -398,9 +420,10 @@
             পুরোটাই বাংলাদেশের বাংলা: জল নয়, পানি; কাকা আর পিসি নয়, চাচা আর ফুফু। কোনো শব্দ
             দুবার ধাঁধা হিসেবে আসে না।
             <br><br>
-            <b>ইন্টারনেট ছাড়াই চলে।</b> একবার খুললেই পুরো খেলা ডিভাইসে থেকে যায় - ২৪৪টি লেভেল,
-            শব্দ, বর্ণের ফন্ট, সব। ব্রাউজার হোম স্ক্রিনে যোগ করার কথা বলবে; সেখান থেকে এটি
-            অ্যাপের মতো খোলে আর নেটওয়ার্ক আর কখনো চায় না। এটি বাড়তি সুবিধা নয়, এটাই মূল কথা:
+            <b>ইন্টারনেট ছাড়াই চলে।</b> একবার খুললেই পুরো খেলা ডিভাইসে থেকে যায় - <span class="lv-count">লেভেল</span>,
+            শব্দ, বর্ণের ফন্ট, সব। হোম স্ক্রিনে যোগ করে নিলে এটি অ্যাপের মতো খোলে আর
+            নেটওয়ার্ক আর কখনো চায় না - কোন ব্রাউজারে কীভাবে, তা
+            <b>অ্যাপ হিসেবে রাখুন</b> অংশে লেখা আছে। এটি বাড়তি সুবিধা নয়, এটাই মূল কথা:
             ইন্টারনেট এমন জিনিস যা মাঝে মাঝে থাকে। কোনো সাইন-আপ নেই, বিজ্ঞাপন নেই, দাম নেই -
             আপনার অগ্রগতি এই ব্রাউজারেই জমা থাকে।
           </p>
@@ -510,6 +533,7 @@
 /* include js/05-scramble.js  arranging a wheel so it does not give the board away */
 /* include js/06-sound.js     every sound the game makes, synthesised - no audio files */
 /* include js/07-render.js    drawing the screen and sizing it to the device */
+/* include js/08-install.js   asking each browser to put the game on the home screen */
 /* include js/09-animate.js   the movement that answers every action */
 /* include js/10-celebrate.js the mascot, and what happens when a board is finished */
 /* include js/11-feedback.js  a note a player can copy and send on, no server behind it */
