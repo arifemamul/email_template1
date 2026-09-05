@@ -83,8 +83,15 @@ await p.waitForTimeout(60);
 let heard = await since(n);
 if (!heard.length) problems.push('tapping a tile made no sound');
 
-// A word being traced should climb: each tile a higher note than the last.
-await p.evaluate(() => { game.picked = []; markTiles(); window.__notes = []; });
+/*
+ * A word being traced should climb: each tile a higher note than the last.
+ *
+ * `soundPick`, not `markTiles`. They were one function once and this test called it for both
+ * jobs; they came apart when `render` arrived, because a redraw has to be safe to call at any
+ * time and one that chirps at the player is not. The sound is an event now and the paint is
+ * not, so a test that wants the sound has to ask for the sound.
+ */
+await p.evaluate(() => { game.picked = []; soundPick(); window.__notes = []; });
 const word = await p.evaluate(() => game.puzzle.words[0].word);
 await p.evaluate(w => {
   const tiles = [...document.querySelectorAll('.tile')];
@@ -94,7 +101,8 @@ await p.evaluate(w => {
     if (i < 0) continue;
     used.add(i);
     game.picked.push(+tiles[i].dataset.i);
-    markTiles();
+    soundPick();
+    render();
   }
 }, word);
 const climb = await p.evaluate(() => window.__notes.map(x => x.freq));
@@ -129,14 +137,45 @@ await p.waitForFunction(() => document.getElementById('bird').className.includes
   .catch(() => problems.push('the bird never went back to idle after cheering'));
 const states = await p.evaluate(async () => {
   const el = document.getElementById('bird');
-  game.picked = []; markTiles();
+  game.picked = []; soundPick(); render();
   const rest = el.className;
-  game.picked = [0]; markTiles();
+  game.picked = [0]; soundPick(); render();
   const busy = el.className;
   return { rest, busy };
 });
 if (!states.rest.includes('idle')) problems.push(`the bird rests as "${states.rest}"`);
 if (!states.busy.includes('think')) problems.push(`the bird ignores a word being traced ("${states.busy}")`);
+
+/*
+ * And the rule that split them: `render` is silent.
+ *
+ * It is called from a dozen places now, including a pointer move and a window resize, so a
+ * redraw that made a noise would turn the game into a rattle. Ten renders with the selection
+ * untouched, and the sound log must not move.
+ */
+const quietRedraw = await p.evaluate(() => {
+  game.picked = [0, 1]; soundPick(); render();
+  const before = window.__notes.length;
+  // Cleared by something that is not the player - a shuffle does exactly this - and then
+  // redrawn. `soundedPick` is the tell: it is what `soundPick` moves, and only `soundPick`
+  // may move it. A redraw that quietly consumed the transition would leave it at 0, and the
+  // real sound would then never play when the player does let go.
+  game.picked = [];
+  for (let i = 0; i < 10; i++) render();
+  return {
+    before, after: window.__notes.length,
+    primed: soundedPick,
+    bird: document.getElementById('bird').className,
+  };
+});
+if (quietRedraw.after !== quietRedraw.before)
+  problems.push(`ten redraws made ${quietRedraw.after - quietRedraw.before} sound(s); render must be silent`);
+if (quietRedraw.primed !== 2)
+  problems.push(`ten redraws moved soundedPick to ${quietRedraw.primed}; only soundPick may move it`);
+if (!quietRedraw.bird.includes('think'))
+  problems.push(`redrawing changed the bird to "${quietRedraw.bird}"`);
+console.log(`render: 10 redraws over a cleared shelf - ${quietRedraw.after - quietRedraw.before} `
+          + `sounds, soundedPick still ${quietRedraw.primed}, bird unmoved`);
 
 // ---- the mute switch: silences, persists, and is not in the two rows a child uses --------
 const placed = await p.evaluate(() => {

@@ -52,8 +52,7 @@ function loadLevel(i) {
   // level that newly shows one would otherwise be allocated space as though it were not
   // there, and the wheel would be pushed off the bottom by exactly the chip plus its gap.
   drawScreen();
-  drawHud();
-  drawPreview();
+  render();
   drawLevelGrid();
   drawSayAdds();
 }
@@ -400,12 +399,27 @@ function drawTrail(tip) {
  * the four call sites means drag and tap cannot drift apart, and a letter can never be added
  * silently.
  */
-let soundedPick = 0;
-
+/** Which tiles are on the shelf. Paint only - see `soundPick` for why that matters. */
 function markTiles() {
   for (const t of el.wheel.querySelectorAll(".tile")) {
     t.classList.toggle("sel", game.picked.includes(+t.dataset.i));
   }
+}
+
+let soundedPick = 0;
+
+/*
+ * The sound a changing selection makes, kept apart from the paint that goes with it.
+ *
+ * These were one function, and that was fine while every caller was a selection change. It
+ * stopped being fine the moment `render` existed: a redraw has to be safe to call at any time
+ * and as often as you like, and one that chirps at the player is not. Shuffling the wheel
+ * clears the selection and redraws - it must not sound like the player just put a tile back.
+ *
+ * So the rule is the one every render function wants: painting is idempotent, noise is an
+ * event. This is called where the selection actually moved, and nowhere else.
+ */
+function soundPick() {
   const n = game.picked.length;
   if (n > soundedPick) {
     // Up the scale as the word grows, so the sounds themselves say "you are getting
@@ -452,6 +466,45 @@ const HUE = (() => {
   for (const lv of LEVELS) if (!(lv.name in of)) of[lv.name] = (n++ % 5) + 1;
   return of;
 })();
+
+/* ============================================================================
+   One redraw
+   ============================================================================ */
+/*
+ * Everything on the game screen that is a function of `game`, redrawn from `game`.
+ *
+ * This used to be four or five calls written out after every state change - `markTiles();
+ * drawTrail(); drawPreview();` here, `refreshBoard(); drawHud();` there - sixty-odd of them
+ * across the file, and the bug was always the same shape: change something, forget one of the
+ * calls, and the screen disagrees with the game until something else happens to redraw it. The
+ * hint countdown was the last one to bite, needing its new draw wired into three separate
+ * places by hand.
+ *
+ * Now: change state, call `render`. It is cheap enough to call on every pointer move that
+ * changes the selection - a board of at most forty cells, a ring of at most five tiles, and
+ * two small innerHTML writes - and it holds nothing back, so there is no such thing as
+ * rendering the wrong part.
+ *
+ * `tip` is the live end of the trail while a finger is down, and is the only argument any of
+ * this takes: everything else is read from `game`.
+ *
+ * TWO THINGS ARE DELIBERATELY NOT IN HERE, both because they cost far more than the rest:
+ *
+ *   drawScreen()     measures the viewport and rebuilds the board and the wheel from scratch.
+ *                    It belongs to a level arriving or the window changing size, not to
+ *                    picking a letter.
+ *   drawLevelGrid()  builds a button per level, and there are hundreds. It changes only when
+ *                    progress does.
+ *
+ * Both are still called by hand, in the four places that need them.
+ */
+function render(tip) {
+  drawHud();
+  refreshBoard();
+  markTiles();
+  drawTrail(tip);
+  drawPreview();
+}
 
 function drawLevelGrid() {
   el.levelGrid.innerHTML = "";

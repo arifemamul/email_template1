@@ -27,18 +27,18 @@ let verdictTimer = null;
 
 function showVerdict(word, result, ms = 720) {
   game.verdict = { word, result };
-  drawPreview();
+  render();
   clearTimeout(verdictTimer);
-  verdictTimer = setTimeout(() => { game.verdict = null; drawPreview(); }, ms);
+  verdictTimer = setTimeout(() => { game.verdict = null; render(); }, ms);
 }
 
 function submitWord() {
   const word = currentWord();
   game.picked = [];
   game.tapMode = false;
-  markTiles();
-  drawTrail();
-  if (!word) { drawPreview(); return; }
+  soundPick();
+  render();
+  if (!word) return;
 
   const lv = level();
   const done = foundSet();
@@ -79,8 +79,7 @@ function submitWord() {
       settle = 0;
     }
     setTimeout(() => {
-      refreshBoard();
-      drawHud();
+      render();
       drawLevelGrid();
     }, settle);
 
@@ -134,9 +133,8 @@ el.wheel.addEventListener("pointerdown", e => {
     game.picked = [i];
   }
   game.verdict = null;
-  markTiles();
-  drawTrail();
-  drawPreview();
+  soundPick();
+  render();
 });
 
 el.wheel.addEventListener("pointermove", e => {
@@ -147,6 +145,9 @@ el.wheel.addEventListener("pointermove", e => {
   }
   if (!game.moved) return;
 
+  // The only draw in the file that is not `render`, and the only one that should be: this runs
+  // on every pointer move, not just the ones that change the selection, and all it has to do
+  // is keep the loose end of the trail under the finger. Nothing else on screen has changed.
   const rect = el.wheel.getBoundingClientRect();
   drawTrail([e.clientX - rect.left, e.clientY - rect.top]);
 
@@ -154,9 +155,8 @@ el.wheel.addEventListener("pointermove", e => {
   if (i === null) return;
   if (game.picked.length >= 2 && i === game.picked[game.picked.length - 2]) game.picked.pop();
   else if (!game.picked.includes(i)) game.picked.push(i);
-  markTiles();
-  drawTrail([e.clientX - rect.left, e.clientY - rect.top]);
-  drawPreview();
+  soundPick();
+  render([e.clientX - rect.left, e.clientY - rect.top]);
 });
 
 function endDrag() {
@@ -166,15 +166,14 @@ function endDrag() {
     submitWord();
   } else {
     game.tapMode = true;   // a plain click keeps the selection for more clicks
-    drawTrail();
-    drawPreview();
+    render();
   }
 }
 
 el.wheel.addEventListener("pointerup", endDrag);
 el.wheel.addEventListener("pointercancel", () => {
   game.dragging = false;
-  if (!game.tapMode) { game.picked = []; markTiles(); drawTrail(); drawPreview(); }
+  if (!game.tapMode) { game.picked = []; soundPick(); render(); }
 });
 
 document.addEventListener("keydown", e => {
@@ -182,7 +181,7 @@ document.addEventListener("keydown", e => {
   if (e.key === "Escape") {
     if (guideIsOpen()) { closeGuide(); return; }
     game.picked = []; game.tapMode = false;
-    markTiles(); drawTrail(); drawPreview();
+    soundPick(); render();
   }
 });
 
@@ -205,8 +204,7 @@ el.hint.addEventListener("click", () => {
   game.hintAt = Date.now() + HINT_WAIT;
   Sfx.hint();
   persist();
-  refreshBoard();
-  drawHud();
+  render();
 
   const cell = el.board.querySelector(`[data-pos="${target}"]`);
   if (cell && !reduced()) {
@@ -241,8 +239,10 @@ el.shuffle.addEventListener("click", () => {
   }
   game.picked = [];
   game.tapMode = false;
+  // No `soundPick`: the shuffle has its own sound, and clearing the shelf on the way is not a
+  // thing the player did.
   drawScreen();
-  drawPreview();
+  render();
   animateShuffle(before);
 });
 
@@ -410,7 +410,7 @@ el.mute.addEventListener("click", () => {
 let resizeTimer = null;
 new ResizeObserver(() => {
   clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => { drawScreen(); markTiles(); }, 60);
+  resizeTimer = setTimeout(() => { drawScreen(); render(); }, 60);
 }).observe(document.querySelector(".screen"));
 
 /* first unsolved level makes the best landing spot */

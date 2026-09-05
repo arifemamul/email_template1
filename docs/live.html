@@ -3125,8 +3125,7 @@ game.picked = [];
 game.verdict = null;
 game.tapMode = false;
 drawScreen();
-drawHud();
-drawPreview();
+render();
 drawLevelGrid();
 drawSayAdds();
 }
@@ -3332,12 +3331,15 @@ svg += `<line x1="${last[0]}" y1="${last[1]}" x2="${tip[0]}" y2="${tip[1]}" stro
 el.trail.innerHTML = svg;
 }
 
-let soundedPick = 0;
-
 function markTiles() {
 for (const t of el.wheel.querySelectorAll(".tile")) {
 t.classList.toggle("sel", game.picked.includes(+t.dataset.i));
 }
+}
+
+let soundedPick = 0;
+
+function soundPick() {
 const n = game.picked.length;
 if (n > soundedPick) {
 Sfx.tap(n - 1);
@@ -3376,6 +3378,14 @@ let n = 0;
 for (const lv of LEVELS) if (!(lv.name in of)) of[lv.name] = (n++ % 5) + 1;
 return of;
 })();
+
+function render(tip) {
+drawHud();
+refreshBoard();
+markTiles();
+drawTrail(tip);
+drawPreview();
+}
 
 function drawLevelGrid() {
 el.levelGrid.innerHTML = "";
@@ -4317,18 +4327,18 @@ let verdictTimer = null;
 
 function showVerdict(word, result, ms = 720) {
 game.verdict = { word, result };
-drawPreview();
+render();
 clearTimeout(verdictTimer);
-verdictTimer = setTimeout(() => { game.verdict = null; drawPreview(); }, ms);
+verdictTimer = setTimeout(() => { game.verdict = null; render(); }, ms);
 }
 
 function submitWord() {
 const word = currentWord();
 game.picked = [];
 game.tapMode = false;
-markTiles();
-drawTrail();
-if (!word) { drawPreview(); return; }
+soundPick();
+render();
+if (!word) return;
 
 const lv = level();
 const done = foundSet();
@@ -4359,8 +4369,7 @@ if (placed) settle = flyLettersToBoard(word, placed.cells) || 0;
 settle = 0;
 }
 setTimeout(() => {
-refreshBoard();
-drawHud();
+render();
 drawLevelGrid();
 }, settle);
 
@@ -4406,9 +4415,8 @@ else if (!game.picked.includes(i)) game.picked.push(i);
 game.picked = [i];
 }
 game.verdict = null;
-markTiles();
-drawTrail();
-drawPreview();
+soundPick();
+render();
 });
 
 el.wheel.addEventListener("pointermove", e => {
@@ -4426,9 +4434,8 @@ const i = tileAt(e.clientX, e.clientY);
 if (i === null) return;
 if (game.picked.length >= 2 && i === game.picked[game.picked.length - 2]) game.picked.pop();
 else if (!game.picked.includes(i)) game.picked.push(i);
-markTiles();
-drawTrail([e.clientX - rect.left, e.clientY - rect.top]);
-drawPreview();
+soundPick();
+render([e.clientX - rect.left, e.clientY - rect.top]);
 });
 
 function endDrag() {
@@ -4438,15 +4445,14 @@ if (game.moved) {
 submitWord();
 } else {
 game.tapMode = true;   // a plain click keeps the selection for more clicks
-drawTrail();
-drawPreview();
+render();
 }
 }
 
 el.wheel.addEventListener("pointerup", endDrag);
 el.wheel.addEventListener("pointercancel", () => {
 game.dragging = false;
-if (!game.tapMode) { game.picked = []; markTiles(); drawTrail(); drawPreview(); }
+if (!game.tapMode) { game.picked = []; soundPick(); render(); }
 });
 
 document.addEventListener("keydown", e => {
@@ -4454,7 +4460,7 @@ if (e.key === "Enter" && game.picked.length) { e.preventDefault(); submitWord();
 if (e.key === "Escape") {
 if (guideIsOpen()) { closeGuide(); return; }
 game.picked = []; game.tapMode = false;
-markTiles(); drawTrail(); drawPreview();
+soundPick(); render();
 }
 });
 
@@ -4476,8 +4482,7 @@ game.hints[lv.id] = [...hintSet(), target];
 game.hintAt = Date.now() + HINT_WAIT;
 Sfx.hint();
 persist();
-refreshBoard();
-drawHud();
+render();
 
 const cell = el.board.querySelector(`[data-pos="${target}"]`);
 if (cell && !reduced()) {
@@ -4505,7 +4510,7 @@ const j = Math.floor(Math.random() * (i + 1));
 game.picked = [];
 game.tapMode = false;
 drawScreen();
-drawPreview();
+render();
 animateShuffle(before);
 });
 
@@ -4626,7 +4631,7 @@ el.mute.title = muted ? "শব্দ চালু করুন" : "শব্দ
 let resizeTimer = null;
 new ResizeObserver(() => {
 clearTimeout(resizeTimer);
-resizeTimer = setTimeout(() => { drawScreen(); markTiles(); }, 60);
+resizeTimer = setTimeout(() => { drawScreen(); render(); }, 60);
 }).observe(document.querySelector(".screen"));
 
 const firstOpen = LEVELS.findIndex(lv => !game.completed[lv.id]);
