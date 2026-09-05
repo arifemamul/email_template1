@@ -170,6 +170,31 @@ REJECTED = {
     'বধ': 'slaying',
     'লাশ': 'corpse',
     'মল': 'excrement',
+    # Taken off boards that had already shipped them. তাস was spotted first - a game of
+    # cards is a game of gambling to most parents - and the rest came out of reading all 861
+    # board words with that same question asked of each.
+    'তাস': 'playing cards - the picture a parent reads is gambling',
+    'চুমু': 'a kiss - physical intimacy, not a spelling target',
+    'সুপারি': 'betel nut - an addictive chew, and the nut itself is a carcinogen',
+    'পান': 'betel leaf - the same habit, and the leaf only means the chew',
+    'অস্ত্র': 'a weapon - the gloss brief was literally a sword or a spear',
+    'চাকু': 'a knife - a blade, and nothing else',
+    'গুলতি': 'a slingshot - a toy whose whole use is hurting a bird',
+    'চোষা': 'to suck - a second sense a child should not meet in a word game',
+    # the same pass over the alphabet guide's conjunct examples
+    'শিরশ্ছেদ': 'beheading',
+    'যুদ্ধ': 'war',
+    'শত্রু': 'an enemy',
+    'ধ্বংস': 'destruction',
+    'বিধ্বস্ত': 'wrecked',
+    'বিদ্রোহ': 'rebellion',
+    'দুর্ভিক্ষ': 'famine',
+    'লাঞ্ছনা': 'humiliation',
+    'লুণ্ঠন': 'looting',
+    'থাপ্পড়': 'a slap',
+    'যক্ষ্মা': 'tuberculosis',
+    'নিরস্ত্র': 'disarmed - the weapon is still the subject',
+    'ব্লেড': 'a razor blade',
     # grammar, not vocabulary
     'করেছেন': 'verb inflection',
     'হয়ত': 'particle',

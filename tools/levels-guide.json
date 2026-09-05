@@ -4,7 +4,7 @@
  "READ_THE_THIN_LIST": "These words were chosen to illustrate a form, not to be a puzzle. The generator ranks by corpus frequency and reports the rarest it placed; a word that is real and legal can still be wrong for a five-year-old. Move any such word into REJECTED in tools/vocabulary.py and re-run with --write.",
  "counts": {
   "levels": 33,
-  "words": 77,
+  "words": 76,
   "left_in_the_guide": 537
  },
  "levels": [
@@ -44,17 +44,6 @@
      "freq": 4.59,
      "en": "a limb, a body part",
      "flag": "an arm and a leg, drawn apart from a body",
-     "from": "যুক্তবর্ণ"
-    },
-    {
-     "w": "অস্ত্র",
-     "split": [
-      "অ",
-      "স্ত্র"
-     ],
-     "freq": 5.29,
-     "en": "a weapon",
-     "flag": "a sword or spear on its own",
      "from": "যুক্তবর্ণ"
     }
    ]
@@ -473,7 +462,7 @@
       "ত্র"
      ],
      "freq": 4.39,
-     "en": "a vessel; a groom",
+     "en": "a vessel, a pot",
      "flag": "a brass pot",
      "from": "ফলা"
     },
